@@ -3,9 +3,20 @@
    "version": "0.1.0",
    "private": true,
    "dependencies": {
+      "bootstrap": "^4.1.0",
+      "immutable": "^3.8.2",
+      "lodash": "^4.17.10",
       "react": "^16.3.2",
       "react-dom": "^16.3.2",
-      "react-scripts": "1.1.4"
+      "react-redux": "^5.0.7",
+      "react-router": "^4.2.0",
+      "react-router-dom": "^4.2.2",
+      "react-scripts": "1.1.4",
+      "redux": "^4.0.0",
+      "redux-form": "^7.3.0",
+      "redux-persist": "^5.9.1",
+      "redux-persist-transform-immutable": "^5.0.0",
+      "redux-thunk": "^2.2.0"
    },
    "scripts": {
       "start": "react-scripts start",
@@ -17,6 +28,7 @@
    "devDependencies": {
       "concurrently": "^3.5.1",
       "gulp": "^3.9.1",
-      "gulp-sass": "^4.0.1"
+      "gulp-sass": "^4.0.1",
+      "redux-logger": "^3.0.6"
    }
 }
