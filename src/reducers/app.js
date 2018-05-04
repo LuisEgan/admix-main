@@ -25,7 +25,6 @@ import {
    SET_INITIAL_REPORT_APP,
    UPDATE_PLACEMENTS
 } from "../actions";
-import { selectApp, savedApp, placement } from "../actions";
 
 export const initialState = Map({
    counter: 0,
@@ -149,7 +148,6 @@ const actionsMap = {
       );
    },
    [LOGOUT_SUCCESS]: (state, action) => {
-      const isLoggedIn = false;
       return state.merge(Map(initialState));
    },
    [APPS_SUCCESS]: (state, action) => {
@@ -185,6 +183,7 @@ const actionsMap = {
             selectedApp = app;
             return true;
          }
+         return false;
       });
       selectedApp.scenes = scenes;
 
@@ -217,6 +216,7 @@ const actionsMap = {
                app.scenes[i].savedInputs = [savedInputs];
                return true;
             }
+            return false;
          });
          savedApps.push(app);
       };
@@ -239,14 +239,17 @@ const actionsMap = {
                            //If the clicked inputs weren't already saved, store them
                            savedApps[i].scenes[j].savedInputs.push(savedInputs);
                         }
+                        return false;
                      });
                      return true;
                   }
+                  return false;
                });
             } else if (i === savedApps.length - 1) {
                //If there some saved apps but the just clicked wasn't saved yet
                _saveAppForFirstTime();
             }
+            return false;
          });
       }
 
@@ -277,6 +280,7 @@ const actionsMap = {
                scene.placements.push(placements[i]);
                return true;
             }
+            return false;
          });
       });
 

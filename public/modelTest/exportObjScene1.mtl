@@ -1,0 +1,139 @@
+newmtl Mat_Misc_01
+Kd 1 1 1
+map_Kd Materials\Misc_01_Albedo.png
+map_Bump -bm 0.01 Materials\Misc_01_Normal.png
+illum 2
+
+newmtl Mat_Books
+Kd 1 1 1
+map_Kd Materials\Books_Albedo.png
+illum 2
+
+newmtl Mat_Frames
+Kd 1 1 1
+map_Kd Materials\Frames_Albedo.png
+illum 2
+
+newmtl Mat_Sofa
+Kd 1 1 1
+Ks 0.2 0.2 0.2
+map_Kd Materials\SofaGroup_Albedo.png
+map_Bump -bm 0.01 Materials\SofaGroup_Normal.png
+illum 2
+
+newmtl Leaves_1
+Kd 1 1 1
+map_Kd Materials\RedRose_Vase_Low_Atlas.png
+map_Bump -bm 0.01 Materials\RedRose_Vase_Low_Atlas_Normal.png
+illum 2
+
+newmtl Meshes_2
+Kd 1 1 1
+map_Kd Materials\Vase_01.png
+map_Bump -bm 0.01 Materials\Vase_01_Normal.png
+illum 2
+
+newmtl Fronds_0
+Kd 1 1 1
+map_Kd Materials\RedRose_Vase_Low_Atlas.png
+map_Bump -bm 0.01 Materials\RedRose_Vase_Low_Atlas_Normal.png
+illum 2
+
+newmtl Fronds_1
+Kd 1 1 1
+map_Kd Materials\PonytailPalm_Low_Atlas.png
+map_Bump -bm 0.01 Materials\PonytailPalm_Low_Atlas_Normal.png
+illum 2
+
+newmtl Leaves_2
+Kd 1 1 1
+map_Kd Materials\PonytailPalm_Low_Atlas.png
+map_Bump -bm 0.01 Materials\PonytailPalm_Low_Atlas_Normal.png
+illum 2
+
+newmtl Meshes_3
+Kd 1 1 1
+map_Kd Materials\ClayPot_01.png
+map_Bump -bm 0.01 Materials\ClayPot_01_Normal.png
+illum 2
+
+newmtl Branches_0
+Kd 1 1 1
+map_Kd Materials\PonytailPalmBark.png
+map_Bump -bm 0.01 Materials\PonytailPalmBark_Normal.png
+illum 2
+
+newmtl Mat_Curtain_02
+Kd 1 1 1
+Tr 0.1686274
+d 0.8313726
+map_Bump -bm 0.01 Materials\Curtains_Normal.png
+illum 2
+
+newmtl Mat_Misc_04
+Kd 1 1 1
+map_Kd Materials\Misc_04_Albedo.png
+illum 2
+
+newmtl lambert1
+Kd 0.5 0.5 0.5
+illum 2
+
+newmtl Mat_TV_Screen
+Kd 0 0 0
+illum 2
+
+newmtl Mat_FabricWall
+Kd 1 1 1
+Ks 0.2 0.2 0.2
+map_Kd Materials\Wall_Group_FabricWall_Albedo.jpg
+map_Bump -bm 0.01 Materials\Wall_Group_FabricWall_Normal.png
+illum 2
+
+newmtl Mat_TVWall
+Kd 1 1 1
+map_Kd Materials\Wall_Group_TVWall_AlbedoTransparency.png
+map_Bump -bm 0.01 Materials\Wall_Group_TVWall_Normal.png
+illum 2
+
+newmtl Mat_WhiteWall
+Kd 1 1 1
+Ks 0.2 0.2 0.2
+map_Kd Materials\Wall_Group_WhiteWall_AlbedoTransparency.png
+map_Bump -bm 0.01 Materials\Wall_Group_WhiteWall_Normal.png
+illum 2
+
+newmtl Mat_Top
+Kd 1 1 1
+map_Kd Materials\Wall_Group_Top_AlbedoTransparency.png
+illum 2
+
+newmtl Mat_Floor
+Kd 1 1 1
+Ks 0.6176471 0.6176471 0.6176471
+map_Kd Materials\Wall_Group_Floor_AlbedoTransparency.png
+map_Bump -bm 0.01 Materials\Wall_Group_Floor_Normal.png
+illum 2
+
+newmtl Mat_Lamp_01
+Kd 1 1 1
+Tr 0.07200003
+d 0.928
+illum 2
+
+newmtl Mat_Lamp_02
+Kd 1 1 1
+map_Bump -bm 0.01 Materials\Lamp_Lamp_01_Normal.png
+illum 2
+
+newmtl Mat_Glass
+Kd 0.6842561 0.8308824 0.8187478
+Tr 0.816
+d 0.184
+Ks 0.8676471 0.8676471 0.8676471
+illum 2
+
+newmtl Default-Material
+Kd 1 1 1
+illum 2
+

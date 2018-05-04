@@ -1,5 +1,4 @@
 import api from "../api";
-import { browserHistory } from "react-router";
 
 export const ACTION = "ACTION";
 

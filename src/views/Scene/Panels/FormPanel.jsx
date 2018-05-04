@@ -1,559 +1,506 @@
 import React, { Component } from "react";
-import ReactDOM from "react-dom";
-import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { NavLink } from "react-router-dom";
-import { routeCodes } from "config/routes";
-import { saveInputs } from "actions/app";
+import { saveInputs } from "../../../actions/";
 
-import thumbsUp from "../../../../assets/img/Thumbs_Up_Hand_Sign_Emoji.png";
+import thumbsUp from "../../../assets/img/Thumbs_Up_Hand_Sign_Emoji.png";
 
 import dbCategories from "./categories.json";
 import dbSubCategories from "./subCategories.json";
 
-const allSubCategories = [
-  {
-    category: "tal",
-    subs: [
-      "Art/Technology",
-      "Arts & Crafts",
-      "Board Games/Puzzles",
-      "Card Games",
-      "Outdoor Games",
-      "Chess",
-      "Collecting",
-      "Comic Books",
-      "Guitar"
-    ]
-  }
-];
-
-const allSubs = {
-  "Arts & Entertainment": [
-    "Art/Technology",
-    "Arts & Crafts",
-    "Board Games/Puzzles",
-    "Card Games",
-    "Outdoor Games",
-    "Chess",
-    "Collecting",
-    "Comic Books",
-    "Guitar"
-  ],
-  Automotive: [],
-  Business: [],
-  Careers: [],
-  Education: [],
-  "Family & Parenting": [],
-  "Health & Fitness": [],
-  "Food & Drink": [],
-  "Hobbies & Interests": [],
-  "Home & Garden": [],
-  "Law, Government, & Politics": [],
-  News: [],
-  "Personal Finance": [],
-  Society: [],
-  Science: [],
-  Pets: [],
-  Sports: [],
-  "Style & Fashion": [],
-  "Technology & Computing": [],
-  Travel: [],
-  "Real Estate": [],
-  Shopping: [],
-  "Religion & Spirituality": [],
-  Uncategorized: [],
-  "Non-Standard Content": [],
-  "Illegal Content": []
-};
-
 export default class FormPanel extends Component {
-  static propTypes = {
-    slidesManager: PropTypes.func,
-    onSave: PropTypes.func,
-    dispatch: PropTypes.func,
-    updateClickedPlacement: PropTypes.func,
-    activeClickedElem: PropTypes.func,
+   static propTypes = {
+      slidesManager: PropTypes.func,
+      onSave: PropTypes.func,
+      dispatch: PropTypes.func,
+      updateClickedPlacement: PropTypes.func,
+      activeClickedElem: PropTypes.func,
 
-    selectedApp: PropTypes.object,
-    selectedScene: PropTypes.object,
-    clickedPlacement: PropTypes.object,
+      selectedApp: PropTypes.object,
+      selectedScene: PropTypes.object,
+      clickedPlacement: PropTypes.object,
 
-    savedApps: PropTypes.array,
+      savedApps: PropTypes.array,
 
-    sceneMounted: PropTypes.bool
-  };
+      sceneMounted: PropTypes.bool
+   };
 
-  constructor(props) {
-    super(props);
+   constructor(props) {
+      super(props);
 
-    this.state = {
-      renderCounter: 0,
-      animating: false,
-      slidedIn: true,
-      placementTypeInfoBox: false,
-      activeInfoBox: false,
-      categoryInfoBox: false,
-      publicInfoBox: false,
-      publicText: "Public",
-      focusedInput: "",
-      feedbackClass: "",
-      subCategories: [],
+      this.state = {
+         renderCounter: 0,
+         animating: false,
+         slidedIn: true,
+         placementTypeInfoBox: false,
+         activeInfoBox: false,
+         categoryInfoBox: false,
+         publicInfoBox: false,
+         publicText: "Public",
+         focusedInput: "",
+         feedbackClass: "",
+         subCategories: [],
 
-      savedInputs: {
-        placementId: "",
-        appId: "",
-        sceneId: "",
-        placementName: "",
-        placementType: "",
-        isActive: true,
-        category: "Category",
-        subCategory: "Sub-Category"
+         savedInputs: {
+            placementId: "",
+            appId: "",
+            sceneId: "",
+            placementName: "",
+            placementType: "",
+            isActive: true,
+            category: "Category",
+            subCategory: "Sub-Category"
+         }
+      };
+
+      this.toggleSlide = this.toggleSlide.bind(this);
+      this.renderInputs = this.renderInputs.bind(this);
+      this.selectCategory = this.selectCategory.bind(this);
+      this.selectSubCategory = this.selectSubCategory.bind(this);
+      this.toggleInfoBox = this.toggleInfoBox.bind(this);
+      this.focusInput = this.focusInput.bind(this);
+      this.resetInputFocus = this.resetInputFocus.bind(this);
+      this.handleOnChange = this.handleOnChange.bind(this);
+      this.onSave = this.onSave.bind(this);
+      this.resetInputs = this.resetInputs.bind(this);
+   }
+
+   componentWillMount() {
+      window.savedInputs = [];
+      window.savedInputsNames = [];
+   }
+
+   componentWillReceiveProps(nextProps) {
+      let { savedInputs, slidedIn, renderCounter } = this.state;
+      const { clickedPlacement } = nextProps;
+
+      // console.log(clickedPlacement);
+
+      const {
+         placementId,
+         placementName,
+         placementType,
+         isActive,
+         category,
+         subCategory
+      } = clickedPlacement;
+
+      if (!!clickedPlacement.placementName) {
+         savedInputs.placementId = placementId
+            ? placementId
+            : clickedPlacement._id;
+         savedInputs.placementName = placementName;
+         savedInputs.placementType = placementType;
+         savedInputs.isActive = isActive;
+         savedInputs.category = category;
+         savedInputs.subCategory = subCategory;
+         slidedIn = false;
       }
-    };
 
-    this.toggleSlide = this.toggleSlide.bind(this);
-    this.renderInputs = this.renderInputs.bind(this);
-    this.selectCategory = this.selectCategory.bind(this);
-    this.selectSubCategory = this.selectSubCategory.bind(this);
-    this.toggleInfoBox = this.toggleInfoBox.bind(this);
-    this.focusInput = this.focusInput.bind(this);
-    this.resetInputFocus = this.resetInputFocus.bind(this);
-    this.handleOnChange = this.handleOnChange.bind(this);
-    this.onSave = this.onSave.bind(this);
-    this.resetInputs = this.resetInputs.bind(this);
-  }
+      // if ( sceneMounted && oldPlacementName !== clickedPlacement.placementName ) {
+      //     savedInputs.appId = '';
+      //     savedInputs.sceneId = '';
+      //     savedInputs.format = '';
+      //     savedInputs.isActive = true;
+      //     savedInputs.Public = true;
+      //     savedInputs.Default = '';
+      //     savedInputs.Category = 'Category';
+      //     savedInputs.Subcategory = 'Sub-category';
+      //     savedInputs.Preferred = '';
+      //     savedInputs.Blacklisted = '';
+      // }
 
-  componentWillMount() {
-    window.savedInputs = [];
-    window.savedInputsNames = [];
-  }
+      if (!!clickedPlacement.placementName) {
+         renderCounter++;
+      }
+      this.setState({ savedInputs, slidedIn, renderCounter });
+   }
 
-  componentWillReceiveProps(nextProps) {
-    let { savedInputs, slidedIn, renderCounter } = this.state;
-    const { sceneMounted, clickedPlacement } = nextProps;
-    const oldPlacementName = savedInputs.placementName;
+   toggleSlide() {
+      let { slidedIn } = this.state;
+      slidedIn = !slidedIn;
+      // slidesManager("FormPanel");
+      this.setState({ slidedIn });
+   }
 
-    // console.log(clickedPlacement);
-
-    const {
-      placementId,
-      placementName,
-      placementType,
-      isActive,
-      category,
-      subCategory
-    } = clickedPlacement;
-
-    if (!!clickedPlacement.placementName) {
-      savedInputs.placementId = placementId
-        ? placementId
-        : clickedPlacement._id;
-      savedInputs.placementName = placementName;
-      savedInputs.placementType = placementType;
-      savedInputs.isActive = isActive;
+   selectCategory(category) {
+      const { savedInputs, subCategories } = this.state;
       savedInputs.category = category;
+
+      const newSubCategories = dbSubCategories[category];
+
+      // If the sub-category does not belong in the category, clear it
+      let sameSubcategories = true;
+      subCategories.some((subCat, i) => {
+         if (subCat !== dbSubCategories[category][i]) {
+            sameSubcategories = false;
+            return true;
+         }
+         return false;
+      });
+
+      if (!sameSubcategories) {
+         savedInputs.subCategory = "Sub-Category";
+      }
+
+      this.setState({ savedInputs, subCategories: newSubCategories });
+      this.onSave();
+   }
+
+   selectSubCategory(subCategory) {
+      const { savedInputs } = this.state;
       savedInputs.subCategory = subCategory;
-      slidedIn = false;
-    }
+      this.setState({ savedInputs });
+      this.onSave();
+   }
 
-    // if ( sceneMounted && oldPlacementName !== clickedPlacement.placementName ) {
-    //     savedInputs.appId = '';
-    //     savedInputs.sceneId = '';
-    //     savedInputs.format = '';
-    //     savedInputs.isActive = true;
-    //     savedInputs.Public = true;
-    //     savedInputs.Default = '';
-    //     savedInputs.Category = 'Category';
-    //     savedInputs.Subcategory = 'Sub-category';
-    //     savedInputs.Preferred = '';
-    //     savedInputs.Blacklisted = '';
-    // }
-
-    if (!!clickedPlacement.placementName) {
-      renderCounter++;
-    }
-    this.setState({ savedInputs, slidedIn, renderCounter });
-  }
-
-  toggleSlide() {
-    const { slidesManager } = this.props;
-    let { slidedIn } = this.state;
-    slidedIn = !slidedIn;
-    // slidesManager("FormPanel");
-    this.setState({ slidedIn });
-  }
-
-  selectCategory(category) {
-    const { savedInputs, subCategories } = this.state;
-    savedInputs.category = category;
-
-    const newSubCategories = dbSubCategories[category];
-
-    // If the sub-category does not belong in the category, clear it
-    let sameSubcategories = true;
-    subCategories.some((subCat, i) => {
-      if (subCat !== dbSubCategories[category][i]) {
-        sameSubcategories = false;
-        return true;
-      }
-    });
-
-    if (!sameSubcategories) {
-      savedInputs.subCategory = "Sub-Category";
-    }
-
-    this.setState({ savedInputs, subCategories: newSubCategories });
-    this.onSave();
-  }
-
-  selectSubCategory(subCategory) {
-    const { savedInputs } = this.state;
-    savedInputs.subCategory = subCategory;
-    this.setState({ savedInputs });
-    this.onSave();
-  }
-
-  toggleInfoBox(input) {
-    switch (input) {
-      case "placementType":
-        const placementTypeInfoBox = !this.state.placementTypeInfoBox;
-        this.setState({ placementTypeInfoBox });
-        break;
-      case "isActive":
-        const activeInfoBox = !this.state.activeInfoBox;
-        this.setState({ activeInfoBox });
-        break;
-      case "Category":
-        const categoryInfoBox = !this.state.categoryInfoBox;
-        this.setState({ categoryInfoBox });
-        break;
-    }
-  }
-
-  renderInputs_OLD() {
-    const inputs = [
-      "placementName",
-      "placementType",
-      "isActive",
-      "Public",
-      "Default",
-      "category",
-      "subCategory",
-      "Preferred",
-      "Blacklisted"
-    ];
-
-    let _input = input => {
-      if (input === "isActive" || input === "Public") {
-        const { activeInfoBox, publicInfoBox } = this.state;
-        let display, title;
-
-        if (input === "isActive") {
-          display = activeInfoBox ? (display = "block") : (display = "none");
-          title = input;
-        } else {
-          display = publicInfoBox ? (display = "block") : (display = "none");
-          title = this.state.publicText;
-        }
-        const style = { display };
-
-        return (
-          <div className="form-item" key={input}>
-            <div className="active-switch clearfix">
-              <div
-                className="container info-box"
-                style={style}
-                id={`${input}-info-box`}
-              >
-                Here's some information about the {input} check button, so the
-                user understands what he or she is clicking.
-              </div>
-              <i
-                className="fa fa-question-circle-o"
-                aria-hidden="true"
-                onMouseEnter={this.toggleInfoBox.bind(null, input)}
-                onMouseLeave={this.toggleInfoBox.bind(null, input)}
-              />
-              <span>{title}</span>
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  defaultChecked
-                  onChange={this.handleOnChange.bind(null, input)}
-                />
-                <span className="slider round" />
-              </label>
-            </div>
-          </div>
-        );
-      } else if (input === "Category" || input === "Subcategory") {
-        const { savedInputs: { Category, Subcategory } } = this.state;
-
-        let categories = [
-          "Arts & Entertainment",
-          "Automotive",
-          "Business",
-          "Education",
-          "Health & Fitness",
-          "Food & Drinks",
-          "Hobbies & Interests",
-          "Sports"
-        ];
-        let subCategories = [
-          "Art/Technology",
-          "Arts & Crafts",
-          "Board Games/Puzzles",
-          "Card Games",
-          "Outdoor Games",
-          "Chess",
-          "Collecting",
-          "Comic Books",
-          "Guitar"
-        ];
-
-        categories = categories.map(
-          function(cat) {
-            return (
-              <a
-                className="dropdown-item"
-                onClick={this.selectCategory.bind(null, cat)}
-                key={cat}
-              >
-                {cat}
-              </a>
-            );
-          }.bind(this)
-        );
-
-        subCategories = subCategories.map(
-          function(cat) {
-            return (
-              <a
-                className="dropdown-item"
-                onClick={this.selectSubCategory.bind(null, cat)}
-                key={cat}
-              >
-                {cat}
-              </a>
-            );
-          }.bind(this)
-        );
-
-        const title = input === "Category" ? Category : Subcategory;
-        const dropdown = input === "Category" ? categories : subCategories;
-        return (
-          <div className="form-item" key={input}>
-            <div className="btn-group dropleft">
-              <button
-                type="button"
-                className="btn btn-secondary dropdown-toggle"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
-                {title}
-              </button>
-              <div className="dropdown-menu">{dropdown}</div>
-            </div>
-          </div>
-        );
-      } else {
-        return (
-          <div className="form-item" key={input}>
-            <input
-              ref={i => {
-                this[input] = i;
-              }}
-              onClick={this.focusInput.bind(null, input)}
-              id={input}
-              type="text"
-              className="form-control"
-              placeholder={input}
-              aria-describedby="basic-addon1"
-              onChange={this.handleOnChange.bind(null, input)}
-              value={this.state.savedInputs[input]}
-            />
-          </div>
-        );
-      }
-    };
-
-    _input = _input.bind(this);
-
-    return inputs.map(_input);
-  }
-
-  renderInputs() {
-    const inputs = [
-      "placementName",
-      "placementType",
-      "isActive",
-      "category",
-      "subCategory"
-    ];
-    const {
-      placementTypeInfoBox,
-      activeInfoBox,
-      categoryInfoBox,
-      savedInputs,
-      feedbackClass,
-      animating
-    } = this.state;
-
-    const _q_icon = input => {
-      let display;
-      let top = {};
+   toggleInfoBox(input) {
       switch (input) {
-        case "placementType":
-          display = placementTypeInfoBox
-            ? { display: "block" }
-            : { display: "none" };
-          break;
-        case "isActive":
-          display = activeInfoBox ? { display: "block" } : { display: "none" };
-          // top = { top: "35%" };
-          break;
-        case "Category":
-          display = categoryInfoBox
-            ? { display: "block" }
-            : { display: "none" };
-          break;
-      }
-      const style = display;
-      return (
-        <div className="question-icon" style={top}>
-          <div className="info-box" style={style} id={`${input}-info-box`}>
-            Here's some information about the {input} check button, so the user
-            understands what he or she is clicking.
-          </div>
-          <i
-            className="fa fa-question-circle"
-            aria-hidden="true"
-            onMouseEnter={this.toggleInfoBox.bind(null, input)}
-            onMouseLeave={this.toggleInfoBox.bind(null, input)}
-          />
-        </div>
-      );
-    };
+         case "placementType":
+            const placementTypeInfoBox = !this.state.placementTypeInfoBox;
+            this.setState({ placementTypeInfoBox });
+            break;
+         case "isActive":
+            const activeInfoBox = !this.state.activeInfoBox;
+            this.setState({ activeInfoBox });
+            break;
+         case "Category":
+            const categoryInfoBox = !this.state.categoryInfoBox;
+            this.setState({ categoryInfoBox });
+            break;
 
-    const dropdown = function(input) {
-      let {
-        savedInputs: { category, subCategory },
-        subCategories
+         default:
+      }
+   }
+
+   renderInputs_OLD() {
+      const inputs = [
+         "placementName",
+         "placementType",
+         "isActive",
+         "Public",
+         "Default",
+         "category",
+         "subCategory",
+         "Preferred",
+         "Blacklisted"
+      ];
+
+      let _input = input => {
+         if (input === "isActive" || input === "Public") {
+            const { activeInfoBox, publicInfoBox } = this.state;
+            let display, title;
+
+            if (input === "isActive") {
+               display = activeInfoBox
+                  ? (display = "block")
+                  : (display = "none");
+               title = input;
+            } else {
+               display = publicInfoBox
+                  ? (display = "block")
+                  : (display = "none");
+               title = this.state.publicText;
+            }
+            const style = { display };
+
+            return (
+               <div className="form-item" key={input}>
+                  <div className="active-switch clearfix">
+                     <div
+                        className="container info-box"
+                        style={style}
+                        id={`${input}-info-box`}
+                     >
+                        Here's some information about the {input} check button,
+                        so the user understands what he or she is clicking.
+                     </div>
+                     <i
+                        className="fa fa-question-circle-o"
+                        aria-hidden="true"
+                        onMouseEnter={this.toggleInfoBox.bind(null, input)}
+                        onMouseLeave={this.toggleInfoBox.bind(null, input)}
+                     />
+                     <span>{title}</span>
+                     <label className="switch">
+                        <input
+                           type="checkbox"
+                           defaultChecked
+                           onChange={this.handleOnChange.bind(null, input)}
+                        />
+                        <span className="slider round" />
+                     </label>
+                  </div>
+               </div>
+            );
+         } else if (input === "Category" || input === "Subcategory") {
+            const {
+               savedInputs: { Category, Subcategory }
+            } = this.state;
+
+            let categories = [
+               "Arts & Entertainment",
+               "Automotive",
+               "Business",
+               "Education",
+               "Health & Fitness",
+               "Food & Drinks",
+               "Hobbies & Interests",
+               "Sports"
+            ];
+            let subCategories = [
+               "Art/Technology",
+               "Arts & Crafts",
+               "Board Games/Puzzles",
+               "Card Games",
+               "Outdoor Games",
+               "Chess",
+               "Collecting",
+               "Comic Books",
+               "Guitar"
+            ];
+
+            categories = categories.map(
+               function(cat) {
+                  return (
+                     <a
+                        className="dropdown-item"
+                        onClick={this.selectCategory.bind(null, cat)}
+                        key={cat}
+                     >
+                        {cat}
+                     </a>
+                  );
+               }.bind(this)
+            );
+
+            subCategories = subCategories.map(
+               function(cat) {
+                  return (
+                     <a
+                        className="dropdown-item"
+                        onClick={this.selectSubCategory.bind(null, cat)}
+                        key={cat}
+                     >
+                        {cat}
+                     </a>
+                  );
+               }.bind(this)
+            );
+
+            const title = input === "Category" ? Category : Subcategory;
+            const dropdown = input === "Category" ? categories : subCategories;
+            return (
+               <div className="form-item" key={input}>
+                  <div className="btn-group dropleft">
+                     <button
+                        type="button"
+                        className="btn btn-secondary dropdown-toggle"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                     >
+                        {title}
+                     </button>
+                     <div className="dropdown-menu">{dropdown}</div>
+                  </div>
+               </div>
+            );
+         } else {
+            return (
+               <div className="form-item" key={input}>
+                  <input
+                     ref={i => {
+                        this[input] = i;
+                     }}
+                     onClick={this.focusInput.bind(null, input)}
+                     id={input}
+                     type="text"
+                     className="form-control"
+                     placeholder={input}
+                     aria-describedby="basic-addon1"
+                     onChange={this.handleOnChange.bind(null, input)}
+                     value={this.state.savedInputs[input]}
+                  />
+               </div>
+            );
+         }
+      };
+
+      _input = _input.bind(this);
+
+      return inputs.map(_input);
+   }
+
+   renderInputs() {
+      const {
+         placementTypeInfoBox,
+         activeInfoBox,
+         categoryInfoBox,
+         savedInputs,
+         feedbackClass,
+         animating
       } = this.state;
 
-      // let categories = [
-      //   "Arts & Entertainment",
-      //   "Automotive",
-      //   "Business",
-      //   "Education",
-      //   "Health & Fitness",
-      //   "Food & Drinks",
-      //   "Hobbies & Interests",
-      //   "Sports"
-      // ];
+      const _q_icon = input => {
+         let display;
+         let top = {};
+         switch (input) {
+            case "placementType":
+               display = placementTypeInfoBox
+                  ? { display: "block" }
+                  : { display: "none" };
+               break;
+            case "isActive":
+               display = activeInfoBox
+                  ? { display: "block" }
+                  : { display: "none" };
+               // top = { top: "35%" };
+               break;
+            case "Category":
+               display = categoryInfoBox
+                  ? { display: "block" }
+                  : { display: "none" };
+               break;
+            default:
+         }
+         const style = display;
+         return (
+            <div className="question-icon" style={top}>
+               <div className="info-box" style={style} id={`${input}-info-box`}>
+                  Here's some information about the {input} check button, so the
+                  user understands what he or she is clicking.
+               </div>
+               <i
+                  className="fa fa-question-circle"
+                  aria-hidden="true"
+                  onMouseEnter={this.toggleInfoBox.bind(null, input)}
+                  onMouseLeave={this.toggleInfoBox.bind(null, input)}
+               />
+            </div>
+         );
+      };
 
-      // let subCategories = [
-      //   "Art/Technology",
-      //   "Arts & Crafts",
-      //   "Board Games/Puzzles",
-      //   "Card Games",
-      //   "Outdoor Games",
-      //   "Chess",
-      //   "Collecting",
-      //   "Comic Books",
-      //   "Guitar"
-      // ];
+      const dropdown = function(input) {
+         let {
+            savedInputs: { category, subCategory },
+            subCategories
+         } = this.state;
 
-      const categories = dbCategories.map(
-        function(cat) {
-          return (
-            <a
-              className="dropdown-item"
-              onClick={this.selectCategory.bind(null, cat)}
-              key={cat}
-            >
-              {cat}
-            </a>
-          );
-        }.bind(this)
-      );
+         // let categories = [
+         //   "Arts & Entertainment",
+         //   "Automotive",
+         //   "Business",
+         //   "Education",
+         //   "Health & Fitness",
+         //   "Food & Drinks",
+         //   "Hobbies & Interests",
+         //   "Sports"
+         // ];
 
-      subCategories = subCategories.map(
-        function(cat) {
-          return (
-            <a
-              className="dropdown-item"
-              onClick={this.selectSubCategory.bind(null, cat)}
-              key={cat}
-            >
-              {cat}
-            </a>
-          );
-        }.bind(this)
-      );
+         // let subCategories = [
+         //   "Art/Technology",
+         //   "Arts & Crafts",
+         //   "Board Games/Puzzles",
+         //   "Card Games",
+         //   "Outdoor Games",
+         //   "Chess",
+         //   "Collecting",
+         //   "Comic Books",
+         //   "Guitar"
+         // ];
 
-      let title =
-        input === "category"
-          ? category === undefined ? "Category" : category
-          : subCategory === undefined ? "Sub-Category" : subCategory;
-      const dropdown = input === "category" ? categories : subCategories;
+         const categories = dbCategories.map(
+            function(cat) {
+               return (
+                  <a
+                     className="dropdown-item"
+                     onClick={this.selectCategory.bind(null, cat)}
+                     key={cat}
+                  >
+                     {cat}
+                  </a>
+               );
+            }.bind(this)
+         );
+
+         subCategories = subCategories.map(
+            function(cat) {
+               return (
+                  <a
+                     className="dropdown-item"
+                     onClick={this.selectSubCategory.bind(null, cat)}
+                     key={cat}
+                  >
+                     {cat}
+                  </a>
+               );
+            }.bind(this)
+         );
+
+         let title =
+            input === "category"
+               ? category === undefined
+                  ? "Category"
+                  : category
+               : subCategory === undefined
+                  ? "Sub-Category"
+                  : subCategory;
+         const dropdown = input === "category" ? categories : subCategories;
+         return (
+            <div className="btn-group">
+               <button type="button" className="btn btn-secondary btn-name">
+                  {title}
+               </button>
+               <button
+                  type="button"
+                  className="btn btn-secondary dropdown-toggle dropdown-toggle-split"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+               >
+                  <span className="sr-only">{title}</span>
+               </button>
+               <div className="dropdown-menu">{dropdown}</div>
+            </div>
+         );
+      }.bind(this);
+
+      const labelStyle = animating ? { opacity: 0.7 } : { opacity: 1 };
       return (
-        <div className="btn-group">
-          <button type="button" className="btn btn-secondary btn-name">
-            {title}
-          </button>
-          <button
-            type="button"
-            className="btn btn-secondary dropdown-toggle dropdown-toggle-split"
-            data-toggle="dropdown"
-            aria-haspopup="true"
-            aria-expanded="false"
-          >
-            <span className="sr-only">{title}</span>
-          </button>
-          <div className="dropdown-menu">{dropdown}</div>
-        </div>
-      );
-    }.bind(this);
-
-    const labelStyle = animating ? { opacity: 0.7 } : { opacity: 1 };
-    return (
-      <div id="inputs-container">
-        <div className="input-container">
-          <div className="input-title st">Name</div>
-          <div id="input-placement-name">{savedInputs.placementName}</div>
-        </div>
-        <div className="input-container">
-          {_q_icon("placementType")}
-          <div className="input-title st">Format</div>
-          <div className="text-truncate">{savedInputs.placementType}</div>
-        </div>
-        <div className="input-container">
-          {_q_icon("isActive")}
-          <div className="input-title st active-prop">Active</div>
-          <div id="form-panel-active-switch">
-            <div className="active-switch clearfix toggleBtn">
-              <div className="toggles">
-                <input
-                  type="checkbox"
-                  name="formPanelToggle"
-                  id="formPanelToggle"
-                  className="ios-toggle"
-                  checked={savedInputs.isActive}
-                  onChange={this.handleOnChange.bind(null, "isActive")}
-                  disabled={animating}
-                />
-                <label
-                  htmlFor="formPanelToggle"
-                  className="checkbox-label"
-                  data-on=""
-                  data-off=""
-                  style={labelStyle}
-                />
-              </div>
-              {/* <label className="switch">
+         <div id="inputs-container">
+            <div className="input-container">
+               <div className="input-title st">Name</div>
+               <div id="input-placement-name">{savedInputs.placementName}</div>
+            </div>
+            <div className="input-container">
+               {_q_icon("placementType")}
+               <div className="input-title st">Format</div>
+               <div className="text-truncate">{savedInputs.placementType}</div>
+            </div>
+            <div className="input-container">
+               {_q_icon("isActive")}
+               <div className="input-title st active-prop">Active</div>
+               <div id="form-panel-active-switch">
+                  <div className="active-switch clearfix toggleBtn">
+                     <div className="toggles">
+                        <input
+                           type="checkbox"
+                           name="formPanelToggle"
+                           id="formPanelToggle"
+                           className="ios-toggle"
+                           checked={savedInputs.isActive}
+                           onChange={this.handleOnChange.bind(null, "isActive")}
+                           disabled={animating}
+                        />
+                        <label
+                           htmlFor="formPanelToggle"
+                           className="checkbox-label"
+                           data-on=""
+                           data-off=""
+                           style={labelStyle}
+                        />
+                     </div>
+                     {/* <label className="switch">
                 <input
                   type="checkbox"
                   checked={savedInputs.isActive}
@@ -561,167 +508,168 @@ export default class FormPanel extends Component {
                 />
                 <span className="slider round" />
               </label> */}
+                  </div>
+               </div>
             </div>
-          </div>
-        </div>
-        <div className="input-container column">
-          {_q_icon("Category")}
-          <div className="input-title st">Category</div>
-          <div>{dropdown("category")}</div>
-        </div>
-        <div className="input-container column">
-          <div className="input-title st">Sub-Category</div>
-          <div>{dropdown("subCategory")}</div>
-        </div>
-        <div className="input-container cc">
-          {/* <button className="submit" onClick={this.onSave}>Save</button> */}
-          <div id="input-save-feedback" className={feedbackClass}>
-            Saved!
-            <img src={thumbsUp} alt="Thumbs Up!" />
-          </div>
-        </div>
-      </div>
-    );
-  }
+            <div className="input-container column">
+               {_q_icon("Category")}
+               <div className="input-title st">Category</div>
+               <div>{dropdown("category")}</div>
+            </div>
+            <div className="input-container column">
+               <div className="input-title st">Sub-Category</div>
+               <div>{dropdown("subCategory")}</div>
+            </div>
+            <div className="input-container cc">
+               {/* <button className="submit" onClick={this.onSave}>Save</button> */}
+               <div id="input-save-feedback" className={feedbackClass}>
+                  Saved!
+                  <img src={thumbsUp} alt="Thumbs Up!" />
+               </div>
+            </div>
+         </div>
+      );
+   }
 
-  focusInput(input) {
-    if (input !== "Name") {
-      this.setState({ focusedInput: input });
-      this[input].focus();
-    }
-  }
+   focusInput(input) {
+      if (input !== "Name") {
+         this.setState({ focusedInput: input });
+         this[input].focus();
+      }
+   }
 
-  resetInputFocus() {
-    const { focusedInput } = this.state;
-    if (!!this[focusedInput]) {
-      this[focusedInput].blur();
-      this.setState({ focusedInput: "" });
-    }
-  }
+   resetInputFocus() {
+      const { focusedInput } = this.state;
+      if (!!this[focusedInput]) {
+         this[focusedInput].blur();
+         this.setState({ focusedInput: "" });
+      }
+   }
 
-  handleOnChange(input, e) {
-    const { savedInputs } = this.state;
-    let { target: { value } } = e;
+   handleOnChange(input, e) {
+      const { savedInputs } = this.state;
+      let {
+         target: { value }
+      } = e;
 
-    if (input === "isActive") {
-      value = e.target.checked;
-    }
+      if (input === "isActive") {
+         value = e.target.checked;
+      }
 
-    savedInputs[input] = value;
-    this.setState({ savedInputs, animating: true });
-    this.onSave();
+      savedInputs[input] = value;
+      this.setState({ savedInputs, animating: true });
+      this.onSave();
 
-    setTimeout(() => {
-      this.setState({ animating: false });
-    }, 1000);
-  }
-
-  onSave() {
-    const { savedInputs } = this.state;
-    const {
-      dispatch,
-      selectedApp,
-      selectedScene,
-      savedApps,
-      updateClickedPlacement,
-      activeClickedElem
-    } = this.props;
-    let newInputs = {};
-
-    const {
-      placementId,
-      placementName,
-      placementType,
-      isActive,
-      category,
-      subCategory
-    } = savedInputs;
-
-    let updatedPlacement = {};
-
-    updatedPlacement.placementId = placementId;
-    updatedPlacement.appId = selectedApp._id;
-    updatedPlacement.sceneId = selectedScene._id;
-
-    updatedPlacement.placementName = placementName;
-    updatedPlacement.placementType = placementType;
-    updatedPlacement.isActive = isActive;
-    updatedPlacement.category = category;
-    updatedPlacement.subCategory = subCategory;
-
-    if (placementName === "") {
-      alert("Please select a placement!");
-    } else {
-      updateClickedPlacement(updatedPlacement);
-      dispatch(saveInputs(updatedPlacement));
-
-      this.setState({ feedbackClass: "feedback" });
       setTimeout(() => {
-        this.setState({ feedbackClass: "" });
-      }, 2300);
-    }
+         this.setState({ animating: false });
+      }, 1000);
+   }
 
-    activeClickedElem("saveClicked");
-  }
+   onSave() {
+      const { savedInputs } = this.state;
+      const {
+         dispatch,
+         selectedApp,
+         selectedScene,
+         updateClickedPlacement,
+         activeClickedElem
+      } = this.props;
 
-  resetInputs() {
-    const { placementName } = this.state;
-    const savedInputs = {
-      appId: "",
-      sceneId: "",
-      placementName,
-      placementType: "",
-      isActive: true,
-      Public: true,
-      Default: "",
-      category: "Category",
-      subCategory: "Sub-Category",
-      Preferred: "",
-      Blacklisted: ""
-    };
-    this.setState({ savedInputs });
-  }
+      const {
+         placementId,
+         placementName,
+         placementType,
+         isActive,
+         category,
+         subCategory
+      } = savedInputs;
 
-  render() {
-    const { slidedIn, savedInputs, renderCounter } = this.state;
-    const { onSave, sceneMounted, mouseOnPanel } = this.props;
+      let updatedPlacement = {};
 
-    // renderCounter is used to keep the panel closed without animation when the scene is mounted
-    const slideAnim = renderCounter
-      ? slidedIn ? "slideOutRight" : "slideInRight"
-      : "closed";
-    const arrow = slidedIn ? "left" : "right";
+      updatedPlacement.placementId = placementId;
+      updatedPlacement.appId = selectedApp._id;
+      updatedPlacement.sceneId = selectedScene._id;
 
-    if (!sceneMounted) {
-      return <div />;
-    }
+      updatedPlacement.placementName = placementName;
+      updatedPlacement.placementType = placementType;
+      updatedPlacement.isActive = isActive;
+      updatedPlacement.category = category;
+      updatedPlacement.subCategory = subCategory;
 
-    // console.log(this.state);
+      if (placementName === "") {
+         alert("Please select a placement!");
+      } else {
+         updateClickedPlacement(updatedPlacement);
+         dispatch(saveInputs(updatedPlacement));
 
-    return (
-      <div
-        className={`container panel ${slideAnim}`}
-        id="form-panel"
-        onMouseLeave={this.resetInputFocus}
-        onMouseEnter={mouseOnPanel}
-        onMouseLeave={mouseOnPanel}
-      >
-        <div
-          className={`panel-toggle-btn cc ${arrow}`}
-          onClick={this.toggleSlide}
-        />
+         this.setState({ feedbackClass: "feedback" });
+         setTimeout(() => {
+            this.setState({ feedbackClass: "" });
+         }, 2300);
+      }
 
-        <h3 className="st">Edit placement</h3>
+      activeClickedElem("saveClicked");
+   }
 
-        <div id="form-panel-inputs">{this.renderInputs()}</div>
+   resetInputs() {
+      const { placementName } = this.state;
+      const savedInputs = {
+         appId: "",
+         sceneId: "",
+         placementName,
+         placementType: "",
+         isActive: true,
+         Public: true,
+         Default: "",
+         category: "Category",
+         subCategory: "Sub-Category",
+         Preferred: "",
+         Blacklisted: ""
+      };
+      this.setState({ savedInputs });
+   }
 
-        <div id="form-footer">
-          <div id="form-footer-separator" />
-          <div id="form-footer-text" className="mb">
-            Click on other placements in the scene to edit!
-          </div>
-        </div>
-      </div>
-    );
-  }
+   render() {
+      const { slidedIn, renderCounter } = this.state;
+      const { sceneMounted, mouseOnPanel } = this.props;
+
+      // renderCounter is used to keep the panel closed without animation when the scene is mounted
+      const slideAnim = renderCounter
+         ? slidedIn
+            ? "slideOutRight"
+            : "slideInRight"
+         : "closed";
+      const arrow = slidedIn ? "left" : "right";
+
+      if (!sceneMounted) {
+         return <div />;
+      }
+
+      // console.log(this.state);
+
+      return (
+         <div
+            className={`container panel ${slideAnim}`}
+            id="form-panel"
+            onMouseEnter={mouseOnPanel}
+            onMouseLeave={mouseOnPanel}
+         >
+            <div
+               className={`panel-toggle-btn cc ${arrow}`}
+               onClick={this.toggleSlide}
+            />
+
+            <h3 className="st">Edit placement</h3>
+
+            <div id="form-panel-inputs">{this.renderInputs()}</div>
+
+            <div id="form-footer">
+               <div id="form-footer-separator" />
+               <div id="form-footer-text" className="mb">
+                  Click on other placements in the scene to edit!
+               </div>
+            </div>
+         </div>
+      );
+   }
 }

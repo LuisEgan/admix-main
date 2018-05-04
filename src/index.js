@@ -7,10 +7,11 @@ import "./index.css";
 
 // bootstrap
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import "../node_modules/bootstrap/dist/js/bootstrap.min.js";
 
 import configureStore from "./config/store";
-// import App from "views/App";
-import App from "./App";
+import App from "./views/App";
+// import App from "./App";
 
 const { persistor, store } = configureStore();
 

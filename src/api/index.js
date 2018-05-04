@@ -1,10 +1,10 @@
-import promisePolyfill from "es6-promise";
-import "isomorphic-fetch";
-import { saveInputs } from "../actions";
+// import promisePolyfill from "es6-promise";
+// import "isomorphic-fetch";
 
-import reportData from "../assets/data/placementDailyReport-total.json";
+import reportData from "../assets/data/placementDailyReport.json";
+// import reportData from "../assets/data/placementDailyReport-total.json";
 
-promisePolyfill.polyfill();
+// promisePolyfill.polyfill();
 
 const dns = "http://ec2-52-15-223-69.us-east-2.compute.amazonaws.com";
 
