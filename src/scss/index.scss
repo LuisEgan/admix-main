@@ -328,7 +328,7 @@ $inputsFontSize: calc(0.45em + 0.3vw);
       display: flex;
       height: 100%;
       padding: 0;
-      margin: 0;
+      margin: 0 auto;
       width: 100%;
       > div {
          height: 100%;
@@ -347,7 +347,7 @@ $inputsFontSize: calc(0.45em + 0.3vw);
          }
       }
       #steps-container {
-         width: 70%;
+         width: 55%;
 
          a {
             color: black;
@@ -392,18 +392,16 @@ $inputsFontSize: calc(0.45em + 0.3vw);
          display: flex;
          align-items: center;
          flex-flow: row-reverse;
-         width: 16%;
+         width: 25%;
          text-align: right;
          position: relative;
          > img {
-            position: absolute;
-            left: 0;
             width: 4vw;
             height: 4vw;
             border-radius: 100%;
             max-width: 50px;
             max-height: 50px;
-            margin-left: 1.5vw;
+            margin-right: 1.5vw;
          }
          .dropdown {
             display: flex;
@@ -883,7 +881,7 @@ $inputsFontSize: calc(0.45em + 0.3vw);
 
             input {
                width: 100%;
-               margin: 2% 0;
+               margin: 2vh 0;
             }
          }
 
@@ -897,12 +895,12 @@ $inputsFontSize: calc(0.45em + 0.3vw);
          }
 
          #lost-pass-text {
-            padding: 1%;
+            padding: 2vh 0 1vh;
          }
 
          .separator-container {
             @extend .cc;
-            padding: 5%;
+            padding: 3vh 0 5vh;
             .separator {
                border-bottom: dotted black 3px;
                width: 15%;

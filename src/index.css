@@ -333,7 +333,7 @@ h2 {
     display: flex;
     height: 100%;
     padding: 0;
-    margin: 0;
+    margin: 0 auto;
     width: 100%; }
     #headerMenu .container > div {
       height: 100%;
@@ -349,7 +349,7 @@ h2 {
         max-width: 200px;
         min-width: 100px; }
     #headerMenu .container #steps-container {
-      width: 70%; }
+      width: 55%; }
       #headerMenu .container #steps-container a {
         color: black;
         width: 15%; }
@@ -391,18 +391,16 @@ h2 {
       -webkit-box-direction: reverse;
       -ms-flex-flow: row-reverse;
       flex-flow: row-reverse;
-      width: 16%;
+      width: 25%;
       text-align: right;
       position: relative; }
       #headerMenu .container #dropdown-container > img {
-        position: absolute;
-        left: 0;
         width: 4vw;
         height: 4vw;
         border-radius: 100%;
         max-width: 50px;
         max-height: 50px;
-        margin-left: 1.5vw; }
+        margin-right: 1.5vw; }
       #headerMenu .container #dropdown-container .dropdown {
         display: -webkit-box;
         display: -ms-flexbox;
@@ -775,7 +773,7 @@ h2 {
         padding: 0 10%; }
         #login > span .inputs-container .inputs input {
           width: 100%;
-          margin: 2% 0; }
+          margin: 2vh 0; }
       #login > span .inputs-container .login-btn {
         padding: 5% 5% 2% 5%;
         text-align: center; }
@@ -783,9 +781,9 @@ h2 {
           color: #fff;
           width: 60%; }
       #login > span .inputs-container #lost-pass-text {
-        padding: 1%; }
+        padding: 2vh 0 1vh; }
       #login > span .inputs-container .separator-container {
-        padding: 5%; }
+        padding: 3vh 0 5vh; }
         #login > span .inputs-container .separator-container .separator {
           border-bottom: dotted black 3px;
           width: 15%; }
