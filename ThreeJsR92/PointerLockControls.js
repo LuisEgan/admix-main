@@ -5,6 +5,8 @@
 THREE.PointerLockControls = function(pCamera) {
    var scope = this;
 
+   var moveForwardWheel = false;
+   var moveBackwardWheel = false;
    var moveForward = false;
    var moveBackward = false;
    var moveLeft = false;
@@ -31,13 +33,15 @@ THREE.PointerLockControls = function(pCamera) {
    //==============
 
    var onMouseWheel = function(event) {
+      event.preventDefault();
+
       if (event.deltaY < 0) {
-         moveForward = true;
+         moveForwardWheel = true;
       } else if (event.deltaY > 0) {
-         moveBackward = true;
+         moveBackwardWheel = true;
       } else {
-         moveForward = false;
-         moveBackward = false;
+         moveForwardWheel = false;
+         moveBackwardWheel = false;
       }
    };
 
@@ -49,22 +53,53 @@ THREE.PointerLockControls = function(pCamera) {
       var movementY =
          event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
-      yawObject.rotation.y -= movementX * 0.002;
-      pitchObject.rotation.x -= movementY * 0.002;
+      if (!scope.wheelClick) {
+         yawObject.rotation.y -= movementX * 0.002;
+         pitchObject.rotation.x -= movementY * 0.002;
 
-      pitchObject.rotation.x = Math.max(
-         -PI_2,
-         Math.min(PI_2, pitchObject.rotation.x)
-      );
+         pitchObject.rotation.x = Math.max(
+            -PI_2,
+            Math.min(PI_2, pitchObject.rotation.x)
+         );
+      } else {
+         document.body.style.cursor = "move";
+         if (movementX > 0) {
+            moveRight = false;
+            moveLeft = true;
+         } else if (movementX < 0) {
+            moveLeft = false;
+            moveRight = true;
+         }
+
+         if (movementY > 0) {
+            moveDown = false;
+            moveUp = true;
+         } else if (movementY < 0) {
+            moveUp = false;
+            moveDown = true;
+         }
+      }
    };
 
    var onMouseUp = function(event) {
+      document.body.style.cursor = "default";
+
       scope.enabled = false;
+      scope.wheelClick = false;
+
+      moveRight = false;
+      moveLeft = false;
+      moveUp = false;
+      moveDown = false;
    };
 
    var onMouseDown = function(event) {
-      console.log("event.which: ", event.which);
+      event.preventDefault();
+
       scope.enabled = true;
+
+      // If the user clicks with the wheel
+      event.which === 2 && (scope.wheelClick = true);
    };
 
    var onKeyDown = function(event) {
@@ -125,10 +160,12 @@ THREE.PointerLockControls = function(pCamera) {
 
    this.noRotation = function() {
       document.removeEventListener("mousemove", onMouseMove, false);
+      document.removeEventListener("wheel", onMouseWheel, false);
    };
 
    this.yesRotation = function() {
       document.addEventListener("mousemove", onMouseMove, false);
+      document.addEventListener("wheel", onMouseWheel, false);
    };
 
    //==============
@@ -167,7 +204,7 @@ THREE.PointerLockControls = function(pCamera) {
       var time = performance.now();
       var delta = (time - prevTime) / 1000;
       var speed = 0.5;
-      var velCoefficient = 3;
+      var velCoefficient = 10;
 
       velocity.x -= velocity.x * velCoefficient * delta;
       velocity.z -= velocity.z * velCoefficient * delta;
@@ -178,9 +215,19 @@ THREE.PointerLockControls = function(pCamera) {
          _dir = scope.getDirection(_dir);
          velocity.add(_dir.multiplyScalar(speed * delta));
       }
+      if (moveForwardWheel) {
+         _dir = scope.getDirection(_dir);
+         velocity.add(_dir.multiplyScalar(speed * delta));
+         moveForwardWheel = false;
+      }
       if (moveBackward) {
          _dir = scope.getDirection(_dir);
          velocity.add(_dir.multiplyScalar(-speed * delta));
+      }
+      if (moveBackwardWheel) {
+         _dir = scope.getDirection(_dir);
+         velocity.add(_dir.multiplyScalar(-speed * delta));
+         moveBackwardWheel = false;
       }
       if (moveLeft) {
          _dir = scope.getDirection(_dir);
