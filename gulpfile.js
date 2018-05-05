@@ -36,3 +36,7 @@ gulp.task("tjsminify", function() {
       )
       .pipe(gulp.dest("./public/THREEJS"));
 });
+
+gulp.task("tjsminify:watch", function() {
+   gulp.watch("./ThreeJsR92/*.js", ["tjsminify"]);
+});
