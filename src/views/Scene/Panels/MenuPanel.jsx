@@ -4,6 +4,13 @@ import { routeCodes } from "../../../config/routes";
 import PropTypes from "prop-types";
 import { getPlacements, resetSelectedApp } from "../../../actions/";
 
+import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import faMousePointer from "@fortawesome/fontawesome-free-solid/faMousePointer";
+
+import controlsArrows from "../../../assets/img/controlsArrows.png";
+import controlsQ from "../../../assets/img/controlsQ.png";
+import controlsE from "../../../assets/img/controlsE.png";
+
 export default class MenuPanel extends Component {
    static propTypes = {
       selectedApp: PropTypes.object,
@@ -139,8 +146,46 @@ export default class MenuPanel extends Component {
       }
    }
 
+   renderControls() {
+      return (
+         <div className="webglControls fadeIn">
+            <div className="cc">
+               <span className="mb">Controls</span>
+            </div>
+            <div>
+               <div>
+                  <div>
+                     <img src={controlsArrows} alt="Arrows" />
+                  </div>
+                  <div>
+                     <img src={controlsQ} alt="Q" />
+                  </div>
+                  <div>
+                     <img src={controlsE} alt="E" />
+                  </div>
+                  <div>
+                     <FontAwesomeIcon icon={faMousePointer} />
+                  </div>
+               </div>
+               <div className="mb">
+                  <div>Move</div>
+                  <div>Up</div>
+                  <div>Down</div>
+                  <div>Rotate</div>
+               </div>
+            </div>
+         </div>
+      );
+   }
+
    render() {
-      const { selectedApp, location, mouseOnPanel, saveClicked } = this.props;
+      const {
+         selectedApp,
+         location,
+         mouseOnPanel,
+         saveClicked,
+         sceneMounted
+      } = this.props;
 
       if (!selectedApp || Object.keys(selectedApp).length < 3) {
          alert("No app selected!");
@@ -217,6 +262,8 @@ export default class MenuPanel extends Component {
                   </div>
                )}
             </div>
+
+            {sceneMounted && this.renderControls()}
          </div>
       );
    }

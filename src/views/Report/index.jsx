@@ -447,7 +447,8 @@ class Placement extends Component {
                            value={from}
                            onDayChange={this.changeDate.bind(null, "from")}
                            dayPickerProps={{
-                              selectedDays: from
+                              selectedDays: from,
+                              disabledDays: { after: to }
                            }}
                         />
                      </div>
@@ -457,7 +458,8 @@ class Placement extends Component {
                            value={to}
                            onDayChange={this.changeDate.bind(null, "to")}
                            dayPickerProps={{
-                              selectedDays: to
+                              selectedDays: to,
+                              disabledDays: { before: from }
                            }}
                         />
                      </div>

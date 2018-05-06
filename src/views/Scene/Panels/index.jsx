@@ -111,6 +111,7 @@ class Panels extends Component {
                accessToken={accessToken}
                activeClickedElem={this.activeClickedElem}
                saveClicked={saveClicked}
+               sceneMounted={sceneMounted}
             />
          </div>
       );

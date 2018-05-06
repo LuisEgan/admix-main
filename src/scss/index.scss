@@ -10,6 +10,7 @@ $blueAdmix: #157cc1;
 
    &::-webkit-scrollbar-track {
       -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
       border-radius: 5px;
    }
 
@@ -562,7 +563,7 @@ $inputsFontSize: calc(0.45em + 0.3vw);
    position: absolute;
    height: 90vh;
    background-color: #fff;
-   width: 25% !important;
+   width: 20% !important;
    padding: 3%;
 }
 
@@ -834,6 +835,45 @@ $inputsFontSize: calc(0.45em + 0.3vw);
       .trash {
          margin-left: auto;
          color: red;
+      }
+   }
+}
+
+.webglControls {
+   position: absolute;
+   width: 100%;
+   left: 0;
+   bottom: 5%;
+   padding: 7%;
+
+   div {
+      display: flex;
+   }
+
+   img,
+   svg {
+      height: 9vh;
+      width: 9vh;
+      max-width: 50px;
+      max-height: 50px;
+      color: #9a9a9a;
+   }
+
+   > div {
+      flex-flow: column;
+
+      &:nth-child(2) {
+         flex-flow: column;
+
+         > div {
+            > div {
+               @extend .cc;
+               width: 25%;
+               padding: 0 2%;
+               font-size: 0.7em;
+               font-weight: bold;
+            }
+         }
       }
    }
 }
@@ -1409,6 +1449,8 @@ $inputsFontSize: calc(0.45em + 0.3vw);
 
    .container {
       z-index: 2;
+      padding-left: 20px;
+      padding-right: 20px;
       .placement-inner {
          width: 45vw;
          position: absolute;
@@ -1566,7 +1608,7 @@ $inputsFontSize: calc(0.45em + 0.3vw);
       padding-top: 8%;
       top: 0;
       z-index: 1;
-      width: 25%;
+      width: 25% !important;
       min-width: 180px;
    }
 
@@ -1646,9 +1688,6 @@ $inputsFontSize: calc(0.45em + 0.3vw);
       #dates {
          display: flex;
          flex-flow: column;
-         // padding: 5%;
-         // padding-left: 0;
-         // padding-top: 20%;
 
          > div {
             padding-top: 5%;
@@ -1662,6 +1701,7 @@ $inputsFontSize: calc(0.45em + 0.3vw);
          #range {
             display: flex;
             flex-flow: row;
+            z-index: 2;
             > div {
                // padding: 5%;
                padding-left: 0;
@@ -1695,10 +1735,6 @@ $inputsFontSize: calc(0.45em + 0.3vw);
                }
             }
          }
-      }
-
-      #app-selection {
-         // padding-top: 5%;
       }
    }
 
