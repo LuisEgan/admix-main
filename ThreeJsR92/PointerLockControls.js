@@ -203,7 +203,7 @@ THREE.PointerLockControls = function(pCamera) {
    this.update = function() {
       var time = performance.now();
       var delta = (time - prevTime) / 1000;
-      var speed = 0.5;
+      var speed = moveForwardWheel || moveBackwardWheel ? 5 : 0.5;
       var velCoefficient = 10;
 
       velocity.x -= velocity.x * velCoefficient * delta;
