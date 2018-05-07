@@ -1,15 +1,19 @@
-// import promisePolyfill from "es6-promise";
-// import "isomorphic-fetch";
-
 import reportData from "../assets/data/placementDailyReport.json";
 // import reportData from "../assets/data/placementDailyReport-total.json";
-
-// promisePolyfill.polyfill();
 
 const dns = "http://ec2-52-15-223-69.us-east-2.compute.amazonaws.com";
 
 function async() {
    return fetch("http://date.jsontest.com/").then(response => response.json());
+}
+
+function isAdmin(accessToken) {
+   return fetch(dns + "/api/v1/user/verify/isAdmin", {
+      method: "GET",
+      headers: new Headers({
+         "x-access-token": accessToken
+      })
+   }).then(response => response.json());
 }
 
 function login(data) {
@@ -44,6 +48,15 @@ function forgotPass(data) {
 
 function getApps(accessToken) {
    return fetch(dns + "/api/v1/user/getApps", {
+      method: "GET",
+      headers: new Headers({
+         "x-access-token": accessToken
+      })
+   }).then(response => response.json());
+}
+
+function getAppsAdmin(accessToken) {
+   return fetch(dns + "/api/v1/user/getAppsAdmin", {
       method: "GET",
       headers: new Headers({
          "x-access-token": accessToken
