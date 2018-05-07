@@ -3,7 +3,7 @@ import { persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import immutableTransform from "redux-persist-transform-immutable";
 import thunk from "redux-thunk";
-import logger from "redux-logger";
+import logger from "./redux-logger";
 
 import rootReducer from "../reducers";
 import persistReducer from "redux-persist/lib/persistReducer";
