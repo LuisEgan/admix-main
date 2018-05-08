@@ -208,28 +208,6 @@ export default class FormPanel extends Component {
             subCategories
          } = this.state;
 
-         // let categories = [
-         //   "Arts & Entertainment",
-         //   "Automotive",
-         //   "Business",
-         //   "Education",
-         //   "Health & Fitness",
-         //   "Food & Drinks",
-         //   "Hobbies & Interests",
-         //   "Sports"
-         // ];
-
-         // let subCategories = [
-         //   "Art/Technology",
-         //   "Arts & Crafts",
-         //   "Board Games/Puzzles",
-         //   "Card Games",
-         //   "Outdoor Games",
-         //   "Chess",
-         //   "Collecting",
-         //   "Comic Books",
-         //   "Guitar"
-         // ];
 
          const categories = dbCategories.map(
             function(cat) {
