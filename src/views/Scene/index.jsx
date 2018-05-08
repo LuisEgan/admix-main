@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import _ from "lodash";
 
 import Panels from "./Panels";
 import Progress from "react-progressbar";
@@ -305,7 +306,8 @@ class Scene extends Component {
                // Check the savedInputs in this session to load the changes done
                savedInputs.some(input => {
                   if (input.placementName === intersected.name) {
-                     clickedPlacement = JSON.parse(JSON.stringify(input));
+                     //    clickedPlacement = JSON.parse(JSON.stringify(input));
+                     clickedPlacement = _.clone(input);
                      isSaved = true;
                      return true;
                   }
@@ -315,28 +317,17 @@ class Scene extends Component {
                // If the object hasn't been changed, load the db info
                if (!isSaved && !!selectedScene.placements) {
                   selectedScene.placements.some(placement => {
-                     // console.log(placement.placementName + " === " + intersected.name);
                      // This should be placement.placementName === intersected.name
                      // With === not !== ; otherwise is for test
                      if (placement.placementName === intersected.name) {
-                        clickedPlacement = JSON.parse(
-                           JSON.stringify(placement)
-                        );
+                        clickedPlacement = _.clone(placement);
                         return true;
                      }
                      return false;
                   });
                }
-               console.log("clickedPlacement: ", clickedPlacement);
 
-               // For test / fallback
-               clickedPlacement.placementName = intersected.name;
-               clickedPlacement.isActive =
-                  clickedPlacement.isActive !== undefined
-                     ? clickedPlacement.isActive
-                     : true;
-
-               console.log("AFTER \n\n clickedPlacement: ", clickedPlacement);
+               clickedPlacement.placementId = clickedPlacement._id;
 
                this.setState({ clickedPlacement });
             }

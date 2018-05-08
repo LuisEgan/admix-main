@@ -317,6 +317,7 @@ export const getPlacements = (appId, sceneId, accessToken) => dispatch => {
 };
 
 export const updatePlacements = (accessToken, data) => dispatch => {
+   console.log("data: ", data);
    dispatch(asyncStart());
 
    api

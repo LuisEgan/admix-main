@@ -38,7 +38,6 @@ class Validation extends Component {
    }
 
    updatePlacements() {
-      this.setState({ startCampaign: true });
       const { dispatch, savedInputs, accessToken, selectedApp } = this.props;
       const { _id, platformName, name } = selectedApp;
       const appDetails = {
@@ -49,11 +48,8 @@ class Validation extends Component {
       };
       dispatch(toggleAppStatus(appDetails, accessToken));
 
-      savedInputs.forEach(input => {
-         delete input.placementName;
-      });
-
       dispatch(updatePlacements(accessToken, savedInputs));
+      this.setState({ startCampaign: true });
    }
 
    emojiLoaded() {

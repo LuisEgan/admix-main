@@ -73,45 +73,26 @@ export default class FormPanel extends Component {
       let { savedInputs, slidedIn, renderCounter } = this.state;
       const { clickedPlacement } = nextProps;
 
-      // console.log(clickedPlacement);
-
-      const {
-         placementId,
-         placementName,
-         placementType,
-         isActive,
-         category,
-         subCategory
-      } = clickedPlacement;
+      const propsToSave = [
+         "appId",
+         "sceneId",
+         "placementId",
+         "placementName",
+         "placementType",
+         "isActive",
+         "category",
+         "subCategory"
+      ];
 
       if (!!clickedPlacement.placementName) {
-         savedInputs.placementId = placementId
-            ? placementId
-            : clickedPlacement._id;
-         savedInputs.placementName = placementName;
-         savedInputs.placementType = placementType;
-         savedInputs.isActive = isActive;
-         savedInputs.category = category;
-         savedInputs.subCategory = subCategory;
+         propsToSave.forEach(prop => {
+            savedInputs[prop] = clickedPlacement[prop];
+         });
+
          slidedIn = false;
-      }
-
-      // if ( sceneMounted && oldPlacementName !== clickedPlacement.placementName ) {
-      //     savedInputs.appId = '';
-      //     savedInputs.sceneId = '';
-      //     savedInputs.format = '';
-      //     savedInputs.isActive = true;
-      //     savedInputs.Public = true;
-      //     savedInputs.Default = '';
-      //     savedInputs.Category = 'Category';
-      //     savedInputs.Subcategory = 'Sub-category';
-      //     savedInputs.Preferred = '';
-      //     savedInputs.Blacklisted = '';
-      // }
-
-      if (!!clickedPlacement.placementName) {
          renderCounter++;
       }
+
       this.setState({ savedInputs, slidedIn, renderCounter });
    }
 
@@ -170,165 +151,6 @@ export default class FormPanel extends Component {
 
          default:
       }
-   }
-
-   renderInputs_OLD() {
-      const inputs = [
-         "placementName",
-         "placementType",
-         "isActive",
-         "Public",
-         "Default",
-         "category",
-         "subCategory",
-         "Preferred",
-         "Blacklisted"
-      ];
-
-      let _input = input => {
-         if (input === "isActive" || input === "Public") {
-            const { activeInfoBox, publicInfoBox } = this.state;
-            let display, title;
-
-            if (input === "isActive") {
-               display = activeInfoBox
-                  ? (display = "block")
-                  : (display = "none");
-               title = input;
-            } else {
-               display = publicInfoBox
-                  ? (display = "block")
-                  : (display = "none");
-               title = this.state.publicText;
-            }
-            const style = { display };
-
-            return (
-               <div className="form-item" key={input}>
-                  <div className="active-switch clearfix">
-                     <div
-                        className="container info-box"
-                        style={style}
-                        id={`${input}-info-box`}
-                     >
-                        Here's some information about the {input} check button,
-                        so the user understands what he or she is clicking.
-                     </div>
-                     <i
-                        className="fa fa-question-circle-o"
-                        aria-hidden="true"
-                        onMouseEnter={this.toggleInfoBox.bind(null, input)}
-                        onMouseLeave={this.toggleInfoBox.bind(null, input)}
-                     />
-                     <span>{title}</span>
-                     <label className="switch">
-                        <input
-                           type="checkbox"
-                           defaultChecked
-                           onChange={this.handleOnChange.bind(null, input)}
-                        />
-                        <span className="slider round" />
-                     </label>
-                  </div>
-               </div>
-            );
-         } else if (input === "Category" || input === "Subcategory") {
-            const {
-               savedInputs: { Category, Subcategory }
-            } = this.state;
-
-            let categories = [
-               "Arts & Entertainment",
-               "Automotive",
-               "Business",
-               "Education",
-               "Health & Fitness",
-               "Food & Drinks",
-               "Hobbies & Interests",
-               "Sports"
-            ];
-            let subCategories = [
-               "Art/Technology",
-               "Arts & Crafts",
-               "Board Games/Puzzles",
-               "Card Games",
-               "Outdoor Games",
-               "Chess",
-               "Collecting",
-               "Comic Books",
-               "Guitar"
-            ];
-
-            categories = categories.map(
-               function(cat) {
-                  return (
-                     <a
-                        className="dropdown-item"
-                        onClick={this.selectCategory.bind(null, cat)}
-                        key={cat}
-                     >
-                        {cat}
-                     </a>
-                  );
-               }.bind(this)
-            );
-
-            subCategories = subCategories.map(
-               function(cat) {
-                  return (
-                     <a
-                        className="dropdown-item"
-                        onClick={this.selectSubCategory.bind(null, cat)}
-                        key={cat}
-                     >
-                        {cat}
-                     </a>
-                  );
-               }.bind(this)
-            );
-
-            const title = input === "Category" ? Category : Subcategory;
-            const dropdown = input === "Category" ? categories : subCategories;
-            return (
-               <div className="form-item" key={input}>
-                  <div className="btn-group dropleft">
-                     <button
-                        type="button"
-                        className="btn btn-secondary dropdown-toggle"
-                        data-toggle="dropdown"
-                        aria-haspopup="true"
-                        aria-expanded="false"
-                     >
-                        {title}
-                     </button>
-                     <div className="dropdown-menu">{dropdown}</div>
-                  </div>
-               </div>
-            );
-         } else {
-            return (
-               <div className="form-item" key={input}>
-                  <input
-                     ref={i => {
-                        this[input] = i;
-                     }}
-                     onClick={this.focusInput.bind(null, input)}
-                     id={input}
-                     type="text"
-                     className="form-control"
-                     placeholder={input}
-                     aria-describedby="basic-addon1"
-                     onChange={this.handleOnChange.bind(null, input)}
-                     value={this.state.savedInputs[input]}
-                  />
-               </div>
-            );
-         }
-      };
-
-      _input = _input.bind(this);
-
-      return inputs.map(_input);
    }
 
    renderInputs() {
@@ -569,44 +391,18 @@ export default class FormPanel extends Component {
       const { savedInputs } = this.state;
       const {
          dispatch,
-         selectedApp,
-         selectedScene,
          updateClickedPlacement,
          activeClickedElem
       } = this.props;
 
-      const {
-         placementId,
-         placementName,
-         placementType,
-         isActive,
-         category,
-         subCategory
-      } = savedInputs;
+      console.log("savedInputs: ", savedInputs);
+      updateClickedPlacement(savedInputs);
+      dispatch(saveInputs(savedInputs));
 
-      let updatedPlacement = {};
-
-      updatedPlacement.placementId = placementId;
-      updatedPlacement.appId = selectedApp._id;
-      updatedPlacement.sceneId = selectedScene._id;
-
-      updatedPlacement.placementName = placementName;
-      updatedPlacement.placementType = placementType;
-      updatedPlacement.isActive = isActive;
-      updatedPlacement.category = category;
-      updatedPlacement.subCategory = subCategory;
-
-      if (placementName === "") {
-         alert("Please select a placement!");
-      } else {
-         updateClickedPlacement(updatedPlacement);
-         dispatch(saveInputs(updatedPlacement));
-
-         this.setState({ feedbackClass: "feedback" });
-         setTimeout(() => {
-            this.setState({ feedbackClass: "" });
-         }, 2300);
-      }
+      this.setState({ feedbackClass: "feedback" });
+      setTimeout(() => {
+         this.setState({ feedbackClass: "" });
+      }, 2300);
 
       activeClickedElem("saveClicked");
    }
