@@ -651,22 +651,6 @@ class Scene extends Component {
                   this.mount = mount;
                }}
             />
-
-            {sceneMounted && (
-               <div id="controls">
-                  <h5>
-                     {/* <b>Hold click and drag = </b>rotate. <b>Hold 'S' = </b>zoom.
-              <b>Hold 'D' = </b>pan. */}
-                     <b>Q</b> - Up |&nbsp;
-                     <b>E</b> - Down |&nbsp;
-                     <b>W / ↑ </b> - Forward |&nbsp;
-                     <b>A / ← </b> - Left |&nbsp;
-                     <b>S / ↓ </b> - Backwards |&nbsp;
-                     <b>D / → </b> - Right |&nbsp;
-                     <b>Click and drag</b> - Rotate
-                  </h5>
-               </div>
-            )}
          </div>
       );
    }
