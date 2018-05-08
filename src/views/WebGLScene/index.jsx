@@ -405,6 +405,7 @@ export default class WebGLScene extends Component {
             }.bind(this)
          );
 
+         this.controls.noRotation();
          this.setState({ loadingProgress, loadingError, sceneMounted: true });
          confirmSceneLoaded();
          isLoadingScene(false);

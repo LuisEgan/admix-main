@@ -82,7 +82,7 @@ THREE.PointerLockControls = function(pCamera) {
    };
 
    var onMouseUp = function(event) {
-      document.body.style.cursor = "default";
+      scope.wheelClick && (document.body.style.cursor = "alias");
 
       scope.enabled = false;
       scope.wheelClick = false;
@@ -159,11 +159,13 @@ THREE.PointerLockControls = function(pCamera) {
    };
 
    this.noRotation = function() {
+      document.body.style.cursor = "default";
       document.removeEventListener("mousemove", onMouseMove, false);
       document.removeEventListener("wheel", onMouseWheel, false);
    };
 
    this.yesRotation = function() {
+      document.body.style.cursor = "alias";
       document.addEventListener("mousemove", onMouseMove, false);
       document.addEventListener("wheel", onMouseWheel, false);
    };
