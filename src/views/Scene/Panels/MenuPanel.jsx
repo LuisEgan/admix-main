@@ -30,12 +30,14 @@ export default class MenuPanel extends Component {
       this.state = {
          slidedIn: false,
          selectedScene: "",
-         showHappyInfoBox: false
+         showHappyInfoBox: false,
+         showDdScenes: false
       };
 
       this.toggleSlide = this.toggleSlide.bind(this);
       this.goBack = this.goBack.bind(this);
       this.sceneOnClick = this.sceneOnClick.bind(this);
+      this.toggleDropdowns = this.toggleDropdowns.bind(this);
       this.onHappyBtn = this.onHappyBtn.bind(this);
    }
 
@@ -71,10 +73,10 @@ export default class MenuPanel extends Component {
       // Change dropdown scene display
       this.setState({ selectedScene: scene.name });
 
-      // Set Scene (parent parent component) selectedScene state
+      // Set Scene (parent parent component /Scene index) selectedScene state
       selectScene(scene);
 
-      // Tell Panel (parent component) that a scene was clicked
+      // Tell Panel (parent component /Panels index) that a scene was clicked
       activeClickedElem("sceneClicked");
 
       // Load webgl
@@ -83,9 +85,17 @@ export default class MenuPanel extends Component {
       }, 1500);
    }
 
+   toggleDropdowns(forceClose = false) {
+      const { forceCloseFormPanel } = this.props;
+      let { showDdScenes } = this.state;
+      forceCloseFormPanel();
+      showDdScenes = forceClose ? false : !showDdScenes;
+      this.setState({ showDdScenes });
+   }
+
    renderScenesSelect() {
       const { asyncLoading, selectedApp } = this.props;
-      let { selectedScene } = this.state;
+      let { selectedScene, showDdScenes } = this.state;
       const { scenes } = selectedApp;
       const loadingIcon = <p>Loading...</p>;
       let dropdown = "";
@@ -111,6 +121,8 @@ export default class MenuPanel extends Component {
          selectedScene = "Select your scene";
       }
 
+      let showDropdown = showDdScenes ? "show" : "";
+
       return (
          <div className="btn-group">
             <button type="button" className="btn btn-secondary dropdown-title">
@@ -119,13 +131,16 @@ export default class MenuPanel extends Component {
             <button
                type="button"
                className="btn btn-secondary dropdown-toggle dropdown-toggle-split"
-               data-toggle="dropdown"
-               aria-haspopup="true"
-               aria-expanded="false"
+               onClick={this.toggleDropdowns.bind(null, false)}
             >
                <span className="sr-only">{selectedScene}</span>
             </button>
-            <div className="dropdown-menu">{dropdown}</div>
+            <div
+               className={`dropdown-menu ${showDropdown}`}
+               onMouseLeave={this.toggleDropdowns.bind(null, true)}
+            >
+               {dropdown}
+            </div>
          </div>
       );
 

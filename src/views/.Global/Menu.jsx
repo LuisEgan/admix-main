@@ -34,6 +34,7 @@ class Menu extends Component {
       super(props);
 
       this.state = {
+         showDropdown: false,
          stepBarStyle: {
             left: 0,
             opacity: 0,
@@ -43,10 +44,10 @@ class Menu extends Component {
       };
 
       this.handleLogout = this.handleLogout.bind(this);
-      this.renderSteps = this.renderSteps.bind(this);
       this.handleClick = this.handleClick.bind(this);
       this.updateMenuImg = this.updateMenuImg.bind(this);
       this.handleNoImg = this.handleNoImg.bind(this);
+      this.toggleDropdowns = this.toggleDropdowns.bind(this);
    }
 
    componentWillReceiveProps(nextProps) {
@@ -146,63 +147,20 @@ class Menu extends Component {
       }, 500);
    }
 
-   renderSteps() {
-      const {
-         location: { pathname }
-      } = this.props;
-
-      const showEdit =
-         pathname.includes("/scene") || pathname.includes("/validation");
-      const showValidation = pathname.includes("/validation");
-
-      return (
-         <div className="cc">
-            <div className="cc" onClick={this.handleClick.bind(null, "Apps")}>
-               Apps
-            </div>{" "}
-            >
-            {showEdit && (
-               <div
-                  className="cc"
-                  onClick={this.handleClick.bind(null, "Edit")}
-               >
-                  Edit
-               </div>
-            )}{" "}
-            >
-            {showValidation && (
-               <div
-                  className="cc"
-                  onClick={this.handleClick.bind(null, "Validate")}
-               >
-                  Validate
-               </div>
-            )}
-            {!showValidation && <div className="cc" style={{ opacity: 0 }} />}
-         </div>
-      );
+   toggleDropdowns(forceClose = false) {
+      let { showDropdown } = this.state;
+      showDropdown = forceClose ? false : !showDropdown;
+      this.setState({ showDropdown });
    }
 
    render() {
-      const { stepBarStyle, redirectTo, userImg } = this.state;
+      let { stepBarStyle, redirectTo, userImg, showDropdown } = this.state;
       const {
          location: { pathname },
          isLoggedIn
       } = this.props;
 
-      const buttonStyle = {
-         border: 0,
-         backgroundColor: "transparent",
-         borderColor: "transparent"
-      };
-      // const doRenderStep = (
-      //   !!(location) && !(
-      //     pathname.includes("login") ||
-      //     pathname.includes("setup") ||
-      //     pathname.includes("congratulations")
-      //   )
-      // );
-      const doRenderStep = false;
+      showDropdown = showDropdown ? "show" : "";
 
       return (
          <div className="" id="headerMenu">
@@ -215,11 +173,7 @@ class Menu extends Component {
                   </div>
                </div>
 
-               <div className="cc" id="steps-container">
-                  <div id="steps-bar" style={stepBarStyle} />
-                  {doRenderStep && this.renderSteps()}
-                  {/* {this.renderSteps()} */}
-               </div>
+               <div className="cc" id="steps-container" />
 
                {isLoggedIn && (
                   <div className="" id="dropdown-container">
@@ -227,18 +181,14 @@ class Menu extends Component {
                         <button
                            className="btn btn-secondary dropdown-toggle"
                            type="button"
-                           id="dropdownMenuButton"
-                           data-toggle="dropdown"
-                           aria-haspopup="true"
-                           aria-expanded="false"
-                           style={buttonStyle}
+                           onClick={this.toggleDropdowns.bind(null, false)}
                         >
                            {/* <i className="fa fa-user" aria-hidden="true"></i> */}
                            <span className="st">My Profile</span>
                         </button>
                         <div
-                           className="dropdown-menu"
-                           aria-labelledby="dropdownMenuButton"
+                           className={`dropdown-menu ${showDropdown}`}
+                           onMouseLeave={this.toggleDropdowns.bind(null, true)}
                         >
                            {!isLoggedIn && (
                               <NavLink

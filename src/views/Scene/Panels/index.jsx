@@ -43,6 +43,7 @@ class Panels extends Component {
 
       this.slidesManager = this.slidesManager.bind(this);
       this.activeClickedElem = this.activeClickedElem.bind(this);
+      this.forceCloseFormPanel = this.forceCloseFormPanel.bind(this);
    }
 
    slidesManager(panel) {
@@ -60,6 +61,10 @@ class Panels extends Component {
       const state = this.state;
       state[elem] = true;
       this.setState(state);
+   }
+
+   forceCloseFormPanel() {
+      this.FormPanel.forceClose();
    }
 
    render() {
@@ -83,6 +88,7 @@ class Panels extends Component {
       return (
          <div>
             <FormPanel
+               ref={i => (this.FormPanel = i)}
                mouseOnPanel={mouseOnPanel}
                slidesManager={this.slidesManager}
                selectedApp={selectedApp}
@@ -112,6 +118,7 @@ class Panels extends Component {
                activeClickedElem={this.activeClickedElem}
                saveClicked={saveClicked}
                sceneMounted={sceneMounted}
+               forceCloseFormPanel={this.forceCloseFormPanel}
             />
          </div>
       );

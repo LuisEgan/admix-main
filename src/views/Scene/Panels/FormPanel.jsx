@@ -28,9 +28,8 @@ export default class FormPanel extends Component {
       super(props);
 
       this.state = {
-         renderCounter: 0,
          animating: false,
-         slidedIn: true,
+         slidedIn: "closed",
          placementTypeInfoBox: false,
          activeInfoBox: false,
          categoryInfoBox: false,
@@ -53,24 +52,28 @@ export default class FormPanel extends Component {
       };
 
       this.toggleSlide = this.toggleSlide.bind(this);
+      this.hardUnfocus = this.hardUnfocus.bind(this);
       this.renderInputs = this.renderInputs.bind(this);
       this.selectCategory = this.selectCategory.bind(this);
       this.selectSubCategory = this.selectSubCategory.bind(this);
       this.toggleInfoBox = this.toggleInfoBox.bind(this);
+      this.toggleDropdowns = this.toggleDropdowns.bind(this);
       this.focusInput = this.focusInput.bind(this);
       this.resetInputFocus = this.resetInputFocus.bind(this);
       this.handleOnChange = this.handleOnChange.bind(this);
       this.onSave = this.onSave.bind(this);
       this.resetInputs = this.resetInputs.bind(this);
+      this.forceClose = this.forceClose.bind(this);
    }
 
-   componentWillMount() {
+   componentDidMount() {
       window.savedInputs = [];
       window.savedInputsNames = [];
    }
 
    componentWillReceiveProps(nextProps) {
-      let { savedInputs, slidedIn, renderCounter } = this.state;
+      let { savedInputs, slidedIn } = this.state;
+      const oldClickedPlacement = this.props.clickedPlacement;
       const { clickedPlacement } = nextProps;
 
       const propsToSave = [
@@ -84,16 +87,26 @@ export default class FormPanel extends Component {
          "subCategory"
       ];
 
-      if (!!clickedPlacement.placementName) {
+      if (
+         !!clickedPlacement.placementName &&
+         oldClickedPlacement.placementName !== clickedPlacement.placementName
+      ) {
          propsToSave.forEach(prop => {
             savedInputs[prop] = clickedPlacement[prop];
          });
 
          slidedIn = false;
-         renderCounter++;
       }
 
-      this.setState({ savedInputs, slidedIn, renderCounter });
+      const subCategories = dbSubCategories[savedInputs.category]
+         ? dbSubCategories[savedInputs.category]
+         : [];
+
+      this.setState({ savedInputs, slidedIn, subCategories });
+   }
+
+   hardUnfocus(input) {
+      this[input].blur();
    }
 
    toggleSlide() {
@@ -123,14 +136,19 @@ export default class FormPanel extends Component {
          savedInputs.subCategory = "Sub-Category";
       }
 
-      this.setState({ savedInputs, subCategories: newSubCategories });
+      this.setState({
+         savedInputs,
+         subCategories: newSubCategories,
+         showDdCats: false
+      });
       this.onSave();
    }
 
    selectSubCategory(subCategory) {
       const { savedInputs } = this.state;
       savedInputs.subCategory = subCategory;
-      this.setState({ savedInputs });
+
+      this.setState({ savedInputs, showDdSubCats: false });
       this.onSave();
    }
 
@@ -150,6 +168,18 @@ export default class FormPanel extends Component {
             break;
 
          default:
+      }
+   }
+
+   toggleDropdowns(input, forceClose = false) {
+      let { showDdCats, showDdSubCats } = this.state;
+
+      if (input === "category") {
+         showDdCats = forceClose ? false : !showDdCats;
+         this.setState({ showDdCats });
+      } else {
+         showDdSubCats = forceClose ? false : !showDdSubCats;
+         this.setState({ showDdSubCats });
       }
    }
 
@@ -205,9 +235,10 @@ export default class FormPanel extends Component {
       const dropdown = function(input) {
          let {
             savedInputs: { category, subCategory },
-            subCategories
+            subCategories,
+            showDdCats,
+            showDdSubCats
          } = this.state;
-
 
          const categories = dbCategories.map(
             function(cat) {
@@ -245,7 +276,12 @@ export default class FormPanel extends Component {
                : subCategory === undefined
                   ? "Sub-Category"
                   : subCategory;
+
          const dropdown = input === "category" ? categories : subCategories;
+
+         let showDropdown = input === "category" ? showDdCats : showDdSubCats;
+         showDropdown = showDropdown ? "show" : "";
+
          return (
             <div className="btn-group">
                <button type="button" className="btn btn-secondary btn-name">
@@ -254,13 +290,16 @@ export default class FormPanel extends Component {
                <button
                   type="button"
                   className="btn btn-secondary dropdown-toggle dropdown-toggle-split"
-                  data-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
+                  onClick={this.toggleDropdowns.bind(null, input, false)}
                >
                   <span className="sr-only">{title}</span>
                </button>
-               <div className="dropdown-menu">{dropdown}</div>
+               <div
+                  className={`dropdown-menu ${showDropdown}`}
+                  onMouseLeave={this.toggleDropdowns.bind(null, input, true)}
+               >
+                  {dropdown}
+               </div>
             </div>
          );
       }.bind(this);
@@ -373,7 +412,6 @@ export default class FormPanel extends Component {
          activeClickedElem
       } = this.props;
 
-      console.log("savedInputs: ", savedInputs);
       updateClickedPlacement(savedInputs);
       dispatch(saveInputs(savedInputs));
 
@@ -403,23 +441,35 @@ export default class FormPanel extends Component {
       this.setState({ savedInputs });
    }
 
+   forceClose() {
+      const { slidedIn } = this.state;
+
+      if (slidedIn) {
+         this.setState({ slidedIn: "closed" });
+      } else {
+         this.setState({ slidedIn: true });
+         setTimeout(() => {
+            this.setState({ slidedIn: "closed" });
+         }, 600);
+      }
+   }
+
    render() {
-      const { slidedIn, renderCounter } = this.state;
+      const { slidedIn } = this.state;
       const { sceneMounted, mouseOnPanel } = this.props;
 
-      // renderCounter is used to keep the panel closed without animation when the scene is mounted
-      const slideAnim = renderCounter
-         ? slidedIn
-            ? "slideOutRight"
-            : "slideInRight"
+      const slideAnim = sceneMounted
+         ? slidedIn === "closed"
+            ? "closed"
+            : slidedIn
+               ? "slideOutRight"
+               : "slideInRight"
          : "closed";
       const arrow = slidedIn ? "left" : "right";
 
       if (!sceneMounted) {
          return <div />;
       }
-
-      // console.log(this.state);
 
       return (
          <div

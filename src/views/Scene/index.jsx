@@ -94,32 +94,6 @@ class Scene extends Component {
          windowW: width,
          windowH: height
       });
-
-      // if (!isLoad_webgl) {
-      // LOAD SCRIPTS
-      // const scripts = [
-      //    "CopyShader",
-      //    "FXAAShader",
-      //    "EffectComposer",
-      //    "RenderPass",
-      //    "ShaderPass",
-      //    "PointerLockControls",
-      //    "OutlinePass"
-      // ];
-
-      // let scriptPath;
-
-      // scripts.forEach(script => {
-      //    const s = document.createElement("script");
-      //    scriptPath = `../../../threeJsScripts/${script}.js`;
-      //    console.log("scriptPath: ", scriptPath);
-      //    //    s.src = require(scriptPath);
-      //    s.src = scriptPath;
-      //    s.async = true;
-      //    document.body.appendChild(s);
-      // });
-      // dispatch(load_webgl());
-      // }
    }
 
    componentDidMount() {
@@ -181,6 +155,7 @@ class Scene extends Component {
       this.camera = camera;
       this.scene = scene;
       this.group = group;
+
       this.mouse = mouse;
       this.raycaster = raycaster;
       this.selectedObjects = selectedObjects;
@@ -413,8 +388,9 @@ class Scene extends Component {
    loadScene() {
       const { THREE } = window;
 
+      console.log("this.group: ", this.group);
       // Check is there was a scene loaded
-      if (!!this.group) {
+      if (this.group.children.length > 0) {
          this.clear();
       }
 
@@ -428,18 +404,10 @@ class Scene extends Component {
       if (!sceneMounted) {
          this.mount.appendChild(this.renderer.domElement);
          this.setEventListeners();
+         this.setPostProcessing();
       }
-      this.setPostProcessing();
 
       const obj3d = new THREE.Object3D();
-
-      // userData.userObjects.some(obj => {
-      //   if (obj.includes(selectedScene.name)) {
-      //     objUrl = obj;
-      //     return true;
-      //   }
-      // });
-      // mtlUrl = objUrl.split(".")[0] + ".mtl";
 
       // LOAD OBJECT
       const onProgress = xhr => {
@@ -477,23 +445,6 @@ class Scene extends Component {
          this.setState({ loadingProgress, loadingError, sceneMounted: true });
       };
 
-      // LOAD MTL FILE
-      // const obj = require(`../../assets/obj/scene.obj`);
-      // LOAD MTL FILE
-      // const mtl = require(`../../assets/obj/scene.mtl`);
-
-      // const obj = "http://almora.io/scene.obj";
-      // const obj = require(`../../assets/webgl/modelTest/exportObjScene1.obj`);
-      // const mtl = require(`../../assets/webgl/modelTest/exportObjScene1.mtl`);
-
-      // const obj = "Scene.obj";
-      // const mtl = "Scene.mtl";
-      // const renderPath = "https://s3.us-east-2.amazonaws.com/advirbucket/8f7e892d-7726-480b-8b27-c1e38205b72d/9ca489a9-9f30-49ab-a599-25fbe565e720/";
-
-      // console.log(mtl);
-
-      // {s3 server address}/{userId}/{sceneId}/{sceneName}.obj
-
       // GET .OBJ AND .MTL URL
       const dns = "https://s3.us-east-2.amazonaws.com/advirbucket";
       let renderPath = `${dns}/${userId}/${selectedScene._id}/`;
@@ -523,16 +474,20 @@ class Scene extends Component {
       });
 
       this.scene.add(this.group);
+
       this.group.add(obj3d);
    }
 
    clear() {
+      // Clear object name from form
+      this.setState({ clickedPlacement: {}, sceneMounted: false });
+      const { THREE } = window;
       const { scene } = this;
       var selectedObject = scene.getObjectByName("scene 1");
       scene.remove(selectedObject);
 
-      // Clear object name from form
-      this.setState({ clickedPlacement: {} });
+      this.controls.dispose();
+      this.group = new THREE.Group();
    }
 
    disableControls() {
@@ -556,13 +511,15 @@ class Scene extends Component {
    enablePointerLockControls() {
       const { THREE } = window;
 
-      const { scene, camera } = this;
-      const controls = new THREE.PointerLockControls(camera);
+      if (!this.controls) {
+         const controls = new THREE.PointerLockControls(this.camera);
 
-      scene.add(controls.getObject());
+         this.scene.add(controls.getObject());
 
-      this.controls = controls;
-      this.scene = scene;
+         this.controls = controls;
+      } else {
+         this.controls.enable();
+      }
    }
 
    TrackballControlsEnableWheel() {

@@ -103,6 +103,8 @@ THREE.PointerLockControls = function(pCamera) {
    };
 
    var onKeyDown = function(event) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
       var target = event.target || event.srcElement;
       if (target.nodeName.toLowerCase() == "input") return;
       switch (event.keyCode) {
@@ -168,6 +170,24 @@ THREE.PointerLockControls = function(pCamera) {
       document.body.style.cursor = "alias";
       document.addEventListener("mousemove", onMouseMove, false);
       document.addEventListener("wheel", onMouseWheel, false);
+   };
+
+   this.dispose = function() {
+      document.removeEventListener("wheel", onMouseWheel, false);
+      document.removeEventListener("mousemove", onMouseMove, false);
+      document.removeEventListener("mouseup", onMouseUp, false);
+      document.removeEventListener("mousedown", onMouseDown, false);
+      document.removeEventListener("keydown", onKeyDown, false);
+      document.removeEventListener("keyup", onKeyUp, false);
+   };
+
+   this.enable = function() {
+      document.addEventListener("wheel", onMouseWheel, false);
+      document.addEventListener("mousemove", onMouseMove, false);
+      document.addEventListener("mouseup", onMouseUp, false);
+      document.addEventListener("mousedown", onMouseDown, false);
+      document.addEventListener("keydown", onKeyDown, false);
+      document.addEventListener("keyup", onKeyUp, false);
    };
 
    //==============

@@ -50,7 +50,7 @@ $black: #000;
 $white: #fff;
 
 .hidden {
-   display: none;
+   display: none !important;
 }
 
 .cc {
@@ -404,6 +404,12 @@ $inputsFontSize: calc(0.45em + 0.3vw);
             max-height: 50px;
             margin-right: 1.5vw;
          }
+
+         button {
+            border: 0;
+            background-color: transparent;
+         }
+
          .dropdown {
             display: flex;
             flex-flow: row-reverse;
@@ -428,7 +434,7 @@ $inputsFontSize: calc(0.45em + 0.3vw);
             }
          }
          .dropdown-menu.show {
-            transform: translate3d(-10%, 40px, 0px) !important;
+            transform: translate3d(0, 0px, 0) !important;
             // border: 0;
             width: 120%;
             min-width: unset;
@@ -588,7 +594,6 @@ $inputsFontSize: calc(0.45em + 0.3vw);
       }
 
       .dropdown-menu.show {
-         transform: translate3d(0%, 65%, 0) !important;
          width: 100%;
          // border: none !important;
          box-shadow: none;
@@ -1356,7 +1361,6 @@ $inputsFontSize: calc(0.45em + 0.3vw);
                      justify-content: center;
                   }
                   .dropdown-menu.show {
-                     transform: translate3d(0%, 13%, 0) !important;
                      max-height: 25vh;
                      overflow-y: scroll;
                   }
