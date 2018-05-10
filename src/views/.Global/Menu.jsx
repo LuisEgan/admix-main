@@ -163,9 +163,9 @@ class Menu extends Component {
       showDropdown = showDropdown ? "show" : "";
 
       return (
-         <div className="" id="headerMenu">
+         <div id="headerMenu">
             <div className="container">
-               <div className="" id="logo-container">
+               <div id="logo-container">
                   <div className="header-logo cc">
                      <NavLink exact to={routeCodes.LOGIN} className="cc">
                         <img src={logoImg20} />
