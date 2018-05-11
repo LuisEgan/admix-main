@@ -167,7 +167,7 @@ class Setup extends Component {
                   <img src={unity} alt="Engine" />
                </div>
 
-               <div className="app-name">{name}</div>
+               <div className="app-name mb">{name}</div>
 
                <div className="app-status">
                   <div className="active-switch clearfix toggleBtn">

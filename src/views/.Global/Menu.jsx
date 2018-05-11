@@ -6,6 +6,7 @@ import PropTypes from "prop-types";
 import { logout, async } from "../../actions";
 import logoImg20 from "../../assets/img/logo_20.png";
 import loginImg from "../../assets/img/login-img.png";
+import userImgGen from "../../assets/img/userImg.png";
 import book2 from "../../assets/img/book2.jpg";
 import sam20 from "../../assets/img/sam_20.jpg";
 import admixLoading from "../../assets/gifs/admixBreath.gif";
@@ -40,13 +41,14 @@ class Menu extends Component {
             opacity: 0,
             redirectTo: ""
          },
-         userImg: ""
+         userImg: "",
+         userHasImg: true
       };
 
       this.handleLogout = this.handleLogout.bind(this);
       this.handleClick = this.handleClick.bind(this);
       this.updateMenuImg = this.updateMenuImg.bind(this);
-      this.handleNoImg = this.handleNoImg.bind(this);
+      this.noUserImg = this.noUserImg.bind(this);
       this.toggleDropdowns = this.toggleDropdowns.bind(this);
    }
 
@@ -94,11 +96,12 @@ class Menu extends Component {
       const { userData } = this.props;
       const userId = userData._id;
       this.setState({
-         userImg: `${CLOUDINARY_IMG_URL}/${userId}.png?${new Date().getTime()}`
+         userImg: `${CLOUDINARY_IMG_URL}/${userId}.png?${new Date().getTime()}`,
+         userHasImg: true
       });
    }
 
-   handleNoImg(e) {
+   noUserImg(e) {
       const { userData } = this.props;
       const userId = userData._id;
 
@@ -109,12 +112,13 @@ class Menu extends Component {
 
       userImg = userId
          ? `${CLOUDINARY_IMG_URL}/${userId}.png?${new Date().getTime()}`
-         : "";
-      this.setState({ userImg });
+         : loginImg;
+      this.setState({ userImg, userHasImg: false });
    }
 
    handleLogout() {
       const { dispatch } = this.props;
+      this.toggleDropdowns(true);
       dispatch(logout());
    }
 
@@ -148,19 +152,30 @@ class Menu extends Component {
    }
 
    toggleDropdowns(forceClose = false) {
+      console.log("forceClose: ", forceClose);
       let { showDropdown } = this.state;
       showDropdown = forceClose ? false : !showDropdown;
       this.setState({ showDropdown });
    }
 
    render() {
-      let { stepBarStyle, redirectTo, userImg, showDropdown } = this.state;
+      let {
+         stepBarStyle,
+         redirectTo,
+         userImg,
+         showDropdown,
+         userHasImg
+      } = this.state;
       const {
          location: { pathname },
          isLoggedIn
       } = this.props;
 
       showDropdown = showDropdown ? "show" : "";
+
+      const userImgStyle = userHasImg
+         ? {}
+         : { padding: "4%", backgroundColor: "#f2f2f2" };
 
       return (
          <div id="headerMenu">
@@ -195,6 +210,7 @@ class Menu extends Component {
                                  exact
                                  to={routeCodes.LOGIN}
                                  className="dropdown-item"
+                                 onClick={this.toggleDropdowns.bind(null, true)}
                               >
                                  Login
                               </NavLink>
@@ -205,6 +221,7 @@ class Menu extends Component {
                                  exact
                                  to={routeCodes.PROFILE}
                                  className="dropdown-item"
+                                 onClick={this.toggleDropdowns.bind(null, true)}
                               >
                                  Profile
                               </NavLink>
@@ -213,18 +230,14 @@ class Menu extends Component {
                            {isLoggedIn && (
                               <a
                                  className="dropdown-item"
-                                 onClick={event => this.handleLogout(event)}
+                                 onClick={this.handleLogout}
                               >
                                  Logout
                               </a>
                            )}
                         </div>
                      </div>
-                     <img
-                        src={userImg}
-                        onError={this.handleNoImg}
-                        alt="Login"
-                     />
+                     <img src={userImg} onError={this.noUserImg} alt="Login" />
                   </div>
                )}
             </div>

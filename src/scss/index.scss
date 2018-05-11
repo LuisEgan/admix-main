@@ -4,6 +4,8 @@ $mobileBreakpoint: 830px;
 $blueAdmix: #157cc1;
 
 * {
+   font-family: "Roboto";
+
    &::-webkit-scrollbar {
       width: 0.5em;
    }
@@ -37,7 +39,7 @@ body {
 }
 
 body {
-   // font-family: 'Lato', sans-serif;
+   font-family: "Roboto", sans-serif;
    font-size: 18px;
    color: #383939;
    background: #fdfdfd;
@@ -739,15 +741,20 @@ $inputsFontSize: calc(0.45em + 0.3vw);
 
    .dropzone {
       @extend .cc;
+      position: relative;
       border-radius: 100% !important;
-      border: none !important;
-      width: 7vw !important;
-      height: 7vw !important;
-      max-width: 80px;
-      max-height: 80px;
-      background-color: #b2b2b2;
+      border: solid 3px $blueAdmix;
+      //   padding: 5%;
+      background-color: white;
+      max-width: 100px;
+      max-height: 100px;
       font-weight: bolder;
-      color: #f2f2f2;
+      color: #999999;
+      background-color: white;
+      //   border: none !important;
+      //   width: 7vw !important;
+      //   height: 7vw !important;
+      //   background-color: #b2b2b2;
 
       img {
          width: 7vw;
@@ -755,11 +762,28 @@ $inputsFontSize: calc(0.45em + 0.3vw);
          border-radius: 100%;
          max-width: 80px;
          max-height: 80px;
+         padding: 10%;
+      }
+
+      svg {
+         color: $blueAdmix;
+         position: absolute;
+         bottom: 0;
+         font-size: 1.5em;
+         right: 0;
+         background: white;
+         padding: 4%;
+         border-radius: 100%;
       }
 
       &:hover {
+         svg {
+            color: white;
+            background: $blueAdmix;
+            transition: 0.5s;
+         }
          cursor: pointer;
-         background-color: #999999;
+         //  background-color: #999999;
       }
    }
 
@@ -1042,7 +1066,7 @@ $inputsFontSize: calc(0.45em + 0.3vw);
                @extend .text-truncate;
                width: 25%;
                padding: 0 2%;
-               // text-align: center;
+               color: black;
             }
 
             .app-status {
@@ -1958,8 +1982,8 @@ $inputsFontSize: calc(0.45em + 0.3vw);
 
 #profile {
    .container {
-      padding: 3%;
-      margin: 0;
+      padding: 0 3%;
+      margin: 0 auto;
 
       > div {
          display: flex;
@@ -1970,7 +1994,7 @@ $inputsFontSize: calc(0.45em + 0.3vw);
             &:first-child() {
                display: flex;
                align-items: center;
-               width: 10%;
+               width: 20vw;
                color: #000000;
             }
 
