@@ -15,7 +15,6 @@ import {
    CLOUDINARY_IMG_URL
 } from "../../config/cloudinary";
 
-import cross from "../../assets/img/cross.png";
 import userImgGen from "../../assets/img/userImg.png";
 
 class Profile extends Component {
@@ -120,7 +119,7 @@ class Profile extends Component {
                updateMenuImg();
                this.setState({
                   uploadedFileCloudinaryUrl: `${
-                     response.body.secure_url
+                     data.body.secure_url
                   }?${new Date().getTime()}`,
                   userHasImg: true
                });
