@@ -1,9 +1,13 @@
+import api from "../../api";
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Field, reduxForm } from "redux-form";
 import PropTypes from "prop-types";
 import Dropzone from "react-dropzone";
 import request from "superagent";
+
+import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
 
 import {
    CLOUDINARY_UPLOAD_PRESET,
@@ -12,6 +16,7 @@ import {
 } from "../../config/cloudinary";
 
 import cross from "../../assets/img/cross.png";
+import userImgGen from "../../assets/img/userImg.png";
 
 class Profile extends Component {
    static propTypes = {
@@ -25,12 +30,14 @@ class Profile extends Component {
          statusMssg: "",
          uploadedFileCloudinaryUrl: "",
          uploadedFile: "",
-         userImg: true
+         userHasImg: true
       };
 
       this.renderField = this.renderField.bind(this);
       this.onImageDrop = this.onImageDrop.bind(this);
-      this.handleImageUpload = this.handleImageUpload.bind(this);
+      this.handleImageUploadClient = this.handleImageUploadClient.bind(this);
+      this.handleImageUploadServer = this.handleImageUploadServer.bind(this);
+      this.noUserImg = this.noUserImg.bind(this);
    }
 
    componentDidMount() {
@@ -53,6 +60,80 @@ class Profile extends Component {
 
    hardUnfocus(input) {
       this[input].blur();
+   }
+
+   handleSubmit = e => {
+      e.preventDefault();
+      const {
+         form: {
+            profileForm: { values }
+         }
+      } = this.props;
+      console.log("values: ", values);
+   };
+
+   onImageDrop(files) {
+      this.setState({
+         uploadedFile: files[0]
+      });
+
+      this.handleImageUploadClient(files[0]);
+   }
+
+   handleImageUploadClient(file) {
+      const {
+         userData: { _id },
+         updateMenuImg
+      } = this.props;
+
+      let upload = request
+         .post(CLOUDINARY_UPLOAD_URL)
+         .field("upload_preset", CLOUDINARY_UPLOAD_PRESET)
+         .field("public_id", _id)
+         .field("file", file);
+
+      upload.end((err, response) => {
+         if (err) {
+            console.error(err);
+         }
+
+         if (response.body.secure_url !== "") {
+            updateMenuImg();
+            this.setState({
+               uploadedFileCloudinaryUrl: `${
+                  response.body.secure_url
+               }?${new Date().getTime()}`,
+               userHasImg: true
+            });
+         }
+      });
+   }
+
+   handleImageUploadServer(uploadImg) {
+      const { accessToken, updateMenuImg } = this.props;
+
+      api
+         .cloudinayImgUpload(accessToken, uploadImg)
+         .then(data => {
+            console.log("data: ", data);
+            if (data.body.secure_url !== "") {
+               updateMenuImg();
+               this.setState({
+                  uploadedFileCloudinaryUrl: `${
+                     response.body.secure_url
+                  }?${new Date().getTime()}`,
+                  userHasImg: true
+               });
+            }
+         })
+         .catch(error => {
+            console.log("error: ", error);
+         });
+   }
+
+   noUserImg(e) {
+      e.target.src = userImgGen;
+      this.setState({ userHasImg: false });
    }
 
    renderField(field) {
@@ -84,61 +165,17 @@ class Profile extends Component {
       );
    }
 
-   handleSubmit = e => {
-      e.preventDefault();
-      const {
-         form: {
-            profileForm: { values }
-         }
-      } = this.props;
-      console.log("values: ", values);
-   };
-
-   onImageDrop(files) {
-      this.setState({
-         uploadedFile: files[0]
-      });
-
-      this.handleImageUpload(files[0]);
-   }
-
-   handleImageUpload(file) {
-      const {
-         userData: { _id },
-         updateMenuImg
-      } = this.props;
-
-      let upload = request
-         .post(CLOUDINARY_UPLOAD_URL)
-         .field("upload_preset", CLOUDINARY_UPLOAD_PRESET)
-         .field("public_id", _id)
-         .field("file", file);
-
-      upload.end((err, response) => {
-         if (err) {
-            console.error(err);
-         }
-
-         if (response.body.secure_url !== "") {
-            updateMenuImg();
-            this.setState({
-               uploadedFileCloudinaryUrl: `${
-                  response.body.secure_url
-               }?${new Date().getTime()}`
-            });
-         }
-      });
-   }
-
    render() {
-      const { statusMssg, uploadedFileCloudinaryUrl } = this.state;
+      const { statusMssg, uploadedFileCloudinaryUrl, userHasImg } = this.state;
+
+      const userImgStyle = userHasImg ? { padding: "5%" } : { padding: "15%" };
 
       return (
-         <div id="profile">
+         <div className="step-container" id="profile">
             <form onSubmit={this.handleSubmit}>
                <div className="container">
                   <div>
-                     <h2 className="st">My profile</h2>
+                     <h3 className="st">My profile</h3>
                   </div>
                   <div>
                      <div className="mb">Profile picture</div>
@@ -149,18 +186,14 @@ class Profile extends Component {
                            onDrop={this.onImageDrop}
                            className="dropzone"
                         >
-                           {/* <img src={cross} alt="+" /> */}
                            <img
                               src={uploadedFileCloudinaryUrl}
-                              onError={e => {
-                                 e.target.src = cross;
-                              }}
+                              onError={this.noUserImg}
                               alt="+"
+                              style={userImgStyle}
                            />
+                           <FontAwesomeIcon icon={faEdit} />
                         </Dropzone>
-                        {/* <div className="image-uploaded">
-                  <img src={} onError={}/>
-                </div> */}
                      </div>
                   </div>
 
