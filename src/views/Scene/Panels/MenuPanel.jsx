@@ -124,7 +124,10 @@ export default class MenuPanel extends Component {
       let showDropdown = showDdScenes ? "show" : "";
 
       return (
-         <div className="btn-group">
+         <div
+            className="btn-group"
+            onMouseLeave={this.toggleDropdowns.bind(null, true)}
+         >
             <button type="button" className="btn btn-secondary dropdown-title">
                {selectedScene}
             </button>

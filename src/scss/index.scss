@@ -596,6 +596,7 @@ $inputsFontSize: calc(0.45em + 0.3vw);
       }
 
       .dropdown-menu.show {
+         transform: translate3d(0, -1vh, 0px) !important;
          width: 100%;
          // border: none !important;
          box-shadow: none;
@@ -1385,6 +1386,7 @@ $inputsFontSize: calc(0.45em + 0.3vw);
                      justify-content: center;
                   }
                   .dropdown-menu.show {
+                     transform: translate3d(0, -1vh, 0px) !important;
                      max-height: 25vh;
                      overflow-y: scroll;
                   }

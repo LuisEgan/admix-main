@@ -283,7 +283,10 @@ export default class FormPanel extends Component {
          showDropdown = showDropdown ? "show" : "";
 
          return (
-            <div className="btn-group">
+            <div
+               className="btn-group"
+               onMouseLeave={this.toggleDropdowns.bind(null, input, true)}
+            >
                <button type="button" className="btn btn-secondary btn-name">
                   {title}
                </button>

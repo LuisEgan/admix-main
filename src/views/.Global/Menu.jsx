@@ -152,7 +152,6 @@ class Menu extends Component {
    }
 
    toggleDropdowns(forceClose = false) {
-      console.log("forceClose: ", forceClose);
       let { showDropdown } = this.state;
       showDropdown = forceClose ? false : !showDropdown;
       this.setState({ showDropdown });
@@ -191,7 +190,11 @@ class Menu extends Component {
                <div className="cc" id="steps-container" />
 
                {isLoggedIn && (
-                  <div className="" id="dropdown-container">
+                  <div
+                     className=""
+                     id="dropdown-container"
+                     onMouseLeave={this.toggleDropdowns.bind(null, true)}
+                  >
                      <div className="dropdown">
                         <button
                            className="btn btn-secondary dropdown-toggle"
