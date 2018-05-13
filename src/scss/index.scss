@@ -953,6 +953,22 @@ $inputsFontSize: calc(0.45em + 0.3vw);
                width: 100%;
                margin: 2vh 0;
             }
+
+            svg {
+               position: absolute;
+               bottom: 40%;
+               right: 5%;
+               transition: 0.3s;
+               &:hover {
+                  font-size: 1.2em;
+                  color: $blueAdmix;
+                  bottom: 35%;
+               }
+            }
+
+            .userPass {
+               position: relative;
+            }
          }
 
          .login-btn {
@@ -1000,6 +1016,12 @@ $inputsFontSize: calc(0.45em + 0.3vw);
             @extend .btn-dark;
          }
       }
+   }
+
+   #passRules {
+      font-size: 0.8em;
+      color: $grey-text;
+      text-align: left;
    }
 }
 

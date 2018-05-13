@@ -3,10 +3,12 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { login, signup, forgotPass, resetAsync } from "../../actions";
 import ToggleDisplay from "react-toggle-display";
+import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import faEye from "@fortawesome/fontawesome-free-solid/faEye";
 
 // @connect(state => ({
 //    asyncData: state.app.get("asyncData"),
-//    asyncError: state.app.get("asyncError"),
+//    asyncError: state.app.get("asy      ncError"),
 //    asyncLoading: state.app.get("asyncLoading"),
 //    counter: state.app.get("counter"),
 //    isLoggedIn: state.app.get("isLoggedIn")
@@ -27,6 +29,13 @@ class Login extends Component {
       this.state = {
          email: "",
          password: "",
+         passInputType: "password",
+         passValidation: {
+            focused: false,
+            is8: false,
+            hasLetter: false,
+            hasNumber: false
+         },
          name: "",
          show: "login",
          animate: false
@@ -37,6 +46,7 @@ class Login extends Component {
 
       this.handleInputChange = this.handleInputChange.bind(this);
       this.handleforgotPass = this.handleforgotPass.bind(this);
+      this.togglePassInputType = this.togglePassInputType.bind(this);
       this.toggleView = this.toggleView.bind(this);
       this.handleFocus = this.handleFocus.bind(this);
       this.handleKeyPress = this.handleKeyPress.bind(this);
@@ -64,6 +74,12 @@ class Login extends Component {
       });
    }
 
+   togglePassInputType() {
+      let { passInputType } = this.state;
+      passInputType = passInputType === "password" ? "text" : "password";
+      this.setState({ passInputType });
+   }
+
    handleLogin() {
       const { dispatch } = this.props;
       const { email, password } = this.state;
@@ -85,13 +101,22 @@ class Login extends Component {
    handleInputChange(input, e) {
       const state = this.state;
       state[input] = e.target.value;
+
       this.setState(state);
    }
 
-   handleFocus() {
+   handleFocus(input, e) {
+      console.log("input: ", input);
       const { asyncError, dispatch } = this.props;
+      const { passValidation } = this.state;
+
       if (asyncError !== "") {
          dispatch(resetAsync());
+      }
+
+      if (input === "password") {
+         passValidation.focused = true;
+         this.setState({ passValidation });
       }
    }
 
@@ -105,21 +130,27 @@ class Login extends Component {
       this[input].focus();
    }
 
+   is8(str) {
+      return str.length > 7;
+   }
+
+   hasLetter(str) {
+      return /[a-z]/i.test(str);
+   }
+
+   hasNumber(str) {
+      return /\d/.test(str);
+   }
+
    render() {
       const { asyncData, asyncError, asyncLoading } = this.props;
 
-      const { show } = this.state;
-
-      // if (isLoggedIn) {
-      //    return (
-      //       <Redirect
-      //          to={{
-      //             pathname: routeCodes.SETUP,
-      //             state: { from: location }
-      //          }}
-      //       />
-      //    );
-      // }
+      const {
+         show,
+         passInputType,
+         password,
+         passValidation: { focused }
+      } = this.state;
 
       // const loading = <i className="fa fa-cog fa-spin"></i>;
       const loadingIcon = <p>Loading...</p>;
@@ -127,6 +158,18 @@ class Login extends Component {
       const showLogin = show === "login";
       const showLostPast = show === "forgotPass";
       const showRegister = show === "register";
+
+      // for password register
+      let is8Style, hasLetterStyle, hasNumberStyle;
+      if (focused) {
+         is8Style = this.is8(password) ? { color: "green" } : { color: "red" };
+         hasLetterStyle = this.hasLetter(password)
+            ? { color: "green" }
+            : { color: "red" };
+         hasNumberStyle = this.hasNumber(password)
+            ? { color: "green" }
+            : { color: "red" };
+      }
 
       return (
          <div id="login" onKeyPress={this.handleKeyPress}>
@@ -148,17 +191,28 @@ class Login extends Component {
                         }}
                         onClick={this.hardFocus.bind(null, "nameInput")}
                      />
-                     <input
-                        type="password"
-                        className="form-control"
-                        placeholder="Password"
-                        onChange={this.handleInputChange.bind(null, "password")}
-                        onFocus={this.handleFocus}
-                        ref={input => {
-                           this.passInput = input;
-                        }}
-                        onClick={this.hardFocus.bind(null, "passInput")}
-                     />
+
+                     <div className="userPass">
+                        <input
+                           type={passInputType}
+                           className="form-control"
+                           placeholder="Password"
+                           onChange={this.handleInputChange.bind(
+                              null,
+                              "password"
+                           )}
+                           onFocus={this.handleFocus}
+                           ref={input => {
+                              this.passInput = input;
+                           }}
+                           onClick={this.hardFocus.bind(null, "passInput")}
+                        />
+                        <FontAwesomeIcon
+                           icon={faEye}
+                           onMouseEnter={this.togglePassInputType}
+                           onMouseLeave={this.togglePassInputType}
+                        />
+                     </div>
                   </div>
 
                   <div className="login-btn cc">
@@ -276,17 +330,35 @@ class Login extends Component {
                            "registerEmailInput"
                         )}
                      />
-                     <input
-                        type="password"
-                        className="form-control"
-                        placeholder="Password"
-                        onChange={this.handleInputChange.bind(null, "password")}
-                        onFocus={this.handleFocus}
-                        ref={input => {
-                           this.registerPassInput = input;
-                        }}
-                        onClick={this.hardFocus.bind(null, "registerPassInput")}
-                     />
+                     <div className="userPass">
+                        <input
+                           type={passInputType}
+                           className="form-control"
+                           placeholder="Password"
+                           onChange={this.handleInputChange.bind(
+                              null,
+                              "password"
+                           )}
+                           onFocus={this.handleFocus.bind(null, "password")}
+                           ref={input => {
+                              this.registerPassInput = input;
+                           }}
+                           onClick={this.hardFocus.bind(
+                              null,
+                              "registerPassInput"
+                           )}
+                        />
+                        <FontAwesomeIcon
+                           icon={faEye}
+                           onMouseEnter={this.togglePassInputType}
+                           onMouseLeave={this.togglePassInputType}
+                        />
+                     </div>
+                     <div id="passRules">
+                        <span style={is8Style}>min 8 characters - </span>
+                        <span style={hasLetterStyle}>one letter - </span>
+                        <span style={hasNumberStyle}>one number</span>
+                     </div>
                   </div>
 
                   <div className="login-btn cc">
