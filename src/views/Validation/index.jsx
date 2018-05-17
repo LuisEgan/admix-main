@@ -48,7 +48,9 @@ class Validation extends Component {
       };
       dispatch(toggleAppStatus(appDetails, accessToken));
 
-      dispatch(updatePlacements(accessToken, savedInputs));
+      savedInputs.length !== 0 &&
+         dispatch(updatePlacements(accessToken, savedInputs));
+
       this.setState({ startCampaign: true });
    }
 
@@ -61,8 +63,9 @@ class Validation extends Component {
       const { startCampaign, emojiLoaded } = this.state;
       const loadingIcon = <p>Loading...</p>;
 
-      if (savedInputs.length === 0) {
-         const route = startCampaign ? "CONGRATULATIONS" : "SETUP";
+      if (savedInputs.length === 0 && startCampaign) {
+         //  const route = startCampaign ? "CONGRATULATIONS" : "SETUP";
+         const route = "CONGRATULATIONS";
          return (
             <Redirect
                to={{

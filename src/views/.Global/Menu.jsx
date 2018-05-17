@@ -204,10 +204,7 @@ class Menu extends Component {
                            {/* <i className="fa fa-user" aria-hidden="true"></i> */}
                            <span className="st">My Profile</span>
                         </button>
-                        <div
-                           className={`dropdown-menu ${showDropdown}`}
-                           onMouseLeave={this.toggleDropdowns.bind(null, true)}
-                        >
+                        <div className={`dropdown-menu ${showDropdown}`}>
                            {!isLoggedIn && (
                               <NavLink
                                  exact

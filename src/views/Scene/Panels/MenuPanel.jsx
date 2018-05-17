@@ -258,7 +258,14 @@ export default class MenuPanel extends Component {
                </div>
 
                <h2 className="mb">Happy with all the scenes?</h2>
-               {saveClicked && (
+               <NavLink
+                  exact
+                  to={routeCodes.VALIDATION}
+                  className="btn btn-dark"
+               >
+                  Finish Editing
+               </NavLink>
+               {/* {saveClicked && (
                   <NavLink
                      exact
                      to={routeCodes.VALIDATION}
@@ -278,7 +285,7 @@ export default class MenuPanel extends Component {
                         Finish Editing
                      </button>
                   </div>
-               )}
+               )} */}
             </div>
 
             {sceneMounted && this.renderControls()}
