@@ -197,13 +197,7 @@ export default class MenuPanel extends Component {
    }
 
    render() {
-      const {
-         selectedApp,
-         location,
-         mouseOnPanel,
-         saveClicked,
-         sceneMounted
-      } = this.props;
+      const { selectedApp, location, mouseOnPanel, sceneMounted } = this.props;
 
       if (!selectedApp || Object.keys(selectedApp).length < 3) {
          alert("No app selected!");

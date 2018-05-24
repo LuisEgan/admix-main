@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { login, signup, forgotPass, resetAsync } from "../../actions";
 import ToggleDisplay from "react-toggle-display";
+import STR from "../../utils/strFuncs";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faEye from "@fortawesome/fontawesome-free-solid/faEye";
 
@@ -30,12 +31,18 @@ class Login extends Component {
          email: "",
          password: "",
          passInputType: "password",
-         passValidation: {
-            focused: false,
-            is8: false,
-            hasLetter: false,
-            hasNumber: false
+         confirmPassword: "",
+         regValidation: {
+            isValidName: "",
+            isValidEmail: "",
+            is8: "",
+            hasLetter: "",
+            hasNumber: "",
+            arePassSame: "",
+            policy: false,
+            consent: false
          },
+         registerBtnDisabled: true,
          name: "",
          show: "login",
          animate: false
@@ -100,23 +107,42 @@ class Login extends Component {
 
    handleInputChange(input, e) {
       const state = this.state;
-      state[input] = e.target.value;
+      const inputValue = e.target.value;
+
+      state[input] = inputValue;
+      state.registerBtnDisabled = false;
+
+      if (input === "name") {
+         state.regValidation.isValidName = STR.hasOnlyLetters(inputValue);
+      } else if (input === "email") {
+         state.regValidation.isValidEmail = STR.isValidEmail(inputValue);
+      } else if (input === "password") {
+         state.regValidation.is8 = STR.isAtleast(inputValue, 8);
+         state.regValidation.hasLetter = STR.hasLetter(inputValue);
+         state.regValidation.hasNumber = STR.hasNumber(inputValue);
+      } else if (input === "confirmPassword") {
+         state.regValidation.arePassSame = state.password === inputValue;
+      } else {
+         // for policy and consent
+         state.regValidation[input] = !state.regValidation[input];
+      }
+
+      for (let validation in state.regValidation) {
+         if (!state.regValidation[validation]) {
+            state.registerBtnDisabled = true;
+         }
+      }
+
+      if (state.name === "") state.registerBtnDisabled = true;
 
       this.setState(state);
    }
 
-   handleFocus(input, e) {
-      console.log("input: ", input);
+   handleFocus(e) {
       const { asyncError, dispatch } = this.props;
-      const { passValidation } = this.state;
 
       if (asyncError !== "") {
          dispatch(resetAsync());
-      }
-
-      if (input === "password") {
-         passValidation.focused = true;
-         this.setState({ passValidation });
       }
    }
 
@@ -130,26 +156,21 @@ class Login extends Component {
       this[input].focus();
    }
 
-   is8(str) {
-      return str.length > 7;
-   }
-
-   hasLetter(str) {
-      return /[a-z]/i.test(str);
-   }
-
-   hasNumber(str) {
-      return /\d/.test(str);
-   }
-
    render() {
       const { asyncData, asyncError, asyncLoading } = this.props;
 
       const {
          show,
          passInputType,
-         password,
-         passValidation: { focused }
+         regValidation: {
+            isValidName,
+            isValidEmail,
+            is8,
+            hasLetter,
+            hasNumber,
+            arePassSame
+         },
+         registerBtnDisabled
       } = this.state;
 
       // const loading = <i className="fa fa-cog fa-spin"></i>;
@@ -159,17 +180,28 @@ class Login extends Component {
       const showLostPast = show === "forgotPass";
       const showRegister = show === "register";
 
-      // for password register
-      let is8Style, hasLetterStyle, hasNumberStyle;
-      if (focused) {
-         is8Style = this.is8(password) ? { color: "green" } : { color: "red" };
-         hasLetterStyle = this.hasLetter(password)
-            ? { color: "green" }
-            : { color: "red" };
-         hasNumberStyle = this.hasNumber(password)
-            ? { color: "green" }
-            : { color: "red" };
-      }
+      // for register validation
+      const goodStyle = { color: "green" };
+      const badStyle = { color: "red" };
+
+      // name
+      const isValidNameStyle =
+         isValidName === "" ? {} : isValidName ? goodStyle : badStyle;
+
+      // email
+      const isValidEmailStyle =
+         isValidEmail === "" ? {} : isValidEmail ? goodStyle : badStyle;
+
+      // password
+      const is8Style = is8 === "" ? {} : is8 ? goodStyle : badStyle;
+      const hasLetterStyle =
+         hasLetter === "" ? {} : hasLetter ? goodStyle : badStyle;
+      const hasNumberStyle =
+         hasNumber === "" ? {} : hasNumber ? goodStyle : badStyle;
+
+      // password confirm
+      const arePassSameStyle =
+         arePassSame === "" ? {} : arePassSame ? goodStyle : badStyle;
 
       return (
          <div id="login" onKeyPress={this.handleKeyPress}>
@@ -305,32 +337,50 @@ class Login extends Component {
                   </div>
 
                   <div className="inputs">
-                     <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Name"
-                        onChange={this.handleInputChange.bind(null, "name")}
-                        onFocus={this.handleFocus}
-                        ref={input => {
-                           this.registerNameInput = input;
-                        }}
-                        onClick={this.hardFocus.bind(null, "registerNameInput")}
-                     />
-                     <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Email"
-                        onChange={this.handleInputChange.bind(null, "email")}
-                        onFocus={this.handleFocus}
-                        ref={input => {
-                           this.registerEmailInput = input;
-                        }}
-                        onClick={this.hardFocus.bind(
-                           null,
-                           "registerEmailInput"
-                        )}
-                     />
-                     <div className="userPass">
+                     {/* NAME */}
+                     <div>
+                        <input
+                           type="text"
+                           className="form-control"
+                           placeholder="Name"
+                           onChange={this.handleInputChange.bind(null, "name")}
+                           onFocus={this.handleFocus}
+                           ref={input => {
+                              this.registerNameInput = input;
+                           }}
+                           onClick={this.hardFocus.bind(
+                              null,
+                              "registerNameInput"
+                           )}
+                        />
+                     </div>
+                     <div className="registerRules">
+                        <span style={isValidNameStyle}>only letters</span>
+                     </div>
+
+                     {/* EMAIL */}
+                     <div>
+                        <input
+                           type="text"
+                           className="form-control"
+                           placeholder="Email"
+                           onChange={this.handleInputChange.bind(null, "email")}
+                           onFocus={this.handleFocus}
+                           ref={input => {
+                              this.registerEmailInput = input;
+                           }}
+                           onClick={this.hardFocus.bind(
+                              null,
+                              "registerEmailInput"
+                           )}
+                        />
+                     </div>
+                     <div className="registerRules">
+                        <span style={isValidEmailStyle}>valid e-mail</span>
+                     </div>
+
+                     {/* PASSWORD */}
+                     <div>
                         <input
                            type={passInputType}
                            className="form-control"
@@ -339,7 +389,7 @@ class Login extends Component {
                               null,
                               "password"
                            )}
-                           onFocus={this.handleFocus.bind(null, "password")}
+                           onFocus={this.handleFocus}
                            ref={input => {
                               this.registerPassInput = input;
                            }}
@@ -354,13 +404,87 @@ class Login extends Component {
                            onMouseLeave={this.togglePassInputType}
                         />
                      </div>
-                     <div id="passRules">
+                     <div className="registerRules">
                         <span style={is8Style}>min 8 characters - </span>
                         <span style={hasLetterStyle}>one letter - </span>
                         <span style={hasNumberStyle}>one number</span>
                      </div>
+
+                     {/* PASSWORD CONFIRM */}
+                     <div>
+                        <input
+                           type={passInputType}
+                           className="form-control"
+                           placeholder="Confirm Password"
+                           onChange={this.handleInputChange.bind(
+                              null,
+                              "confirmPassword"
+                           )}
+                           onFocus={this.handleFocus}
+                           ref={input => {
+                              this.registerConfirmPassInput = input;
+                           }}
+                           onClick={this.hardFocus.bind(
+                              null,
+                              "registerConfirmPassInput"
+                           )}
+                        />
+                        <FontAwesomeIcon
+                           icon={faEye}
+                           onMouseEnter={this.togglePassInputType}
+                           onMouseLeave={this.togglePassInputType}
+                        />
+                     </div>
+                     <div className="registerRules">
+                        <span style={arePassSameStyle}>
+                           both passwords match
+                        </span>
+                     </div>
+
+                     {/* TERMS AND CONDITIONS */}
+                     <div className="registerCheckbox">
+                        <div>
+                           <div className="checkbox">
+                              <input
+                                 type="checkbox"
+                                 id="policy"
+                                 onChange={this.handleInputChange.bind(
+                                    null,
+                                    "policy"
+                                 )}
+                              />
+                              <label htmlFor="policy" />
+                           </div>
+                        </div>
+                        <div>
+                           I have read to Admix’s T&Cs and privacy policy
+                        </div>
+                     </div>
+
+                     {/* USERS CONSENT */}
+                     <div className="registerCheckbox">
+                        <div>
+                           <div className="checkbox">
+                              <input
+                                 type="checkbox"
+                                 id="consent"
+                                 onChange={this.handleInputChange.bind(
+                                    null,
+                                    "consent"
+                                 )}
+                              />
+                              <label htmlFor="consent" />
+                           </div>
+                        </div>
+                        <div>
+                           I confirm that I have consent from my users to
+                           process some of their data, such as device ID or
+                           location, to serve more relevant ads.
+                        </div>
+                     </div>
                   </div>
 
+                  {/* BUTTON */}
                   <div className="login-btn cc">
                      {asyncLoading && loadingIcon}
                      {asyncError && <p>Error: {asyncError}</p>}
@@ -371,6 +495,7 @@ class Login extends Component {
                            <button
                               className="btn btn-dark"
                               onClick={this.handleSignup}
+                              disabled={registerBtnDisabled}
                            >
                               Register
                            </button>
