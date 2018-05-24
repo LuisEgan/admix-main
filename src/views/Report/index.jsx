@@ -410,7 +410,7 @@ class Placement extends Component {
 
       const owAct = show("ow") ? "active" : "";
       const perAct = show("pe") ? "active" : "";
-      const anAct = show("an") ? "active" : "";
+      // const anAct = show("an") ? "active" : "";
 
       const performanceShow = show("pe")
          ? { display: "block" }
@@ -487,12 +487,12 @@ class Placement extends Component {
                   >
                      Performance
                   </a>
-                  <a
+                  {/* <a
                      className={`list-group-item list-group-item-action st ${anAct}`}
                      onClick={this.changeView.bind(null, "an")}
                   >
                      Analytics
-                  </a>
+                  </a> */}
                </div>
                {/* <div
                   className="menu-panel-vertical-cover"
