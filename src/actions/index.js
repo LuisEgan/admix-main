@@ -30,6 +30,8 @@ export const REGISTER_REQUEST = "USERS_REGISTER_REQUEST",
    LOADED_WEBGL_SCRIPTS = "LOADED_WEBGL_SCRIPTS",
    REPORT_DATA = "REPORT_DATA",
    SET_INITIAL_REPORT_APP = "SET_INITIAL_REPORT_APP",
+   SET_USER_IMG_URL = "SET_USER_IMG_URL",
+   USER_IMG_UPLOAD = "USER_IMG_UPLOAD",
    PERSIST_REHYDRATE = "persist/REHYDRATE";
 
 // Test action
@@ -202,6 +204,16 @@ const sendReportData = data => {
    };
 };
 
+export const setUserImgURL = data => ({
+   type: SET_USER_IMG_URL,
+   data
+});
+
+const doimgUpload = data => ({
+   type: USER_IMG_UPLOAD,
+   data
+});
+
 // ===========================
 // FETCH
 // ===========================
@@ -289,6 +301,40 @@ export const toggleAppStatus = (appDetails, accessToken) => dispatch => {
          dispatch(doToggleAppStatus(data));
       })
       .catch(error => dispatch(asyncError(error)));
+};
+
+export const imgUpload = (uploadImg, accessToken) => dispatch => {
+   dispatch(asyncStart());
+
+   const data = {
+      uploadImg
+   };
+
+   api
+      .cloudinayImgUpload(accessToken, data)
+      .then(data => {
+         dispatch(doimgUpload(data));
+      })
+      .catch(error => {
+         console.log("error: ", error);
+      });
+};
+
+export const fetchUserImgURL = (imgURL, accessToken) => dispatch => {
+   dispatch(asyncStart());
+
+   dispatch(setUserImgURL(imgURL));
+
+   //    const data = {
+   //       imgURL
+   //    };
+
+   //    api
+   //       .cloudinayImgURL(accessToken, data)
+   //       .then(data => {
+   //          dispatch(setUserImgURL(data));
+   //       })
+   //       .catch(error => dispatch(asyncError(error)));
 };
 
 // ===========================

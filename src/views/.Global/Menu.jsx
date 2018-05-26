@@ -3,13 +3,16 @@ import { connect } from "react-redux";
 import { NavLink, Redirect, Switch, Link } from "react-router-dom";
 import { routeCodes } from "../../config/routes";
 import PropTypes from "prop-types";
-import { logout, async } from "../../actions";
+import { logout, async, fetchUserImgURL } from "../../actions";
 import logoImg20 from "../../assets/img/logo_20.png";
 import loginImg from "../../assets/img/login-img.png";
 import userImgGen from "../../assets/img/userImg.png";
 import book2 from "../../assets/img/book2.jpg";
 import sam20 from "../../assets/img/sam_20.jpg";
 import admixLoading from "../../assets/gifs/admixBreath.gif";
+
+import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import faUser from "@fortawesome/fontawesome-free-solid/faUser";
 
 import {
    CLOUDINARY_UPLOAD_PRESET,
@@ -36,13 +39,7 @@ class Menu extends Component {
 
       this.state = {
          showDropdown: false,
-         stepBarStyle: {
-            left: 0,
-            opacity: 0,
-            redirectTo: ""
-         },
-         userImg: "",
-         userHasImg: true
+         imgChecked: false
       };
 
       this.handleLogout = this.handleLogout.bind(this);
@@ -52,39 +49,25 @@ class Menu extends Component {
       this.toggleDropdowns = this.toggleDropdowns.bind(this);
    }
 
-   componentWillReceiveProps(nextProps) {
-      const {
-         location: { pathname },
-         userData
-      } = nextProps;
-      let stepBarStyle;
+   static getDerivedStateFromProps(nextProps, prevSate) {
+      const { userData, dispatch, accesstoken } = nextProps;
+      const { imgChecked } = prevSate;
+
       const userId = userData._id;
 
-      if (!!location) {
-         if (pathname.includes("setup")) {
-            stepBarStyle = {
-               opacity: 0,
-               left: AppsLeft
-            };
-         } else if (pathname.includes("scene")) {
-            stepBarStyle = {
-               // opacity: 1,
-               left: EditLeft
-            };
-         } else if (pathname.includes("validation")) {
-            stepBarStyle = {
-               // opacity: 1,
-               left: ValidateLeft
-            };
-         }
-
-         this.updateMenuImg();
-         this.setState({ stepBarStyle });
+      if (userId && !imgChecked) {
+         const userImg = `${CLOUDINARY_IMG_URL}/${userId}.png?${new Date().getTime()}`;
+         const imgURL = `${CLOUDINARY_IMG_URL}/${userId}.png`;
+         dispatch(fetchUserImgURL(imgURL, accesstoken));
+         return {
+            imgChecked: true
+         };
       }
+
+      return null;
    }
 
    componentDidMount() {
-      this.updateMenuImg();
       this.props.onRef(this);
    }
 
@@ -118,6 +101,7 @@ class Menu extends Component {
 
    handleLogout() {
       const { dispatch } = this.props;
+      this.setState({ imgChecked: false });
       this.toggleDropdowns(true);
       dispatch(logout());
    }
@@ -157,6 +141,21 @@ class Menu extends Component {
       this.setState({ showDropdown });
    }
 
+   renderUserImg() {
+      const { userImgURL } = this.props;
+      const { imgChecked } = this.state;
+
+      if (!imgChecked) {
+         return;
+      } else {
+         if (userImgURL !== "") {
+            return <img src={userImgURL} alt="Login" />;
+         } else {
+            return <FontAwesomeIcon icon={faUser} />;
+         }
+      }
+   }
+
    render() {
       let {
          stepBarStyle,
@@ -165,16 +164,13 @@ class Menu extends Component {
          showDropdown,
          userHasImg
       } = this.state;
+
       const {
          location: { pathname },
          isLoggedIn
       } = this.props;
 
       showDropdown = showDropdown ? "show" : "";
-
-      const userImgStyle = userHasImg
-         ? {}
-         : { padding: "4%", backgroundColor: "#f2f2f2" };
 
       return (
          <div id="headerMenu">
@@ -189,34 +185,34 @@ class Menu extends Component {
 
                <div className="cc" id="steps-container" />
 
-               {isLoggedIn && (
-                  <div
-                     className=""
-                     id="dropdown-container"
-                     onMouseLeave={this.toggleDropdowns.bind(null, true)}
-                  >
-                     <div className="dropdown">
-                        <button
-                           className="btn btn-secondary dropdown-toggle"
-                           type="button"
-                           onClick={this.toggleDropdowns.bind(null, false)}
-                        >
-                           {/* <i className="fa fa-user" aria-hidden="true"></i> */}
-                           <span className="st">My Profile</span>
-                        </button>
-                        <div className={`dropdown-menu ${showDropdown}`}>
-                           {!isLoggedIn && (
-                              <NavLink
-                                 exact
-                                 to={routeCodes.LOGIN}
-                                 className="dropdown-item"
-                                 onClick={this.toggleDropdowns.bind(null, true)}
-                              >
-                                 Login
-                              </NavLink>
-                           )}
+               <div
+                  className=""
+                  id="dropdown-container"
+                  onMouseLeave={this.toggleDropdowns.bind(null, true)}
+               >
+                  <div className="dropdown">
+                     <button
+                        className="btn btn-secondary dropdown-toggle"
+                        type="button"
+                        onClick={this.toggleDropdowns.bind(null, false)}
+                     >
+                        {/* <i className="fa fa-user" aria-hidden="true"></i> */}
+                        <span className="st">My Profile</span>
+                     </button>
+                     <div className={`dropdown-menu ${showDropdown}`}>
+                        {!isLoggedIn && (
+                           <NavLink
+                              exact
+                              to={routeCodes.LOGIN}
+                              className="dropdown-item"
+                              onClick={this.toggleDropdowns.bind(null, true)}
+                           >
+                              Login
+                           </NavLink>
+                        )}
 
-                           {isLoggedIn && (
+                        {isLoggedIn && (
+                           <React.Fragment>
                               <NavLink
                                  exact
                                  to={routeCodes.PROFILE}
@@ -225,21 +221,18 @@ class Menu extends Component {
                               >
                                  Profile
                               </NavLink>
-                           )}
-
-                           {isLoggedIn && (
                               <a
                                  className="dropdown-item"
                                  onClick={this.handleLogout}
                               >
                                  Logout
                               </a>
-                           )}
-                        </div>
+                           </React.Fragment>
+                        )}
                      </div>
-                     <img src={userImg} onError={this.noUserImg} alt="Login" />
                   </div>
-               )}
+                  {this.renderUserImg()}
+               </div>
             </div>
          </div>
       );
@@ -252,6 +245,8 @@ const mapStateToProps = state => ({
    asyncError: state.app.get("asyncError"),
    asyncLoading: state.app.get("asyncLoading"),
    counter: state.app.get("counter"),
+   accesstoken: state.app.get("accesstoken"),
+   userImgURL: state.app.get("userImgURL"),
    isLoggedIn: state.app.get("isLoggedIn")
 });
 

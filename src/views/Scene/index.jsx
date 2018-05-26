@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import _ from "lodash";
+import { ADMIX_OBJ_PREFIX } from "../../utils/constants";
 
 import Panels from "./Panels";
 import Progress from "react-progressbar";
@@ -178,7 +179,8 @@ class Scene extends Component {
          window.removeEventListener("mousemove", this.onTouchMove);
          window.removeEventListener("touchmove", this.onTouchMove);
          window.removeEventListener("click", this.onObjectClick);
-         // this.TrackballControlsDisableWheel();
+         this.controls.noRotation();
+         this.controls.dispose();
       }
    }
 
@@ -235,7 +237,7 @@ class Scene extends Component {
 
    addSelectedObject(object) {
       this.selectedObjects = [];
-      if (object.name.includes("__advirObj__")) {
+      if (object.name.includes(ADMIX_OBJ_PREFIX)) {
          this.selectedObjects.push(object);
       }
       this.outlinePass.selectedObjects = this.selectedObjects;
@@ -257,7 +259,7 @@ class Scene extends Component {
 
          if (intersects.length > 0 && !!intersects[0].object.material.color) {
             const intersected = intersects[0].object;
-            if (intersected.name.includes("__advirObj__")) {
+            if (intersected.name.includes(ADMIX_OBJ_PREFIX)) {
                // Change previous selected to material (if there's a previous)
                if (this.intersected) {
                   this.intersected.material = this.intersected.currentMaterial;
@@ -303,6 +305,7 @@ class Scene extends Component {
                }
 
                clickedPlacement.placementId = clickedPlacement._id;
+               console.log("clickedPlacement: ", clickedPlacement);
 
                this.setState({ clickedPlacement });
             }
@@ -388,7 +391,6 @@ class Scene extends Component {
    loadScene() {
       const { THREE } = window;
 
-      console.log("this.group: ", this.group);
       // Check is there was a scene loaded
       if (this.group.children.length > 0) {
          this.clear();
@@ -434,7 +436,7 @@ class Scene extends Component {
          object.traverse(function(child) {
             if (
                child instanceof THREE.Mesh &&
-               child.name.includes("__advirObj__")
+               child.name.includes(ADMIX_OBJ_PREFIX)
             ) {
                child.material = material;
                // outlinePass.selectedObjects.push( child );
@@ -512,12 +514,14 @@ class Scene extends Component {
       const { THREE } = window;
 
       if (!this.controls) {
+         console.log("here no controls");
          const controls = new THREE.PointerLockControls(this.camera);
 
          this.scene.add(controls.getObject());
 
          this.controls = controls;
       } else {
+         console.log("here yes controls");
          this.controls.enable();
       }
    }
@@ -532,6 +536,7 @@ class Scene extends Component {
 
    mouseOnPanel() {
       const isMouseOnPanel = !this.state.isMouseOnPanel;
+      console.log("isMouseOnPanel: ", isMouseOnPanel);
 
       // this is so when the mouse is on either panel user can't rotate the scene onclick
       if (isMouseOnPanel) {

@@ -974,6 +974,11 @@ $inputsFontSize: calc(0.45em + 0.3vw);
                display: flex;
                position: relative;
                margin-top: 2vh;
+
+               a {
+                  color: $blueAdmix !important;
+               }
+
                > div {
                   &:first-child {
                      width: 10%;

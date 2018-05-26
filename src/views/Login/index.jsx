@@ -357,7 +357,6 @@ class Login extends Component {
                      <div className="registerRules">
                         <span style={isValidNameStyle}>only letters</span>
                      </div>
-
                      {/* EMAIL */}
                      <div>
                         <input
@@ -378,7 +377,6 @@ class Login extends Component {
                      <div className="registerRules">
                         <span style={isValidEmailStyle}>valid e-mail</span>
                      </div>
-
                      {/* PASSWORD */}
                      <div>
                         <input
@@ -409,7 +407,6 @@ class Login extends Component {
                         <span style={hasLetterStyle}>one letter - </span>
                         <span style={hasNumberStyle}>one number</span>
                      </div>
-
                      {/* PASSWORD CONFIRM */}
                      <div>
                         <input
@@ -440,7 +437,6 @@ class Login extends Component {
                            both passwords match
                         </span>
                      </div>
-
                      {/* TERMS AND CONDITIONS */}
                      <div className="registerCheckbox">
                         <div>
@@ -457,7 +453,22 @@ class Login extends Component {
                            </div>
                         </div>
                         <div>
-                           I have read to Admix’s T&Cs and privacy policy
+                           I have read to Admix’s &nbsp;
+                           <a
+                              href="http://admix.in/pdf/terms.pdf"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                           >
+                              T&Cs
+                           </a>
+                           &nbsp; and &nbsp;
+                           <a
+                              href="http://admix.in/pdf/privacy.pdf"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                           >
+                              privacy policy
+                           </a>
                         </div>
                      </div>
 

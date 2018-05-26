@@ -23,7 +23,9 @@ import {
    LOADED_WEBGL_SCRIPTS,
    REPORT_DATA,
    SET_INITIAL_REPORT_APP,
-   UPDATE_PLACEMENTS
+   UPDATE_PLACEMENTS,
+   USER_IMG_UPLOAD,
+   SET_USER_IMG_URL
 } from "../actions";
 
 export const initialState = Map({
@@ -40,7 +42,8 @@ export const initialState = Map({
    savedInputs: [],
    load_webgl: false,
    reportData: {},
-   initialReportAppId: []
+   initialReportAppId: [],
+   userImgURL: ""
 });
 
 const actionsMap = {
@@ -387,6 +390,30 @@ const actionsMap = {
       return state.merge(
          Map({
             initialReportAppId
+         })
+      );
+   },
+
+   [USER_IMG_UPLOAD]: (state, data) => {
+      const asyncLoading = false;
+      const userImgURL = data.data;
+
+      return state.merge(
+         Map({
+            asyncLoading,
+            userImgURL
+         })
+      );
+   },
+
+   [SET_USER_IMG_URL]: (state, data) => {
+      const asyncLoading = false;
+      const userImgURL = data.data;
+
+      return state.merge(
+         Map({
+            asyncLoading,
+            userImgURL
          })
       );
    }

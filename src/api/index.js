@@ -7,13 +7,23 @@ function async() {
    return fetch("http://date.jsontest.com/").then(response => response.json());
 }
 
-function cloudinayImgUpload(accessToken, uploadImg) {
+function cloudinayImgUpload(accessToken, data) {
    return fetch(dns + "/api/v1/user/cloudinaryUpload", {
-      method: "GET",
+      method: "POST",
       headers: new Headers({
          "x-access-token": accessToken
       }),
-      body: JSON.stringify(uploadImg)
+      body: JSON.stringify(data)
+   }).then(response => response.json());
+}
+
+function cloudinayImgURL(accessToken, data) {
+   return fetch(dns + "/api/v1/user/cloudinayImgURL", {
+      method: "POST",
+      headers: new Headers({
+         "x-access-token": accessToken
+      }),
+      body: JSON.stringify(data)
    }).then(response => response.json());
 }
 
@@ -127,6 +137,7 @@ const getReportData = appsIds => reportData;
 export default {
    async,
    cloudinayImgUpload,
+   cloudinayImgURL,
    isAdmin,
    login,
    signup,

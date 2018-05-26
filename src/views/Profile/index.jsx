@@ -1,7 +1,7 @@
-import api from "../../api";
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Field, reduxForm } from "redux-form";
+import { imgUpload, setUserImgURL } from "../../actions";
 import PropTypes from "prop-types";
 import Dropzone from "react-dropzone";
 import request from "superagent";
@@ -82,7 +82,7 @@ class Profile extends Component {
    handleImageUploadClient(file) {
       const {
          userData: { _id },
-         updateMenuImg
+         dispatch
       } = this.props;
 
       let upload = request
@@ -97,7 +97,10 @@ class Profile extends Component {
          }
 
          if (response.body.secure_url !== "") {
-            updateMenuImg();
+            const imgURL = {
+               data: response.body.secure_url
+            };
+            dispatch(setUserImgURL(imgURL));
             this.setState({
                uploadedFileCloudinaryUrl: `${
                   response.body.secure_url
@@ -109,25 +112,9 @@ class Profile extends Component {
    }
 
    handleImageUploadServer(uploadImg) {
-      const { accessToken, updateMenuImg } = this.props;
+      const { accessToken, dispatch } = this.props;
 
-      api
-         .cloudinayImgUpload(accessToken, uploadImg)
-         .then(data => {
-            console.log("data: ", data);
-            if (data.body.secure_url !== "") {
-               updateMenuImg();
-               this.setState({
-                  uploadedFileCloudinaryUrl: `${
-                     data.body.secure_url
-                  }?${new Date().getTime()}`,
-                  userHasImg: true
-               });
-            }
-         })
-         .catch(error => {
-            console.log("error: ", error);
-         });
+      dispatch(imgUpload(uploadImg, accessToken));
    }
 
    noUserImg(e) {

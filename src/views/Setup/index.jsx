@@ -148,122 +148,6 @@ class Setup extends Component {
       }
    }
 
-   renderApps() {
-      let { apps, selectedApp } = this.props;
-
-      return apps.map((app, i) => {
-         // if (i > 1) return;
-         const { _id, name, isActive } = app;
-
-         const selectedAppClass =
-            selectedApp && selectedApp._id === _id ? "app-selected" : "";
-
-         return (
-            <div
-               className={`app-select-container ${selectedAppClass}`}
-               key={_id}
-            >
-               <div className="engine-logo">
-                  <img src={unity} alt="Engine" />
-               </div>
-
-               <div className="app-name mb">{name}</div>
-
-               <div className="app-status">
-                  <div className="active-switch clearfix toggleBtn">
-                     <div className="toggles">
-                        <input
-                           type="checkbox"
-                           name={_id}
-                           id={_id}
-                           className="ios-toggle"
-                           checked={isActive}
-                           onChange={this.handleOnSwitch.bind(null, app)}
-                        />
-                        <label
-                           htmlFor={_id}
-                           className="checkbox-label"
-                           data-on="Live"
-                           data-off="Inactive"
-                        />
-                     </div>
-                     {/* <label className="switch">
-                <input
-                  type="checkbox"
-                  checked={isActive}
-                  onChange={this.handleOnSwitch.bind(null, app)}
-                />
-                <span className="slider round" />
-              </label>
-              <span>{liveStatus}</span> */}
-                  </div>
-               </div>
-
-               <div
-                  className="app-buttons"
-                  onMouseLeave={this.hideEditInfoBox.bind(null, _id)}
-               >
-                  <div
-                     className="info-box"
-                     id={_id}
-                     style={{ display: "none" }}
-                     ref={infoBox => {
-                        this[_id] = infoBox;
-                     }}
-                  >
-                     Campaign is live, turn it off before editing!
-                  </div>
-                  <button
-                     className="btn btn-dark"
-                     onClick={this.getReportData.bind(null, _id)}
-                  >
-                     Report
-                  </button>
-                  <button
-                     className="btn btn-dark"
-                     disabled={isActive}
-                     onClick={this.selectApp.bind(null, _id, "edit")}
-                     onMouseEnter={this.showEditInfoBox.bind(null, _id)}
-                  >
-                     Edit
-                  </button>
-               </div>
-            </div>
-         );
-      });
-   }
-
-   renderNoApps() {
-      return (
-         <div id="no-apps">
-            <img
-               src="https://cdn.shopify.com/s/files/1/1061/1924/files/Thinking_Face_Emoji.png?9898922749706957214"
-               alt="mmm"
-            />
-            <h3 className="st">
-               Looks like you have not connected your app yet.
-            </h3>
-            <h2 className="mb">
-               To get started, create your inventory in Unity with the <br />{" "}
-               Advir plugin. Apps will appear here automatically.
-            </h2>
-            <h2 className="mb">
-               <br />
-               <br />
-               Don't have the plugin?
-            </h2>
-            <a
-               href="https://assetstore.unity.com/"
-               target="_blank"
-               className="btn btn-dark"
-               rel="noopener noreferrer"
-            >
-               Download Advir for Unity
-            </a>
-         </div>
-      );
-   }
-
    selectApp(appId) {
       const { dispatch, accessToken } = this.props;
 
@@ -463,6 +347,115 @@ class Setup extends Component {
                   </div>
                </div>
             ))}
+         </div>
+      );
+   }
+
+   renderApps() {
+      let { apps, selectedApp } = this.props;
+
+      const appsRe = apps.slice().reverse();
+
+      return appsRe.map((app, i) => {
+         // if (i > 1) return;
+         const { _id, name, isActive } = app;
+
+         const selectedAppClass =
+            selectedApp && selectedApp._id === _id ? "app-selected" : "";
+
+         return (
+            <div
+               className={`app-select-container ${selectedAppClass}`}
+               key={_id}
+            >
+               <div className="engine-logo">
+                  <img src={unity} alt="Engine" />
+               </div>
+
+               <div className="app-name mb">{name}</div>
+
+               <div className="app-status">
+                  <div className="active-switch clearfix toggleBtn">
+                     <div className="toggles">
+                        <input
+                           type="checkbox"
+                           name={_id}
+                           id={_id}
+                           className="ios-toggle"
+                           checked={isActive}
+                           onChange={this.handleOnSwitch.bind(null, app)}
+                        />
+                        <label
+                           htmlFor={_id}
+                           className="checkbox-label"
+                           data-on="Live"
+                           data-off="Inactive"
+                        />
+                     </div>
+                  </div>
+               </div>
+
+               <div
+                  className="app-buttons"
+                  onMouseLeave={this.hideEditInfoBox.bind(null, _id)}
+               >
+                  <div
+                     className="info-box"
+                     id={_id}
+                     style={{ display: "none" }}
+                     ref={infoBox => {
+                        this[_id] = infoBox;
+                     }}
+                  >
+                     Campaign is live, turn it off before editing!
+                  </div>
+                  <button
+                     className="btn btn-dark"
+                     onClick={this.getReportData.bind(null, _id)}
+                  >
+                     Report
+                  </button>
+                  <button
+                     className="btn btn-dark"
+                     disabled={isActive}
+                     onClick={this.selectApp.bind(null, _id, "edit")}
+                     onMouseEnter={this.showEditInfoBox.bind(null, _id)}
+                  >
+                     Edit
+                  </button>
+               </div>
+            </div>
+         );
+      });
+   }
+
+   renderNoApps() {
+      return (
+         <div id="no-apps">
+            <img
+               src="https://cdn.shopify.com/s/files/1/1061/1924/files/Thinking_Face_Emoji.png?9898922749706957214"
+               alt="mmm"
+            />
+            <h3 className="st">
+               Looks like you have not connected your app yet.
+            </h3>
+            <h2 className="mb">
+               To get started, create your inventory in Unity with the <br />{" "}
+               Advir plugin. Apps will appear here automatically.
+            </h2>
+            <h2 className="mb">
+               <br />
+               <br />
+               Don't have the plugin?
+            </h2>
+            <a
+               href="https://assetstore.unity.com/"
+               target="_blank"
+               className="btn btn-dark"
+               rel="noopener noreferrer"
+            >
+               Download Advir for Unity
+            </a>
          </div>
       );
    }
