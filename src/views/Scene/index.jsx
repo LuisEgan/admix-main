@@ -87,16 +87,6 @@ class Scene extends Component {
       });
    }
 
-   componentWillMount() {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-
-      this.setState({
-         windowW: width,
-         windowH: height
-      });
-   }
-
    componentDidMount() {
       const { THREE, innerWidth, innerHeight } = window;
 
@@ -148,14 +138,12 @@ class Scene extends Component {
       // POST-PROCESSING
       const composer = null;
 
-      const group = new THREE.Group();
       const selectedObjects = [];
       const mouse = new THREE.Vector2();
       const raycaster = new THREE.Raycaster();
 
       this.camera = camera;
       this.scene = scene;
-      this.group = group;
 
       this.mouse = mouse;
       this.raycaster = raycaster;
@@ -260,6 +248,7 @@ class Scene extends Component {
          if (intersects.length > 0 && !!intersects[0].object.material.color) {
             const intersected = intersects[0].object;
             if (intersected.name.includes(ADMIX_OBJ_PREFIX)) {
+               console.log("intersected.name: ", intersected.name);
                // Change previous selected to material (if there's a previous)
                if (this.intersected) {
                   this.intersected.material = this.intersected.currentMaterial;
@@ -284,7 +273,7 @@ class Scene extends Component {
                savedInputs.some(input => {
                   if (input.placementName === intersected.name) {
                      //    clickedPlacement = JSON.parse(JSON.stringify(input));
-                     clickedPlacement = _.clone(input);
+                     clickedPlacement = _.cloneDeep(input);
                      isSaved = true;
                      return true;
                   }
@@ -297,16 +286,20 @@ class Scene extends Component {
                      // This should be placement.placementName === intersected.name
                      // With === not !== ; otherwise is for test
                      if (placement.placementName === intersected.name) {
-                        clickedPlacement = _.clone(placement);
+                        clickedPlacement = _.cloneDeep(placement);
                         return true;
                      }
                      return false;
                   });
                }
 
-               clickedPlacement.placementId = clickedPlacement._id;
-               console.log("clickedPlacement: ", clickedPlacement);
+               // this is because if the input was already saved the .placementId exists
+               // if it wasn't saved, the data from the db is ._id and it has to be transformed to .placementId
+               clickedPlacement.placementId = clickedPlacement.placementId
+                  ? clickedPlacement.placementId
+                  : clickedPlacement._id;
 
+               console.log("clickedPlacement: ", clickedPlacement);
                this.setState({ clickedPlacement });
             }
          }
@@ -391,9 +384,13 @@ class Scene extends Component {
    loadScene() {
       const { THREE } = window;
 
+      const selectedObject = this.scene.getObjectByName("userLoadedScene");
+
       // Check is there was a scene loaded
-      if (this.group.children.length > 0) {
+      if (selectedObject) {
          this.clear();
+         this.loadScene();
+         return;
       }
 
       this.enablePointerLockControls();
@@ -401,15 +398,12 @@ class Scene extends Component {
       const { sceneMounted, selectedScene } = this.state;
       const { userData } = this.props;
       const userId = userData._id;
-      // const { THREE, innerWidth, innerHeight } = window;
 
       if (!sceneMounted) {
          this.mount.appendChild(this.renderer.domElement);
          this.setEventListeners();
          this.setPostProcessing();
       }
-
-      const obj3d = new THREE.Object3D();
 
       // LOAD OBJECT
       const onProgress = xhr => {
@@ -428,10 +422,8 @@ class Scene extends Component {
          const loadingProgress = 0;
          const loadingError = null;
 
-         object.name = "scene 1";
+         object.name = "userLoadedScene";
          object.position.set(0, 0, 0);
-         obj3d.add(object);
-         // this.scene.add(object);
          var material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
          object.traverse(function(child) {
             if (
@@ -439,11 +431,10 @@ class Scene extends Component {
                child.name.includes(ADMIX_OBJ_PREFIX)
             ) {
                child.material = material;
-               // outlinePass.selectedObjects.push( child );
-               // this.addSelectedObjectOnLoad( child );
             }
          });
 
+         this.scene.add(object);
          this.setState({ loadingProgress, loadingError, sceneMounted: true });
       };
 
@@ -474,22 +465,13 @@ class Scene extends Component {
             onError.bind(this)
          );
       });
-
-      this.scene.add(this.group);
-
-      this.group.add(obj3d);
    }
 
    clear() {
       // Clear object name from form
       this.setState({ clickedPlacement: {}, sceneMounted: false });
-      const { THREE } = window;
-      const { scene } = this;
-      var selectedObject = scene.getObjectByName("scene 1");
-      scene.remove(selectedObject);
-
-      this.controls.dispose();
-      this.group = new THREE.Group();
+      var selectedObject = this.scene.getObjectByName("userLoadedScene");
+      this.scene.remove(selectedObject);
    }
 
    disableControls() {
@@ -514,14 +496,12 @@ class Scene extends Component {
       const { THREE } = window;
 
       if (!this.controls) {
-         console.log("here no controls");
          const controls = new THREE.PointerLockControls(this.camera);
 
          this.scene.add(controls.getObject());
 
          this.controls = controls;
       } else {
-         console.log("here yes controls");
          this.controls.enable();
       }
    }
@@ -536,7 +516,6 @@ class Scene extends Component {
 
    mouseOnPanel() {
       const isMouseOnPanel = !this.state.isMouseOnPanel;
-      console.log("isMouseOnPanel: ", isMouseOnPanel);
 
       // this is so when the mouse is on either panel user can't rotate the scene onclick
       if (isMouseOnPanel) {

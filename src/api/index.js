@@ -66,21 +66,34 @@ function forgotPass(data) {
    }).then(response => response.json());
 }
 
-function getApps(accessToken) {
-   return fetch(dns + "/api/v1/user/getApps", {
-      method: "GET",
-      headers: new Headers({
-         "x-access-token": accessToken
-      })
-   }).then(response => response.json());
-}
+function getApps(accessToken, data) {
+    return fetch(dns + "/api/v1/user/getApps", {
+       method: "GET",
+       headers: new Headers({
+          "x-access-token": accessToken,
+       })
+    }).then(response => response.json());
+ }
 
-function getAppsAdmin(accessToken) {
+// function getApps(accessToken, data) {
+//    return fetch(dns + "/api/v1/user/getApps", {
+//       method: "POST",
+//       headers: new Headers({
+//          "x-access-token": accessToken,
+//          "Content-Type": "application/json"
+//       }),
+//       body: JSON.stringify(data)
+//    }).then(response => response.json());
+// }
+
+function getAppsAdmin(accessToken, data) {
    return fetch(dns + "/api/v1/user/getAppsAdmin", {
-      method: "GET",
+      method: "POST",
       headers: new Headers({
-         "x-access-token": accessToken
-      })
+         "x-access-token": accessToken,
+         "Content-Type": "application/json"
+      }),
+      body: JSON.stringify(data)
    }).then(response => response.json());
 }
 

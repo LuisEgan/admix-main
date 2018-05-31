@@ -8,6 +8,8 @@ import Validation from "../views/Validation";
 import Congratulations from "../views/Congratulations";
 import Report from "../views/Report";
 import Profile from "../views/Profile";
+import EmailSuccess from "../views/EmailVerification/emailSuccess";
+import EmailFailure from "../views/EmailVerification/emailFailure";
 import NotFound from "../views/NotFound";
 
 const publicPath = "/";
@@ -19,7 +21,9 @@ export const routeCodes = {
    VALIDATION: `${publicPath}validation`,
    CONGRATULATIONS: `${publicPath}congratulations`,
    REPORT: `${publicPath}report`,
-   PROFILE: `${publicPath}profile`
+   PROFILE: `${publicPath}profile`,
+   EMAIL_SUCCESS: `${publicPath}emailSuccess`,
+   EMAIL_FAILURE: `${publicPath}emailFailure`
 };
 
 const PrivateRoute = ({ component: Component, isLoggedIn, ...rest }) => (
@@ -104,13 +108,23 @@ export default props => {
             location={location}
          />
          <PrivateRoute
-            path={routeCodes.profile}
+            path={routeCodes.PROFILE}
             component={Profile}
             isLoggedIn={isLoggedIn}
             location={location}
             customFuncs={{ updateMenuImg }}
          />
-         <Route path="*" component={NotFound} isLoggedIn={isLoggedIn} />
+         <Route
+            path={routeCodes.EMAIL_SUCCESS}
+            component={EmailSuccess}
+            exact
+         />
+         <Route
+            path={routeCodes.EMAIL_FAILURE}
+            component={EmailFailure}
+            exact
+         />
+         <Route path="*" component={NotFound} />
       </Switch>
    );
 };

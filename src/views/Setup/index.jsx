@@ -9,7 +9,8 @@ import {
    selectApp,
    toggleAppStatus,
    getReportData,
-   setInitialReportApp
+   setInitialReportApp,
+   resetSavedInputs
 } from "../../actions";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faGlobe from "@fortawesome/fontawesome-free-solid/faGlobe";
@@ -77,17 +78,8 @@ class Setup extends Component {
       this.setFilter = this.setFilter.bind(this);
    }
 
-   componentWillMount() {
-      const { dispatch, accessToken, userData } = this.props;
-
-      if (!userData._id) {
-      }
-      dispatch(getApps(accessToken));
-      dispatch(getUserData(accessToken));
-   }
-
    componentDidMount() {
-      const { apps } = this.props;
+      const { apps, dispatch, accessToken } = this.props;
       const activeApps = [];
       apps.forEach(app => {
          const { _id, isActive } = app;
@@ -96,6 +88,9 @@ class Setup extends Component {
 
       const allAppsIds = apps.map(app => app._id);
       this.setState({ allAppsIds, activeApps });
+      dispatch(getApps(accessToken));
+      dispatch(getUserData(accessToken));
+      dispatch(resetSavedInputs());
    }
 
    componentWillReceiveProps(nextProps) {
@@ -206,8 +201,9 @@ class Setup extends Component {
 
       filterBy[filterIndex][attr] = value;
 
+      console.log("filterBy: ", filterBy);
       this.setState({ filterBy });
-      // dispatch(getApps(accessToken));
+      // dispatch(getApps(accessToken, filterBy));
    }
 
    renderFilter() {
@@ -271,20 +267,6 @@ class Setup extends Component {
 
       return (
          <div className="filter-container fadeIn">
-            {/* <div className="filter-header">
-          <div>
-            <h2 className="st">Filter</h2>
-          </div>
-          <div id="plus" onClick={this.addFilter}>
-            <FontAwesomeIcon icon={faPlusSquare} />
-          </div>
-          <div id="go">
-            <FontAwesomeIcon icon={faSearch} />
-          </div>
-        </div>
-
-        <hr /> */}
-
             {filterBy.map((filter, i) => (
                <div className="filter" key={`${filter}-${i}`}>
                   {filterTypes.map(f => {
@@ -409,12 +391,12 @@ class Setup extends Component {
                   >
                      Campaign is live, turn it off before editing!
                   </div>
-                  <button
+                  {/* <button
                      className="btn btn-dark"
                      onClick={this.getReportData.bind(null, _id)}
                   >
                      Report
-                  </button>
+                  </button> */}
                   <button
                      className="btn btn-dark"
                      disabled={isActive}

@@ -101,7 +101,6 @@ export default class MenuPanel extends Component {
       let dropdown = "";
 
       dropdown = scenes.map(scene => {
-         console.log("scene: ", scene);
          const { name } = scene;
          return (
             <a

@@ -84,7 +84,8 @@ export default class FormPanel extends Component {
          "placementType",
          "isActive",
          "category",
-         "subCategory"
+         "subCategory",
+         "addedPrefix"
       ];
 
       if (
@@ -180,6 +181,90 @@ export default class FormPanel extends Component {
       } else {
          showDdSubCats = forceClose ? false : !showDdSubCats;
          this.setState({ showDdSubCats });
+      }
+   }
+
+   focusInput(input) {
+      if (input !== "Name") {
+         this.setState({ focusedInput: input });
+         this[input].focus();
+      }
+   }
+
+   resetInputFocus() {
+      const { focusedInput } = this.state;
+      if (!!this[focusedInput]) {
+         this[focusedInput].blur();
+         this.setState({ focusedInput: "" });
+      }
+   }
+
+   handleOnChange(input, e) {
+      const { savedInputs } = this.state;
+      let {
+         target: { value }
+      } = e;
+
+      if (input === "isActive") {
+         value = e.target.checked;
+      }
+
+      savedInputs[input] = value;
+      this.setState({ savedInputs, animating: true });
+      this.onSave();
+
+      setTimeout(() => {
+         this.setState({ animating: false });
+      }, 1000);
+   }
+
+   onSave() {
+      const { savedInputs } = this.state;
+      const {
+         dispatch,
+         updateClickedPlacement,
+         activeClickedElem
+      } = this.props;
+
+      updateClickedPlacement(savedInputs);
+      dispatch(saveInputs(savedInputs));
+
+      this.setState({ feedbackClass: "feedback" });
+      setTimeout(() => {
+         this.setState({ feedbackClass: "" });
+      }, 2300);
+
+      activeClickedElem("saveClicked");
+   }
+
+   resetInputs() {
+      const { placementName } = this.state;
+      const savedInputs = {
+         appId: "",
+         sceneId: "",
+         placementName,
+         placementType: "",
+         isActive: true,
+         Public: true,
+         Default: "",
+         category: "Category",
+         subCategory: "Sub-Category",
+         Preferred: "",
+         Blacklisted: ""
+      };
+      this.setState({ savedInputs });
+   }
+
+   forceClose() {
+      const { slidedIn } = this.state;
+
+      if (slidedIn) {
+         this.setState({ slidedIn: "closed" });
+      } else {
+         this.setState({ slidedIn: true });
+         setTimeout(() => {
+            this.setState({ slidedIn: "closed" });
+         }, 600);
       }
    }
 
@@ -343,13 +428,13 @@ export default class FormPanel extends Component {
                         />
                      </div>
                      {/* <label className="switch">
-                <input
-                  type="checkbox"
-                  checked={savedInputs.isActive}
-                  onChange={this.handleOnChange.bind(null, "isActive")}
-                />
-                <span className="slider round" />
-              </label> */}
+              <input
+                type="checkbox"
+                checked={savedInputs.isActive}
+                onChange={this.handleOnChange.bind(null, "isActive")}
+              />
+              <span className="slider round" />
+            </label> */}
                   </div>
                </div>
             </div>
@@ -371,90 +456,6 @@ export default class FormPanel extends Component {
             </div>
          </div>
       );
-   }
-
-   focusInput(input) {
-      if (input !== "Name") {
-         this.setState({ focusedInput: input });
-         this[input].focus();
-      }
-   }
-
-   resetInputFocus() {
-      const { focusedInput } = this.state;
-      if (!!this[focusedInput]) {
-         this[focusedInput].blur();
-         this.setState({ focusedInput: "" });
-      }
-   }
-
-   handleOnChange(input, e) {
-      const { savedInputs } = this.state;
-      let {
-         target: { value }
-      } = e;
-
-      if (input === "isActive") {
-         value = e.target.checked;
-      }
-
-      savedInputs[input] = value;
-      this.setState({ savedInputs, animating: true });
-      this.onSave();
-
-      setTimeout(() => {
-         this.setState({ animating: false });
-      }, 1000);
-   }
-
-   onSave() {
-      const { savedInputs } = this.state;
-      const {
-         dispatch,
-         updateClickedPlacement,
-         activeClickedElem
-      } = this.props;
-
-      updateClickedPlacement(savedInputs);
-      dispatch(saveInputs(savedInputs));
-
-      this.setState({ feedbackClass: "feedback" });
-      setTimeout(() => {
-         this.setState({ feedbackClass: "" });
-      }, 2300);
-
-      activeClickedElem("saveClicked");
-   }
-
-   resetInputs() {
-      const { placementName } = this.state;
-      const savedInputs = {
-         appId: "",
-         sceneId: "",
-         placementName,
-         placementType: "",
-         isActive: true,
-         Public: true,
-         Default: "",
-         category: "Category",
-         subCategory: "Sub-Category",
-         Preferred: "",
-         Blacklisted: ""
-      };
-      this.setState({ savedInputs });
-   }
-
-   forceClose() {
-      const { slidedIn } = this.state;
-
-      if (slidedIn) {
-         this.setState({ slidedIn: "closed" });
-      } else {
-         this.setState({ slidedIn: true });
-         setTimeout(() => {
-            this.setState({ slidedIn: "closed" });
-         }, 600);
-      }
    }
 
    render() {

@@ -1,5 +1,6 @@
 import { Map } from "immutable";
 import _ from "lodash";
+import { ADMIX_OBJ_PREFIX } from "../utils/constants";
 
 import {
    ACTION,
@@ -18,6 +19,7 @@ import {
    SET_PLACEMENT,
    SET_PLACEMENTS,
    SAVE_INPUTS,
+   RESET_SAVED_INPUTS,
    TOGGLE_APP_STATUS,
    USER_DATA_SUCCESS,
    LOADED_WEBGL_SCRIPTS,
@@ -278,12 +280,18 @@ const actionsMap = {
 
       selectedApp.scenes.forEach(scene => {
          scene.placements = [];
-         placements.some((placement, i) => {
+         placements.forEach((placement, i) => {
             if (scene._id === placement.sceneId._id) {
-               scene.placements.push(placements[i]);
-               return true;
+               const placementToPush = _.cloneDeep(placements[i]);
+               placementToPush.addedPrefix = false;
+
+               if (!placementToPush.placementName.includes(ADMIX_OBJ_PREFIX)) {
+                  placementToPush.addedPrefix = true;
+                  placementToPush.placementName =
+                     ADMIX_OBJ_PREFIX + placementToPush.placementName;
+               }
+               scene.placements.push(placementToPush);
             }
-            return false;
          });
       });
 
@@ -298,18 +306,27 @@ const actionsMap = {
 
    [SAVE_INPUTS]: (state, { toSaveInputs }) => {
       let savedInputs = state.get("savedInputs");
+      const newInput = _.cloneDeep(toSaveInputs);
       savedInputs = !!savedInputs ? savedInputs : [];
 
       // Slice out the savedInput if it was already saved
-      savedInputs = savedInputs.filter(
-         input => input.placementName !== toSaveInputs.placementName
-      );
+      savedInputs = savedInputs.filter(input => {
+         return input.placementName !== toSaveInputs.placementName;
+      });
 
-      savedInputs = [...savedInputs, toSaveInputs];
+      savedInputs = [...savedInputs, newInput];
 
       return state.merge(
          Map({
             savedInputs
+         })
+      );
+   },
+
+   [RESET_SAVED_INPUTS]: state => {
+      return state.merge(
+         Map({
+            savedInputs: []
          })
       );
    },

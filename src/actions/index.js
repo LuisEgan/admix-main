@@ -24,6 +24,7 @@ export const REGISTER_REQUEST = "USERS_REGISTER_REQUEST",
    SET_PLACEMENT = "SET_PLACEMENT",
    SET_PLACEMENTS = "SET_PLACEMENTS",
    SAVE_INPUTS = "SAVE_INPUTS",
+   RESET_SAVED_INPUTS = "RESET_SAVED_INPUTS",
    TOGGLE_APP_STATUS = "TOGGLE_APP_STATUS",
    UPDATE_PLACEMENTS = "UPDATE_PLACEMENTS",
    USER_DATA_SUCCESS = "USER_DATA_SUCCESS",
@@ -164,6 +165,10 @@ export const saveInputs = toSaveInputs => ({
    toSaveInputs
 });
 
+export const resetSavedInputs = () => ({
+   type: RESET_SAVED_INPUTS
+});
+
 const showUserData = data => {
    if (data.status) {
       return {
@@ -268,13 +273,36 @@ export const forgotPass = username => dispatch => {
       .catch(error => dispatch(asyncError(error)));
 };
 
-export const getApps = accessToken => dispatch => {
+export const getApps = (accessToken, filterBy = []) => dispatch => {
    dispatch(asyncStart());
 
+   const data = {
+      filterBy
+   };
+
    api
-      .getApps(accessToken)
+      .getApps(accessToken, data)
       .then(data => dispatch(showApps(data)))
       .catch(error => dispatch(asyncError(error)));
+
+   //    api
+   //       .isAdmin(accessToken)
+   //       .then(response => {
+   //          console.log("response: ", response);
+   //          if (response.status) {
+   //             api
+   //                .getAppsAdmin(accessToken, data)
+   //                .then(data => dispatch(showApps(data)))
+   //                .catch(error => dispatch(asyncError(error)));
+   //          } else {
+   //             console.log("data: ", data);
+   //             api
+   //                .getApps(accessToken, data)
+   //                .then(data => dispatch(showApps(data)))
+   //                .catch(error => dispatch(asyncError(error)));
+   //          }
+   //       })
+   //       .catch(error => dispatch(asyncError(error)));
 };
 
 export const getUserData = accessToken => dispatch => {

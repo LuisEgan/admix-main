@@ -4,6 +4,7 @@ import { Redirect } from "react-router-dom";
 import { routeCodes } from "../../config/routes";
 import PropTypes from "prop-types";
 import { updatePlacements, toggleAppStatus } from "../../actions";
+import { ADMIX_OBJ_PREFIX } from "../../utils/constants";
 
 import cool from "../../assets/img/Sunglasses_Emoji_40.png";
 import coolLoad from "../../assets/img/Sunglasses_Emoji_load.png";
@@ -48,8 +49,19 @@ class Validation extends Component {
       };
       dispatch(toggleAppStatus(appDetails, accessToken));
 
+      const parsedInputs = savedInputs.map(input => {
+         if (input.addedPrefix) {
+            input.placementName = input.placementName.replace(
+               ADMIX_OBJ_PREFIX,
+               ""
+            );
+         }
+
+         return input;
+      });
+
       savedInputs.length !== 0 &&
-         dispatch(updatePlacements(accessToken, savedInputs));
+         dispatch(updatePlacements(accessToken, parsedInputs));
 
       this.setState({ startCampaign: true });
    }

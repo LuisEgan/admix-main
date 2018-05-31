@@ -1360,9 +1360,9 @@ $inputsFontSize: calc(0.45em + 0.3vw);
                }
 
                #input-placement-name {
-                  @extend .text-truncate;
+                  //   @extend .text-truncate;
                   // font-size: .85em;
-                  // word-wrap: break-word;
+                  word-wrap: break-word;
                }
 
                #form-panel-active-switch {

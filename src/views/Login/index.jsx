@@ -109,18 +109,20 @@ class Login extends Component {
       const state = this.state;
       const inputValue = e.target.value;
 
-      state[input] = inputValue;
+      const inputParsed = input.replace("Reg", "");
+      state[inputParsed] = inputValue;
       state.registerBtnDisabled = false;
 
-      if (input === "name") {
+      if (input === "nameReg") {
          state.regValidation.isValidName = STR.hasOnlyLetters(inputValue);
-      } else if (input === "email") {
+      } else if (input === "emailReg") {
          state.regValidation.isValidEmail = STR.isValidEmail(inputValue);
-      } else if (input === "password") {
+      } else if (input === "passwordReg") {
          state.regValidation.is8 = STR.isAtleast(inputValue, 8);
          state.regValidation.hasLetter = STR.hasLetter(inputValue);
          state.regValidation.hasNumber = STR.hasNumber(inputValue);
-      } else if (input === "confirmPassword") {
+         state.regValidation.arePassSame = state.confirmPassword === inputValue;
+      } else if (input === "confirmPasswordReg") {
          state.regValidation.arePassSame = state.password === inputValue;
       } else {
          // for policy and consent
@@ -208,7 +210,7 @@ class Login extends Component {
             <ToggleDisplay show={showLogin}>
                <div className="inputs-container">
                   <div className="inputs-header">
-                     <h3 className="st">Login</h3>
+                     <h3 className="st">Log in</h3>
                   </div>
 
                   <div className="inputs">
@@ -256,7 +258,7 @@ class Login extends Component {
                               className="btn btn-dark"
                               onClick={this.handleLogin}
                            >
-                              Login
+                              Log in
                            </button>
                         )}
                   </div>
@@ -343,7 +345,10 @@ class Login extends Component {
                            type="text"
                            className="form-control"
                            placeholder="Name"
-                           onChange={this.handleInputChange.bind(null, "name")}
+                           onChange={this.handleInputChange.bind(
+                              null,
+                              "nameReg"
+                           )}
                            onFocus={this.handleFocus}
                            ref={input => {
                               this.registerNameInput = input;
@@ -363,7 +368,10 @@ class Login extends Component {
                            type="text"
                            className="form-control"
                            placeholder="Email"
-                           onChange={this.handleInputChange.bind(null, "email")}
+                           onChange={this.handleInputChange.bind(
+                              null,
+                              "emailReg"
+                           )}
                            onFocus={this.handleFocus}
                            ref={input => {
                               this.registerEmailInput = input;
@@ -385,7 +393,7 @@ class Login extends Component {
                            placeholder="Password"
                            onChange={this.handleInputChange.bind(
                               null,
-                              "password"
+                              "passwordReg"
                            )}
                            onFocus={this.handleFocus}
                            ref={input => {
@@ -415,7 +423,7 @@ class Login extends Component {
                            placeholder="Confirm Password"
                            onChange={this.handleInputChange.bind(
                               null,
-                              "confirmPassword"
+                              "confirmPasswordReg"
                            )}
                            onFocus={this.handleFocus}
                            ref={input => {
