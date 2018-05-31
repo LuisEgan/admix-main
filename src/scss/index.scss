@@ -327,6 +327,10 @@ $inputsFontSize: calc(0.45em + 0.3vw);
    min-height: 70px;
    background-color: #fff;
 
+   svg {
+      margin: 10px;
+   }
+
    .container {
       display: flex;
       height: 100%;

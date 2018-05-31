@@ -39,7 +39,8 @@ class Menu extends Component {
 
       this.state = {
          showDropdown: false,
-         imgChecked: false
+         imgChecked: false,
+         badURL: false
       };
 
       this.handleLogout = this.handleLogout.bind(this);
@@ -143,13 +144,24 @@ class Menu extends Component {
 
    renderUserImg() {
       const { userImgURL } = this.props;
-      const { imgChecked } = this.state;
+      const { imgChecked, badURL } = this.state;
 
       if (!imgChecked) {
          return;
       } else {
          if (userImgURL !== "") {
-            return <img src={userImgURL} alt="Login" />;
+            if (badURL) {
+               return (
+                  <img
+                     src={userImgURL}
+                     onError={() => {
+                        this.setState({ badURL: true });
+                     }}
+                     alt="Login"
+                  />
+               );
+            }
+            return <FontAwesomeIcon icon={faUser} />;
          } else {
             return <FontAwesomeIcon icon={faUser} />;
          }
