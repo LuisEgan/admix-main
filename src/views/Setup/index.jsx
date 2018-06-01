@@ -473,12 +473,12 @@ class Setup extends Component {
                      <FontAwesomeIcon icon={faSearchPlus} /> &nbsp;
                      <span className="mb">Filter</span>
                   </div>
-                  <button
+                  {/* <button
                      className="btn btn-dark"
                      onClick={this.getReportData.bind(null, allAppsIds)}
                   >
                      <FontAwesomeIcon icon={faGlobe} /> &nbsp; Global Report
-                  </button>
+                  </button> */}
                </div>
 
                {filterBy.length > 0 && this.renderFilter()}
