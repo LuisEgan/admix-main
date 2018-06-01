@@ -150,7 +150,7 @@ class Menu extends Component {
          return;
       } else {
          if (userImgURL !== "") {
-            if (badURL) {
+            if (!badURL) {
                return (
                   <img
                      src={userImgURL}
