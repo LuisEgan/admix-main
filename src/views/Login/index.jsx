@@ -60,6 +60,14 @@ class Login extends Component {
       this.hardFocus = this.hardFocus.bind(this);
    }
 
+   componentDidMount() {
+      const {
+         location: { search }
+      } = this.props;
+      const show = search.split("?")[1];
+      (show === "register" || show === "forgotPass") && this.setState({ show });
+   }
+
    handleClick() {
       this.setState({
          show: !this.state.show,
