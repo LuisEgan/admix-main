@@ -436,7 +436,7 @@ class Setup extends Component {
                className="btn btn-dark"
                rel="noopener noreferrer"
             >
-               Download Advir for Unity
+               Download Admix for Unity
             </a>
          </div>
       );
