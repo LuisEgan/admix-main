@@ -61,7 +61,8 @@ class Setup extends Component {
          //filter
 
          filterBy: [],
-         showFilter: true
+         showFilter: true,
+         userUsedFilter: false
       };
 
       this.selectApp = this.selectApp.bind(this);
@@ -70,6 +71,7 @@ class Setup extends Component {
       this.toggleEditInfoBox = this.toggleEditInfoBox.bind(this);
       this.hideEditInfoBox = this.hideEditInfoBox.bind(this);
       this.showEditInfoBox = this.showEditInfoBox.bind(this);
+      this.renderNoApps = this.renderNoApps.bind(this);
 
       //filter
       this.toggleFilter = this.toggleFilter.bind(this);
@@ -181,29 +183,37 @@ class Setup extends Component {
 
       filterBy.push(newFilter);
 
-      this.setState({ filterBy });
+      this.setState({ filterBy, userUsedFilter: true });
    }
 
    deleteFilter(i) {
+      const { accessToken, dispatch } = this.props;
       const { filterBy } = this.state;
       filterBy.splice(i, 1);
-      this.setState({ filterBy });
+      const userUsedFilter = filterBy.length !== 0;
+      this.setState({ filterBy, userUsedFilter });
+      dispatch(getApps(accessToken, filterBy));
    }
 
    setFilter({ filterIndex, attr }, e) {
+      const { accessToken, dispatch } = this.props;
       const { filterBy } = this.state;
 
       let {
          target: { value }
       } = e;
 
-      value = attr === "isActive" ? value === "live" : value;
+      value =
+         attr === "isActive"
+            ? value === ""
+               ? value
+               : value === "live"
+            : value;
 
       filterBy[filterIndex][attr] = value;
 
-      console.log("filterBy: ", filterBy);
       this.setState({ filterBy });
-      // dispatch(getApps(accessToken, filterBy));
+      dispatch(getApps(accessToken, filterBy));
    }
 
    renderFilter() {
@@ -225,9 +235,12 @@ class Setup extends Component {
          )} ${str.substring(uppIndex, str.length)}`;
       };
 
+      const {
+         location: { search }
+      } = this.props;
       let { filterBy } = this.state;
 
-      const isAdmin = true;
+      const isAdmin = search === "?iamanadmin";
 
       const filterTypes = isAdmin
          ? [
@@ -235,11 +248,12 @@ class Setup extends Component {
               "_id",
               "userId",
               "userName",
-              "appEngine",
+              // "appEngine",
               "isActive",
               "platformName"
            ]
-         : ["name", "appEngine", "isActive", "platformName"];
+         : ["name", "isActive", "platformName"];
+      //  : ["name", "appEngine", "isActive", "platformName"];
 
       const appEnginesOpts = [
          <option value="unity" key="unity">
@@ -412,32 +426,46 @@ class Setup extends Component {
    }
 
    renderNoApps() {
+      const { userUsedFilter } = this.state;
       return (
          <div id="no-apps">
             <img
                src="https://cdn.shopify.com/s/files/1/1061/1924/files/Thinking_Face_Emoji.png?9898922749706957214"
                alt="mmm"
             />
-            <h3 className="st">
-               Looks like you have not connected your app yet.
-            </h3>
-            <h2 className="mb">
-               To get started, create your inventory in Unity with the <br />{" "}
-               Advir plugin. Apps will appear here automatically.
-            </h2>
-            <h2 className="mb">
-               <br />
-               <br />
-               Don't have the plugin?
-            </h2>
-            <a
-               href="https://assetstore.unity.com/"
-               target="_blank"
-               className="btn btn-dark"
-               rel="noopener noreferrer"
-            >
-               Download Admix for Unity
-            </a>
+            {!userUsedFilter && (
+               <React.Fragment>
+                  <h3 className="st">
+                     Looks like you have not connected your app yet.
+                  </h3>
+                  <h2 className="mb">
+                     To get started, create your inventory in Unity with the{" "}
+                     <br /> Advir plugin. Apps will appear here automatically.
+                  </h2>
+                  <h2 className="mb">
+                     <br />
+                     <br />
+                     Don't have the plugin?
+                  </h2>
+                  <a
+                     href="https://assetstore.unity.com/"
+                     target="_blank"
+                     className="btn btn-dark"
+                     rel="noopener noreferrer"
+                  >
+                     Download Admix for Unity
+                  </a>
+               </React.Fragment>
+            )}
+
+            {userUsedFilter && (
+               <React.Fragment>
+                  <h3 className="st">You dont't seem to have that app.</h3>
+                  <h2 className="mb">
+                     Check your spelling or the filter combinations.
+                  </h2>
+               </React.Fragment>
+            )}
          </div>
       );
    }

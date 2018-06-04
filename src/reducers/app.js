@@ -9,6 +9,7 @@ import {
    ACTION_SUCCESS,
    RESET_ASYNC,
    FORGOT_PASS,
+   SET_PASS,
    LOGIN_SUCCESS,
    LOGOUT_SUCCESS,
    REGISTER_SUCCESS,
@@ -128,7 +129,8 @@ const actionsMap = {
       );
    },
 
-   [FORGOT_PASS]: (state, action) => {
+   [FORGOT_PASS]: (state, data) => {
+      console.log("FORGOT_PASS data: ", data);
       const asyncLoading = false;
       const asyncData = {
          mssg: "Success! Now, check your email for further instructions."
@@ -140,6 +142,21 @@ const actionsMap = {
          })
       );
    },
+
+   [SET_PASS]: (state, data) => {
+      const asyncLoading = false;
+
+      const asyncData = {
+         mssg: data.data.message
+      };
+      return state.merge(
+         Map({
+            asyncLoading,
+            asyncData
+         })
+      );
+   },
+
    [LOGIN_SUCCESS]: (state, action) => {
       const { data } = action.data;
       const isLoggedIn = true;

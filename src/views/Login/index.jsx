@@ -157,8 +157,15 @@ class Login extends Component {
    }
 
    handleKeyPress(e) {
+      const { show } = this.state;
       if (e.key === "Enter") {
-         this.handleLogin();
+         if (show === "login") {
+            this.handleLogin();
+         } else if (show === "register") {
+            this.handleSignup();
+         } else if (show === "forgotPass") {
+            this.handleforgotPass();
+         }
       }
    }
 
@@ -305,6 +312,7 @@ class Login extends Component {
                            this.emailInput = input;
                         }}
                         onClick={this.hardFocus.bind(null, "emailInput")}
+                        onFocus={this.handleFocus}
                      />
                   </div>
 

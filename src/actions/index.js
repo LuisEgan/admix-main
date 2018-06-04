@@ -15,6 +15,7 @@ export const REGISTER_REQUEST = "USERS_REGISTER_REQUEST",
    LOGOUT_SUCCESS = "USERS_LOGOUT_SUCCESS",
    LOGIN_FAILURE = "USERS_LOGIN_FAILURE",
    FORGOT_PASS = "USERS_FORGOT_PASS",
+   SET_PASS = "USERS_SET_PASS",
    LOGOUT = "USERS_LOGOUT",
    APPS_SUCCESS = "USERS_APPS_SUCCESS",
    APPS_ERROR = "USERS_APPS_SUCCESS_FAILURE",
@@ -105,6 +106,18 @@ function doForgotPass(data) {
    if (data.status) {
       return {
          type: FORGOT_PASS,
+         data
+      };
+   } else {
+      return asyncError(data);
+   }
+}
+
+function doSetPassword(data) {
+   console.log("doSetPassword data: ", data);
+   if (data.status) {
+      return {
+         type: SET_PASS,
          data
       };
    } else {
@@ -263,13 +276,23 @@ export function signup(name, email, password) {
    };
 }
 
-export const forgotPass = username => dispatch => {
+export const forgotPass = email => dispatch => {
    dispatch(asyncStart());
 
-   const data = { username };
+   const data = { email };
    api
       .forgotPass(data)
       .then(data => dispatch(doForgotPass(data)))
+      .catch(error => dispatch(asyncError(error)));
+};
+
+export const setNewPass = ({ token, userId, newPass }) => dispatch => {
+   dispatch(asyncStart());
+
+   const data = { token, userId, newPass };
+   api
+      .setNewPass(data)
+      .then(res => dispatch(doSetPassword(res)))
       .catch(error => dispatch(asyncError(error)));
 };
 

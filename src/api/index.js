@@ -1,7 +1,7 @@
 import reportData from "../assets/data/placementDailyReport.json";
 // import reportData from "../assets/data/placementDailyReport-total.json";
 
-const dns = "http://ec2-52-15-223-69.us-east-2.compute.amazonaws.com";
+const dns = "http://ec2-52-15-223-69.us-east-2.compute.amazonaws.com:3005";
 
 function async() {
    return fetch("http://date.jsontest.com/").then(response => response.json());
@@ -66,25 +66,35 @@ function forgotPass(data) {
    }).then(response => response.json());
 }
 
-function getApps(accessToken, data) {
-    return fetch(dns + "/api/v1/user/getApps", {
-       method: "GET",
-       headers: new Headers({
-          "x-access-token": accessToken,
-       })
-    }).then(response => response.json());
- }
+function setNewPass(data) {
+   return fetch(dns + "/api/v1/user/setNewPassword", {
+      method: "POST",
+      headers: new Headers({
+         "Content-Type": "application/json"
+      }),
+      body: JSON.stringify(data)
+   }).then(response => response.json());
+}
 
-// function getApps(accessToken, data) {
-//    return fetch(dns + "/api/v1/user/getApps", {
-//       method: "POST",
-//       headers: new Headers({
-//          "x-access-token": accessToken,
-//          "Content-Type": "application/json"
-//       }),
-//       body: JSON.stringify(data)
-//    }).then(response => response.json());
-// }
+function getAppsAll(accessToken, data) {
+   return fetch(dns + "/api/v1/user/getApps", {
+      method: "GET",
+      headers: new Headers({
+         "x-access-token": accessToken
+      })
+   }).then(response => response.json());
+}
+
+function getApps(accessToken, data) {
+   return fetch(dns + "/api/v1/user/getApps", {
+      method: "POST",
+      headers: new Headers({
+         "x-access-token": accessToken,
+         "Content-Type": "application/json"
+      }),
+      body: JSON.stringify(data)
+   }).then(response => response.json());
+}
 
 function getAppsAdmin(accessToken, data) {
    return fetch(dns + "/api/v1/user/getAppsAdmin", {
@@ -155,6 +165,8 @@ export default {
    login,
    signup,
    forgotPass,
+   setNewPass,
+   getAppsAll,
    getApps,
    getAppsAdmin,
    getUserData,
