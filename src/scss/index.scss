@@ -440,10 +440,10 @@ $inputsFontSize: calc(0.45em + 0.3vw);
             }
          }
          .dropdown-menu.show {
-            transform: translate3d(0, -2vh, 0) !important;
+            transform: translate3d(-2vh, -2vh, 0) !important;
             // border: 0;
-            width: 120%;
-            min-width: unset;
+            // width: 120%;
+            min-width: 120px;
             a {
                font-size: 0.75em;
                font-size: calc(0.35em + 0.8vw);

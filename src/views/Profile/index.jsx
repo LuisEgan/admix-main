@@ -197,7 +197,7 @@ class Profile extends Component {
                   </div>
                   <br />
                   <br />
-                  <div>
+                  {/* <div>
                      <div className="mb">New password</div>
                      <div>
                         <Field name="password" component={this.renderField} />
@@ -214,7 +214,7 @@ class Profile extends Component {
                   </div>
                   <div>
                      <button className="btn btn-black">Save</button>
-                  </div>
+                  </div> */}
                </div>
             </form>
          </div>

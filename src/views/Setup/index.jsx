@@ -405,6 +405,8 @@ class Setup extends Component {
                   >
                      Campaign is live, turn it off before editing!
                   </div>
+
+                  {/* REPORT COMMENTED */}
                   {/* <button
                      className="btn btn-dark"
                      onClick={this.getReportData.bind(null, _id)}
@@ -496,6 +498,7 @@ class Setup extends Component {
                      <FontAwesomeIcon icon={faSearchPlus} /> &nbsp;
                      <span className="mb">Filter</span>
                   </div>
+                  {/* REPORT COMMENTED */}
                   {/* <button
                      className="btn btn-dark"
                      onClick={this.getReportData.bind(null, allAppsIds)}

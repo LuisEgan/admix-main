@@ -213,25 +213,53 @@ class Menu extends Component {
                      </button>
                      <div className={`dropdown-menu ${showDropdown}`}>
                         {!isLoggedIn && (
-                           <NavLink
-                              exact
-                              to={routeCodes.LOGIN}
-                              className="dropdown-item"
-                              onClick={this.toggleDropdowns.bind(null, true)}
-                           >
-                              Login
-                           </NavLink>
+                           <React.Fragment>
+                              <NavLink
+                                 exact
+                                 to={routeCodes.DOWNLOAD}
+                                 className="dropdown-item"
+                                 onClick={this.toggleDropdowns.bind(null, true)}
+                              >
+                                 Download
+                              </NavLink>
+                              <NavLink
+                                 exact
+                                 to={routeCodes.LOGIN}
+                                 className="dropdown-item"
+                                 onClick={this.toggleDropdowns.bind(null, true)}
+                              >
+                                 Login
+                              </NavLink>
+                           </React.Fragment>
                         )}
 
                         {isLoggedIn && (
                            <React.Fragment>
                               <NavLink
                                  exact
+                                 to={routeCodes.SETUP}
+                                 className="dropdown-item"
+                                 onClick={this.toggleDropdowns.bind(null, true)}
+                              >
+                                 My Apps
+                              </NavLink>
+
+                              <NavLink
+                                 exact
                                  to={routeCodes.PROFILE}
                                  className="dropdown-item"
                                  onClick={this.toggleDropdowns.bind(null, true)}
                               >
-                                 Profile
+                                 My Profile
+                              </NavLink>
+
+                              <NavLink
+                                 exact
+                                 to={routeCodes.DOWNLOAD}
+                                 className="dropdown-item"
+                                 onClick={this.toggleDropdowns.bind(null, true)}
+                              >
+                                 Download
                               </NavLink>
                               <a
                                  className="dropdown-item"
