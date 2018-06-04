@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Redirect } from "react-router-dom";
+import { Redirect, NavLink } from "react-router-dom";
 import { routeCodes } from "../../config/routes";
 import PropTypes from "prop-types";
 import {
@@ -447,14 +447,9 @@ class Setup extends Component {
                      <br />
                      Don't have the plugin?
                   </h2>
-                  <a
-                     href="https://assetstore.unity.com/"
-                     target="_blank"
-                     className="btn btn-dark"
-                     rel="noopener noreferrer"
-                  >
-                     Download Admix for Unity
-                  </a>
+                  <NavLink to="/download" className="btn btn-dark">
+                     Download Admix plugin
+                  </NavLink>
                </React.Fragment>
             )}
 

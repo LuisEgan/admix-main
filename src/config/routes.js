@@ -8,6 +8,7 @@ import Validation from "../views/Validation";
 import Congratulations from "../views/Congratulations";
 import Report from "../views/Report";
 import Profile from "../views/Profile";
+import Download from "../views/Download";
 import ForgotPass from "../views/ForgotPass";
 import EmailSuccess from "../views/EmailVerification/emailSuccess";
 import EmailFailure from "../views/EmailVerification/emailFailure";
@@ -23,6 +24,7 @@ export const routeCodes = {
    CONGRATULATIONS: `${publicPath}congratulations`,
    REPORT: `${publicPath}report`,
    PROFILE: `${publicPath}profile`,
+   DOWNLOAD: `${publicPath}download`,
    FORGOT_PASS: `${publicPath}forgotPass`,
    EMAIL_SUCCESS: `${publicPath}emailSuccess`,
    EMAIL_FAILURE: `${publicPath}emailFailure`
@@ -116,6 +118,7 @@ export default props => {
             location={location}
             customFuncs={{ updateMenuImg }}
          />
+         <Route path={routeCodes.DOWNLOAD} component={Download} exact />
          <Route path={routeCodes.FORGOT_PASS} component={ForgotPass} exact />
          <Route
             path={routeCodes.EMAIL_SUCCESS}
