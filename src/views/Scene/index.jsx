@@ -212,7 +212,7 @@ class Scene extends Component {
          y = event.clientY;
       }
 
-      this.mouse.x = x / window.innerWidth * 2 - 1;
+      this.mouse.x = (x / window.innerWidth) * 2 - 1;
       this.mouse.y = -(y / window.innerHeight) * 2 + 1;
 
       const intersects = this.checkIntersection();
@@ -407,7 +407,7 @@ class Scene extends Component {
 
       // LOAD OBJECT
       const onProgress = xhr => {
-         const loadingProgress = Math.round(xhr.loaded / xhr.total * 100);
+         const loadingProgress = Math.round((xhr.loaded / xhr.total) * 100);
          this.setState({ loadingProgress });
       };
 
@@ -450,6 +450,8 @@ class Scene extends Component {
          objUrl = `exportObjScene1.obj`;
          mtlUrl = `exportObjScene1.mtl`;
       }
+
+      console.log(objUrl);
 
       const mtlLoader = new THREE.MTLLoader();
       mtlLoader.setPath(renderPath);
