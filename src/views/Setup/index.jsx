@@ -197,7 +197,7 @@ class Setup extends Component {
 
    setFilter({ filterIndex, attr }, e) {
       const { accessToken, dispatch } = this.props;
-      const { filterBy } = this.state;
+      let { filterBy } = this.state;
 
       let {
          target: { value }
@@ -212,8 +212,17 @@ class Setup extends Component {
 
       filterBy[filterIndex][attr] = value;
 
+      filterBy.length === 1 &&
+         value.length === 0 &&
+         dispatch(getApps(accessToken, []));
+
       this.setState({ filterBy });
-      dispatch(getApps(accessToken, filterBy));
+
+      if (attr === "name") {
+         value.length >= 3 && dispatch(getApps(accessToken, filterBy));
+      } else {
+         dispatch(getApps(accessToken, filterBy));
+      }
    }
 
    renderFilter() {
