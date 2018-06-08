@@ -179,7 +179,8 @@ class Menu extends Component {
 
       const {
          location: { pathname },
-         isLoggedIn
+         isLoggedIn,
+         userData
       } = this.props;
 
       showDropdown = showDropdown ? "show" : "";
@@ -209,7 +210,7 @@ class Menu extends Component {
                         onClick={this.toggleDropdowns.bind(null, false)}
                      >
                         {/* <i className="fa fa-user" aria-hidden="true"></i> */}
-                        <span className="st">My Profile</span>
+                        <span className="st">Hi, {userData.name}!</span>
                      </button>
                      <div className={`dropdown-menu ${showDropdown}`}>
                         {!isLoggedIn && (
