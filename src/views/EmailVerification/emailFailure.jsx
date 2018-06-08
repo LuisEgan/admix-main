@@ -17,7 +17,7 @@ export default class Congratulations extends Component {
                   <h2 className="st">Something went wrong</h2>
                   <h3 className="mb">
                      Please contact our team at{" "}
-                     <a href="mailto:contact@admix.in">contact@admix.in</a> for
+                     <a href="mailto:support@admix.in">support@admix.in</a> for
                      help <br />
                   </h3>
                   <a href="http://admix.in/" className="btn btn-dark">

@@ -52,7 +52,7 @@ export default class Congratulations extends Component {
                      </ul>
 
                      <h2 className="st">Questions?</h2>
-                     <a href="mailto:contact@admix.in">Contact support</a>
+                     <a href="mailto:support@admix.in">Contact support</a>
                   </div>
                </div>
             </div>

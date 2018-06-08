@@ -152,7 +152,7 @@ class Profile extends Component {
    }
 
    render() {
-      const { statusMssg, uploadedFileCloudinaryUrl, userHasImg } = this.state;
+      const { uploadedFileCloudinaryUrl, userHasImg } = this.state;
 
       const userImgStyle = userHasImg ? { padding: "5%" } : { padding: "15%" };
 
