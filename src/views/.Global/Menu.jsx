@@ -210,7 +210,13 @@ class Menu extends Component {
                         onClick={this.toggleDropdowns.bind(null, false)}
                      >
                         {/* <i className="fa fa-user" aria-hidden="true"></i> */}
-                        <span className="st">Hi, {userData.name}!</span>
+                        <span className="st">
+                           {userData.name === undefined ||
+                           userData.name === "" ||
+                           !userData.name
+                              ? "Hello!"
+                              : "Hi, " + userData.name + "!"}
+                        </span>
                      </button>
                      <div className={`dropdown-menu ${showDropdown}`}>
                         {!isLoggedIn && (
