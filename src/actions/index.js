@@ -389,17 +389,6 @@ export const fetchUserImgURL = (imgURL, accessToken) => dispatch => {
       dispatch(asyncStart());
 
       dispatch(setUserImgURL(imgURL));
-
-      //    const data = {
-      //       imgURL
-      //    };
-
-      //    api
-      //       .cloudinayImgURL(accessToken, data)
-      //       .then(data => {
-      //          dispatch(setUserImgURL(data));
-      //       })
-      //       .catch(error => dispatch(asyncError(error)));
 };
 
 // ===========================

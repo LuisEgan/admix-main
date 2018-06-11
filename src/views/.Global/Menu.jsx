@@ -10,6 +10,7 @@ import userImgGen from "../../assets/img/userImg.png";
 import book2 from "../../assets/img/book2.jpg";
 import sam20 from "../../assets/img/sam_20.jpg";
 import admixLoading from "../../assets/gifs/admixBreath.gif";
+import defaultImg from "../../assets/img/default_pic.jpg";
 
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faUser from "@fortawesome/fontawesome-free-solid/faUser";
@@ -19,10 +20,6 @@ import {
    CLOUDINARY_UPLOAD_URL,
    CLOUDINARY_IMG_URL
 } from "../../config/cloudinary";
-
-const AppsLeft = "27%";
-const EditLeft = "43%";
-const ValidateLeft = "60%";
 
 // @connect(state => ({
 //   userData: state.app.get("userData")
@@ -44,9 +41,6 @@ class Menu extends Component {
       };
 
       this.handleLogout = this.handleLogout.bind(this);
-      this.handleClick = this.handleClick.bind(this);
-      this.updateMenuImg = this.updateMenuImg.bind(this);
-      this.noUserImg = this.noUserImg.bind(this);
       this.toggleDropdowns = this.toggleDropdowns.bind(this);
    }
 
@@ -76,64 +70,11 @@ class Menu extends Component {
       this.props.onRef(undefined);
    }
 
-   updateMenuImg() {
-      const { userData } = this.props;
-      const userId = userData._id;
-      this.setState({
-         userImg: `${CLOUDINARY_IMG_URL}/${userId}.png?${new Date().getTime()}`,
-         userHasImg: true
-      });
-   }
-
-   noUserImg(e) {
-      const { userData } = this.props;
-      const userId = userData._id;
-
-      let userImg = "";
-
-      userImg = admixLoading;
-      this.setState({ userImg });
-
-      userImg = userId
-         ? `${CLOUDINARY_IMG_URL}/${userId}.png?${new Date().getTime()}`
-         : loginImg;
-      this.setState({ userImg, userHasImg: false });
-   }
-
    handleLogout() {
       const { dispatch } = this.props;
       this.setState({ imgChecked: false });
       this.toggleDropdowns(true);
       dispatch(logout());
-   }
-
-   handleClick(step, e) {
-      const { location, history } = this.props;
-      let left, redirectTo;
-      switch (step) {
-         case "Apps":
-            left = AppsLeft;
-            redirectTo = routeCodes.LOGIN;
-            break;
-         case "Edit":
-            left = EditLeft;
-            redirectTo = routeCodes.SCENE;
-            break;
-         case "Validate":
-            left = ValidateLeft;
-            redirectTo = routeCodes.VALIDATION;
-            break;
-      }
-
-      const stepBarStyle = {
-         opacity: 1,
-         left
-      };
-
-      this.setState({ stepBarStyle });
-      setTimeout(() => {
-         history.push(redirectTo);
-      }, 500);
    }
 
    toggleDropdowns(forceClose = false) {
@@ -142,45 +83,14 @@ class Menu extends Component {
       this.setState({ showDropdown });
    }
 
-   renderUserImg() {
-      const { userImgURL } = this.props;
-      const { imgChecked, badURL } = this.state;
-
-      if (!imgChecked) {
-         return;
-      } else {
-         if (userImgURL !== "") {
-            if (!badURL) {
-               return (
-                  <img
-                     src={userImgURL}
-                     onError={() => {
-                        this.setState({ badURL: true });
-                     }}
-                     alt="Login"
-                  />
-               );
-            }
-            return <FontAwesomeIcon icon={faUser} />;
-         } else {
-            return <FontAwesomeIcon icon={faUser} />;
-         }
-      }
-   }
-
    render() {
-      let {
-         stepBarStyle,
-         redirectTo,
-         userImg,
-         showDropdown,
-         userHasImg
-      } = this.state;
+      let { showDropdown } = this.state;
 
       const {
          location: { pathname },
          isLoggedIn,
-         userData
+         userData,
+         userImgURL
       } = this.props;
 
       showDropdown = showDropdown ? "show" : "";
@@ -278,7 +188,13 @@ class Menu extends Component {
                         )}
                      </div>
                   </div>
-                  {this.renderUserImg()}
+                  {isLoggedIn && (
+                     <img
+                        src={userImgURL}
+                        onError={e => (e.target.src = defaultImg)}
+                        alt="Login"
+                     />
+                  )}
                </div>
             </div>
          </div>

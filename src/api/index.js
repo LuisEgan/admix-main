@@ -1,7 +1,7 @@
 import reportData from "../assets/data/placementDailyReport.json";
 // import reportData from "../assets/data/placementDailyReport-total.json";
 
-const dns = "http://ec2-52-15-223-69.us-east-2.compute.amazonaws.com:3005";
+const dns = "http://ec2-52-15-223-69.us-east-2.compute.amazonaws.com";
 
 function async () {
     return fetch("http://date.jsontest.com/").then(response => response.json());

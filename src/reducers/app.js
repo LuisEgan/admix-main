@@ -5,9 +5,6 @@ import _ from "lodash";
 import {
       ADMIX_OBJ_PREFIX
 } from "../utils/constants";
-import {
-      CLOUDINARY_IMG_URL
-} from "../config/cloudinary";
 
 import {
       ACTION,
@@ -474,7 +471,6 @@ const actionsMap = {
       [SET_USER_IMG_URL]: (state, data) => {
             const asyncLoading = false;
             const userImgURL = data.data;
-            console.log('userImgURL: ', userImgURL);
 
             return state.merge(
                   Map({

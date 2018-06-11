@@ -14,7 +14,7 @@ import {
    CLOUDINARY_UPLOAD_URL
 } from "../../config/cloudinary";
 
-import userImgGen from "../../assets/img/userImg.png";
+import defaultImg from "../../assets/img/default_pic.jpg";
 
 class Profile extends Component {
    static propTypes = {
@@ -58,7 +58,6 @@ class Profile extends Component {
             profileForm: { values }
          }
       } = this.props;
-      console.log("values: ", values);
    };
 
    onImageDrop(files) {
@@ -114,7 +113,7 @@ class Profile extends Component {
    }
 
    noUserImg(e) {
-      e.target.src = userImgGen;
+      e.target.src = defaultImg;
       this.setState({ userHasImg: false });
    }
 
@@ -149,9 +148,8 @@ class Profile extends Component {
 
    render() {
       const { userImgURL } = this.props;
-      const { userHasImg } = this.state;
 
-      const userImgStyle = userHasImg ? { padding: "5%" } : { padding: "15%" };
+      //   const userImgStyle = userHasImg ? { padding: "5%" } : { padding: "15%" };
 
       return (
          <div className="step-container" id="profile">
@@ -173,7 +171,7 @@ class Profile extends Component {
                                     src={userImgURL}
                                     onError={this.noUserImg}
                                     alt="+"
-                                    style={userImgStyle}
+                                    // style={userImgStyle}
                                  />
                                  <FontAwesomeIcon icon={faEdit} />
                               </Dropzone>
