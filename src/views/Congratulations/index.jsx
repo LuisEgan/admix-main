@@ -40,9 +40,6 @@ export default class Congratulations extends Component {
                      <br />
                      follow the progress of your campaign. <br />
                   </h3>
-                  {/* <NavLink exact to="/setup" className="btn btn-dark">
-                            Go to dashboard
-                        </NavLink> */}
                   <a href="/setup" className="btn btn-dark">
                      Go to dashboard
                   </a>

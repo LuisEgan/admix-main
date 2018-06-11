@@ -10,8 +10,11 @@ import {
    toggleAppStatus,
    getReportData,
    setInitialReportApp,
-   resetSavedInputs
+   resetSavedInputs,
+   setUserImgURL
 } from "../../actions";
+import { CLOUDINARY_IMG_URL } from "../../config/cloudinary";
+
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faGlobe from "@fortawesome/fontawesome-free-solid/faGlobe";
 import faSearchPlus from "@fortawesome/fontawesome-free-solid/faSearchPlus";
@@ -81,7 +84,7 @@ class Setup extends Component {
    }
 
    componentDidMount() {
-      const { apps, dispatch, accessToken } = this.props;
+      const { apps, dispatch, accessToken, userData } = this.props;
       const activeApps = [];
       apps.forEach(app => {
          const { _id, isActive } = app;
@@ -92,6 +95,7 @@ class Setup extends Component {
       this.setState({ allAppsIds, activeApps });
       dispatch(getApps(accessToken));
       dispatch(getUserData(accessToken));
+      dispatch(setUserImgURL(CLOUDINARY_IMG_URL + userData._id + ".png"));
       dispatch(resetSavedInputs());
    }
 

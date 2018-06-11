@@ -11,8 +11,7 @@ import faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
 
 import {
    CLOUDINARY_UPLOAD_PRESET,
-   CLOUDINARY_UPLOAD_URL,
-   CLOUDINARY_IMG_URL
+   CLOUDINARY_UPLOAD_URL
 } from "../../config/cloudinary";
 
 import userImgGen from "../../assets/img/userImg.png";
@@ -27,7 +26,6 @@ class Profile extends Component {
 
       this.state = {
          statusMssg: "",
-         uploadedFileCloudinaryUrl: "",
          uploadedFile: "",
          userHasImg: true
       };
@@ -40,17 +38,9 @@ class Profile extends Component {
    }
 
    componentDidMount() {
-      const {
-         userData: { _id }
-      } = this.props;
-
       this.hardFocus("email");
       this.hardFocus("userName");
       this.hardUnfocus("userName");
-
-      this.setState({
-         uploadedFileCloudinaryUrl: `${CLOUDINARY_IMG_URL}/${_id}.png`
-      });
    }
 
    hardFocus(input) {
@@ -72,11 +62,20 @@ class Profile extends Component {
    };
 
    onImageDrop(files) {
+      const { userData } = this.props;
+
       this.setState({
          uploadedFile: files[0]
       });
 
-      this.handleImageUploadClient(files[0]);
+      const reader = new FileReader();
+      reader.onload = () => {
+         const imgPath = reader.result;
+         this.handleImageUploadServer({ imgPath, userId: userData._id });
+      };
+      reader.readAsDataURL(files[0]);
+
+      //   this.handleImageUploadClient(files[0]);
    }
 
    handleImageUploadClient(file) {
@@ -102,19 +101,16 @@ class Profile extends Component {
             };
             dispatch(setUserImgURL(imgURL));
             this.setState({
-               uploadedFileCloudinaryUrl: `${
-                  response.body.secure_url
-               }?${new Date().getTime()}`,
                userHasImg: true
             });
          }
       });
    }
 
-   handleImageUploadServer(uploadImg) {
+   handleImageUploadServer({ imgPath, userId }) {
       const { accessToken, dispatch } = this.props;
 
-      dispatch(imgUpload(uploadImg, accessToken));
+      dispatch(imgUpload(imgPath, userId, accessToken));
    }
 
    noUserImg(e) {
@@ -152,52 +148,59 @@ class Profile extends Component {
    }
 
    render() {
-      const { uploadedFileCloudinaryUrl, userHasImg } = this.state;
+      const { userImgURL } = this.props;
+      const { userHasImg } = this.state;
 
       const userImgStyle = userHasImg ? { padding: "5%" } : { padding: "15%" };
 
       return (
          <div className="step-container" id="profile">
-            <form onSubmit={this.handleSubmit}>
-               <div className="container">
-                  <div>
-                     <h3 className="st">My profile</h3>
-                  </div>
-                  <div>
-                     <div className="mb">Profile picture</div>
-                     <div className="image-drop">
-                        <Dropzone
-                           multiple={false}
-                           accept="image/*"
-                           onDrop={this.onImageDrop}
-                           className="dropzone"
-                        >
-                           <img
-                              src={uploadedFileCloudinaryUrl}
-                              onError={this.noUserImg}
-                              alt="+"
-                              style={userImgStyle}
-                           />
-                           <FontAwesomeIcon icon={faEdit} />
-                        </Dropzone>
-                     </div>
-                  </div>
+            <div className="container simple-container">
+               <h3 className="st">My profile</h3>
+               <div>
+                  <form onSubmit={this.handleSubmit}>
+                     <div className="container">
+                        <div>
+                           <div className="mb">Profile picture</div>
+                           <div className="image-drop">
+                              <Dropzone
+                                 multiple={false}
+                                 accept="image/*"
+                                 onDrop={this.onImageDrop}
+                                 className="dropzone"
+                              >
+                                 <img
+                                    src={userImgURL}
+                                    onError={this.noUserImg}
+                                    alt="+"
+                                    style={userImgStyle}
+                                 />
+                                 <FontAwesomeIcon icon={faEdit} />
+                              </Dropzone>
+                           </div>
+                        </div>
 
-                  <div>
-                     <div className="mb">Name</div>
-                     <div>
-                        <Field name="userName" component={this.renderField} />
-                     </div>
-                  </div>
-                  <div>
-                     <div className="mb">Email</div>
-                     <div>
-                        <Field name="email" component={this.renderField} />
-                     </div>
-                  </div>
-                  <br />
-                  <br />
-                  {/* <div>
+                        <div>
+                           <div className="mb">Name</div>
+                           <div>
+                              <Field
+                                 name="userName"
+                                 component={this.renderField}
+                              />
+                           </div>
+                        </div>
+                        <div>
+                           <div className="mb">Email</div>
+                           <div>
+                              <Field
+                                 name="email"
+                                 component={this.renderField}
+                              />
+                           </div>
+                        </div>
+                        <br />
+                        <br />
+                        {/* <div>
                      <div className="mb">New password</div>
                      <div>
                         <Field name="password" component={this.renderField} />
@@ -215,8 +218,10 @@ class Profile extends Component {
                   <div>
                      <button className="btn btn-black">Save</button>
                   </div> */}
+                     </div>
+                  </form>
                </div>
-            </form>
+            </div>
          </div>
       );
    }
@@ -233,6 +238,7 @@ const mapStateToProps = state => {
    return {
       accessToken: state.app.get("accessToken"),
       isLoggedIn: state.app.get("isLoggedIn"),
+      userImgURL: state.app.get("userImgURL"),
       userData,
       form: state.form,
       initialValues

@@ -226,7 +226,7 @@ export const setUserImgURL = data => ({
       data
 });
 
-const doimgUpload = data => ({
+const imgUploadRes = data => ({
       type: USER_IMG_UPLOAD,
       data
 });
@@ -367,17 +367,18 @@ export const toggleAppStatus = (appDetails, accessToken) => dispatch => {
             .catch(error => dispatch(asyncError(error)));
 };
 
-export const imgUpload = (uploadImg, accessToken) => dispatch => {
+export const imgUpload = (imgPath, userId, accessToken) => dispatch => {
       dispatch(asyncStart());
 
       const data = {
-            uploadImg
+            imgPath,
+            userId
       };
 
       api
             .cloudinayImgUpload(accessToken, data)
             .then(data => {
-                  dispatch(doimgUpload(data));
+                  dispatch(imgUploadRes(data));
             })
             .catch(error => {
                   console.log("error: ", error);
