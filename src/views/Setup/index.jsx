@@ -158,10 +158,17 @@ class Setup extends Component {
    }
 
    getReportData(appsIds) {
-      const { dispatch } = this.props;
-      const isAdmin = true;
-      dispatch(getReportData(isAdmin, appsIds));
+      const {
+         dispatch,
+         accessToken,
+         location: { search }
+      } = this.props;
+
+      const isAdmin = search === "?iamanadmin";
+      dispatch(getReportData(isAdmin, appsIds, accessToken));
+
       dispatch(setInitialReportApp(appsIds));
+      dispatch(getApps(accessToken));
       this.setState({ appSelected: true, report: true });
    }
 
@@ -420,12 +427,12 @@ class Setup extends Component {
                   </div>
 
                   {/* REPORT COMMENTED */}
-                  {/* <button
+                  <button
                      className="btn btn-dark"
                      onClick={this.getReportData.bind(null, _id)}
                   >
                      Report
-                  </button> */}
+                  </button>
                   <button
                      className="btn btn-dark"
                      disabled={isActive}
@@ -502,7 +509,7 @@ class Setup extends Component {
          <div className="step-container" id="apps">
             <div className="container">
                <div id="apps-myApps">
-                  <h3 className="st">My apps</h3>
+                  <h3 className="st sc-h3">My apps</h3>
                   <div
                      id="filter"
                      className="unselectable"
@@ -512,12 +519,12 @@ class Setup extends Component {
                      <span className="mb">Filter</span>
                   </div>
                   {/* REPORT COMMENTED */}
-                  {/* <button
+                  <button
                      className="btn btn-dark"
                      onClick={this.getReportData.bind(null, allAppsIds)}
                   >
                      <FontAwesomeIcon icon={faGlobe} /> &nbsp; Global Report
-                  </button> */}
+                  </button>
                </div>
 
                {filterBy.length > 0 && this.renderFilter()}

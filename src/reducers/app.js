@@ -412,6 +412,7 @@ const actionsMap = {
             const asyncLoading = false;
             const reportData = {};
 
+            console.log('data: ', data);
             data.data.forEach(elem => {
                   const elemClone = _.cloneDeep(elem);
                   const {
@@ -459,6 +460,7 @@ const actionsMap = {
       [USER_IMG_UPLOAD]: (state, data) => {
             const asyncLoading = false;
             const userImgURL = data.data.data.secure_url;
+            console.log('data.data.data: ', data.data);
 
             return state.merge(
                   Map({

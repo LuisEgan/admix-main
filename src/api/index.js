@@ -1,7 +1,8 @@
 import reportData from "../assets/data/placementDailyReport.json";
 // import reportData from "../assets/data/placementDailyReport-total.json";
 
-const dns = "http://ec2-52-15-223-69.us-east-2.compute.amazonaws.com";
+// const dns = "http://ec2-52-15-223-69.us-east-2.compute.amazonaws.com";
+const dns = "https://api.admix.in";
 
 function async () {
     return fetch("http://date.jsontest.com/").then(response => response.json());
@@ -156,7 +157,17 @@ const updatePlacements = (accessToken, data) =>
         body: JSON.stringify(data)
     }).then(response => response.json());
 
-const getReportData = appsIds => reportData;
+const getReportData = (accessToken, data) => reportData;
+
+// const getReportData = (accessToken, data) =>
+//     fetch(`http://ec2-52-200-109-193.compute-1.amazonaws.com:3020/report/placement/daily`, {
+//         method: "POST",
+//         headers: new Headers({
+//             "Content-Type": "application/json",
+//             "x-access-token": accessToken
+//         }),
+//         body: JSON.stringify(data)
+//     }).then(response => response.json());
 
 export default {
     async,

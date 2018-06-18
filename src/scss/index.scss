@@ -295,7 +295,8 @@ h2 {
 
 $sidesPadding: 3%;
 $minWidth: 700px;
-$arrowSize: calc(3px+0.35vw);
+// $arrowSize: calc(3px+0.35vw);
+$arrowSize: .85vw;
 $arrowColor: #4c4c4c;
 $inputsFontSize: calc(0.45em+0.3vw);
 #headerMenu {
@@ -460,8 +461,9 @@ $inputsFontSize: calc(0.45em+0.3vw);
     .container {
         width: 100%;
         padding: 0;
-        >h3 {
-            padding: 1% 0;
+        >h3,
+        .sc-h3 {
+            padding: calc(1vh + 1vw) 0;
         }
     }
 }
@@ -547,7 +549,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
 
 .menu-panel {
     .panel-toggle-btn {
-        right: -3vw;
+        right: -4vw;
     }
     >.container {
         padding: 0;
@@ -700,8 +702,8 @@ $inputsFontSize: calc(0.45em+0.3vw);
         border-radius: 100% !important;
         border: solid 3px $blueAdmix; //   padding: 5%;
         background-color: white;
-        max-width: 100px;
-        max-height: 100px;
+        max-width: 170px;
+        max-height: 170px;
         font-weight: bolder;
         color: #999999;
         background-color: white; //   border: none !important;
@@ -709,11 +711,11 @@ $inputsFontSize: calc(0.45em+0.3vw);
         //   height: 7vw !important;
         //   background-color: #b2b2b2;
         img {
-            width: 7vw;
-            height: 7vw;
+            width: 10vw;
+            height: 10vw;
             border-radius: 100%;
-            max-width: 80px;
-            max-height: 80px;
+            max-width: 100px;
+            max-height: 100px;
             padding: 10%;
         }
         svg {
@@ -837,6 +839,33 @@ $inputsFontSize: calc(0.45em+0.3vw);
     }
 }
 
+.ExpansionPanel {
+    border-radius: 5px;
+    &::before {
+        background-color: transparent !important;
+    }
+}
+
+.password-eye {
+    position: absolute;
+    bottom: 30%;
+    right: 5%;
+    transition: 0.3s;
+    &:hover {
+        font-size: 1.2em;
+        color: $blueAdmix;
+        bottom: 25%;
+    }
+}
+
+.redux-form-inputs-container {
+    position: relative;
+    width: 100%;
+    >div {
+        width: 100%;
+    }
+}
+
 /******************************************************/
 
 /***********************LOGIN**************************/
@@ -877,17 +906,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
                 input {
                     width: 100%;
                     margin: 2vh 0 0.5vh 0;
-                }
-                svg {
-                    position: absolute;
-                    bottom: 30%;
-                    right: 5%;
-                    transition: 0.3s;
-                    &:hover {
-                        font-size: 1.2em;
-                        color: $blueAdmix;
-                        bottom: 25%;
-                    }
                 }
                 >div {
                     position: relative;
@@ -1107,6 +1125,10 @@ $inputsFontSize: calc(0.45em+0.3vw);
 
 /******************************************************/
 
+.customCursor {
+    cursor: url(./assets/img/favicon.png), auto;
+}
+
 #webgl {
     min-height: 100%;
     height: 100%;
@@ -1196,7 +1218,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
     #form-panel {
         right: 0;
         .panel-toggle-btn {
-            left: -3vw;
+            left: -4vw;
         }
         hr {
             width: 50%;
@@ -1824,39 +1846,50 @@ $inputsFontSize: calc(0.45em+0.3vw);
 /******************************************************/
 
 #profile {
-    .container {
-        padding: 0 3%;
-        margin: 0 auto;
+    form {
+        width: 100%;
+    }
+    .simple-container {
         >div {
-            display: flex;
-            flex-flow: row;
-            padding: 0.5% 0;
-            >div {
-                &:first-child() {
+            background-color: transparent;
+            padding-top: 3vh;
+        }
+        .container {
+            padding: 0vh 3vw;
+            width: 100%;
+            position: relative;
+            h5 {
+                text-align: left; // padding: 4vh 0 0vh;
+            }
+            .expansionPanelDetails-container {
+                width: 100%;
+                >div {
                     display: flex;
-                    align-items: center;
-                    width: 20vw;
-                    color: #000000;
-                }
-                &:last-child() {
-                    padding-left: 45px;
-                }
-                .form-group {
-                    display: flex;
-                    margin: 0;
-                    position: relative;
-                    input {
-                        width: 250px;
-                    }
-                    .text-help {
-                        position: absolute;
-                        bottom: -35%;
-                        font-size: 0.8em;
-                        color: red;
-                    }
                 }
             }
+            .ExpansionPanel {
+                margin: 1vw;
+                .sectionIcon {
+                    margin-right: 2vw;
+                    font-size: 2em;
+                    max-width: 2vw;
+                }
+            }
+            #image-drop-container {
+                @extend .cc;
+                position: absolute;
+                z-index: 1;
+                top: -12vh;
+                left: 0;
+                right: 0;
+                margin-left: auto;
+                margin-right: auto;
+                width: 0px;
+            }
         }
+    }
+    .password-eye {
+        bottom: 43%;
     }
 }
 

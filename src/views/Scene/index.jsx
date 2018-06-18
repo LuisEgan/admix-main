@@ -10,7 +10,7 @@ import Progress from "react-progressbar";
 import monkey from "../../assets/img/See_No_Evil_Monkey_Emoji.png";
 import monkeyArrow from "../../assets/img/monkeyArrow.png";
 
-let TrackballControls;
+// let TrackballControls;
 // let PointerLockControls;
 // let mtl;
 
@@ -67,18 +67,17 @@ class Scene extends Component {
       this.selectScene = this.selectScene.bind(this);
       this.loadScene = this.loadScene.bind(this);
       this.clear = this.clear.bind(this);
-      this.enableControls = this.enableControls.bind(this);
       this.enablePointerLockControls = this.enablePointerLockControls.bind(
          this
       );
-      this.disableControls = this.disableControls.bind(this);
+      this.enableOrbitControls = this.enableOrbitControls.bind(this);
+      this.enableTrackBallControls = this.enableTrackBallControls.bind(this);
+      this.handleKeyDown = this.handleKeyDown.bind(this);
+      this.handleKeyUp = this.handleKeyUp.bind(this);
       this.mouseOnPanel = this.mouseOnPanel.bind(this);
       this.updateClickedPlacement = this.updateClickedPlacement.bind(this);
 
-      // window.THREE = THREE;
-      // window.THREE.Pass = Pass;
-      // if (!props.isLoad_webgl) {
-      // }
+      this.isALTdown = false;
    }
 
    handleInput(e) {
@@ -90,19 +89,17 @@ class Scene extends Component {
    componentDidMount() {
       const { THREE, innerWidth, innerHeight } = window;
 
-      // const PointerLockControls = require('three-pointerlock');
-      TrackballControls = require("../../assets/webgl/modules/three-trackballcontrols");
-
       // CAMERA
       const camera = new THREE.PerspectiveCamera(
          75,
-         innerWidth / innerHeight,
+         window.innerWidth / window.innerHeight,
          1,
          1000
       );
+
       // Setting a new camera position will affect the controls rotation
-      // camera.position.set(0, 10, 10);
-      // camera.lookAt(scene.position);
+      camera.position.set(0, 20, 20);
+      camera.lookAt(new THREE.Vector3(0, 0, 0));
       // camera.up = new THREE.Vector3(0, 0, 1);
 
       // RENDERER
@@ -116,6 +113,7 @@ class Scene extends Component {
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0xcccccc);
       scene.fog = new THREE.FogExp2(0xcccccc, 0.002);
+      // scene.add(new THREE.AxesHelper(20));
 
       // LIGHTS
       var light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 0.75);
@@ -167,7 +165,6 @@ class Scene extends Component {
          window.removeEventListener("mousemove", this.onTouchMove);
          window.removeEventListener("touchmove", this.onTouchMove);
          window.removeEventListener("click", this.onObjectClick);
-         this.controls.noRotation();
          this.controls.dispose();
       }
    }
@@ -393,7 +390,15 @@ class Scene extends Component {
          return;
       }
 
-      this.enablePointerLockControls();
+      // this.enablePointerLockControls({
+      //    iYawX: 0,
+      //    iYawY: 0,
+      //    iYawZ: 0,
+      //    iYawRot: 0,
+      //    iPitchRot: 0
+      // });
+
+      this.enableOrbitControls({ lookAtX: 0, lookAtY: 0, lookAtZ: 0 });
 
       const { sceneMounted, selectedScene } = this.state;
       const { userData } = this.props;
@@ -451,15 +456,18 @@ class Scene extends Component {
          mtlUrl = `exportObjScene1.mtl`;
       }
 
-      console.log(objUrl);
+      // THREE.ImageUtils.crossOrigin = "anonymous";
 
       const mtlLoader = new THREE.MTLLoader();
       mtlLoader.setPath(renderPath);
+      mtlLoader.setCrossOrigin(true);
+
       mtlLoader.load(mtlUrl, materials => {
          materials.preload();
          const objLoader = new THREE.OBJLoader();
          objLoader.setMaterials(materials);
          objLoader.setPath(renderPath);
+
          objLoader.load(
             objUrl,
             onLoad.bind(this),
@@ -471,17 +479,66 @@ class Scene extends Component {
 
    clear() {
       // Clear object name from form
+      this.controls.dispose();
       this.setState({ clickedPlacement: {}, sceneMounted: false });
       var selectedObject = this.scene.getObjectByName("userLoadedScene");
       this.scene.remove(selectedObject);
    }
 
-   disableControls() {
-      this.controls = null;
+   //    gotta include <script src="./THREEJS/PointerLockControls.min.js"></script>   in /public/index.html for this to work
+   enablePointerLockControls({ iYawX, iYawY, iYawZ, iYawRot, iPitchRot }) {
+      const { THREE } = window;
+
+      // Position is given by the yawObject position, the camera doesn't move! (it must be at (0,0,0))
+      // lookAt can be set by
+
+      const controls = new THREE.PointerLockControls(this.camera, {
+         iYawX,
+         iYawY,
+         iYawZ,
+         iYawRot,
+         iPitchRot
+      });
+
+      this.scene.add(controls.getYawObject());
+
+      this.controls = controls;
+      this.arePointerControlsEnabled = true;
    }
 
-   enableControls() {
-      const controls = new TrackballControls(this.camera);
+   //    gotta include <script src="./THREEJS/OrbitControls.min.js"></script> in /public/index.html for this to work
+   //    enableOrbitControls({ lookAtX, lookAtY, lookAtZ }) {
+   enableOrbitControls() {
+      const { THREE } = window;
+
+      // Position is given by the camera position
+      // lookAt can be set by controls.target.set
+
+      const controls = new THREE.OrbitControls(
+         this.camera,
+         this.renderer.domElement
+      );
+      controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+      controls.dampingFactor = 1.5;
+      // controls.minDistance = 1;
+      // controls.maxDistance = 500;
+      controls.target.set(0, 0, 0);
+      this.controls = controls;
+   }
+
+   //    gotta include <script src="./THREEJS/TrackballControls.min.js"></script>   in /public/index.html for this to work
+   enableTrackBallControls() {
+      const { THREE } = window;
+
+      const camera = new THREE.PerspectiveCamera(
+         60,
+         window.innerWidth / window.innerHeight,
+         1,
+         1000
+      );
+      camera.position.z = 5;
+
+      const controls = new THREE.TrackballControls(camera);
       controls.rotateSpeed = 1.0;
       controls.zoomSpeed = 1.2;
       controls.panSpeed = 0.8;
@@ -492,20 +549,8 @@ class Scene extends Component {
       controls.keys = [65, 83, 68];
 
       this.controls = controls;
-   }
-
-   enablePointerLockControls() {
-      const { THREE } = window;
-
-      if (!this.controls) {
-         const controls = new THREE.PointerLockControls(this.camera);
-
-         this.scene.add(controls.getObject());
-
-         this.controls = controls;
-      } else {
-         this.controls.enable();
-      }
+      this.camera = camera;
+      this.areTrackBallControlsEnabled = true;
    }
 
    TrackballControlsEnableWheel() {
@@ -516,14 +561,68 @@ class Scene extends Component {
       this.controls.stopWheel();
    }
 
+   handleKeyDown(e) {
+      const { THREE } = window;
+      e.preventDefault();
+      console.log("e.keyCode : ", e.keyCode);
+      console.log("this.camera.position: ", this.camera.position);
+
+      if (e.keyCode === 65) {
+         const cameraWorldDir = new THREE.Vector3();
+         this.camera.getWorldDirection(cameraWorldDir);
+         this.camera.position.add(cameraWorldDir.multiplyScalar(2));
+      }
+      if (e.keyCode === 68) {
+         this.camera.position.set(
+            this.camera.position.x + 1,
+            this.camera.position.y,
+            this.camera.position.z
+         );
+      }
+      if (e.keyCode === 65) {
+         this.camera.position.set(
+            this.camera.position.x + 1,
+            this.camera.position.y,
+            this.camera.position.z
+         );
+      }
+      if (e.keyCode === 65) {
+         this.camera.position.set(
+            this.camera.position.x + 1,
+            this.camera.position.y,
+            this.camera.position.z
+         );
+      }
+      // key = ALT
+      if (e.keyCode === 18 && !this.isALTdown) {
+         document.body.style.cursor = "move";
+         this.controls.mouseButtons = {
+            ORBIT: THREE.MOUSE.RIGHT,
+            PAN: THREE.MOUSE.LEFT
+         };
+      }
+   }
+   handleKeyUp(e) {
+      const { THREE } = window;
+      e.preventDefault();
+      // key = ALT
+      if (e.keyCode === 18) {
+         document.body.style.cursor = "default";
+         this.controls.mouseButtons = {
+            ORBIT: THREE.MOUSE.LEFT,
+            PAN: THREE.MOUSE.RIGHT
+         };
+      }
+   }
+
    mouseOnPanel() {
       const isMouseOnPanel = !this.state.isMouseOnPanel;
 
       // this is so when the mouse is on either panel user can't rotate the scene onclick
       if (isMouseOnPanel) {
-         this.controls && this.controls.noRotation();
+         //    this.controls && this.controls.noRotation();
       } else {
-         this.controls && this.controls.yesRotation();
+         //    this.controls && this.controls.yesRotation();
       }
 
       this.setState({ isMouseOnPanel });
@@ -549,7 +648,12 @@ class Scene extends Component {
             : loadingProgress;
 
       return (
-         <div id="webgl">
+         <div
+            id="webgl"
+            onKeyDown={this.handleKeyDown}
+            onKeyUp={this.handleKeyUp}
+            tabIndex="0"
+         >
             <Panels
                mouseOnPanel={this.mouseOnPanel}
                loadScene={this.loadScene}

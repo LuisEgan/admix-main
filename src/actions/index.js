@@ -381,8 +381,10 @@ export const imgUpload = (imgPath, userId, accessToken) => dispatch => {
                   dispatch(imgUploadRes(data));
             })
             .catch(error => {
-                  console.log("error: ", error);
+                  console.log('error: ', error);
+                  dispatch(asyncError(error))
             });
+
 };
 
 export const fetchUserImgURL = (imgURL, accessToken) => dispatch => {
@@ -434,8 +436,28 @@ export const updatePlacements = (accessToken, data) => dispatch => {
 // REPORT
 // ===========================
 
-export const getReportData = (isAdmin, appsIds) => dispatch => {
+export const getReportData = (isAdmin, appsIds, accessToken) => dispatch => {
       dispatch(asyncStart());
+
+      const currentDate = new Date();
+
+      const data = {
+            startDate: {
+                  year: 2018,
+                  month: 1,
+                  day: 1
+            },
+            endDate: {
+                  year: currentDate.getFullYear(),
+                  month: currentDate.getMonth(),
+                  day: currentDate.getDate()
+            }
+      }
+
+      // api
+      //       .getReportData(accessToken, data)
+      //       .then(res => dispatch(sendReportData(res)))
+      //       .catch(error => dispatch(asyncError(error)));
 
       const reportData = api.getReportData(appsIds);
       dispatch(sendReportData(reportData));

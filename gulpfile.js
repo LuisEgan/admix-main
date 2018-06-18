@@ -26,7 +26,7 @@ gulp.task("sass:watch", function () {
 });
 
 gulp.task("tjsminify", function () {
-      gulp
+      return gulp
             .src("./ThreeJsR92/*.js")
             .pipe(
                   minify({

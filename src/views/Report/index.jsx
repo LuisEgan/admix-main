@@ -35,7 +35,7 @@ const takeDays = function(date, days) {
 //   initialReportAppId: state.app.get("initialReportAppId"),
 //   isLoad_webgl: state.app.get("load_webgl")
 // }))
-class Placement extends Component {
+class Report extends Component {
    static propTypes = {
       dispatch: PropTypes.func
    };
@@ -549,4 +549,4 @@ const mapStateToProps = state => ({
    isLoad_webgl: state.app.get("load_webgl")
 });
 
-export default connect(mapStateToProps)(Placement);
+export default connect(mapStateToProps)(Report);

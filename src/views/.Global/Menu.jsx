@@ -188,13 +188,14 @@ class Menu extends Component {
                         )}
                      </div>
                   </div>
-                  {isLoggedIn && (
-                     <img
-                        src={userImgURL}
-                        onError={e => (e.target.src = defaultImg)}
-                        alt="Login"
-                     />
-                  )}
+                  {isLoggedIn &&
+                     userData._id && (
+                        <img
+                           src={userImgURL}
+                           onError={e => (e.target.src = defaultImg)}
+                           alt="Login"
+                        />
+                     )}
                </div>
             </div>
          </div>
