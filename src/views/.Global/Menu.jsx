@@ -191,7 +191,7 @@ class Menu extends Component {
                   {isLoggedIn &&
                      userData._id && (
                         <img
-                           src={userImgURL}
+                           src={userData.cloudinaryImgURL}
                            onError={e => (e.target.src = defaultImg)}
                            alt="Login"
                         />

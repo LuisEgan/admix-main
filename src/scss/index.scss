@@ -451,6 +451,12 @@ $inputsFontSize: calc(0.45em+0.3vw);
     }
 }
 
+#snackbar.error {
+    >div {
+        background: red;
+    }
+}
+
 .btn-dark {
     background-color: #262626;
     color: #fff;
@@ -800,7 +806,13 @@ $inputsFontSize: calc(0.45em+0.3vw);
         }
         .trash {
             margin-left: auto;
-            color: red;
+            .trash-plus {
+                color: #33cc33;
+                margin-right: 1vw;
+            }
+            .trash-minus {
+                color: red;
+            }
         }
     }
 }

@@ -425,6 +425,7 @@ class Login extends Component {
                            icon={faEye}
                            onMouseEnter={this.togglePassInputType}
                            onMouseLeave={this.togglePassInputType}
+                           className="password-eye"
                         />
                      </div>
                      <div className="registerRules">
@@ -455,6 +456,7 @@ class Login extends Component {
                            icon={faEye}
                            onMouseEnter={this.togglePassInputType}
                            onMouseLeave={this.togglePassInputType}
+                           className="password-eye"
                         />
                      </div>
                      <div className="registerRules">

@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 
 import Routes from "../../config/routes";
 import Menu from "../.Global/Menu";
+import Snackbar from "../.Global/SnackBar";
 
 // @withRouter()
 // @connect(state => ({
@@ -31,7 +32,6 @@ class App extends Component {
                history={history}
                onRef={ref => (this.menu = ref)}
             />
-
             <div id="Page">
                <div id="content">
                   <Routes
@@ -41,6 +41,7 @@ class App extends Component {
                   />
                </div>
             </div>
+            <Snackbar />
          </div>
       );
    }

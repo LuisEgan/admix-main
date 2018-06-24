@@ -13,6 +13,7 @@ import ForgotPass from "../views/ForgotPass";
 import EmailSuccess from "../views/EmailVerification/emailSuccess";
 import EmailFailure from "../views/EmailVerification/emailFailure";
 import NotFound from "../views/NotFound";
+import ChangeEmail from "../views/ChangeEmail";
 
 const publicPath = "/";
 
@@ -26,6 +27,7 @@ export const routeCodes = {
    PROFILE: `${publicPath}profile`,
    DOWNLOAD: `${publicPath}download`,
    FORGOT_PASS: `${publicPath}forgotPass`,
+   CHANGE_EMAIL: `${publicPath}changeEmail`,
    EMAIL_SUCCESS: `${publicPath}emailSuccess`,
    EMAIL_FAILURE: `${publicPath}emailFailure`
 };
@@ -120,6 +122,7 @@ export default props => {
          />
          <Route path={routeCodes.DOWNLOAD} component={Download} exact />
          <Route path={routeCodes.FORGOT_PASS} component={ForgotPass} exact />
+         <Route path={routeCodes.CHANGE_EMAIL} component={ChangeEmail} exact />
          <Route
             path={routeCodes.EMAIL_SUCCESS}
             component={EmailSuccess}

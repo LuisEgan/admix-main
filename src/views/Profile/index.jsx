@@ -1,7 +1,14 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Field, reduxForm } from "redux-form";
-import { imgUpload, setUserImgURL, forgotPass } from "../../actions";
+import {
+   imgUpload,
+   setUserImgURL,
+   forgotPass,
+   updateUser,
+   changeEmail,
+   logout
+} from "../../actions";
 import PropTypes from "prop-types";
 import Dropzone from "react-dropzone";
 import request from "superagent";
@@ -42,7 +49,9 @@ class Profile extends Component {
       this.state = {
          statusMssg: "",
          uploadedFile: "",
-         passInputType: "password"
+         passInputType: "password",
+         clicked: "",
+         isWarningVisible: false
       };
 
       this.togglePassInputType = this.togglePassInputType.bind(this);
@@ -72,9 +81,17 @@ class Profile extends Component {
       const {
          reduxForm: {
             profileForm: { values }
-         }
+         },
+         userData,
+         dispatch,
+         accessToken
       } = this.props;
-      console.log("values: ", values);
+
+      const update = {
+         name: values.userName
+      };
+
+      dispatch(updateUser(userData._id, update, accessToken));
    };
 
    onImageDrop(files) {
@@ -127,20 +144,25 @@ class Profile extends Component {
    }
 
    handleUserUpdate(input) {
-      const { dispatch, initialValues } = this.props;
+      const { dispatch, initialValues, accessToken } = this.props;
 
       if (input === "password") {
          dispatch(forgotPass(initialValues.email));
+         this.setState({ clicked: "password" });
+      } else if (input === "email") {
+         setTimeout(() => {
+            dispatch(logout());
+         }, 3000);
+         dispatch(changeEmail(initialValues.email, accessToken));
+         this.setState({ clicked: "email" });
       }
    }
 
    renderField(field) {
-      const { initialValues } = this.props;
-      const {
-         input
-         //  meta: { touched, error }
-      } = field;
-      //   let hasDanger = touched && error ? "has-danger" : "";
+      const { initialValues, asyncLoading } = this.props;
+      const { clicked, isWarningVisible } = this.state;
+      const { input } = field;
+
       let label = input.name;
       let helperText;
       let type = "text";
@@ -151,13 +173,30 @@ class Profile extends Component {
          }
          label = "Name";
       } else if (input.name === "email") {
+         const warningStyle = isWarningVisible
+            ? { color: "red", opacity: 1 }
+            : { color: "red", opacity: 0 };
          helperText = (
             <span>
                Want to change your email?
-               <a onClick={this.handleUserUpdate.bind(null, "email")}>
-                  {" "}
-                  Click here.
+               <a
+                  onClick={this.handleUserUpdate.bind(null, "email")}
+                  onMouseEnter={() => {
+                     this.setState({ isWarningVisible: true });
+                  }}
+                  onMouseLeave={() => {
+                     this.setState({ isWarningVisible: false });
+                  }}
+               >
+                  {asyncLoading && clicked === "email"
+                     ? " ...Loading"
+                     : " Click here."}
                </a>
+               <span style={warningStyle}>
+                  &nbsp;Warning! Your account will become inactive and you will
+                  have to verify your new email before logging in again (this
+                  will log you out).
+               </span>
             </span>
          );
       }
@@ -180,15 +219,16 @@ class Profile extends Component {
    }
 
    render() {
-      const { userImgURL, initialValues } = this.props;
-      const { passInputType } = this.state;
+      const { initialValues, asyncLoading, userData } = this.props;
+      const { passInputType, clicked, isWarningVisible } = this.state;
 
       passhelperText = (
          <span>
             Want to change your password?
             <a onClick={this.handleUserUpdate.bind(null, "password")}>
-               {" "}
-               Click here.
+               {asyncLoading && clicked === "password"
+                  ? " ...Loading"
+                  : " Click here."}
             </a>
          </span>
       );
@@ -209,8 +249,8 @@ class Profile extends Component {
                                  className="dropzone"
                               >
                                  <img
-                                    src={userImgURL}
-                                    onError={this.noUserImg}
+                                    src={userData.cloudinaryImgURL}
+                                    onError={e => (e.target.src = defaultImg)}
                                     alt="+"
                                  />
                                  <FontAwesomeIcon icon={faEdit} />
@@ -242,6 +282,9 @@ class Profile extends Component {
                                  <Field
                                     name="email"
                                     component={this.renderField}
+                                    asyncLoading={asyncLoading}
+                                    clicked={clicked}
+                                    isWarningVisible={isWarningVisible}
                                  />
                                  <div className="redux-form-inputs-container">
                                     <TextField
@@ -321,6 +364,7 @@ const mapStateToProps = state => {
       accessToken: state.app.get("accessToken"),
       isLoggedIn: state.app.get("isLoggedIn"),
       userImgURL: state.app.get("userImgURL"),
+      asyncLoading: state.app.get("asyncLoading"),
       userData,
       reduxForm: state.form,
       initialValues

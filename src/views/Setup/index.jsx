@@ -357,8 +357,14 @@ class Setup extends Component {
                   })}
                   <div className="cc trash">
                      <FontAwesomeIcon
+                        icon={faSearchPlus}
+                        onClick={this.addFilter}
+                        className="trash-plus"
+                     />
+                     <FontAwesomeIcon
                         icon={faSearchMinus}
                         onClick={this.deleteFilter.bind(null, i)}
+                        className="trash-minus"
                      />
                   </div>
                </div>
@@ -488,8 +494,8 @@ class Setup extends Component {
    }
 
    render() {
-      const { appSelected, edit, allAppsIds, filterBy } = this.state;
       const { location, apps, asyncLoading } = this.props;
+      const { appSelected, edit, allAppsIds, filterBy } = this.state;
       const anyApps = apps.length > 0;
 
       if (!asyncLoading && appSelected) {

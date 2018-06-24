@@ -13,7 +13,9 @@ import {
       ACTION_SUCCESS,
       RESET_ASYNC,
       FORGOT_PASS,
+      CHANGE_EMAIL,
       SET_PASS,
+      SET_NEW_EMAIL,
       LOGIN_SUCCESS,
       LOGOUT_SUCCESS,
       REGISTER_SUCCESS,
@@ -31,12 +33,15 @@ import {
       REPORT_DATA,
       SET_INITIAL_REPORT_APP,
       UPDATE_PLACEMENTS,
+      UPDATE_USER,
       USER_IMG_UPLOAD,
-      SET_USER_IMG_URL
+      SET_USER_IMG_URL,
+      SNACKBAR_TOGGLE
 } from "../actions";
 
 export const initialState = Map({
       counter: 0,
+      isSnackBarOpen: false,
       asyncLoading: false,
       asyncError: null,
       asyncData: null,
@@ -64,6 +69,15 @@ const actionsMap = {
             );
       },
 
+      [SNACKBAR_TOGGLE]: state => {
+            const isSnackBarOpen = state.get("isSnackBarOpen");
+            return state.merge(
+                  Map({
+                        isSnackBarOpen: !isSnackBarOpen
+                  })
+            );
+      },
+
       [LOADED_WEBGL_SCRIPTS]: state => {
             return state.merge(
                   Map({
@@ -77,8 +91,7 @@ const actionsMap = {
             return state.merge(
                   Map({
                         asyncLoading: true,
-                        asyncError: null,
-                        asyncData: null
+                        asyncError: null
                   })
             );
       },
@@ -92,12 +105,18 @@ const actionsMap = {
             // Fallback
             asyncError === "" && (asyncError = statusMessage);
 
+            const asyncData = {
+                  mssg: "Oops.. Something went wrong"
+            };
+            const isSnackBarOpen = true;
+
             const asyncLoading = false;
             return state.merge(
                   Map({
                         asyncLoading,
-                        asyncError
-                        // asyncError: action.data && action.data.statusMessage,
+                        asyncError,
+                        asyncData,
+                        isSnackBarOpen
                   })
             );
       },
@@ -143,6 +162,52 @@ const actionsMap = {
             const asyncData = {
                   mssg: "Success! Now, check your email for further instructions."
             };
+            const isSnackBarOpen = true;
+            return state.merge(
+                  Map({
+                        asyncLoading,
+                        asyncData,
+                        isSnackBarOpen
+                  })
+            );
+      },
+
+      [CHANGE_EMAIL]: (state, data) => {
+            const asyncLoading = false;
+            const asyncData = {
+                  mssg: "Success! Now, check your email for further instructions."
+            };
+            const isSnackBarOpen = true;
+            return state.merge(
+                  Map({
+                        asyncLoading,
+                        asyncData,
+                        isSnackBarOpen
+                  })
+            );
+      },
+
+      [UPDATE_USER]: (state, data) => {
+            const asyncLoading = false;
+            const asyncData = {
+                  mssg: "Success! User updated!"
+            };
+            const isSnackBarOpen = true;
+            return state.merge(
+                  Map({
+                        asyncLoading,
+                        asyncData,
+                        isSnackBarOpen
+                  })
+            );
+      },
+
+      [SET_PASS]: (state, data) => {
+            const asyncLoading = false;
+
+            const asyncData = {
+                  mssg: data.data.message
+            };
             return state.merge(
                   Map({
                         asyncLoading,
@@ -151,7 +216,7 @@ const actionsMap = {
             );
       },
 
-      [SET_PASS]: (state, data) => {
+      [SET_NEW_EMAIL]: (state, data) => {
             const asyncLoading = false;
 
             const asyncData = {
@@ -460,12 +525,17 @@ const actionsMap = {
       [USER_IMG_UPLOAD]: (state, data) => {
             const asyncLoading = false;
             const userImgURL = data.data.data.secure_url;
-            console.log('data.data.data: ', data.data);
+            const asyncData = {
+                  mssg: "Success! Image updated!"
+            };
+            const isSnackBarOpen = true;
 
             return state.merge(
                   Map({
                         asyncLoading,
-                        userImgURL
+                        userImgURL,
+                        asyncData,
+                        isSnackBarOpen
                   })
             );
       },
@@ -477,7 +547,7 @@ const actionsMap = {
             return state.merge(
                   Map({
                         asyncLoading,
-                        userImgURL
+                        userImgURL,
                   })
             );
       }

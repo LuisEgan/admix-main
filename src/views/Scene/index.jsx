@@ -520,6 +520,7 @@ class Scene extends Component {
       );
       controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
       controls.dampingFactor = 1.5;
+      controls.zoomSpeed = 10;
       // controls.minDistance = 1;
       // controls.maxDistance = 500;
       controls.target.set(0, 0, 0);

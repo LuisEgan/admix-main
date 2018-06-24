@@ -1,8 +1,8 @@
 import reportData from "../assets/data/placementDailyReport.json";
 // import reportData from "../assets/data/placementDailyReport-total.json";
 
-// const dns = "http://ec2-52-15-223-69.us-east-2.compute.amazonaws.com";
-const dns = "https://api.admix.in";
+const dns = "http://ec2-52-15-223-69.us-east-2.compute.amazonaws.com:3005";
+// const dns = "https://api.admix.in";
 
 function async () {
     return fetch("http://date.jsontest.com/").then(response => response.json());
@@ -58,6 +58,16 @@ function signup(data) {
     }).then(response => response.json());
 }
 
+const updateUser = (accessToken, data) =>
+    fetch(`${dns}/api/v1/user/updateUser`, {
+        method: "PUT",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "x-access-token": accessToken
+        }),
+        body: JSON.stringify(data)
+    }).then(response => response.json());
+
 function forgotPass(data) {
     return fetch(dns + "/api/v1/user/forgot", {
         method: "POST",
@@ -68,8 +78,29 @@ function forgotPass(data) {
     }).then(response => response.json());
 }
 
+function changeEmail(accessToken, data) {
+    return fetch(dns + "/api/v1/user/changeEmail", {
+        method: "POST",
+        headers: new Headers({
+            "Content-Type": "application/json",
+            "x-access-token": accessToken
+        }),
+        body: JSON.stringify(data)
+    }).then(response => response.json());
+}
+
 function setNewPass(data) {
     return fetch(dns + "/api/v1/user/setNewPassword", {
+        method: "POST",
+        headers: new Headers({
+            "Content-Type": "application/json"
+        }),
+        body: JSON.stringify(data)
+    }).then(response => response.json());
+}
+
+function setNewEmail(data) {
+    return fetch(dns + "/api/v1/user/setNewEmail", {
         method: "POST",
         headers: new Headers({
             "Content-Type": "application/json"
@@ -176,8 +207,11 @@ export default {
     isAdmin,
     login,
     signup,
+    updateUser,
     forgotPass,
+    changeEmail,
     setNewPass,
+    setNewEmail,
     getAppsAll,
     getApps,
     getAppsAdmin,

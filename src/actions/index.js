@@ -15,7 +15,9 @@ export const REGISTER_REQUEST = "USERS_REGISTER_REQUEST",
       LOGOUT_SUCCESS = "USERS_LOGOUT_SUCCESS",
       LOGIN_FAILURE = "USERS_LOGIN_FAILURE",
       FORGOT_PASS = "USERS_FORGOT_PASS",
+      CHANGE_EMAIL = "USERS_CHANGE_EMAIL",
       SET_PASS = "USERS_SET_PASS",
+      SET_NEW_EMAIL = "USERS_SET_NEW_EMAIL",
       LOGOUT = "USERS_LOGOUT",
       APPS_SUCCESS = "USERS_APPS_SUCCESS",
       APPS_ERROR = "USERS_APPS_SUCCESS_FAILURE",
@@ -28,12 +30,14 @@ export const REGISTER_REQUEST = "USERS_REGISTER_REQUEST",
       RESET_SAVED_INPUTS = "RESET_SAVED_INPUTS",
       TOGGLE_APP_STATUS = "TOGGLE_APP_STATUS",
       UPDATE_PLACEMENTS = "UPDATE_PLACEMENTS",
+      UPDATE_USER = "UPDATE_USER",
       USER_DATA_SUCCESS = "USER_DATA_SUCCESS",
       LOADED_WEBGL_SCRIPTS = "LOADED_WEBGL_SCRIPTS",
       REPORT_DATA = "REPORT_DATA",
       SET_INITIAL_REPORT_APP = "SET_INITIAL_REPORT_APP",
       SET_USER_IMG_URL = "SET_USER_IMG_URL",
       USER_IMG_UPLOAD = "USER_IMG_UPLOAD",
+      SNACKBAR_TOGGLE = "SNACKBAR_TOGGLE",
       PERSIST_REHYDRATE = "persist/REHYDRATE";
 
 // Test action
@@ -113,6 +117,18 @@ function doForgotPass(data) {
       }
 }
 
+function dochangeEmail(data) {
+      if (data.status) {
+            return {
+                  type: CHANGE_EMAIL,
+                  data
+            };
+      } else {
+            return asyncError(data);
+      }
+}
+
+
 function doSetPassword(data) {
       if (data.status) {
             return {
@@ -123,6 +139,20 @@ function doSetPassword(data) {
             return asyncError(data);
       }
 }
+
+function doSetEmail(data) {
+      if (data.status) {
+            return {
+                  type: SET_NEW_EMAIL,
+                  data
+            };
+      } else {
+            return asyncError(data);
+      }
+}
+
+
+
 
 function showApps(data) {
       if (data.status) {
@@ -231,6 +261,21 @@ const imgUploadRes = data => ({
       data
 });
 
+export const snackbarToggle = () => ({
+      type: SNACKBAR_TOGGLE
+})
+
+const updateUserRes = (data) => {
+      if (data.status) {
+            return {
+                  type: UPDATE_USER,
+                  data
+            };
+      } else {
+            return asyncError(data);
+      }
+}
+
 // ===========================
 // FETCH
 // ===========================
@@ -287,6 +332,18 @@ export const forgotPass = email => dispatch => {
             .catch(error => dispatch(asyncError(error)));
 };
 
+export const changeEmail = (email, accessToken) => dispatch => {
+      dispatch(asyncStart());
+
+      const data = {
+            email
+      };
+      api
+            .changeEmail(accessToken, data)
+            .then(data => dispatch(dochangeEmail(data)))
+            .catch(error => dispatch(asyncError(error)));
+};
+
 export const setNewPass = ({
       token,
       userId,
@@ -302,6 +359,24 @@ export const setNewPass = ({
       api
             .setNewPass(data)
             .then(res => dispatch(doSetPassword(res)))
+            .catch(error => dispatch(asyncError(error)));
+};
+
+export const setNewEmail = ({
+      token,
+      userId,
+      newEmail
+}) => dispatch => {
+      dispatch(asyncStart());
+
+      const data = {
+            token,
+            userId,
+            newEmail
+      };
+      api
+            .setNewEmail(data)
+            .then(res => dispatch(doSetEmail(res)))
             .catch(error => dispatch(asyncError(error)));
 };
 
@@ -379,9 +454,11 @@ export const imgUpload = (imgPath, userId, accessToken) => dispatch => {
             .cloudinayImgUpload(accessToken, data)
             .then(data => {
                   dispatch(imgUploadRes(data));
+
+                  // update userData.cloudinaryURL from db
+                  dispatch(getUserData(accessToken));
             })
             .catch(error => {
-                  console.log('error: ', error);
                   dispatch(asyncError(error))
             });
 
@@ -392,6 +469,28 @@ export const fetchUserImgURL = (imgURL, accessToken) => dispatch => {
 
       dispatch(setUserImgURL(imgURL));
 };
+
+export const updateUser = (userId, update, accessToken) => dispatch => {
+      dispatch(asyncStart());
+
+      const data = {
+            userId,
+            update
+      }
+
+      api
+            .updateUser(accessToken, data)
+            .then(data => {
+                  dispatch(updateUserRes(data));
+                  if (data.status) {
+                        dispatch(getUserData(accessToken));
+                  }
+            })
+            .catch(error => {
+                  dispatch(asyncError(error))
+            });
+
+}
 
 // ===========================
 // SELECT APP
@@ -439,20 +538,20 @@ export const updatePlacements = (accessToken, data) => dispatch => {
 export const getReportData = (isAdmin, appsIds, accessToken) => dispatch => {
       dispatch(asyncStart());
 
-      const currentDate = new Date();
+      // const currentDate = new Date();
 
-      const data = {
-            startDate: {
-                  year: 2018,
-                  month: 1,
-                  day: 1
-            },
-            endDate: {
-                  year: currentDate.getFullYear(),
-                  month: currentDate.getMonth(),
-                  day: currentDate.getDate()
-            }
-      }
+      // const data = {
+      //       startDate: {
+      //             year: 2018,
+      //             month: 1,
+      //             day: 1
+      //       },
+      //       endDate: {
+      //             year: currentDate.getFullYear(),
+      //             month: currentDate.getMonth(),
+      //             day: currentDate.getDate()
+      //       }
+      // }
 
       // api
       //       .getReportData(accessToken, data)
