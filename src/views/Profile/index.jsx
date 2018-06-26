@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Field, reduxForm } from "redux-form";
+import { Field, reduxForm, reset, change } from "redux-form";
 import {
    imgUpload,
    setUserImgURL,
@@ -19,6 +19,15 @@ import Button from "@material-ui/core/Button";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import FormControl from "@material-ui/core/FormControl";
+import Input from "@material-ui/core/Input";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import Select from "@material-ui/core/Select";
 
 import STR from "../../utils/strFuncs";
 
@@ -28,6 +37,9 @@ import faAngleUp from "@fortawesome/fontawesome-free-solid/faAngleUp";
 import faUser from "@fortawesome/fontawesome-free-solid/faUser";
 import faEye from "@fortawesome/fontawesome-free-solid/faEye";
 import faMoneyCheckAlt from "@fortawesome/fontawesome-free-solid/faMoneyCheckAlt";
+import faUniversity from "@fortawesome/fontawesome-free-solid/faUniversity";
+
+import BankDetails from "./BankDetails";
 
 import {
    CLOUDINARY_UPLOAD_PRESET,
@@ -35,6 +47,7 @@ import {
 } from "../../config/cloudinary";
 
 import defaultImg from "../../assets/img/default_pic.jpg";
+import paypal from "../../assets/img/paypal.png";
 
 let passhelperText;
 
@@ -51,7 +64,12 @@ class Profile extends Component {
          uploadedFile: "",
          passInputType: "password",
          clicked: "",
-         isWarningVisible: false
+         isWarningVisible: false,
+         payment: {
+            option: "",
+            region: "",
+            details: {}
+         }
       };
 
       this.togglePassInputType = this.togglePassInputType.bind(this);
@@ -60,6 +78,7 @@ class Profile extends Component {
       this.handleImageUploadClient = this.handleImageUploadClient.bind(this);
       this.handleImageUploadServer = this.handleImageUploadServer.bind(this);
       this.handleUserUpdate = this.handleUserUpdate.bind(this);
+      this.paymentChange = this.paymentChange.bind(this);
    }
 
    hardFocus(input) {
@@ -86,11 +105,31 @@ class Profile extends Component {
          dispatch,
          accessToken
       } = this.props;
+      const { payment } = this.state;
 
-      const update = {
+      let update = {
          name: values.userName
       };
 
+      delete values.email;
+      delete values.password;
+
+      update.payment = {
+         option: payment.option
+      };
+
+      if (payment.option !== "paypal") {
+         let paymentDetail = {};
+         for (let field in values) {
+            if (field !== "userName") {
+               paymentDetail[field] = values[field];
+            }
+         }
+         update.payment.region = payment.region;
+         update.payment.details = paymentDetail;
+      }
+
+      console.log("update: ", update);
       dispatch(updateUser(userData._id, update, accessToken));
    };
 
@@ -158,6 +197,21 @@ class Profile extends Component {
       }
    }
 
+   paymentChange(input, e) {
+      const {
+         dispatch,
+         reduxForm: {
+            profileForm: { values }
+         }
+      } = this.props;
+      console.log("values: ", values);
+      let payment = this.state.payment;
+      payment[input] = e.target.value;
+      dispatch(reset("profileForm"));
+      dispatch(change("profileForm", "userName", values.userName));
+      this.setState({ payment });
+   }
+
    renderField(field) {
       const { initialValues, asyncLoading } = this.props;
       const { clicked, isWarningVisible } = this.state;
@@ -219,8 +273,8 @@ class Profile extends Component {
    }
 
    render() {
-      const { initialValues, asyncLoading, userData } = this.props;
-      const { passInputType, clicked, isWarningVisible } = this.state;
+      const { initialValues, asyncLoading, userData, dispatch } = this.props;
+      const { passInputType, clicked, isWarningVisible, payment } = this.state;
 
       passhelperText = (
          <span>
@@ -232,6 +286,12 @@ class Profile extends Component {
             </a>
          </span>
       );
+
+      const payBanksStyle =
+         payment.option === "bank" ? { display: "block" } : { display: "none" };
+
+      const payBanksDetailsStyle =
+         payment.region !== "" ? { display: "block" } : { display: "none" };
 
       return (
          <div className="step-container" id="profile">
@@ -258,9 +318,11 @@ class Profile extends Component {
                            </div>
                         </div>
 
+                        {/* PERSONAL INFORMATION */}
+
                         <ExpansionPanel
-                           defaultExpanded={true}
                            className="ExpansionPanel"
+                           defaultExpanded={true}
                         >
                            <ExpansionPanelSummary
                               expandIcon={<FontAwesomeIcon icon={faAngleUp} />}
@@ -307,6 +369,8 @@ class Profile extends Component {
                            </ExpansionPanelDetails>
                         </ExpansionPanel>
 
+                        {/* PAYMENT OPTIONS */}
+
                         <ExpansionPanel className="ExpansionPanel">
                            <ExpansionPanelSummary
                               expandIcon={<FontAwesomeIcon icon={faAngleUp} />}
@@ -321,14 +385,98 @@ class Profile extends Component {
                            </ExpansionPanelSummary>
                            <ExpansionPanelDetails>
                               <div className="expansionPanelDetails-container">
-                                 <Field
-                                    name="userName"
-                                    component={this.renderField}
-                                 />
-                                 <Field
-                                    name="email"
-                                    component={this.renderField}
-                                 />
+                                 <FormControl component="fieldset" required>
+                                    <RadioGroup
+                                       aria-label="paymentOpts"
+                                       name="paymentOpts"
+                                       value={payment.option}
+                                       onChange={this.paymentChange.bind(
+                                          null,
+                                          "option"
+                                       )}
+                                       className="paymentOpts"
+                                    >
+                                       <FormControlLabel
+                                          value="paypal"
+                                          control={<Radio />}
+                                          label={
+                                             <img src={paypal} alt="paypal" />
+                                          }
+                                       />
+                                       <FormControlLabel
+                                          value="bank"
+                                          control={<Radio />}
+                                          label={
+                                             <React.Fragment>
+                                                <FontAwesomeIcon
+                                                   icon={faUniversity}
+                                                />{" "}
+                                                Bank
+                                             </React.Fragment>
+                                          }
+                                       />
+                                    </RadioGroup>
+                                 </FormControl>
+
+                                 <div
+                                    id="profile-pay-banks"
+                                    style={payBanksStyle}
+                                    className="fadeIn"
+                                 >
+                                    <FormControl>
+                                       <InputLabel htmlFor="region-helper">
+                                          Region
+                                       </InputLabel>
+                                       <Select
+                                          value={payment.region}
+                                          onChange={this.paymentChange.bind(
+                                             null,
+                                             "region"
+                                          )}
+                                          input={
+                                             <Input
+                                                name="region"
+                                                id="region-helper"
+                                             />
+                                          }
+                                       >
+                                          <MenuItem value="">
+                                             <em>Please select a region</em>
+                                          </MenuItem>
+                                          <MenuItem value="usa">
+                                             United States of America
+                                          </MenuItem>
+                                          <MenuItem value="uk">
+                                             Uniter Kingdom
+                                          </MenuItem>
+                                          <MenuItem value="eu">Europe</MenuItem>
+                                       </Select>
+                                       <FormHelperText>
+                                          Don't see your country yet? You can
+                                          always use PayPal in the meantime{" "}
+                                          <span
+                                             role="img"
+                                             aria-label="thumbs-up"
+                                          >
+                                             👍
+                                          </span>
+                                       </FormHelperText>
+                                    </FormControl>
+
+                                    {payment.region !== "" && (
+                                       <div
+                                          id="profile-pay-banks-details"
+                                          style={payBanksDetailsStyle}
+                                          className="fadeIn"
+                                       >
+                                          <BankDetails
+                                             Field={Field}
+                                             renderField={this.renderField}
+                                             region={payment.region}
+                                          />
+                                       </div>
+                                    )}
+                                 </div>
                               </div>
                            </ExpansionPanelDetails>
                         </ExpansionPanel>

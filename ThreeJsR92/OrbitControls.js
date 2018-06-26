@@ -12,7 +12,7 @@
 //    Orbit - left mouse / touch: one finger move
 //    Zoom - middle mouse, or mousewheel / touch: two finger spread or squish
 //    Pan - right mouse, or arrow keys / touch: three finger swip
-THREE.OrbitControls = function (object, domElement) {
+THREE.OrbitControls = function (object, domElement, scene) {
       this.object = object;
 
       this.domElement = domElement !== undefined ? domElement : document;
@@ -50,6 +50,7 @@ THREE.OrbitControls = function (object, domElement) {
       // Set to false to disable zooming
       this.enableZoom = true;
       this.zoomSpeed = 1.0;
+      this.zoomSpeedOriginal = 1.0;
 
       // Set to false to disable rotating
       this.enableRotate = true;
@@ -134,6 +135,11 @@ THREE.OrbitControls = function (object, domElement) {
 
             var cameraWorldDir = new THREE.Vector3();
 
+            var raycaster = new THREE.Raycaster();
+            var intersected = [];
+            var dollyLimit = 4;
+            var distToChangeSpeed = 25;
+
             return function update() {
                   var position = scope.object.position;
 
@@ -192,7 +198,13 @@ THREE.OrbitControls = function (object, domElement) {
 
                   scope.object.getWorldDirection(cameraWorldDir);
 
-                  if (spherical.radius <= 8) {
+                  raycaster.set(position, cameraWorldDir.normalize());
+                  intersected = raycaster.intersectObjects(scene.children, true);
+                  if (intersected[0]) {
+                        scope.zoomSpeed = intersected[0].distance <= distToChangeSpeed ? scope.zoomSpeedOriginal / 5 : scope.zoomSpeedOriginal;
+                  }
+
+                  if (spherical.radius <= dollyLimit) {
                         scope.target.add(cameraWorldDir.multiplyScalar(0.4));
                   }
 
@@ -210,7 +222,6 @@ THREE.OrbitControls = function (object, domElement) {
                         lastPosition.copy(scope.object.position);
                         lastQuaternion.copy(scope.object.quaternion);
                         zoomChanged = false;
-
                         return true;
                   }
 

@@ -7,9 +7,12 @@ import { getPlacements, resetSelectedApp } from "../../../actions/";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faMousePointer from "@fortawesome/fontawesome-free-solid/faMousePointer";
 
-import controlsArrows from "../../../assets/img/controlsArrows.png";
-import controlsQ from "../../../assets/img/controlsQ.png";
-import controlsE from "../../../assets/img/controlsE.png";
+import MouseScroll from "../../../components/SVG/MouseScroll";
+import RightClick from "../../../components/SVG/RightClick";
+
+// import controlsArrows from "../../../assets/img/controlsArrows.png";
+// import controlsQ from "../../../assets/img/controlsQ.png";
+// import controlsE from "../../../assets/img/controlsE.png";
 
 export default class MenuPanel extends Component {
    static propTypes = {
@@ -171,25 +174,25 @@ export default class MenuPanel extends Component {
                <span className="mb">Controls</span>
             </div>
             <div>
-               <div>
+               <div style={{ justifyContent: "center" }}>
                   <div>
-                     <img src={controlsArrows} alt="Arrows" />
-                  </div>
-                  <div>
-                     <img src={controlsQ} alt="Q" />
-                  </div>
-                  <div>
-                     <img src={controlsE} alt="E" />
+                     <MouseScroll />
                   </div>
                   <div>
                      <FontAwesomeIcon icon={faMousePointer} />
                   </div>
+                  <div>
+                     <RightClick />
+                  </div>
+                  {/* <div>
+                     <img src={controlsE} alt="E" />
+                  </div> */}
                </div>
-               <div className="mb">
-                  <div>Move</div>
-                  <div>Up</div>
-                  <div>Down</div>
-                  <div>Rotate</div>
+               <div className="mb" style={{ justifyContent: "center" }}>
+                  <div>Dolly</div>
+                  <div>Orbit</div>
+                  <div>Pan</div>
+                  {/* <div>Down</div> */}
                </div>
             </div>
          </div>

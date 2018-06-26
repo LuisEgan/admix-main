@@ -245,7 +245,6 @@ class Scene extends Component {
          if (intersects.length > 0 && !!intersects[0].object.material.color) {
             const intersected = intersects[0].object;
             if (intersected.name.includes(ADMIX_OBJ_PREFIX)) {
-               console.log("intersected.name: ", intersected.name);
                // Change previous selected to material (if there's a previous)
                if (this.intersected) {
                   this.intersected.material = this.intersected.currentMaterial;
@@ -296,7 +295,6 @@ class Scene extends Component {
                   ? clickedPlacement.placementId
                   : clickedPlacement._id;
 
-               console.log("clickedPlacement: ", clickedPlacement);
                this.setState({ clickedPlacement });
             }
          }
@@ -516,11 +514,13 @@ class Scene extends Component {
 
       const controls = new THREE.OrbitControls(
          this.camera,
-         this.renderer.domElement
+         this.renderer.domElement,
+         this.scene
       );
       controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
       controls.dampingFactor = 1.5;
-      controls.zoomSpeed = 10;
+      controls.zoomSpeed = 15;
+      controls.zoomSpeedOriginal = 15;
       // controls.minDistance = 1;
       // controls.maxDistance = 500;
       controls.target.set(0, 0, 0);
@@ -565,8 +565,6 @@ class Scene extends Component {
    handleKeyDown(e) {
       const { THREE } = window;
       e.preventDefault();
-      console.log("e.keyCode : ", e.keyCode);
-      console.log("this.camera.position: ", this.camera.position);
 
       if (e.keyCode === 65) {
          const cameraWorldDir = new THREE.Vector3();
