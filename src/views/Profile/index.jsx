@@ -9,7 +9,6 @@ import {
    changeEmail,
    logout
 } from "../../actions";
-import _ from "lodash";
 import PropTypes from "prop-types";
 import Dropzone from "react-dropzone";
 import request from "superagent";
@@ -550,8 +549,7 @@ const mapStateToProps = state => {
    const userData = state.app.get("userData");
    const {
       payment: {
-         details: { bankDetails, region },
-         option
+         details: { bankDetails, region }
       }
    } = userData;
 
@@ -567,7 +565,6 @@ const mapStateToProps = state => {
    for (let bankDetail in bankDetails) {
       initialValues[bankDetail] = bankDetails[bankDetail];
    }
-   console.log("initialValues: ", initialValues);
 
    return {
       accessToken: state.app.get("accessToken"),
