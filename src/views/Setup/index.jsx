@@ -268,15 +268,15 @@ class Setup extends Component {
               "_id",
               "userId",
               "userName",
-              // "appEngine",
+              "appEngine",
               "isActive",
               "platformName"
            ]
-         : ["name", "isActive", "platformName"];
-      //  : ["name", "appEngine", "isActive", "platformName"];
+         : //  : ["name", "isActive", "platformName"];
+           ["name", "appEngine", "isActive", "platformName"];
 
       const appEnginesOpts = [
-         <option value="unity" key="unity">
+         <option value="Unity" key="unity">
             Unity
          </option>,
          <option value="unreal" key="unreal">

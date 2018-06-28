@@ -9,6 +9,7 @@ import {
    changeEmail,
    logout
 } from "../../actions";
+import _ from "lodash";
 import PropTypes from "prop-types";
 import Dropzone from "react-dropzone";
 import request from "superagent";
@@ -59,6 +60,10 @@ class Profile extends Component {
    constructor(props) {
       super(props);
 
+      const {
+         userData: { payment }
+      } = props;
+
       this.state = {
          statusMssg: "",
          uploadedFile: "",
@@ -66,9 +71,11 @@ class Profile extends Component {
          clicked: "",
          isWarningVisible: false,
          payment: {
-            option: "",
-            region: "",
-            details: {}
+            option: payment.option ? payment.option : "",
+            region: payment.details.region ? payment.details.region : "",
+            details: payment.details.bankDetails
+               ? payment.details.bankDetails
+               : {}
          }
       };
 
@@ -103,7 +110,8 @@ class Profile extends Component {
          },
          userData,
          dispatch,
-         accessToken
+         accessToken,
+         initialValues
       } = this.props;
       const { payment } = this.state;
 
@@ -114,22 +122,44 @@ class Profile extends Component {
       delete values.email;
       delete values.password;
 
-      update.payment = {
-         option: payment.option
-      };
+      if (payment.option !== "") {
+         update.payment = {
+            option: payment.option
+         };
 
-      if (payment.option !== "paypal") {
-         let paymentDetail = {};
-         for (let field in values) {
-            if (field !== "userName") {
-               paymentDetail[field] = values[field];
+         if (payment.option !== "paypal") {
+            let paymentDetail = {};
+            update.payment.details = {};
+
+            // this is in case the user chose a different region from the one in the db
+            if (initialValues.initialPaymentRegion !== payment.region) {
+               for (let initialValue in initialValues) {
+                  delete values[initialValue];
+
+                  // clear the old bankDetails values from form
+                  if (
+                     initialValue !== "userName" &&
+                     initialValue !== "initialPaymentRegion" &&
+                     initialValue !== "password" &&
+                     initialValue !== "email"
+                  ) {
+                     console.log("initialValue: ", initialValue);
+                     dispatch(change("profileForm", initialValue, ""));
+                  }
+               }
             }
+
+            for (let field in values) {
+               if (field !== "userName" && field !== "initialPaymentRegion") {
+                  paymentDetail[field] = values[field];
+               }
+            }
+
+            update.payment.details.bankDetails = paymentDetail;
+            update.payment.details.region = payment.region;
          }
-         update.payment.region = payment.region;
-         update.payment.details = paymentDetail;
       }
 
-      console.log("update: ", update);
       dispatch(updateUser(userData._id, update, accessToken));
    };
 
@@ -202,13 +232,27 @@ class Profile extends Component {
          dispatch,
          reduxForm: {
             profileForm: { values }
-         }
+         },
+         initialValues
       } = this.props;
-      console.log("values: ", values);
       let payment = this.state.payment;
       payment[input] = e.target.value;
       dispatch(reset("profileForm"));
       dispatch(change("profileForm", "userName", values.userName));
+
+      // force the update on the new values (this is for when the user updates and changes between regions)
+      for (let initialValue in initialValues) {
+         if (
+            initialValue !== "userName" &&
+            initialValue !== "initialPaymentRegion" &&
+            initialValue !== "password" &&
+            initialValue !== "email"
+         ) {
+            dispatch(
+               change("profileForm", initialValue, initialValues[initialValue])
+            );
+         }
+      }
       this.setState({ payment });
    }
 
@@ -273,7 +317,7 @@ class Profile extends Component {
    }
 
    render() {
-      const { initialValues, asyncLoading, userData, dispatch } = this.props;
+      const { initialValues, asyncLoading, userData } = this.props;
       const { passInputType, clicked, isWarningVisible, payment } = this.state;
 
       passhelperText = (
@@ -371,7 +415,10 @@ class Profile extends Component {
 
                         {/* PAYMENT OPTIONS */}
 
-                        <ExpansionPanel className="ExpansionPanel">
+                        <ExpansionPanel
+                           className="ExpansionPanel"
+                           defaultExpanded={false}
+                        >
                            <ExpansionPanelSummary
                               expandIcon={<FontAwesomeIcon icon={faAngleUp} />}
                            >
@@ -501,12 +548,26 @@ class Profile extends Component {
 
 const mapStateToProps = state => {
    const userData = state.app.get("userData");
+   const {
+      payment: {
+         details: { bankDetails, region },
+         option
+      }
+   } = userData;
+
+   const initialPaymentRegion = region;
 
    const initialValues = {
       userName: userData.name,
       email: userData.email.value,
-      password: "We can't tell you the password 🤐 Click below to change it!"
+      password: "We can't tell you the password 🤐 Click below to change it!",
+      initialPaymentRegion
    };
+
+   for (let bankDetail in bankDetails) {
+      initialValues[bankDetail] = bankDetails[bankDetail];
+   }
+   console.log("initialValues: ", initialValues);
 
    return {
       accessToken: state.app.get("accessToken"),

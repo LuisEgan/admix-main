@@ -9,12 +9,14 @@ const regions = {
    usa: [["Routing Number"]]
 };
 
-const BankDetails = ({ Field, renderField, region, paymentDetailsToState }) => {
+const BankDetails = ({ Field, renderField, region }) => {
    const details = regions[region].map((r, regionsIndex) => {
       let detail = [];
 
-      r.forEach((set, index) => {
-         detail.push(<Field key={set} name={set} component={renderField} />);
+      r.forEach(setItem => {
+         detail.push(
+            <Field key={setItem} name={setItem} component={renderField} />
+         );
       });
 
       if (regionsIndex !== regions[region].length - 1) {
