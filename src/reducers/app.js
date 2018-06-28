@@ -244,8 +244,8 @@ const actionsMap = {
                   asyncLoading
             }
 
-            if (data.adminAccessKey) {
-                  newState.adminToken = data.adminAccessKey;
+            if (data.adminToken) {
+                  newState.adminToken = data.adminToken;
             }
 
             return state.merge(
