@@ -47,6 +47,7 @@ export const initialState = Map({
       asyncData: null,
       isLoggedIn: false,
       accessToken: "",
+      adminToken: "",
       userData: {},
       apps: [],
       selectedApp: {},
@@ -236,12 +237,19 @@ const actionsMap = {
             } = action.data;
             const isLoggedIn = true;
             const asyncLoading = false;
+
+            const newState = {
+                  isLoggedIn,
+                  accessToken: data.loginToken,
+                  asyncLoading
+            }
+
+            if (data.adminAccessKey) {
+                  newState.adminToken = data.adminAccessKey;
+            }
+
             return state.merge(
-                  Map({
-                        isLoggedIn,
-                        accessToken: data,
-                        asyncLoading
-                  })
+                  Map(newState)
             );
       },
       [LOGOUT_SUCCESS]: (state, action) => {
