@@ -36,7 +36,6 @@ body {
 
 body {
     font-family: "Roboto", sans-serif;
-    font-size: 18px;
     color: #383939;
     background: #fdfdfd;
     line-height: 1 !important;
@@ -84,7 +83,7 @@ button {
         cursor: pointer;
     }
     &:visited {
-        color: #fff !important;
+        // color: #fff !important;
     }
 }
 
@@ -111,51 +110,61 @@ p {
     margin-top: 0;
 }
 
-h2 {
-    font-size: 28px;
-}
-
 // Fonts Assignment
 .ht {
     //header text
-    font-family: "Roboto", sans-serif; // font-size: 18px;
+    font-family: "Roboto", sans-serif;
     color: #000000;
+    font-size: 30px !important;
 }
 
 .pt {
     //page title
-    font-family: "Roboto Slab", sans-serif; // font-size: 30px;
+    font-family: "Roboto Slab", sans-serif;
     font-weight: bold;
     color: #4b44c5;
+    font-size: 45px !important;
 }
 
 .st {
     //section title
-    font-family: "Roboto Slab", sans-serif; // font-size: 14px;
+    font-family: "Roboto Slab", sans-serif;
     font-weight: bold;
     color: #000000;
+    font-size: 25px !important;
+}
+
+.sst {
+    //section sub-title
+    font-family: "Roboto Slab", sans-serif;
+    font-weight: bold;
+    color: #000000;
+    font-size: 17px !important;
 }
 
 .mb {
     //main body
-    font-family: "Roboto", sans-serif; // font-size: 12px;
+    font-family: "Roboto", sans-serif;
     font-weight: lighter;
     color: #a8afb9;
     letter-spacing: 1.2px;
+    font-size: 13px !important;
 }
 
 .bt {
     //button text
-    font-family: "Roboto", sans-serif; // font-size: 12px;
+    font-family: "Roboto", sans-serif;
     font-weight: lighter;
     color: #a8afb9;
+    font-size: 20px !important;
 }
 
 .lt {
     //link text
-    font-family: "Roboto", sans-serif; // font-size: 12px;
+    font-family: "Roboto", sans-serif;
     font-weight: lighter;
     color: #4b44c5;
+    font-size: 20px !important;
 }
 
 /******************************************************/
@@ -374,63 +383,31 @@ $inputsFontSize: calc(0.45em+0.3vw);
             }
         }
         #dropdown-container {
-            // @extend .cc;
             display: flex;
             align-items: center;
-            flex-flow: row-reverse;
+            justify-content: flex-end;
             width: 25%;
-            text-align: right;
-            position: relative;
-            >img {
+            img {
                 width: 4vw;
                 height: 4vw;
                 border-radius: 100%;
                 max-width: 50px;
                 max-height: 50px;
-                margin-right: 1.5vw;
             }
             button {
-                border: 0;
-                background-color: transparent;
-            }
-            .dropdown {
-                display: flex;
-                flex-flow: row-reverse;
-                align-items: center;
-                height: 100%;
-                border: none;
-                >button {
-                    padding: 0;
-                    &:focus {
-                        border: none !important;
-                        box-shadow: none;
-                    }
-                    span {
-                        font-size: calc(0.35em + 0.8vw);
-                        &::after {
-                            font-size: calc(0.35em + 0.8vw);
-                            &:hover {
-                                color: #157cc1;
-                            }
-                        }
-                    }
-                }
-            }
-            .dropdown-menu.show {
-                transform: translate3d(-2vh, -2vh, 0) !important;
-                min-width: 10vw;
-                a {
-                    font-size: 0.75em;
-                    font-size: calc(0.35em + 0.8vw);
-                    padding: 5% 20%;
-                    color: #292b2c !important;
-                }
-                .dropdown-item.active,
-                .dropdown-item:active {
-                    background-color: unset;
+                margin: 0 1vw;
+                &:focus {
+                    outline: none;
                 }
             }
         }
+    }
+}
+
+.mui-dropdown-item {
+    color: black;
+    &:visited {
+        color: black;
     }
 }
 
@@ -446,7 +423,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
         height: 90vh;
         width: 100%;
         overflow: auto;
-        font-size: calc(0.6em + 0.3vw);
         padding: 0;
     }
 }
@@ -487,14 +463,11 @@ $inputsFontSize: calc(0.45em+0.3vw);
         }
         h2 {
             padding-top: 2%;
-            padding-bottom: 1.5%;
-            color: #999;
-            font-size: 1.3em;
+            padding-bottom: 1.5%; // color: #999;
         }
         h3 {
             padding-top: 0.5%;
             padding-bottom: 2.5%;
-            font-size: 0.95em;
         }
         a {
             min-width: 200px;
@@ -520,16 +493,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
     }
 }
 
-.dropdown-item {
-    &:hover {
-        color: #000 !important;
-    }
-    &:active {
-        color: #fff;
-        background-color: #157cc1 !important;
-    }
-}
-
 .info-box {
     position: absolute;
     background-color: rgba(0, 0, 0, 0.65);
@@ -539,7 +502,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
     text-align: center;
     word-wrap: break-word;
     z-index: 3;
-    font-size: 0.7em;
     line-height: 1.5;
     left: -13vw;
     max-width: 150px;
@@ -561,7 +523,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
         padding: 0;
         span {
             color: #5eb4ed;
-            font-size: 1.3em;
         }
     }
     .btn-group {
@@ -598,7 +559,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
             bottom: -10vh;
         }
         h2 {
-            font-size: 0.8em;
             padding-bottom: 5%;
         }
         a,
@@ -612,13 +572,9 @@ $inputsFontSize: calc(0.45em+0.3vw);
     }
     #go-back {
         transition: 0.9s;
-        font-size: 0.8em;
         color: #157cc1;
         font-weight: bold;
         padding-bottom: 5%;
-        span {
-            font-size: 1.1em;
-        }
         &:hover {
             cursor: pointer;
             letter-spacing: 1px;
@@ -792,9 +748,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
         display: flex; // justify-content: space-evenly;
         align-items: center;
         width: 100%;
-        span {
-            font-size: 0.8em;
-        }
         input,
         select {
             margin-top: 6px;
@@ -908,9 +861,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
             }
             .inputs-header {
                 padding: 3%;
-                h3 {
-                    font-size: 2em;
-                }
             }
             .inputs {
                 display: flex;
@@ -964,11 +914,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
                     width: 15%;
                 }
             }
-            .register {
-                font-family: "Roboto";
-                font-size: 1.1em;
-                font-weight: bold;
-            }
+            .register {}
         }
     }
     .login-white-bg {
@@ -1103,7 +1049,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
                     }
                     button {
                         margin: 0 5%;
-                        font-size: calc(0.8em + 0.2vw); // min-height: 40px;
+                        font-size: calc(0.8em + 0.2vw);
                         min-width: 80px;
                     }
                 }
@@ -1121,13 +1067,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
             h3,
             h2 {
                 padding: 1.2%;
-            }
-            h3 {
-                font-size: 1.3em;
-                color: #a8afb9;
-            }
-            h2 {
-                font-size: 0.8em;
             }
         }
     }
@@ -1159,7 +1098,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
         z-index: 2;
         color: white;
         font-weight: bold;
-        font-size: 1.2em;
         letter-spacing: 1px;
     }
     .panel-toggle-btn {
@@ -1198,7 +1136,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
         height: 75vh;
         width: 30vw;
         background-color: #f2f2f2;
-        font-size: 0.9em;
         z-index: 1;
         .container {
             overflow: auto;
@@ -1209,7 +1146,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
             padding: 1%;
         }
         #instructions-toggle-btn {
-            position: absolute; // font-size: .75em;
+            position: absolute;
             bottom: -6vh;
             width: 100%;
             padding: 0.5%;
@@ -1243,8 +1180,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
         #form-panel-inputs {
             padding-top: 5%;
             #inputs-container {
-                // overflow-y: hidden;
-                font-size: $inputsFontSize;
                 >.column {
                     flex-flow: column;
                     >div {
@@ -1261,14 +1196,12 @@ $inputsFontSize: calc(0.45em+0.3vw);
                 .input-container {
                     display: flex;
                     position: relative;
-                    padding: 4% 1%; // font-size: .8em;
+                    padding: 4% 1%;
                     >div {
                         padding: 1%;
                         width: 50%;
                     }
                     #input-placement-name {
-                        //   @extend .text-truncate;
-                        // font-size: .85em;
                         word-wrap: break-word;
                     }
                     #form-panel-active-switch {
@@ -1300,8 +1233,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
                         }
                     }
                     .input-title {
-                        font-weight: 500;
-                        font-size: calc(0.45em + 0.5vw);
+                        color: black;
                     }
                     .active-prop {
                         display: flex;
@@ -1320,7 +1252,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
                         width: 100%;
                         .btn {
                             color: black;
-                            font-size: calc(0.75em + 0.3vw);
                             &:hover {
                                 color: red;
                             }
@@ -1338,7 +1269,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
                             overflow-y: scroll;
                         }
                         button {
-                            // font-size: .8em;
                             padding: 0.5vw 0;
                         }
                     }
@@ -1426,24 +1356,17 @@ $inputsFontSize: calc(0.45em+0.3vw);
     #nothing-to-see {
         width: 20vw;
         position: absolute;
-        right: 25%; // height: 30vw;
+        right: 30%;
         top: 45vh;
         text-align: center;
         #arrow {
             position: absolute;
             width: 15vw;
-            left: -15vw;
-            top: -10vh;
+            left: -18vw;
+            top: -15vh;
         }
         #monkey {
             width: 17%;
-        }
-        h2 {
-            color: #888888;
-            font-size: 0.9em;
-        }
-        h3 {
-            font-size: 0.8em;
         }
     }
     canvas {
@@ -1457,9 +1380,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
         padding: 3%;
         color: #fff;
         text-align: center;
-        h5 {
-            font-size: 0.7em;
-        }
     }
 }
 
@@ -1692,7 +1612,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
         padding: 4%;
         h6 {
             padding: 3% 0;
-            font-size: 0.7rem;
             color: black;
         }
         >div {
@@ -1887,7 +1806,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
                 margin: 1vw;
                 .sectionIcon {
                     margin-right: 2vw;
-                    font-size: 2em;
                     max-width: 2vw;
                 }
             }

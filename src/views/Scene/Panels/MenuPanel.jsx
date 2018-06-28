@@ -107,7 +107,7 @@ export default class MenuPanel extends Component {
          const { name } = scene;
          return (
             <a
-               className="dropdown-item"
+               className="dropdown-item mb"
                onClick={this.sceneOnClick.bind(null, scene)}
                key={name}
             >
@@ -131,12 +131,15 @@ export default class MenuPanel extends Component {
             className="btn-group"
             onMouseLeave={this.toggleDropdowns.bind(null, true)}
          >
-            <button type="button" className="btn btn-secondary dropdown-title">
+            <button
+               type="button"
+               className="btn btn-secondary dropdown-title mb"
+            >
                {selectedScene}
             </button>
             <button
                type="button"
-               className="btn btn-secondary dropdown-toggle dropdown-toggle-split"
+               className="btn btn-secondary dropdown-toggle dropdown-toggle-split mb"
                onClick={this.toggleDropdowns.bind(null, false)}
             >
                <span className="sr-only">{selectedScene}</span>
@@ -237,7 +240,7 @@ export default class MenuPanel extends Component {
             <div className="container">
                <h3 className="st">Editing</h3>
                <br />
-               <span>{selectedApp.name}</span>
+               <span className="mb">{selectedApp.name}</span>
             </div>
 
             <br />

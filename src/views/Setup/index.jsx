@@ -18,7 +18,8 @@ import { CLOUDINARY_IMG_URL } from "../../config/cloudinary";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faGlobe from "@fortawesome/fontawesome-free-solid/faGlobe";
 import faSearchPlus from "@fortawesome/fontawesome-free-solid/faSearchPlus";
-import faSearchMinus from "@fortawesome/fontawesome-free-solid/faSearchMinus";
+import faPlus from "@fortawesome/fontawesome-free-solid/faPlus";
+import faMinus from "@fortawesome/fontawesome-free-solid/faMinus";
 
 import unity from "../../assets/img/unity-logo_20.png";
 
@@ -325,7 +326,7 @@ class Setup extends Component {
 
                         return (
                            <div key={f}>
-                              <span className="st">{_parseFilterName(f)}</span>
+                              <span className="sst">{_parseFilterName(f)}</span>
                               <select
                                  className="form-control"
                                  onChange={this.setFilter.bind(null, {
@@ -342,7 +343,7 @@ class Setup extends Component {
                      }
                      return (
                         <div key={f}>
-                           <span className="st">{_parseFilterName(f)}</span>
+                           <span className="sst">{_parseFilterName(f)}</span>
                            <input
                               className="form-control"
                               type="text"
@@ -357,12 +358,12 @@ class Setup extends Component {
                   })}
                   <div className="cc trash">
                      <FontAwesomeIcon
-                        icon={faSearchPlus}
+                        icon={faPlus}
                         onClick={this.addFilter}
                         className="trash-plus"
                      />
                      <FontAwesomeIcon
-                        icon={faSearchMinus}
+                        icon={faMinus}
                         onClick={this.deleteFilter.bind(null, i)}
                         className="trash-minus"
                      />

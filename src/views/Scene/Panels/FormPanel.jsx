@@ -329,7 +329,7 @@ export default class FormPanel extends Component {
             function(cat) {
                return (
                   <a
-                     className="dropdown-item"
+                     className="dropdown-item mb"
                      onClick={this.selectCategory.bind(null, cat)}
                      key={cat}
                   >
@@ -343,7 +343,7 @@ export default class FormPanel extends Component {
             function(cat) {
                return (
                   <a
-                     className="dropdown-item"
+                     className="dropdown-item mb"
                      onClick={this.selectSubCategory.bind(null, cat)}
                      key={cat}
                   >
@@ -372,12 +372,12 @@ export default class FormPanel extends Component {
                className="btn-group"
                onMouseLeave={this.toggleDropdowns.bind(null, input, true)}
             >
-               <button type="button" className="btn btn-secondary btn-name">
+               <button type="button" className="btn btn-secondary btn-name mb">
                   {title}
                </button>
                <button
                   type="button"
-                  className="btn btn-secondary dropdown-toggle dropdown-toggle-split"
+                  className="btn btn-secondary dropdown-toggle dropdown-toggle-split mb"
                   onClick={this.toggleDropdowns.bind(null, input, false)}
                >
                   <span className="sr-only">{title}</span>
@@ -396,17 +396,21 @@ export default class FormPanel extends Component {
       return (
          <div id="inputs-container">
             <div className="input-container">
-               <div className="input-title st">Name</div>
-               <div id="input-placement-name">{savedInputs.placementName}</div>
+               <div className="input-title mb">Name</div>
+               <div id="input-placement-name" className="mb">
+                  {savedInputs.placementName}
+               </div>
             </div>
             <div className="input-container">
                {_q_icon("placementType")}
-               <div className="input-title st">Format</div>
-               <div className="text-truncate">{savedInputs.placementType}</div>
+               <div className="input-title mb">Format</div>
+               <div className="text-truncate mb">
+                  {savedInputs.placementType}
+               </div>
             </div>
             <div className="input-container">
                {_q_icon("isActive")}
-               <div className="input-title st active-prop">Active</div>
+               <div className="input-title mb active-prop">Active</div>
                <div id="form-panel-active-switch">
                   <div className="active-switch clearfix toggleBtn">
                      <div className="toggles">
@@ -440,11 +444,11 @@ export default class FormPanel extends Component {
             </div>
             <div className="input-container column">
                {_q_icon("Category")}
-               <div className="input-title st">Category</div>
+               <div className="input-title mb">Category</div>
                <div>{dropdown("category")}</div>
             </div>
             <div className="input-container column">
-               <div className="input-title st">Sub-Category</div>
+               <div className="input-title mb">Sub-Category</div>
                <div>{dropdown("subCategory")}</div>
             </div>
             <div className="input-container cc">

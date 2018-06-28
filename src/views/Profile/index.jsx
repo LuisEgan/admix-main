@@ -375,7 +375,7 @@ class Profile extends Component {
                                     icon={faUser}
                                     className="sectionIcon"
                                  />
-                                 <h5 className="st">Personal Information</h5>
+                                 <h2 className="sst">Personal Information</h2>
                               </div>
                            </ExpansionPanelSummary>
                            <ExpansionPanelDetails>
@@ -426,7 +426,7 @@ class Profile extends Component {
                                     icon={faMoneyCheckAlt}
                                     className="sectionIcon"
                                  />
-                                 <h5 className="st">Payments Configuration</h5>
+                                 <h2 className="sst">Payments Configuration</h2>
                               </div>
                            </ExpansionPanelSummary>
                            <ExpansionPanelDetails>

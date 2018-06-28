@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { NavLink, Redirect, Switch, Link } from "react-router-dom";
+import { NavLink, Redirect, Link } from "react-router-dom";
 import { routeCodes } from "../../config/routes";
 import PropTypes from "prop-types";
 import { logout, async, fetchUserImgURL } from "../../actions";
@@ -12,8 +12,14 @@ import sam20 from "../../assets/img/sam_20.jpg";
 import admixLoading from "../../assets/gifs/admixBreath.gif";
 import defaultImg from "../../assets/img/default_pic.jpg";
 
+import IconButton from "@material-ui/core/IconButton";
+import AccountCircle from "@material-ui/icons/AccountCircle";
+import MenuItem from "@material-ui/core/MenuItem";
+import MUIMenu from "@material-ui/core/Menu";
+
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faUser from "@fortawesome/fontawesome-free-solid/faUser";
+import faSortDown from "@fortawesome/fontawesome-free-solid/faSortDown";
 
 import {
    CLOUDINARY_UPLOAD_PRESET,
@@ -83,14 +89,29 @@ class Menu extends Component {
       this.setState({ showDropdown });
    }
 
+   handleChange = (event, checked) => {
+      this.setState({ auth: checked });
+   };
+
+   handleDropdown = event => {
+      this.setState({ anchorEl: event.currentTarget });
+   };
+
+   handleClose = () => {
+      this.setState({ anchorEl: null });
+   };
+
    render() {
       let { showDropdown } = this.state;
+      const { anchorEl } = this.state;
+      const open = Boolean(anchorEl);
 
       const {
          location: { pathname },
          isLoggedIn,
          userData,
-         userImgURL
+         userImgURL,
+         asyncLoading
       } = this.props;
 
       showDropdown = showDropdown ? "show" : "";
@@ -108,7 +129,119 @@ class Menu extends Component {
 
                <div className="cc" id="steps-container" />
 
-               <div
+               <div id="dropdown-container">
+                  <span className="sst">
+                     {userData.name === undefined ||
+                     userData.name === "" ||
+                     !userData.name
+                        ? "Hello!"
+                        : "Hi, " + userData.name + "!"}
+                  </span>
+                  <IconButton
+                     aria-owns={open ? "menu-appbar" : null}
+                     aria-haspopup="true"
+                     onClick={this.handleDropdown}
+                     color="inherit"
+                  >
+                     {!isLoggedIn && <FontAwesomeIcon icon={faUser} />}
+
+                     {isLoggedIn &&
+                        userData._id && (
+                           <img
+                              src={userData.cloudinaryImgURL}
+                              onError={e => (e.target.src = defaultImg)}
+                              alt="Login"
+                           />
+                        )}
+                  </IconButton>
+                  <MUIMenu
+                     id="menu-appbar"
+                     anchorEl={anchorEl}
+                     anchorOrigin={{
+                        vertical: "top",
+                        horizontal: "right"
+                     }}
+                     transformOrigin={{
+                        vertical: "top",
+                        horizontal: "right"
+                     }}
+                     open={open}
+                     onClose={this.handleClose}
+                  >
+                     {!isLoggedIn && (
+                        <React.Fragment>
+                           <MenuItem onClick={this.handleClose}>
+                              <NavLink
+                                 exact
+                                 to={routeCodes.DOWNLOAD}
+                                 onClick={this.handleClose.bind(null, true)}
+                                 className="mb mui-dropdown-item"
+                              >
+                                 Download
+                              </NavLink>
+                           </MenuItem>
+                           <MenuItem onClick={this.handleClose}>
+                              <NavLink
+                                 exact
+                                 to={routeCodes.LOGIN}
+                                 onClick={this.handleClose.bind(null, true)}
+                                 className="mb mui-dropdown-item"
+                              >
+                                 Login
+                              </NavLink>
+                           </MenuItem>
+                        </React.Fragment>
+                     )}
+
+                     {isLoggedIn && (
+                        <React.Fragment>
+                           <MenuItem onClick={this.handleClose}>
+                              <NavLink
+                                 exact
+                                 to={routeCodes.SETUP}
+                                 onClick={this.handleClose}
+                                 className="mb mui-dropdown-item"
+                              >
+                                 My Apps
+                              </NavLink>
+                           </MenuItem>
+
+                           <MenuItem onClick={this.handleClose}>
+                              <NavLink
+                                 exact
+                                 to={routeCodes.PROFILE}
+                                 onClick={this.handleClose}
+                                 className="mb mui-dropdown-item"
+                              >
+                                 My Profile
+                              </NavLink>
+                           </MenuItem>
+
+                           <MenuItem onClick={this.handleClose}>
+                              <NavLink
+                                 exact
+                                 to={routeCodes.DOWNLOAD}
+                                 onClick={this.handleClose}
+                                 className="mb mui-dropdown-item"
+                              >
+                                 Download
+                              </NavLink>
+                           </MenuItem>
+
+                           <MenuItem onClick={this.handleClose}>
+                              <a
+                                 onClick={this.handleLogout}
+                                 className="mb mui-dropdown-item"
+                              >
+                                 Logout
+                              </a>
+                           </MenuItem>
+                        </React.Fragment>
+                     )}
+                  </MUIMenu>
+               </div>
+
+               {/* <div
                   className=""
                   id="dropdown-container"
                   onMouseLeave={this.toggleDropdowns.bind(null, true)}
@@ -119,8 +252,7 @@ class Menu extends Component {
                         type="button"
                         onClick={this.toggleDropdowns.bind(null, false)}
                      >
-                        {/* <i className="fa fa-user" aria-hidden="true"></i> */}
-                        <span className="st">
+                        <span className="sst">
                            {userData.name === undefined ||
                            userData.name === "" ||
                            !userData.name
@@ -196,7 +328,7 @@ class Menu extends Component {
                            alt="Login"
                         />
                      )}
-               </div>
+               </div> */}
             </div>
          </div>
       );
