@@ -7,6 +7,12 @@ import ToggleDisplay from "react-toggle-display";
 import DayPickerInput from "react-day-picker/DayPickerInput";
 import "../../../node_modules/react-day-picker/lib/style.css";
 
+import FormControl from "@material-ui/core/FormControl";
+import Input from "@material-ui/core/Input";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
+
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faTrash from "@fortawesome/fontawesome-free-solid/faTrash";
 
@@ -44,12 +50,13 @@ class Report extends Component {
       super(props);
 
       this.state = {
-         show: "ow",
+         show: "pe",
          from: new Date(),
          to: new Date(),
          doLoadScene: false,
          isSceneLoaded: false,
          isLoadingScene: false,
+         progressLoadingScene: 0,
          userApps: {},
          selectedApps: {},
          allAppsSelected: false
@@ -76,17 +83,13 @@ class Report extends Component {
          this
       );
 
+      this.addEventListeners = this.addEventListeners.bind(this);
+      this.disposeEventListeners = this.disposeEventListeners.bind(this);
+
       this.confirmSceneLoaded = this.confirmSceneLoaded.bind(this);
       this.isLoadingScene = this.isLoadingScene.bind(this);
+      this.progressLoadingScene = this.progressLoadingScene.bind(this);
       this.changeAppSelection = this.changeAppSelection.bind(this);
-      this.selectAllApps = this.selectAllApps.bind(this);
-   }
-
-   componentWillMount() {
-      // const { dispatch, reportData, userData } = this.props;
-      // const isAdmin = true;
-      // dispatch(getReportData(isAdmin));
-      // if (Object.keys(reportData).length === 0) dispatch(getReportData());
    }
 
    componentDidMount() {
@@ -109,16 +112,20 @@ class Report extends Component {
       }
 
       // for test
-      userApps["c882ce87-d8eb-45c0-b6ef-2cade5bb8fdc"] = "AYY LMAO";
+      // userApps["c882ce87-d8eb-45c0-b6ef-2cade5bb8fdc"] = "AYY LMAO";
 
       this.setState({ userApps, selectedApps, allAppsSelected });
+   }
+
+   componentWillUnmount() {
+      this.disposeEventListeners();
    }
 
    // =========
    // WebGL Methods
    // =========
-   doLoadScene() {
-      this.webGL.loadScene();
+   doLoadScene(selectedScene) {
+      this.webGL.loadScene(selectedScene);
    }
 
    moveCamera(selectedPlacement) {
@@ -133,12 +140,16 @@ class Report extends Component {
       this.webGL.TrackballControlsDisableWheel();
    }
 
-   confirmSceneLoaded() {
-      this.setState({ isSceneLoaded: true });
+   confirmSceneLoaded(isSceneLoaded) {
+      this.setState({ isSceneLoaded });
    }
 
    isLoadingScene(isLoading) {
       this.setState({ isLoadingScene: isLoading });
+   }
+
+   progressLoadingScene(loadingProgress) {
+      this.setState({ progressLoadingScene: loadingProgress });
    }
 
    noPointerLockControlsRotation() {
@@ -146,6 +157,14 @@ class Report extends Component {
    }
    yesPointerLockControlsRotation() {
       this.webGL.yesPointerLockControlsRotation();
+   }
+
+   addEventListeners() {
+      this.webGL.addEventListeners();
+   }
+
+   disposeEventListeners() {
+      this.webGL.disposeEventListeners();
    }
 
    // =========
@@ -192,32 +211,41 @@ class Report extends Component {
 
       let filteredDataObj = {};
 
-      filteredDates.forEach(date => {
-         const parsedDate = this.parseDate(date);
+      if (!_.isEmpty(reportData)) {
+         console.log("\n\n================================\n\n");
+         console.log("reportData: ", reportData);
+         filteredDates.forEach(date => {
+            const parsedDate = this.parseDate(date);
+            console.log("parsedDate: ", parsedDate);
+            console.log(
+               "reportData[" + parsedDate + "]: ",
+               reportData[parsedDate]
+            );
 
-         // check if there's data (from db) in the date specified by user
-         if (reportData[parsedDate]) {
-            // loop through each app data in each report date specified by user
-            for (let appId in reportData[parsedDate]) {
-               // check if the app is among the selected apps by the user
-               if (selectedApps[appId]) {
-                  filteredDataObj[parsedDate] = filteredDataObj[parsedDate]
-                     ? filteredDataObj[parsedDate]
-                     : {};
-                  filteredDataObj[parsedDate][appId] = _.cloneDeep(
-                     reportData[parsedDate][appId]
-                  );
+            // check if there's data (from db) in the date specified by user
+            if (reportData[parsedDate]) {
+               console.log("IN");
+               // loop through each app data in each report date specified by user
+               for (let appId in reportData[parsedDate]) {
+                  // check if the app is among the selected apps by the user
+                  if (selectedApps[appId]) {
+                     console.log("IN - IN");
+
+                     if (!filteredDataObj[parsedDate])
+                        filteredDataObj[parsedDate] = {};
+                     filteredDataObj[parsedDate][appId] = _.cloneDeep(
+                        reportData[parsedDate][appId]
+                     );
+                  }
                }
+            } else {
+               console.log("OUT");
+               filteredDataObj[parsedDate] = null;
             }
-         } else {
-            filteredDataObj[parsedDate] = null;
-         }
+         });
+      }
 
-         // filteredDataObj[parsedDate] = reportData[parsedDate]
-         //   ? reportData[parsedDate]
-         //   : null;
-      });
-
+      console.log("filteredDataObj: ", filteredDataObj);
       return filteredDataObj;
    }
 
@@ -260,63 +288,71 @@ class Report extends Component {
 
    quickFilter(filter) {
       const { reportData } = this.props;
-      let newState;
 
-      const today = new Date();
-      const yesterday = new Date();
-      const lastWeek = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      lastWeek.setDate(lastWeek.getDate() - 7);
+      if (!_.isEmpty(reportData)) {
+         let newState;
 
-      switch (filter) {
-         case "t":
-            newState = { from: today, to: today };
-            break;
-         case "y":
-            newState = { from: yesterday, to: yesterday };
-            break;
-         case "l":
-            newState = { from: lastWeek, to: today };
-            break;
-         case "a":
-            const keys = Object.keys(reportData);
-            const first = keys[0];
-            const last = keys[keys.length - 1];
-            newState = { from: new Date(first), to: new Date(last) };
-            break;
-         default:
-            return;
+         const today = new Date();
+         const yesterday = new Date();
+         const lastWeek = new Date();
+         yesterday.setDate(yesterday.getDate() - 1);
+         lastWeek.setDate(lastWeek.getDate() - 7);
+
+         switch (filter) {
+            case "t":
+               newState = { from: today, to: today };
+               break;
+            case "y":
+               newState = { from: yesterday, to: yesterday };
+               break;
+            case "l":
+               newState = { from: lastWeek, to: today };
+               break;
+            case "a":
+               const keys = Object.keys(reportData).sort();
+               const first = keys[0];
+               const last = keys[keys.length - 1];
+               newState = { from: new Date(first), to: new Date(last) };
+               break;
+            default:
+               return;
+         }
+
+         this.setState(newState);
       }
-
-      this.setState(newState);
    }
 
-   changeAppSelection(appId) {
-      const { userApps, selectedApps } = this.state;
-      let allAppsSelected = false;
+   changeAppSelection(appId, e) {
+      let { userApps, selectedApps, allAppsSelected } = this.state;
+      appId = e.target.value ? e.target.value : appId;
 
-      if (selectedApps[appId]) {
-         delete selectedApps[appId];
-      } else {
-         selectedApps[appId] = _.cloneDeep(userApps[appId]);
+      if (appId !== "add") {
+         if (appId !== "all") {
+            if (selectedApps[appId]) {
+               delete selectedApps[appId];
+            } else {
+               selectedApps[appId] = _.cloneDeep(userApps[appId]);
+            }
+         } else {
+            if (allAppsSelected) {
+               selectedApps = {};
+            } else {
+               for (let appId in userApps) {
+                  selectedApps[appId] = userApps[appId];
+               }
+            }
+         }
+
+         allAppsSelected = false;
+
+         if (
+            Object.keys(selectedApps).length === Object.keys(userApps).length
+         ) {
+            allAppsSelected = true;
+         }
+
+         this.setState({ selectedApps, allAppsSelected });
       }
-
-      if (Object.keys(selectedApps).length === Object.keys(userApps).length) {
-         allAppsSelected = true;
-      }
-
-      this.setState({ selectedApps, allAppsSelected });
-   }
-
-   selectAllApps() {
-      const { userApps } = this.state;
-      let selectedApps = {};
-
-      for (let appId in userApps) {
-         selectedApps[appId] = userApps[appId];
-      }
-
-      this.setState({ selectedApps, allAppsSelected: true });
    }
 
    // =========
@@ -324,60 +360,29 @@ class Report extends Component {
    // =========
    renderAppsDropdown() {
       const { userApps, selectedApps, allAppsSelected } = this.state;
-
       const selectedAppsDisplay = [];
-
-      const _dropdownStruct = (title, dropdown) => (
-         <div className="btn-group" key={title}>
-            <button type="button" className="btn btn-secondary dropdown-title">
-               {title}
-            </button>
-            <button
-               type="button"
-               className="btn btn-secondary dropdown-toggle dropdown-toggle-split"
-               data-toggle="dropdown"
-               aria-haspopup="true"
-               aria-expanded="false"
-            >
-               <span className="sr-only" />
-            </button>
-            <div className="dropdown-menu">{dropdown}</div>
-         </div>
-      );
-
-      let dropdown = allAppsSelected
-         ? []
-         : [
-              <a
-                 className="dropdown-item unselectable"
-                 onClick={this.selectAllApps}
-                 key={`allApps`}
-              >
-                 {`Add all`}
-              </a>
-           ];
+      const dropdown = [];
 
       for (let appId in userApps) {
          if (!selectedApps[appId]) {
             dropdown.push(
-               <a
-                  className="dropdown-item unselectable"
-                  // onClick={this.changeAppSelection.bind(null, appId)}
-                  onClick={this.changeAppSelection.bind(
-                     null,
-                     "c882ce87-d8eb-45c0-b6ef-2cade5bb8fdc"
-                  )}
-                  key={appId}
+               <MenuItem
+                  value={appId}
+                  key={`${appId}-${Math.random()}`}
+                  className="mb"
                >
                   {userApps[appId]}
-               </a>
+               </MenuItem>
             );
          }
       }
 
       for (let appId in selectedApps) {
          const selectedAppDisplay = (
-            <div className="report-selectedApp" key={selectedApps[appId]}>
+            <div
+               className="report-selectedApp"
+               key={`${selectedApps[appId]}-${Math.random()}`}
+            >
                <div>{selectedApps[appId]}</div>
                <div onClick={this.changeAppSelection.bind(null, appId)}>
                   <FontAwesomeIcon icon={faTrash} />
@@ -387,11 +392,27 @@ class Report extends Component {
          selectedAppsDisplay.push(selectedAppDisplay);
       }
 
-      const allAppsDropwdown = _dropdownStruct("Add app", dropdown);
-
       return (
-         <div>
-            {allAppsDropwdown}
+         <div className="mb">
+            <FormControl className="fw">
+               <InputLabel htmlFor="apps-helper" className="mb">
+                  Apps selection
+               </InputLabel>
+               <Select
+                  value="add"
+                  onChange={this.changeAppSelection.bind(null, "")}
+                  input={<Input name="apps" id="apps-helper" />}
+                  className="mb"
+               >
+                  <MenuItem value="add" className="mb">
+                     Add app
+                  </MenuItem>
+                  <MenuItem value="all" className="mb">
+                     {allAppsSelected ? "Unselect all" : "Select all"}
+                  </MenuItem>
+                  {dropdown}
+               </Select>
+            </FormControl>
             <div id="report-selectedAppsDisplay">{selectedAppsDisplay}</div>
          </div>
       );
@@ -404,9 +425,18 @@ class Report extends Component {
          to,
          isSceneLoaded,
          isLoadingScene,
+         progressLoadingScene,
          selectedApps
       } = this.state;
-      const { dispatch, isLoad_webgl, reportData, userData } = this.props;
+
+      const {
+         dispatch,
+         accessToken,
+         isLoad_webgl,
+         reportData,
+         userData,
+         selectedApp
+      } = this.props;
 
       const owAct = show("ow") ? "active" : "";
       const perAct = show("pe") ? "active" : "";
@@ -427,6 +457,7 @@ class Report extends Component {
                   }}
                   confirmSceneLoaded={this.confirmSceneLoaded}
                   isLoadingScene={this.isLoadingScene}
+                  progressLoadingScene={this.progressLoadingScene}
                   userData={userData}
                />
             </div>
@@ -434,13 +465,11 @@ class Report extends Component {
             <div className={`panel menu-panel`}>
                <div id="app-selection" className="container">
                   <h3 className="st">Reporting</h3>
-                  <span>{this.renderAppsDropdown()}</span>
+                  {this.renderAppsDropdown()}
                </div>
 
-               <hr />
-
                <div id="dates">
-                  <h6 className="st">Display</h6>
+                  <h6 className="sst">Display</h6>
                   <div id="range">
                      <div id="from">
                         <DayPickerInput
@@ -465,30 +494,50 @@ class Report extends Component {
                      </div>
                   </div>
                   <div id="quickFilters">
-                     <a onClick={this.quickFilter.bind(null, "t")}>today</a>
-                     <a onClick={this.quickFilter.bind(null, "y")}>yesterday</a>
-                     <a onClick={this.quickFilter.bind(null, "l")}>last week</a>
-                     <a onClick={this.quickFilter.bind(null, "a")}>all</a>
+                     <a
+                        onClick={this.quickFilter.bind(null, "t")}
+                        className="mb"
+                     >
+                        today
+                     </a>
+                     <a
+                        onClick={this.quickFilter.bind(null, "y")}
+                        className="mb"
+                     >
+                        yesterday
+                     </a>
+                     <a
+                        onClick={this.quickFilter.bind(null, "l")}
+                        className="mb"
+                     >
+                        last week
+                     </a>
+                     <a
+                        onClick={this.quickFilter.bind(null, "a")}
+                        className="mb"
+                     >
+                        all
+                     </a>
                   </div>
                </div>
 
                <hr />
 
-               <div className="list-group">
+               <div className="list-group sst">
                   <a
-                     className={`list-group-item list-group-item-action st ${owAct}`}
+                     className={`list-group-item list-group-item-action ${owAct}`}
                      onClick={this.changeView.bind(null, "ow")}
                   >
                      Overview
                   </a>
                   <a
-                     className={`list-group-item list-group-item-action st ${perAct}`}
+                     className={`list-group-item list-group-item-action ${perAct}`}
                      onClick={this.changeView.bind(null, "pe")}
                   >
                      Performance
                   </a>
                   {/* <a
-                     className={`list-group-item list-group-item-action st ${anAct}`}
+                     className={`list-group-item list-group-item-action ${anAct}`}
                      onClick={this.changeView.bind(null, "an")}
                   >
                      Analytics
@@ -510,6 +559,9 @@ class Report extends Component {
             <ToggleDisplay show={show("pe")}>
                <Performance
                   reportData={reportData}
+                  dispatch={dispatch}
+                  accessToken={accessToken}
+                  selectedApp={selectedApp}
                   selectedApps={selectedApps}
                   filteredReportData={filteredData()}
                   fromDate={from}
@@ -528,8 +580,11 @@ class Report extends Component {
                   yesPointerLockControlsRotation={
                      this.yesPointerLockControlsRotation
                   }
+                  addEventListeners={this.addEventListeners}
+                  disposeEventListeners={this.disposeEventListeners}
                   isSceneLoaded={isSceneLoaded}
                   isLoadingScene={isLoadingScene}
+                  progressLoadingScene={progressLoadingScene}
                />
             </ToggleDisplay>
 
@@ -543,7 +598,9 @@ class Report extends Component {
 
 const mapStateToProps = state => ({
    apps: state.app.get("apps"),
+   accessToken: state.app.get("accessToken"),
    userData: state.app.get("userData"),
+   selectedApp: state.app.get("selectedApp"),
    reportData: state.app.get("reportData"),
    initialReportAppId: state.app.get("initialReportAppId"),
    isLoad_webgl: state.app.get("load_webgl")

@@ -48,6 +48,9 @@ export default class WebGLScene extends Component {
       //CONTROLS
       this.enableControls = this.enableControls.bind(this);
       this.disableControls = this.disableControls.bind(this);
+      this.enableOrbitControls = this.enableOrbitControls.bind(this);
+      this.addEventListeners = this.addEventListeners.bind(this);
+      this.disposeEventListeners = this.disposeEventListeners.bind(this);
 
       // SCENE
       this.selectScene = this.selectScene.bind(this);
@@ -123,7 +126,7 @@ export default class WebGLScene extends Component {
          y = event.clientY;
       }
 
-      this.mouse.x = x / (window.innerWidth * this.windowMultiplier) * 2 - 1;
+      this.mouse.x = (x / (window.innerWidth * this.windowMultiplier)) * 2 - 1;
       this.mouse.y =
          -(y / (window.innerHeight * this.windowMultiplier)) * 2 + 1;
 
@@ -182,7 +185,7 @@ export default class WebGLScene extends Component {
          0.1,
          100
       );
-      // camera.position.set(-4.1, 7.2, 4.2);
+      camera.position.set(0, 20, 20);
       this.camera = camera;
    }
 
@@ -230,7 +233,7 @@ export default class WebGLScene extends Component {
          window.addEventListener("resize", this.onWindowResize, false);
          window.addEventListener("mousemove", this.onTouchMove);
          window.addEventListener("touchmove", this.onTouchMove);
-         // window.addEventListener("click", this.onObjectClick);
+         window.addEventListener("click", this.onObjectClick);
          this.setState({ eventListenersSet: true });
       }
    }
@@ -311,31 +314,94 @@ export default class WebGLScene extends Component {
    }
 
    TrackballControlsEnableWheel() {
-      this.controls.startWheel();
+      // this.controls.startWheel();
    }
 
    TrackballControlsDisableWheel() {
-      this.controls.stopWheel();
-   }
-
-   enablePointerLockControls() {
-      const { THREE } = window;
-
-      const { scene, camera } = this;
-
-      const controls = new THREE.PointerLockControls(camera);
-
-      scene.add(controls.getObject());
-
-      this.controls = controls;
-      this.scene = scene;
+      // this.controls.stopWheel();
    }
 
    noPointerLockControlsRotation() {
-      this.controls && this.controls.noRotation();
+      // this.controls && this.controls.noRotation();
    }
    yesPointerLockControlsRotation() {
-      this.controls && this.controls.yesRotation();
+      // this.controls && this.controls.yesRotation();
+   }
+
+   //    gotta include <script src="./THREEJS/PointerLockControls.min.js"></script>   in /public/index.html for this to work
+   enablePointerLockControls({ iYawX, iYawY, iYawZ, iYawRot, iPitchRot }) {
+      const { THREE } = window;
+
+      // Position is given by the yawObject position, the camera doesn't move! (it must be at (0,0,0))
+      // lookAt can be set by
+
+      const controls = new THREE.PointerLockControls(this.camera, {
+         iYawX,
+         iYawY,
+         iYawZ,
+         iYawRot,
+         iPitchRot
+      });
+
+      this.scene.add(controls.getYawObject());
+
+      this.controls = controls;
+      this.arePointerControlsEnabled = true;
+   }
+
+   //    gotta include <script src="./THREEJS/OrbitControls.min.js"></script> in /public/index.html for this to work
+   enableOrbitControls() {
+      const { THREE } = window;
+
+      // Position is given by the camera position
+      // lookAt can be set by controls.target.set
+
+      const controls = new THREE.OrbitControls(
+         this.camera,
+         undefined,
+         this.scene
+      );
+      controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+      controls.dampingFactor = 1.5;
+      controls.zoomSpeed = 5;
+      controls.zoomSpeedOriginal = 5;
+      controls.target.set(0, 0, 0);
+      this.controls = controls;
+   }
+
+   //    gotta include <script src="./THREEJS/TrackballControls.min.js"></script>   in /public/index.html for this to work
+   enableTrackBallControls() {
+      const { THREE } = window;
+
+      const camera = new THREE.PerspectiveCamera(
+         60,
+         window.innerWidth / window.innerHeight,
+         1,
+         1000
+      );
+      camera.position.z = 5;
+
+      const controls = new THREE.TrackballControls(camera);
+      controls.rotateSpeed = 1.0;
+      controls.zoomSpeed = 1.2;
+      controls.panSpeed = 0.8;
+      controls.noZoom = false;
+      controls.noPan = false;
+      controls.staticMoving = true;
+      controls.dynamicDampingFactor = 0.3;
+      controls.keys = [65, 83, 68];
+
+      this.controls = controls;
+      this.camera = camera;
+      this.areTrackBallControlsEnabled = true;
+   }
+
+   addEventListeners() {
+      this.controls && this.controls.addEventListeners();
+   }
+
+   disposeEventListeners() {
+      this.controls && this.controls.dispose();
    }
    // =====================
    // </CONTROLS>
@@ -351,19 +417,37 @@ export default class WebGLScene extends Component {
       this.setState({ selectedScene });
    }
 
-   loadScene() {
+   loadScene(selectedScene) {
       const { THREE } = window;
+      const { sceneMounted } = this.state;
+      const {
+         userData,
+         confirmSceneLoaded,
+         isLoadingScene,
+         progressLoadingScene
+      } = this.props;
+      const userId = userData._id;
+
+      const selectedObject = this.scene.getObjectByName("userLoadedScene");
 
       // Check is there was a scene loaded
-      if (!!this.group) {
+      if (selectedObject) {
          this.clear();
+         this.loadScene(selectedScene);
+         confirmSceneLoaded(false);
+
+         return;
       }
 
-      this.enablePointerLockControls();
-
-      const { sceneMounted, selectedScene } = this.state;
-      const { userData, confirmSceneLoaded, isLoadingScene } = this.props;
-      const userId = userData._id;
+      // const PLControlsConfig = {
+      //    iYawX: 0,
+      //    iYawY: 0,
+      //    iYawZ: 0,
+      //    iYawRot: 0,
+      //    iPitchRot: 0
+      // };
+      // this.enablePointerLockControls(PLControlsConfig);
+      this.enableOrbitControls({ lookAtX: 70, lookAtY: 0, lookAtZ: 0 });
 
       if (!sceneMounted) {
          this.mount.appendChild(this.renderer.domElement);
@@ -371,13 +455,12 @@ export default class WebGLScene extends Component {
       }
       this.setPostProcessing();
 
-      const obj3d = new THREE.Object3D();
-
       // LOAD OBJECT
       const onProgress = xhr => {
-         const loadingProgress = Math.round(xhr.loaded / xhr.total * 100);
-         this.setState({ loadingProgress });
+         const loadingProgress = Math.round((xhr.loaded / xhr.total) * 100);
+         progressLoadingScene(loadingProgress);
          isLoadingScene(true);
+         this.setState({ loadingProgress });
       };
 
       const onError = error => {
@@ -390,9 +473,8 @@ export default class WebGLScene extends Component {
          const loadingProgress = 0;
          const loadingError = null;
 
-         object.name = "scene 1";
+         object.name = "userLoadedScene";
          object.position.set(0, 0, 0);
-         obj3d.add(object);
          object.traverse(
             function(child) {
                if (child.name.includes("__advirObj__")) {
@@ -405,10 +487,11 @@ export default class WebGLScene extends Component {
             }.bind(this)
          );
 
-         this.controls.noRotation();
+         //  this.controls.noRotation();
          this.setState({ loadingProgress, loadingError, sceneMounted: true });
-         confirmSceneLoaded();
+         confirmSceneLoaded(true);
          isLoadingScene(false);
+         this.scene.add(object);
       };
 
       // GET .OBJ AND .MTL URL
@@ -438,15 +521,12 @@ export default class WebGLScene extends Component {
             onError.bind(this)
          );
       });
-
-      this.scene.add(this.group);
-      this.group.add(obj3d);
    }
 
    renderScene() {
-      this.renderer.autoClear = true;
-      this.renderer.setClearColor(0xfff0f0);
-      this.renderer.setClearAlpha(0.0);
+      // this.renderer.autoClear = true;
+      // this.renderer.setClearColor(0xfff0f0);
+      // this.renderer.setClearAlpha(0.0);
       this.scene.updateMatrixWorld();
       if (this.composer) {
          this.composer.render();
@@ -456,9 +536,10 @@ export default class WebGLScene extends Component {
    }
 
    clear() {
-      const { scene } = this;
-      var selectedObject = scene.getObjectByName("scene 1");
-      scene.remove(selectedObject);
+      // Clear object name from form
+      this.controls.dispose();
+      var selectedObject = this.scene.getObjectByName("userLoadedScene");
+      this.scene.remove(selectedObject);
    }
 
    moveCamera(selectedPlacement) {
@@ -496,11 +577,6 @@ export default class WebGLScene extends Component {
 
       // After movement, turn to the placement
       this.controls.getObject().rotation.y = -1.5708;
-
-      // console.log(
-      //    "this.controls.getObject().position: ",
-      //    this.controls.getObject().position
-      // );
    }
    // =====================
    // </SCENE>
@@ -544,7 +620,6 @@ export default class WebGLScene extends Component {
       this.setCamera();
       this.setRenderer();
 
-      this.group = new THREE.Group();
       this.selectedObjects = [];
       this.mouse = new THREE.Vector2();
       this.raycaster = new THREE.Raycaster();
@@ -565,6 +640,7 @@ export default class WebGLScene extends Component {
          window.removeEventListener("touchmove", this.onTouchMove);
          window.removeEventListener("click", this.onObjectClick);
          // this.TrackballControlsDisableWheel();
+         this.controls.dispose();
          this.setState({ sceneMounted: false });
       }
    }

@@ -391,7 +391,7 @@ const actionsMap = {
 
             selectedApp.scenes.forEach(scene => {
                   scene.placements = [];
-                  placements.forEach((placement, i) => {
+                  Array.isArray(placements) && placements.forEach((placement, i) => {
                         if (scene._id === placement.sceneId._id) {
                               const placementToPush = _.cloneDeep(placements[i]);
                               placementToPush.addedPrefix = false;
@@ -485,30 +485,33 @@ const actionsMap = {
             const asyncLoading = false;
             const reportData = {};
 
-            console.log('data: ', data);
-            data.data.forEach(elem => {
+            data.data.data.forEach(elem => {
                   const elemClone = _.cloneDeep(elem);
                   const {
-                        reportDate,
-                        appId
+                        date,
+                        keys: {
+                              appid
+                        }
                   } = elemClone;
-                  delete elemClone.reportDate;
-                  delete elemClone.appId;
+                  delete elemClone.date;
+                  delete elemClone.keys.appid;
+
+                  const reportDate = date.split("T")[0];
 
                   // before adding sub-attributes, the parent atrribute must exist, it won't create whilst creating the child
                   // obj.a.b = value will only work if obj.a already exists
                   if (reportData[reportDate]) {
-                        if (reportData[reportDate][appId]) {
-                              reportData[reportDate][appId] = [
-                                    ...reportData[reportDate][appId],
+                        if (reportData[reportDate][appid]) {
+                              reportData[reportDate][appid] = [
+                                    ...reportData[reportDate][appid],
                                     elemClone
                               ];
                         } else {
-                              reportData[reportDate][appId] = [elemClone];
+                              reportData[reportDate][appid] = [elemClone];
                         }
                   } else {
                         reportData[reportDate] = {};
-                        reportData[reportDate][appId] = [elemClone];
+                        reportData[reportDate][appid] = [elemClone];
                   }
             });
 

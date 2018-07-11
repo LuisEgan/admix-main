@@ -64,45 +64,46 @@ export default class Overview extends Component {
    };
 
    calcGrowth(oldest, newest) {
-      return ((newest - oldest) * 100 / oldest).toFixed(2);
+      return (((newest - oldest) * 100) / oldest).toFixed(2);
    }
 
    calcSumOf(attr) {
       const { filteredReportData } = this.props;
       let sum = 0;
       for (let date in filteredReportData) {
-         if (!!filteredReportData[date]) {
+         if (filteredReportData[date]) {
             for (let appId in filteredReportData[date]) {
-               if (!!filteredReportData[date][appId]) {
+               if (filteredReportData[date][appId]) {
                   for (
                      let i = 0;
                      i < filteredReportData[date][appId].length;
                      i++
                   ) {
-                     sum += filteredReportData[date][appId][i][attr];
+                     sum = filteredReportData[date][appId][i][attr]
+                        ? filteredReportData[date][appId][i][attr] + sum
+                        : sum;
                   }
                }
             }
          }
       }
       sum = sum ? sum : 0;
-      return sum;
+      return sum.toFixed(4);
    }
 
    calcFillRate() {
       const { calcSumOf } = this;
-      let fillRate = (calcSumOf("impression") / calcSumOf("request")).toFixed(
-         2
-      );
-      fillRate = isNaN(fillRate) ? 0 : fillRate;
+      let fillRate = (
+         calcSumOf("impression") / calcSumOf("bidRequest")
+      ).toFixed(2);
+      fillRate = isNaN(fillRate) || fillRate === Infinity ? 0 : fillRate;
       return fillRate;
    }
 
    calcERPM() {
       const { calcSumOf } = this;
       let ERPM = (
-         calcSumOf("revenue") /
-         calcSumOf("impression") *
+         (calcSumOf("revenue") / calcSumOf("impression")) *
          1000
       ).toFixed(2);
 
@@ -136,14 +137,18 @@ export default class Overview extends Component {
             }
 
             // if there's data of that date
-            if (!!period[date]) {
+            if (period[date]) {
                for (let appId in period[date]) {
                   for (let i = 0; i < period[date][appId].length; i++) {
                      // get the sum of all revenues of that date
-                     rDateSum += period[date][appId][i]["revenue"];
+                     rDateSum = period[date][appId][i]["revenue"]
+                        ? period[date][appId][i]["revenue"] + rDateSum
+                        : rDateSum;
 
                      // get the sum of all impressions of that date
-                     iDateSum += period[date][appId][i]["impression"];
+                     iDateSum = period[date][appId][i]["impression"]
+                        ? period[date][appId][i]["revenue"] + iDateSum
+                        : iDateSum;
                   }
                }
             }
@@ -225,24 +230,29 @@ export default class Overview extends Component {
       for (let date in filteredReportData) {
          labels.push(this.formatDate(date));
 
-         // if there's data of that date
          let rDateSum = 0;
          let iDateSum = 0;
 
-         if (!!filteredReportData[date]) {
+         // if there's data of that date
+         if (filteredReportData[date]) {
             for (let appId in filteredReportData[date]) {
-               if (!!filteredReportData[date][appId]) {
+               if (filteredReportData[date][appId]) {
                   for (
                      let i = 0;
                      i < filteredReportData[date][appId].length;
                      i++
                   ) {
                      // get the sum of all revenues of that date
-                     rDateSum += filteredReportData[date][appId][i]["revenue"];
+                     rDateSum = filteredReportData[date][appId][i]["revenue"]
+                        ? filteredReportData[date][appId][i]["revenue"] +
+                          rDateSum
+                        : rDateSum;
 
                      // get the sum of all impressions of that date
-                     iDateSum +=
-                        filteredReportData[date][appId][i]["impression"];
+                     iDateSum = filteredReportData[date][appId][i]["impression"]
+                        ? filteredReportData[date][appId][i]["impression"] +
+                          iDateSum
+                        : iDateSum;
                   }
                }
             }
@@ -326,22 +336,18 @@ export default class Overview extends Component {
                {/* TOP LINE */}
                <div id="overview-topLine">
                   <div className="report-title">
-                     <h5 className="st">Top line</h5>
+                     <h5 className="sst">Top line</h5>
                   </div>
                   <div>
                      {/* BOXES */}
                      <div>
                         <div>
-                           <h3 className="st">
-                              {this.numberWithCommas(calcSumOf("impression"))}
-                           </h3>
+                           <h3 className="st">{calcSumOf("impression")}</h3>
                            <h6 className="mb">impressions</h6>
                            {this.renderQicon("impressions")}
                         </div>
                         <div>
-                           <h3 className="st">
-                              ${this.numberWithCommas(calcSumOf("revenue"))}
-                           </h3>
+                           <h3 className="st">{calcSumOf("revenue")}</h3>
                            <h6 className="mb">net revenue</h6>
                            {this.renderQicon("revenue")}
                         </div>
@@ -356,9 +362,7 @@ export default class Overview extends Component {
                         </div>
                         <div>
                            <h3 className="st">
-                              {this.numberWithCommas(
-                                 calcSumOf("impressionUnique")
-                              )}
+                              {calcSumOf("impressionUnique")}
                            </h3>
                            <h6 className="mb">uniques</h6>
                            {this.renderQicon("uniques")}
@@ -375,7 +379,7 @@ export default class Overview extends Component {
                {/* PLOT */}
                <div id="overview-plot">
                   <div className="report-title">
-                     <h5 className="st">Plot</h5>
+                     <h5 className="sst">Plot</h5>
                   </div>
 
                   {/* GRAPH */}

@@ -8,7 +8,7 @@ const RighClick = props => {
          width="417.031px"
          height="417.031px"
          viewBox="0 0 417.031 417.031"
-         enable-background="new 0 0 417.031 417.031"
+         enableBackground="new 0 0 417.031 417.031"
       >
          <g>
             <path

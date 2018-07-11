@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css?family=Roboto|Roboto+Slab");
+@import url("./scss/animate.min.css");
 $mobileBreakpoint: 830px;
 $blueAdmix: #157cc1;
 * {
@@ -70,6 +71,11 @@ $white: #fff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+// full width
+.fw {
+    width: 100%;
 }
 
 a,
@@ -199,7 +205,7 @@ p {
     animation: fadeOut cubic-bezier(0.44, 0.26, 0.58, 0.82) 1.2s forwards;
 }
 
-@keyframes slideOutRight {
+@keyframes slidePanelOutRight {
     from {
         transform: translate3d(0, 0, 0);
     }
@@ -208,11 +214,11 @@ p {
     }
 }
 
-.slideOutRight {
-    animation: slideOutRight cubic-bezier(0.44, 0.26, 0.58, 0.82) 0.6s forwards;
+.slidePanelOutRight {
+    animation: slidePanelOutRight cubic-bezier(0.44, 0.26, 0.58, 0.82) 0.6s forwards;
 }
 
-@keyframes slideInRight {
+@keyframes slidePanelInRight {
     from {
         transform: translate3d(100%, 0, 0);
     }
@@ -221,11 +227,11 @@ p {
     }
 }
 
-.slideInRight {
-    animation: slideInRight cubic-bezier(0.44, 0.26, 0.58, 0.82) 0.6s forwards;
+.slidePanelInRight {
+    animation: slidePanelInRight cubic-bezier(0.44, 0.26, 0.58, 0.82) 0.6s forwards;
 }
 
-@keyframes slideOutLeft {
+@keyframes slidePanelOutLeft {
     from {
         transform: translate3d(0, 0, 0);
     }
@@ -234,11 +240,11 @@ p {
     }
 }
 
-.slideOutLeft {
-    animation: slideOutLeft cubic-bezier(0.44, 0.26, 0.58, 0.82) 0.6s forwards;
+.slidePanelOutLeft {
+    animation: slidePanelOutLeft cubic-bezier(0.44, 0.26, 0.58, 0.82) 0.6s forwards;
 }
 
-@keyframes slideInLeft {
+@keyframes slidePanelInLeft {
     from {
         transform: translate3d(-100%, 0, 0);
     }
@@ -247,8 +253,8 @@ p {
     }
 }
 
-.slideInLeft {
-    animation: slideInLeft cubic-bezier(0.44, 0.26, 0.58, 0.82) 0.6s forwards;
+.slidePanelInLeft {
+    animation: slidePanelInLeft cubic-bezier(0.44, 0.26, 0.58, 0.82) 0.6s forwards;
 }
 
 @keyframes slideOutTop {
@@ -400,6 +406,30 @@ $inputsFontSize: calc(0.45em+0.3vw);
                     outline: none;
                 }
             }
+            span {
+                display: flex;
+                align-items: center;
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+}
+
+#menu-appbar {
+    ul {
+        position: relative;
+        li {
+            text-align: center;
+            min-height: 7vh;
+            padding: 0;
+            a {
+                @extend .cc;
+                padding: 0 16px;
+                height: 100%;
+                width: 100%; // margin-left: -16px;
+            }
         }
     }
 }
@@ -409,6 +439,12 @@ $inputsFontSize: calc(0.45em+0.3vw);
     &:visited {
         color: black;
     }
+}
+
+.loadingSVG {
+    max-width: 80px;
+    margin: auto;
+    text-align: center;
 }
 
 #Page {
@@ -421,7 +457,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
     #content {
         margin-top: 10vh;
         height: 90vh;
-        width: 100%;
+        width: 100vw;
         overflow: auto;
         padding: 0;
     }
@@ -523,7 +559,14 @@ $inputsFontSize: calc(0.45em+0.3vw);
         padding: 0;
         span {
             color: #5eb4ed;
+            word-wrap: break-word;
         }
+    }
+    label {
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: 80%;
+        text-overflow: ellipsis;
     }
     .btn-group {
         width: 100%;
@@ -547,11 +590,55 @@ $inputsFontSize: calc(0.45em+0.3vw);
             color: black;
         }
     }
+    #displayRadios {
+        width: 100%;
+        margin: 12vh 0;
+        legend {
+            text-align: center;
+        }
+        label {
+            margin: 0;
+            width: 50%;
+            justify-content: center;
+            padding: 5px;
+            &:hover {
+                background: #f2f2f2;
+            }
+        }
+        svg:not(.faIcon) {
+            font-size: 0;
+            color: $blueAdmix;
+        }
+        span {
+            @extend .mb;
+            max-height: 35px;
+        }
+        .faIcon {
+            color: black;
+            font-size: 1.3em;
+        }
+        .radio-btn {
+            text-align: center;
+        }
+        >div {
+            flex-direction: row;
+            >label {
+                &:first-child {
+                    border-top-left-radius: 5px;
+                    border-bottom-left-radius: 5px;
+                }
+                &:last-child {
+                    border-top-right-radius: 5px;
+                    border-bottom-right-radius: 5px;
+                }
+            }
+        }
+    }
     #happy-btn {
         position: relative;
         width: 100%;
         text-align: center;
-        padding-top: 20%;
+        margin-top: 7vh;
         .info-box {
             right: 0;
             width: 50%;
@@ -664,8 +751,8 @@ $inputsFontSize: calc(0.45em+0.3vw);
         border-radius: 100% !important;
         border: solid 3px $blueAdmix; //   padding: 5%;
         background-color: white;
-        max-width: 170px;
-        max-height: 170px;
+        width: 110px;
+        height: 110px;
         font-weight: bolder;
         color: #999999;
         background-color: white; //   border: none !important;
@@ -680,7 +767,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
             max-height: 100px;
             padding: 10%;
         }
-        svg {
+        svg.fa {
             color: $blueAdmix;
             position: absolute;
             bottom: 0;
@@ -691,12 +778,16 @@ $inputsFontSize: calc(0.45em+0.3vw);
             border-radius: 100%;
         }
         &:hover {
-            svg {
+            svg.fa {
                 color: white;
                 background: $blueAdmix;
                 transition: 0.5s;
             }
             cursor: pointer; //  background-color: #999999;
+        }
+        .loadingSVG {
+            width: 50%;
+            height: 50%;
         }
     }
     .image-uploaded {
@@ -759,6 +850,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
         }
         .trash {
             margin-left: auto;
+            font-size: .7em;
             .trash-plus {
                 color: #33cc33;
                 margin-right: 1vw;
@@ -945,6 +1037,9 @@ $inputsFontSize: calc(0.45em+0.3vw);
 /******************************************************/
 
 #apps {
+    .loadingSVG {
+        margin-top: 5vh;
+    }
     >.container {
         padding: 0 $sidesPadding;
         #apps-myApps {
@@ -1031,11 +1126,11 @@ $inputsFontSize: calc(0.45em+0.3vw);
                     position: relative;
                     padding: 1%;
                     .info-box {
-                        top: -100%;
+                        top: -150%;
                         left: unset;
-                        right: 0.1vh;
-                        max-width: 130px;
-                        height: 80%;
+                        right: 0.1vh; // max-width: 130px;
+                        // height: 80%;
+                        font-size: .8em !important;
                         &::after {
                             content: "";
                             position: absolute;
@@ -1089,8 +1184,8 @@ $inputsFontSize: calc(0.45em+0.3vw);
     #scene-loading {
         position: absolute;
         text-align: center;
-        bottom: 10vh;
-        left: 0;
+        bottom: 17vh;
+        left: 7vw;
         right: 0;
         margin: 0 auto;
         height: 7vh;
@@ -1381,6 +1476,55 @@ $inputsFontSize: calc(0.45em+0.3vw);
         color: #fff;
         text-align: center;
     }
+    #rawDataTable-cont {
+        position: absolute;
+        top: 0;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        background: #f2f2f2;
+        overflow-y: auto;
+        padding-bottom: 5vh;
+        >span {
+            margin-left: 25%;
+        }
+        #rawDataTable {
+            width: 72%;
+            margin-top: 15vh;
+            margin-left: 25%;
+            .ReactTable {
+                border: 0;
+                .rt-table {
+                    >div {
+                        @extend .mb;
+                        &:first-child {
+                            background: transparent;
+                            padding-bottom: 1vh;
+                            div {
+                                @extend .st;
+                            }
+                        }
+                        &:nth-child(2) {
+                            div {
+                                @extend .sst;
+                            }
+                        }
+                    }
+                }
+                .rt-tr {
+                    text-align: left;
+                }
+                .rt-td {
+                    display: flex;
+                    white-space: pre-wrap;
+                    align-items: center;
+                    span {
+                        max-height: 25px;
+                    }
+                }
+            }
+        }
+    }
 }
 
 /******************************************************/
@@ -1506,6 +1650,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
         .report-selectedApp {
             padding: 2% 0;
             display: flex;
+            color: #5eb4ed;
             >div {
                 &:first-child {
                     width: 95%;
@@ -1588,6 +1733,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
                 >a {
                     padding: 5%;
                     padding-left: 0;
+                    font-size: .6em !important;
                     &:hover {
                         color: black !important;
                     }
@@ -1603,6 +1749,12 @@ $inputsFontSize: calc(0.45em+0.3vw);
         max-height: 50px;
         h5 {
             color: #b6b6b6;
+            white-space: nowrap;
+        }
+    }
+    #app-selection {
+        >div {
+            padding: 3vh 0;
         }
     }
     #overview {
@@ -1762,6 +1914,21 @@ $inputsFontSize: calc(0.45em+0.3vw);
                 text-align: center;
                 background-color: #f2f2f2;
             }
+            #report-webgl-idle {
+                flex-flow: column;
+                background: white;
+                height: 60vh;
+                width: 80%;
+                margin: 4vh auto;
+                box-shadow: 4px 3px 28px 13px #e6e6e6;
+                border-radius: 5px;
+                #tv {
+                    font-size: 2em;
+                }
+            }
+            #report-webgl-loading {
+                margin-top: 5vh;
+            }
         }
         #performance-tables {
             background-color: #f2f2f2;
@@ -1781,6 +1948,10 @@ $inputsFontSize: calc(0.45em+0.3vw);
 #profile {
     form {
         width: 100%;
+    }
+    input,
+    label {
+        @extend .mb;
     }
     .simple-container {
         padding: 0 2%;
@@ -1878,20 +2049,37 @@ $inputsFontSize: calc(0.45em+0.3vw);
             }
         }
         >div {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            a {
+                // max-width: 50px;
+                width: unset;
+                &:visited {
+                    color: $blueAdmix;
+                }
+            }
             >div {
                 text-align: left;
-                padding: 0 2.5%;
+                width: 50%;
+                min-width: 350px;
+                text-align: center;
                 >div {
                     flex-flow: column;
-                    padding: 0 5%;
+                    padding: 0 2%;
                     img {
                         display: block;
-                        margin: 5% auto;
-                        max-height: 80px;
+                        margin: 0 auto;
+                        padding: 0;
+                        height: 80px;
+                        width: 80px;
                     }
                     p {
                         padding: 5%;
                     }
+                }
+                &:first-child {
+                    justify-content: center;
                 }
                 &:last-child {
                     flex-flow: column;

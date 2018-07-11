@@ -2,6 +2,12 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { saveInputs } from "../../../actions/";
 
+import FormControl from "@material-ui/core/FormControl";
+import Input from "@material-ui/core/Input";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
+
 import thumbsUp from "../../../assets/img/Thumbs_Up_Hand_Sign_Emoji.png";
 
 import dbCategories from "./categories.json";
@@ -52,18 +58,14 @@ export default class FormPanel extends Component {
       };
 
       this.toggleSlide = this.toggleSlide.bind(this);
-      this.hardUnfocus = this.hardUnfocus.bind(this);
+      this.changeDropdownValue = this.changeDropdownValue.bind(this);
+      this.renderDropdown = this.renderDropdown.bind(this);
+      this.renderActiveToggle = this.renderActiveToggle.bind(this);
       this.renderInputs = this.renderInputs.bind(this);
-      this.selectCategory = this.selectCategory.bind(this);
-      this.selectSubCategory = this.selectSubCategory.bind(this);
       this.toggleInfoBox = this.toggleInfoBox.bind(this);
-      this.toggleDropdowns = this.toggleDropdowns.bind(this);
-      this.focusInput = this.focusInput.bind(this);
-      this.resetInputFocus = this.resetInputFocus.bind(this);
-      this.handleOnChange = this.handleOnChange.bind(this);
+      this.handleActiveChange = this.handleActiveChange.bind(this);
       this.onSave = this.onSave.bind(this);
       this.resetInputs = this.resetInputs.bind(this);
-      this.forceClose = this.forceClose.bind(this);
    }
 
    componentDidMount() {
@@ -106,51 +108,11 @@ export default class FormPanel extends Component {
       this.setState({ savedInputs, slidedIn, subCategories });
    }
 
-   hardUnfocus(input) {
-      this[input].blur();
-   }
-
    toggleSlide() {
       let { slidedIn } = this.state;
       slidedIn = !slidedIn;
       // slidesManager("FormPanel");
       this.setState({ slidedIn });
-   }
-
-   selectCategory(category) {
-      const { savedInputs, subCategories } = this.state;
-      savedInputs.category = category;
-
-      const newSubCategories = dbSubCategories[category];
-
-      // If the sub-category does not belong in the category, clear it
-      let sameSubcategories = true;
-      subCategories.some((subCat, i) => {
-         if (subCat !== dbSubCategories[category][i]) {
-            sameSubcategories = false;
-            return true;
-         }
-         return false;
-      });
-
-      if (!sameSubcategories) {
-         savedInputs.subCategory = "Sub-Category";
-      }
-
-      this.setState({
-         savedInputs,
-         subCategories: newSubCategories,
-         showDdCats: false
-      });
-      this.onSave();
-   }
-
-   selectSubCategory(subCategory) {
-      const { savedInputs } = this.state;
-      savedInputs.subCategory = subCategory;
-
-      this.setState({ savedInputs, showDdSubCats: false });
-      this.onSave();
    }
 
    toggleInfoBox(input) {
@@ -172,34 +134,7 @@ export default class FormPanel extends Component {
       }
    }
 
-   toggleDropdowns(input, forceClose = false) {
-      let { showDdCats, showDdSubCats } = this.state;
-
-      if (input === "category") {
-         showDdCats = forceClose ? false : !showDdCats;
-         this.setState({ showDdCats });
-      } else {
-         showDdSubCats = forceClose ? false : !showDdSubCats;
-         this.setState({ showDdSubCats });
-      }
-   }
-
-   focusInput(input) {
-      if (input !== "Name") {
-         this.setState({ focusedInput: input });
-         this[input].focus();
-      }
-   }
-
-   resetInputFocus() {
-      const { focusedInput } = this.state;
-      if (!!this[focusedInput]) {
-         this[focusedInput].blur();
-         this.setState({ focusedInput: "" });
-      }
-   }
-
-   handleOnChange(input, e) {
+   handleActiveChange(input, e) {
       const { savedInputs } = this.state;
       let {
          target: { value }
@@ -209,6 +144,7 @@ export default class FormPanel extends Component {
          value = e.target.checked;
       }
 
+      console.log("savedInputs: ", savedInputs);
       savedInputs[input] = value;
       this.setState({ savedInputs, animating: true });
       this.onSave();
@@ -255,17 +191,90 @@ export default class FormPanel extends Component {
       this.setState({ savedInputs });
    }
 
-   forceClose() {
-      const { slidedIn } = this.state;
+   changeDropdownValue(dropdown, e) {
+      const { value } = e.target;
+      const { savedInputs } = this.state;
+      const newState = { savedInputs };
 
-      if (slidedIn) {
-         this.setState({ slidedIn: "closed" });
+      if (dropdown === "category") {
+         newState.savedInputs.category = value;
+         newState.subCategories = dbSubCategories[value];
       } else {
-         this.setState({ slidedIn: true });
-         setTimeout(() => {
-            this.setState({ slidedIn: "closed" });
-         }, 600);
+         newState.savedInputs.subCategory = value;
       }
+
+      this.setState(newState);
+      this.onSave();
+   }
+
+   renderDropdown(input) {
+      let { subCategories, savedInputs } = this.state;
+
+      const toMap = input === "category" ? dbCategories : subCategories;
+
+      const dropdown = toMap.map(item => {
+         return (
+            <MenuItem value={item} key={item} className="mb">
+               {item}
+            </MenuItem>
+         );
+      });
+
+      return (
+         <FormControl className="fw">
+            <InputLabel htmlFor={`${input}-helper`} className="mb">
+               {input === "category" ? "Category" : "Sub-Category"}
+            </InputLabel>
+            <Select
+               value={
+                  !Array.isArray(savedInputs[input])
+                     ? savedInputs[input]
+                     : savedInputs[input][0]
+               }
+               onChange={this.changeDropdownValue.bind(null, input)}
+               input={<Input name={input} id={`${input}-helper`} />}
+               className="mb"
+            >
+               <MenuItem value="" className="mb">
+                  <em>
+                     Please select a{" "}
+                     {input === "category" ? "Category" : "Sub-Category"}
+                  </em>
+               </MenuItem>
+               {dropdown}
+            </Select>
+         </FormControl>
+      );
+   }
+
+   renderActiveToggle() {
+      const { savedInputs, animating } = this.state;
+      const labelStyle = animating ? { opacity: 0.7 } : { opacity: 1 };
+
+      return (
+         <div id="form-panel-active-switch">
+            <div className="active-switch clearfix toggleBtn">
+               <div className="toggles">
+                  <input
+                     type="checkbox"
+                     name="formPanelToggle"
+                     id="formPanelToggle"
+                     className="ios-toggle"
+                     checked={savedInputs.isActive}
+                     onChange={this.handleActiveChange.bind(null, "isActive")}
+                     disabled={animating}
+                  />
+                  <label
+                     htmlFor="formPanelToggle"
+                     className="checkbox-label"
+                     data-on=""
+                     data-off=""
+                     style={labelStyle}
+                  />
+               </div>
+            </div>
+         </div>
+      );
    }
 
    renderInputs() {
@@ -274,8 +283,7 @@ export default class FormPanel extends Component {
          activeInfoBox,
          categoryInfoBox,
          savedInputs,
-         feedbackClass,
-         animating
+         feedbackClass
       } = this.state;
 
       const _q_icon = input => {
@@ -317,82 +325,6 @@ export default class FormPanel extends Component {
          );
       };
 
-      const dropdown = function(input) {
-         let {
-            savedInputs: { category, subCategory },
-            subCategories,
-            showDdCats,
-            showDdSubCats
-         } = this.state;
-
-         const categories = dbCategories.map(
-            function(cat) {
-               return (
-                  <a
-                     className="dropdown-item mb"
-                     onClick={this.selectCategory.bind(null, cat)}
-                     key={cat}
-                  >
-                     {cat}
-                  </a>
-               );
-            }.bind(this)
-         );
-
-         subCategories = subCategories.map(
-            function(cat) {
-               return (
-                  <a
-                     className="dropdown-item mb"
-                     onClick={this.selectSubCategory.bind(null, cat)}
-                     key={cat}
-                  >
-                     {cat}
-                  </a>
-               );
-            }.bind(this)
-         );
-
-         let title =
-            input === "category"
-               ? category === undefined
-                  ? "Category"
-                  : category
-               : subCategory === undefined
-                  ? "Sub-Category"
-                  : subCategory;
-
-         const dropdown = input === "category" ? categories : subCategories;
-
-         let showDropdown = input === "category" ? showDdCats : showDdSubCats;
-         showDropdown = showDropdown ? "show" : "";
-
-         return (
-            <div
-               className="btn-group"
-               onMouseLeave={this.toggleDropdowns.bind(null, input, true)}
-            >
-               <button type="button" className="btn btn-secondary btn-name mb">
-                  {title}
-               </button>
-               <button
-                  type="button"
-                  className="btn btn-secondary dropdown-toggle dropdown-toggle-split mb"
-                  onClick={this.toggleDropdowns.bind(null, input, false)}
-               >
-                  <span className="sr-only">{title}</span>
-               </button>
-               <div
-                  className={`dropdown-menu ${showDropdown}`}
-                  onMouseLeave={this.toggleDropdowns.bind(null, input, true)}
-               >
-                  {dropdown}
-               </div>
-            </div>
-         );
-      }.bind(this);
-
-      const labelStyle = animating ? { opacity: 0.7 } : { opacity: 1 };
       return (
          <div id="inputs-container">
             <div className="input-container">
@@ -411,48 +343,16 @@ export default class FormPanel extends Component {
             <div className="input-container">
                {_q_icon("isActive")}
                <div className="input-title mb active-prop">Active</div>
-               <div id="form-panel-active-switch">
-                  <div className="active-switch clearfix toggleBtn">
-                     <div className="toggles">
-                        <input
-                           type="checkbox"
-                           name="formPanelToggle"
-                           id="formPanelToggle"
-                           className="ios-toggle"
-                           checked={savedInputs.isActive}
-                           onChange={this.handleOnChange.bind(null, "isActive")}
-                           disabled={animating}
-                        />
-                        <label
-                           htmlFor="formPanelToggle"
-                           className="checkbox-label"
-                           data-on=""
-                           data-off=""
-                           style={labelStyle}
-                        />
-                     </div>
-                     {/* <label className="switch">
-              <input
-                type="checkbox"
-                checked={savedInputs.isActive}
-                onChange={this.handleOnChange.bind(null, "isActive")}
-              />
-              <span className="slider round" />
-            </label> */}
-                  </div>
-               </div>
+               {this.renderActiveToggle()}
             </div>
             <div className="input-container column">
                {_q_icon("Category")}
-               <div className="input-title mb">Category</div>
-               <div>{dropdown("category")}</div>
+               <div>{this.renderDropdown("category")}</div>
             </div>
             <div className="input-container column">
-               <div className="input-title mb">Sub-Category</div>
-               <div>{dropdown("subCategory")}</div>
+               <div>{this.renderDropdown("subCategory")}</div>
             </div>
             <div className="input-container cc">
-               {/* <button className="submit" onClick={this.onSave}>Save</button> */}
                <div id="input-save-feedback" className={feedbackClass}>
                   Saved!
                   <img src={thumbsUp} alt="Thumbs Up!" />
@@ -470,8 +370,8 @@ export default class FormPanel extends Component {
          ? slidedIn === "closed"
             ? "closed"
             : slidedIn
-               ? "slideOutRight"
-               : "slideInRight"
+               ? "slidePanelOutRight"
+               : "slidePanelInRight"
          : "closed";
       const arrow = slidedIn ? "left" : "right";
 

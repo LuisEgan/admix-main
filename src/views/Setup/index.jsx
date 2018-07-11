@@ -21,7 +21,10 @@ import faSearchPlus from "@fortawesome/fontawesome-free-solid/faSearchPlus";
 import faPlus from "@fortawesome/fontawesome-free-solid/faPlus";
 import faMinus from "@fortawesome/fontawesome-free-solid/faMinus";
 
-import unity from "../../assets/img/unity-logo_20.png";
+import Unity from "../../assets/img/unity-logo_20.png";
+// import Unreal from "../../assets/img/Unreal-Engine-Logo_60x60.png";
+
+import AdmixLoading from "../../components/SVG/AdmixLoading";
 
 const getFirstUpper = str => {
    for (let i = 0; i < str.length; i++) {
@@ -35,6 +38,11 @@ const getFirstUpper = str => {
 const capitalizeFirstLetter = string => {
    return string.charAt(0).toUpperCase() + string.slice(1);
 };
+
+// const enginesImgs = {
+//    Unity,
+//    Unreal
+// };
 
 // @connect(state => ({
 //   apps: state.app.get("apps"),
@@ -56,6 +64,7 @@ class Setup extends Component {
       super(props);
 
       this.state = {
+         showContent: false,
          appSelected: false,
          activeApps: [],
          edit: false,
@@ -69,6 +78,7 @@ class Setup extends Component {
          userUsedFilter: false
       };
 
+      this.showContent = this.showContent.bind(this);
       this.selectApp = this.selectApp.bind(this);
       this.getReportData = this.getReportData.bind(this);
       this.handleOnSwitch = this.handleOnSwitch.bind(this);
@@ -98,6 +108,7 @@ class Setup extends Component {
       dispatch(getUserData(accessToken));
       dispatch(setUserImgURL(CLOUDINARY_IMG_URL + userData._id + ".png"));
       dispatch(resetSavedInputs());
+      this.showContent();
    }
 
    componentWillReceiveProps(nextProps) {
@@ -110,6 +121,17 @@ class Setup extends Component {
 
       const allAppsIds = apps.map(app => app._id);
       this.setState({ allAppsIds, activeApps });
+   }
+
+   showContent() {
+      const { asyncLoading, userData } = this.props;
+      if (!asyncLoading && userData._id) {
+         this.setState({ showContent: true });
+      } else {
+         setTimeout(() => {
+            this.showContent();
+         }, 500);
+      }
    }
 
    handleOnSwitch(app) {
@@ -392,12 +414,13 @@ class Setup extends Component {
                key={_id}
             >
                <div className="engine-logo">
-                  <img src={unity} alt="Engine" />
+                  {/* <img src={enginesImgs[app.appEngine]} alt="Engine" /> */}
+                  <img src={Unity} alt="Engine" />
                </div>
 
                <div className="app-name mb">{name}</div>
 
-               <div className="app-status">
+               <div className="app-status mb">
                   <div className="active-switch clearfix toggleBtn">
                      <div className="toggles">
                         <input
@@ -423,7 +446,7 @@ class Setup extends Component {
                   onMouseLeave={this.hideEditInfoBox.bind(null, _id)}
                >
                   <div
-                     className="info-box"
+                     className="info-box mb"
                      id={_id}
                      style={{ display: "none" }}
                      ref={infoBox => {
@@ -435,13 +458,13 @@ class Setup extends Component {
 
                   {/* REPORT COMMENTED */}
                   <button
-                     className="btn btn-dark"
+                     className="btn btn-dark mb"
                      onClick={this.getReportData.bind(null, _id)}
                   >
                      Report
                   </button>
                   <button
-                     className="btn btn-dark"
+                     className="btn btn-dark mb"
                      disabled={isActive}
                      onClick={this.selectApp.bind(null, _id, "edit")}
                      onMouseEnter={this.showEditInfoBox.bind(null, _id)}
@@ -495,8 +518,14 @@ class Setup extends Component {
    }
 
    render() {
-      const { location, apps, asyncLoading } = this.props;
-      const { appSelected, edit, allAppsIds, filterBy } = this.state;
+      const { location, apps, asyncLoading, userData } = this.props;
+      const {
+         showContent,
+         appSelected,
+         edit,
+         allAppsIds,
+         filterBy
+      } = this.state;
       const anyApps = apps.length > 0;
 
       if (!asyncLoading && appSelected) {
@@ -527,22 +556,21 @@ class Setup extends Component {
                   </div>
                   {/* REPORT COMMENTED */}
                   <button
-                     className="btn btn-dark"
+                     className="btn btn-dark sst"
                      onClick={this.getReportData.bind(null, allAppsIds)}
                   >
                      <FontAwesomeIcon icon={faGlobe} /> &nbsp; Global Report
                   </button>
                </div>
 
+               {!showContent && <AdmixLoading loadingText="Loading" />}
+
                {filterBy.length > 0 && this.renderFilter()}
 
-               {/* { ( asyncLoading ) && (
-            loadingIcon
-          )} */}
+               {anyApps &&
+                  showContent && <div id="apps-list">{this.renderApps()}</div>}
 
-               {anyApps && <div id="apps-list">{this.renderApps()}</div>}
-
-               {!anyApps && !asyncLoading && this.renderNoApps()}
+               {!anyApps && userData._id && this.renderNoApps()}
             </div>
          </div>
       );

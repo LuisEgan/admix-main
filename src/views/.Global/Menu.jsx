@@ -5,21 +5,15 @@ import { routeCodes } from "../../config/routes";
 import PropTypes from "prop-types";
 import { logout, async, fetchUserImgURL } from "../../actions";
 import logoImg20 from "../../assets/img/logo_20.png";
-import loginImg from "../../assets/img/login-img.png";
-import userImgGen from "../../assets/img/userImg.png";
-import book2 from "../../assets/img/book2.jpg";
-import sam20 from "../../assets/img/sam_20.jpg";
-import admixLoading from "../../assets/gifs/admixBreath.gif";
 import defaultImg from "../../assets/img/default_pic.jpg";
 
 import IconButton from "@material-ui/core/IconButton";
-import AccountCircle from "@material-ui/icons/AccountCircle";
 import MenuItem from "@material-ui/core/MenuItem";
 import MUIMenu from "@material-ui/core/Menu";
 
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faUser from "@fortawesome/fontawesome-free-solid/faUser";
-import faSortDown from "@fortawesome/fontawesome-free-solid/faSortDown";
+import faCaretDown from "@fortawesome/fontawesome-free-solid/faCaretDown";
 
 import {
    CLOUDINARY_UPLOAD_PRESET,
@@ -130,17 +124,9 @@ class Menu extends Component {
                <div className="cc" id="steps-container" />
 
                <div id="dropdown-container">
-                  <span className="sst">
-                     {userData.name === undefined ||
-                     userData.name === "" ||
-                     !userData.name
-                        ? "Hello!"
-                        : "Hi, " + userData.name + "!"}
-                  </span>
                   <IconButton
                      aria-owns={open ? "menu-appbar" : null}
                      aria-haspopup="true"
-                     onClick={this.handleDropdown}
                      color="inherit"
                   >
                      {!isLoggedIn && <FontAwesomeIcon icon={faUser} />}
@@ -232,6 +218,7 @@ class Menu extends Component {
                               <a
                                  onClick={this.handleLogout}
                                  className="mb mui-dropdown-item"
+                                 href="/login"
                               >
                                  Logout
                               </a>
@@ -239,6 +226,14 @@ class Menu extends Component {
                         </React.Fragment>
                      )}
                   </MUIMenu>
+                  <span className="sst" onClick={this.handleDropdown}>
+                     {userData.name === undefined ||
+                     userData.name === "" ||
+                     !userData.name
+                        ? "Hello!"
+                        : "Hi, " + userData.name}{" "}
+                     <FontAwesomeIcon icon={faCaretDown} />
+                  </span>
                </div>
 
                {/* <div

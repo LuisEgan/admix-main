@@ -15,7 +15,12 @@ const BankDetails = ({ Field, renderField, region }) => {
 
       r.forEach(setItem => {
          detail.push(
-            <Field key={setItem} name={setItem} component={renderField} />
+            <Field
+               key={setItem}
+               name={setItem}
+               component={renderField}
+               className="mb"
+            />
          );
       });
 

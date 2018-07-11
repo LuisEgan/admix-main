@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Pie } from "react-chartjs-2";
+import { selectApp, getPlacements } from "../../../actions";
+
+import AdmixLoading from "../../../components/SVG/AdmixLoading";
 
 import { colors } from "../../../assets/data/colorsArr";
 
@@ -13,6 +16,7 @@ export default class Performance extends Component {
       super(props);
 
       this.state = {
+         selectedApps: {},
          loadedScene: "",
          selectedPlacement: "",
          sceneClicked: false,
@@ -33,10 +37,14 @@ export default class Performance extends Component {
 
       this.pieColorsAssigned = false;
 
-      this.ControlsRotationToggle = this.ControlsRotationToggle.bind(this);
       this.onAppElementsClick = this.onAppElementsClick.bind(this);
       this.onSceneElementsClick = this.onSceneElementsClick.bind(this);
       this.onPlacementElementsClick = this.onPlacementElementsClick.bind(this);
+
+      this.ControlsRotationToggle = this.ControlsRotationToggle.bind(this);
+      this.addEventListeners = this.addEventListeners.bind(this);
+      this.disposeEventListeners = this.disposeEventListeners.bind(this);
+
       this.setScenesData = this.setScenesData.bind(this);
       this.setPlacementsData = this.setPlacementsData.bind(this);
       this.renderScenesTable = this.renderScenesTable.bind(this);
@@ -62,14 +70,93 @@ export default class Performance extends Component {
    }
 
    componentWillReceiveProps(nextProps) {
-      const { clickedAppId } = this.state;
+      const { clickedAppId, loadedScene } = this.state;
+      const { filteredReportData, selectedApps, isLoadingScene } = nextProps;
 
-      const { filteredReportData } = nextProps;
-      this.setAppsData(filteredReportData);
-      this.setScenesData(filteredReportData, clickedAppId);
-      this.setPlacementsData(filteredReportData);
+      if (Object.keys(selectedApps).length > 0 && !isLoadingScene) {
+         this.setAppsData(filteredReportData, selectedApps);
+         this.setScenesData(filteredReportData, clickedAppId);
+         this.setPlacementsData(filteredReportData, loadedScene);
+      }
    }
 
+   onAppElementsClick(e) {
+      const { filteredReportData, dispatch, accessToken } = this.props;
+      const { clickedAppId } = this.state;
+
+      if (e[0]) {
+         const {
+            _model: { label },
+            _chart: {
+               options: { appClickId }
+            }
+         } = e[0];
+         if (appClickId[label] !== clickedAppId) {
+            this.setState({ clickedAppId: appClickId[label] });
+            this.setScenesData(filteredReportData, appClickId[label]);
+            dispatch(selectApp(appClickId[label], accessToken));
+         }
+      }
+   }
+
+   onSceneElementsClick(e) {
+      const {
+         selectedApp,
+         doLoadScene,
+         filteredReportData
+      } = this.props;
+      const { loadedScene } = this.state;
+      let selectedScene = {};
+
+      if (Object.keys(selectedApp).length > 0) {
+         if (e[0]) {
+            const {
+               _model: { label },
+               _chart: {
+                  options: { sceneClickId }
+               }
+            } = e[0];
+            if (sceneClickId[label] !== loadedScene) {
+               selectedApp.scenes.some(scene => {
+                  if (sceneClickId[label] === scene._id) {
+                     selectedScene = scene;
+                     return true;
+                  }
+                  return false;
+               });
+               doLoadScene(selectedScene);
+               document.body.style.cursor = "alias";
+
+               this.setPlacementsData(filteredReportData, sceneClickId[label]);
+
+               this.setState({
+                  loadedScene: sceneClickId[label],
+                  sceneClicked: true
+               });
+            }
+         }
+      }
+   }
+
+   onPlacementElementsClick(e) {
+      const { selectedPlacement } = this.state;
+
+      if (e[0]) {
+         const {
+            _model: { label },
+            _chart: {
+               options: { placementClickId }
+            }
+         } = e[0];
+         //    moveCamera("__advirObj__banner2");
+         if (placementClickId[label] !== selectedPlacement) {
+            // moveCamera(label);
+            this.setState({ selectedPlacement: placementClickId[label] });
+         }
+      }
+   }
+
+   // CONTROLS
    ControlsRotationToggle(toggle) {
       const {
          isSceneLoaded,
@@ -88,71 +175,39 @@ export default class Performance extends Component {
       }
    }
 
-   onAppElementsClick(e) {
-      const { filteredReportData } = this.props;
-      const { clickedAppId } = this.state;
+   addEventListeners() {
+      const { addEventListeners, isSceneLoaded, isLoadingScene } = this.props;
 
-      if (e[0]) {
-         const {
-            _model: { label },
-            _chart: {
-               options: { appClickId }
-            }
-         } = e[0];
-         if (appClickId[label] !== clickedAppId) {
-            this.setState({ clickedAppId: appClickId[label] });
-            this.setScenesData(filteredReportData, appClickId[label]);
-         }
-      }
+      addEventListeners();
+      (isSceneLoaded || isLoadingScene) &&
+         (document.body.style.cursor = "alias");
    }
 
-   onSceneElementsClick(e) {
-      const { doLoadScene } = this.props;
-      const { loadedScene } = this.state;
+   disposeEventListeners() {
+      const { disposeEventListeners } = this.props;
 
-      if (e[0]) {
-         const {
-            _model: { label },
-            _chart: {
-               options: { sceneClickId }
-            }
-         } = e[0];
-         if (sceneClickId[label] !== loadedScene) {
-            doLoadScene();
-            this.setState({
-               loadedScene: sceneClickId[label],
-               sceneClicked: true
-            });
-         }
-      }
+      disposeEventListeners();
+      document.body.style.cursor = "default";
    }
 
-   onPlacementElementsClick(e) {
-      const { moveCamera } = this.props;
-      const { selectedPlacement } = this.state;
+   // SET DATA
 
-      if (e[0]) {
-         const {
-            _model: { label },
-            _chart: {
-               options: { placementClickId }
-            }
-         } = e[0];
-         moveCamera("__advirObj__banner2");
-         if (placementClickId[label] !== selectedPlacement) {
-            // moveCamera(label);
-            this.setState({ selectedPlacement: placementClickId[label] });
-         }
-      }
-   }
+   setAppsData(filteredReportData, selectedApps) {
+      const { accessToken, dispatch, selectedApp } = this.props;
 
-   setAppsData(filteredReportData) {
-      const { selectedApps } = this.props;
       const pieBackgroundColors = [];
       const pieLabels = [];
       const pieData = [];
 
       let uniqueApps = {};
+
+      if (Object.keys(selectedApp).length > 0) {
+         selectedApp.scenes.forEach(scene => {
+            console.log("selectedApp._id: ", selectedApp._id);
+            console.log("scene._id: ", scene._id);
+            dispatch(getPlacements(selectedApp._id, scene._id, accessToken));
+         });
+      }
 
       // group data by appId
       for (let date in filteredReportData) {
@@ -161,8 +216,10 @@ export default class Performance extends Component {
                // make the sum for each items's revenue, impressions and impressionsUniques
 
                if (uniqueApps[appId]) {
-                  uniqueApps[appId].revenue =
-                     uniqueApps[appId].revenue + item.revenue;
+                  if (item.revenue) {
+                     uniqueApps[appId].revenue =
+                        uniqueApps[appId].revenue + item.revenue;
+                  }
 
                   // this is for all the apps table
                   uniqueApps[appId].impression =
@@ -172,7 +229,7 @@ export default class Performance extends Component {
                      uniqueApps[appId].impressionUnique + item.impressionUnique;
                } else {
                   uniqueApps[appId] = {};
-                  uniqueApps[appId].revenue = item.revenue;
+                  uniqueApps[appId].revenue = item.revenue ? item.revenue : 0;
 
                   // this is for all the tables
                   uniqueApps[appId].impression = item.impression;
@@ -194,7 +251,7 @@ export default class Performance extends Component {
          // for pie graph
          pieBackgroundColors.push(colors[i - 1 + 6]);
          pieLabels.push(appLabel);
-         pieData.push(uniqueApps[appId].revenue);
+         pieData.push(uniqueApps[appId].revenue.toFixed(4));
 
          // to know what app was clicked to load its scenes
          appClickId[appLabel] = appId;
@@ -202,7 +259,7 @@ export default class Performance extends Component {
          // for apps table
          appsTableDataItem.label = appLabel;
          appsTableDataItem.appId = appId;
-         appsTableDataItem.revenue = uniqueApps[appId].revenue;
+         appsTableDataItem.revenue = uniqueApps[appId].revenue.toFixed(4);
          appsTableDataItem.impression = uniqueApps[appId].impression;
          appsTableDataItem.impressionUnique =
             uniqueApps[appId].impressionUnique;
@@ -237,6 +294,7 @@ export default class Performance extends Component {
    // this also sets placementsTableData
    setScenesData(filteredReportData, clickedAppId) {
       // const { clickedAppId } = this.state;
+      const { selectedApp } = this.props;
       const pieBackgroundColors = [];
       const pieLabels = [];
       const pieData = [];
@@ -246,7 +304,24 @@ export default class Performance extends Component {
       // this is for all the placements table
       let uniquePlacements = {};
 
+      let placementsSet = false;
+      const placementsNamesById = {};
+
+      if (selectedApp.scenes && selectedApp.scenes[0].placements) {
+         // add Placements names into filteredReportData
+         selectedApp.scenes.forEach(scene => {
+            scene.placements.forEach(placement => {
+               if (!placementsNamesById[placement._id]) {
+                  placementsNamesById[placement._id] = placement.placementName;
+               }
+            });
+         });
+         console.log("placementsNamesById: ", placementsNamesById);
+         placementsSet = true;
+      }
+
       // group data by scene
+      console.log("filteredReportData: ", filteredReportData);
       for (let date in filteredReportData) {
          for (let appId in filteredReportData[date]) {
             if (appId === clickedAppId) {
@@ -257,25 +332,30 @@ export default class Performance extends Component {
                   // SCENES RUMS
                   // ========
 
-                  if (uniqueScenes[item.sceneId]) {
-                     uniqueScenes[item.sceneId].revenue =
-                        uniqueScenes[item.sceneId].revenue + item.revenue;
+                  if (uniqueScenes[item.keys.sceid]) {
+                     if (item.revenue) {
+                        uniqueScenes[item.keys.sceid].revenue =
+                           uniqueScenes[item.keys.sceid].revenue + item.revenue;
+                     }
 
                      // this is for all the scenes table
-                     uniqueScenes[item.sceneId].impression =
-                        uniqueScenes[item.sceneId].impression + item.impression;
+                     uniqueScenes[item.keys.sceid].impression =
+                        uniqueScenes[item.keys.sceid].impression +
+                        item.impression;
 
-                     uniqueScenes[item.sceneId].impressionUnique =
-                        uniqueScenes[item.sceneId].impressionUnique +
+                     uniqueScenes[item.keys.sceid].impressionUnique =
+                        uniqueScenes[item.keys.sceid].impressionUnique +
                         item.impressionUnique;
                   } else {
-                     uniqueScenes[item.sceneId] = {};
-                     uniqueScenes[item.sceneId].revenue = item.revenue;
-                     uniqueScenes[item.sceneId].sceneId = item.sceneId;
+                     uniqueScenes[item.keys.sceid] = {};
+                     uniqueScenes[item.keys.sceid].revenue = item.revenue
+                        ? item.revenue
+                        : 0;
+                     uniqueScenes[item.keys.sceid].sceneId = item.keys.sceid;
 
                      // this is for all the tables
-                     uniqueScenes[item.sceneId].impression = item.impression;
-                     uniqueScenes[item.sceneId].impressionUnique =
+                     uniqueScenes[item.keys.sceid].impression = item.impression;
+                     uniqueScenes[item.keys.sceid].impressionUnique =
                         item.impressionUnique;
                   }
 
@@ -283,28 +363,43 @@ export default class Performance extends Component {
                   // PLACEMENTS SUMS
                   // ========
 
-                  if (uniquePlacements[item.placementId]) {
-                     uniquePlacements[item.placementId].revenue =
-                        uniquePlacements[item.placementId].revenue +
-                        item.revenue;
+                  if (uniquePlacements[item.keys.plaid]) {
+                     if (item.revenue) {
+                        uniquePlacements[item.keys.plaid].revenue =
+                           uniquePlacements[item.keys.plaid].revenue +
+                           item.revenue;
+                     }
 
-                     uniquePlacements[item.placementId].impression =
-                        uniquePlacements[item.placementId].impression +
+                     uniquePlacements[item.keys.plaid].impression =
+                        uniquePlacements[item.keys.plaid].impression +
                         item.impression;
 
-                     uniquePlacements[item.placementId].impressionUnique =
-                        uniquePlacements[item.placementId].impressionUnique +
+                     uniquePlacements[item.keys.plaid].impressionUnique =
+                        uniquePlacements[item.keys.plaid].impressionUnique +
                         item.impressionUnique;
                   } else {
-                     uniquePlacements[item.placementId] = {};
-                     uniquePlacements[item.placementId].sceneId = item.sceneId;
-                     uniquePlacements[item.placementId].placementId =
-                        item.placementId;
-                     uniquePlacements[item.placementId].revenue = item.revenue;
-                     uniquePlacements[item.placementId].impression =
+                     uniquePlacements[item.keys.plaid] = {};
+
+                     uniquePlacements[item.keys.plaid].sceneId =
+                        item.keys.sceid;
+
+                     uniquePlacements[item.keys.plaid].placementId =
+                        item.keys.plaid;
+
+                     uniquePlacements[item.keys.plaid].revenue = item.revenue
+                        ? item.revenue
+                        : 0;
+
+                     uniquePlacements[item.keys.plaid].impression =
                         item.impression;
-                     uniquePlacements[item.placementId].impressionUnique =
+
+                     uniquePlacements[item.keys.plaid].impressionUnique =
                         item.impressionUnique;
+
+                     if (placementsSet) {
+                        uniquePlacements[item.keys.plaid].placementName =
+                           placementsNamesById[item.keys.plaid];
+                     }
                   }
                });
             }
@@ -328,7 +423,7 @@ export default class Performance extends Component {
          // for pie graph
          pieBackgroundColors.push(colors[i - 1]);
          pieLabels.push(sceneLabel);
-         pieData.push(uniqueScenes[scene].revenue);
+         pieData.push(uniqueScenes[scene].revenue.toFixed(4));
 
          // to know what scene was clicked to load its placements
          sceneClickId[sceneLabel] = uniqueScenes[scene].sceneId;
@@ -336,7 +431,7 @@ export default class Performance extends Component {
          // for scenes table
          scenesTableDataItem.label = sceneLabel;
          scenesTableDataItem.sceneId = uniqueScenes[scene].sceneId;
-         scenesTableDataItem.revenue = uniqueScenes[scene].revenue;
+         scenesTableDataItem.revenue = uniqueScenes[scene].revenue.toFixed(4);
          scenesTableDataItem.impression = uniqueScenes[scene].impression;
          scenesTableDataItem.impressionUnique =
             uniqueScenes[scene].impressionUnique;
@@ -362,7 +457,9 @@ export default class Performance extends Component {
 
          placementsTableDataItem.label =
             uniquePlacements[placement].placementId;
-         placementsTableDataItem.revenue = uniquePlacements[placement].revenue;
+         placementsTableDataItem.revenue = uniquePlacements[
+            placement
+         ].revenue.toFixed(4);
          placementsTableDataItem.impression =
             uniquePlacements[placement].impression;
          placementsTableDataItem.impressionUnique =
@@ -397,9 +494,8 @@ export default class Performance extends Component {
       });
    }
 
-   setPlacementsData(filteredReportData) {
-      // const { filteredReportData } = this.props;
-      const { loadedScene } = this.state;
+   setPlacementsData(filteredReportData, loadedScene) {
+      // const { loadedScene } = this.state;
 
       const pieBackgroundColors = [];
       const pieLabels = [];
@@ -409,21 +505,24 @@ export default class Performance extends Component {
 
       // group data by scene
       for (let date in filteredReportData) {
-         if (!!filteredReportData[date]) {
+         if (filteredReportData[date]) {
             for (let appId in filteredReportData[date]) {
-               if (!!filteredReportData[date][appId]) {
+               if (filteredReportData[date][appId]) {
                   filteredReportData[date][appId].forEach(item => {
-                     if (loadedScene === item.sceneId) {
-                        if (uniquePlacements[item.placementId]) {
-                           uniquePlacements[item.placementId].revenue =
-                              uniquePlacements[item.placementId].revenue +
-                              item.revenue;
+                     if (loadedScene === item.keys.sceid) {
+                        if (uniquePlacements[item.keys.plaid]) {
+                           if (item.revenue) {
+                              uniquePlacements[item.keys.plaid].revenue =
+                                 uniquePlacements[item.keys.plaid].revenue +
+                                 item.revenue;
+                           }
                         } else {
-                           uniquePlacements[item.placementId] = {};
-                           uniquePlacements[item.placementId].revenue =
-                              item.revenue;
-                           uniquePlacements[item.placementId].placementId =
-                              item.placementId;
+                           uniquePlacements[item.keys.plaid] = {};
+                           uniquePlacements[
+                              item.keys.plaid
+                           ].revenue = item.revenue ? item.revenue : 0;
+                           uniquePlacements[item.keys.plaid].placementId =
+                              item.keys.plaid;
                         }
                      }
                   });
@@ -440,7 +539,7 @@ export default class Performance extends Component {
          placementLabel = `Placement ${i}`;
          pieBackgroundColors.push(colors[i - 1]);
          pieLabels.push(placementLabel);
-         pieData.push(uniquePlacements[placement].revenue);
+         pieData.push(uniquePlacements[placement].revenue.toFixed(4));
          placementClickId[placementLabel] =
             uniquePlacements[placement].placementId;
          i++;
@@ -464,6 +563,8 @@ export default class Performance extends Component {
 
       this.setState({ placementsPieData, placementsPieOpts });
    }
+
+   // RENDER
 
    renderDropdown() {
       return (
@@ -498,7 +599,7 @@ export default class Performance extends Component {
       return (
          <table className="table table-bordered reportTable">
             <thead>
-               <tr className="st">
+               <tr className="sst">
                   <th scope="col">Scene name</th>
                   <th scope="col">Impressions</th>
                   <th scope="col">Revenue</th>
@@ -511,9 +612,9 @@ export default class Performance extends Component {
                   return (
                      <tr className="mb" key={label}>
                         <td>{label}</td>
-                        <td>{this.numberWithCommas(impression)}</td>
-                        <td>$ {this.numberWithCommas(revenue)}</td>
-                        <td>{this.numberWithCommas(impressionUnique)}</td>
+                        <td>{impression}</td>
+                        <td>$ {revenue}</td>
+                        <td>{impressionUnique}</td>
                      </tr>
                   );
                })}
@@ -528,7 +629,7 @@ export default class Performance extends Component {
       return (
          <table className="table table-bordered reportTable">
             <thead>
-               <tr className="st">
+               <tr className="sst">
                   <th scope="col">Placement name</th>
                   <th scope="col">Impressions</th>
                   <th scope="col">Revenue</th>
@@ -545,11 +646,14 @@ export default class Performance extends Component {
                      impressionUnique
                   } = data;
                   return (
-                     <tr className="mb" key={`${label} (${sceneLabel})`}>
+                     <tr
+                        className="mb"
+                        key={`${label} (${sceneLabel}) ${Math.random()}`}
+                     >
                         <td>{`${label} (${sceneLabel})`}</td>
-                        <td>{this.numberWithCommas(impression)}</td>
-                        <td>$ {this.numberWithCommas(revenue)}</td>
-                        <td>{this.numberWithCommas(impressionUnique)}</td>
+                        <td>{impression}</td>
+                        <td>$ {revenue}</td>
+                        <td>{impressionUnique}</td>
                      </tr>
                   );
                })}
@@ -559,7 +663,11 @@ export default class Performance extends Component {
    }
 
    render() {
-      const { isSceneLoaded, isLoadingScene } = this.props;
+      const {
+         isSceneLoaded,
+         isLoadingScene,
+         progressLoadingScene
+      } = this.props;
 
       let {
          clickedAppId,
@@ -589,9 +697,9 @@ export default class Performance extends Component {
                <div>
                   {/* {this.renderDropdown()} */}
                   <div className="report-title">
-                     <h5 className="st">Apps revenue</h5>
+                     <h5 className="sst">Apps revenue</h5>
                   </div>
-                  <span className="st">Select an app below</span>
+                  <span className="mb">Select an app below</span>
                   <Pie
                      data={appsPieData}
                      options={appsPieOpts}
@@ -606,9 +714,9 @@ export default class Performance extends Component {
                <div>
                   {/* {this.renderDropdown()} */}
                   <div className="report-title">
-                     <h5 className="st">Scenes revenue</h5>
+                     <h5 className="sst">Scenes revenue</h5>
                   </div>
-                  <span className="st">{sceneTxt}</span>
+                  <span className="mb">{sceneTxt}</span>
                   {clickedAppId.length > 0 && (
                      <Pie
                         data={scenesPieData}
@@ -623,8 +731,11 @@ export default class Performance extends Component {
                </div>
 
                <div>
-                  {this.renderDropdown()}
-                  <span className="st">{placementTxt}</span>
+                  {/* {this.renderDropdown()} */}
+                  <div className="report-title">
+                     <h5 className="sst">Placements revenue</h5>
+                  </div>
+                  <span className="mb">{placementTxt}</span>
                   {sceneClicked && (
                      <Pie
                         data={placementsPieData}
@@ -637,24 +748,34 @@ export default class Performance extends Component {
 
             <div
                id="performance-webgl"
-               onMouseLeave={this.ControlsRotationToggle.bind(null, "disable")}
-               onMouseEnter={this.ControlsRotationToggle.bind(null, "enable")}
+               onMouseLeave={this.disposeEventListeners}
+               onMouseEnter={this.addEventListeners}
                style={webglStyle}
             >
                <div id="performance-webgl-left-bar" />
                <div id="performance-webgl-right-bar" />
                <div id="performance-webgl-choose">
-                  {!isSceneLoaded &&
-                     !isLoadingScene && <div id="report-webgl-idle" />}
-                  {isLoadingScene && (
-                     <div id="report-webgl-loading">
-                        <h3 className="st">Loading Scene...</h3>
+                  {!isSceneLoaded && (
+                     <div id="report-webgl-idle" className="cc mb">
+                        {!isLoadingScene && (
+                           <React.Fragment>
+                              <span id="tv" role="img" aria-label="tv">
+                                 📺
+                              </span>
+                              <br />
+                              <span>Your scene will load here</span>
+                           </React.Fragment>
+                        )}
+                        {isLoadingScene && (
+                           <div id="report-webgl-loading">
+                              {<AdmixLoading loadingText="Loading" />}
+                              <h3 className="st">{progressLoadingScene}%</h3>
+                           </div>
+                        )}
                      </div>
                   )}
                   {isSceneLoaded && (
-                     <div id="report-webgl-display" className="st">
-                        {}
-                     </div>
+                     <div id="report-webgl-display" className="st" />
                   )}
                </div>
             </div>

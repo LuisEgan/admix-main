@@ -524,9 +524,17 @@ class Login extends Component {
 
                   {/* BUTTON */}
                   <div className="login-btn cc">
+                     {/* loading */}
                      {asyncLoading && loadingIcon}
+
+                     {/* error */}
                      {asyncError && <p>Error: {asyncError}</p>}
-                     {asyncData !== null && <p>{asyncData.mssg}</p>}
+
+                     {/* success message */}
+                     {asyncData !== null &&
+                        !asyncError && <p>{asyncData.mssg}</p>}
+
+                     {/* button */}
                      {!asyncLoading &&
                         !asyncError &&
                         !asyncData && (

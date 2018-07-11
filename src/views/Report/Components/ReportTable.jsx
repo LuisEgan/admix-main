@@ -31,10 +31,12 @@ export default class WebGLScene extends Component {
    render() {
       const { reportData } = this.props;
 
+      if (reportData[0].previousPeriods === "") return null;
+
       return (
          <table className="table table-bordered reportTable">
             <thead>
-               <tr className="st">
+               <tr className="sst">
                   <th scope="col">Previous periods</th>
                   <th scope="col">Impressions</th>
                   <th scope="col">Revenue</th>
@@ -48,7 +50,7 @@ export default class WebGLScene extends Component {
                      <tr className="mb" key={previousPeriods}>
                         <td>{previousPeriods}</td>
                         <td>
-                           {this.numberWithCommas(impressions.value)}
+                           {impressions.value}
                            <span
                               className={`perc ${this.gc(impressions.growth)}`}
                            >
@@ -56,13 +58,13 @@ export default class WebGLScene extends Component {
                            </span>
                         </td>
                         <td>
-                           $ {this.numberWithCommas(revenue.value)}
+                           $ {revenue.value}
                            <span className={`perc ${this.gc(revenue.growth)}`}>
                               {this.parseGrowth(revenue.growth)}
                            </span>
                         </td>
                         <td>
-                           {this.numberWithCommas(impressions.value)}
+                           {impressions.value}
                            <span
                               className={`perc ${this.gc(impressions.growth)}`}
                            >

@@ -4,8 +4,20 @@ import { routeCodes } from "../../../config/routes";
 import PropTypes from "prop-types";
 import { getPlacements, resetSelectedApp } from "../../../actions/";
 
+import FormControl from "@material-ui/core/FormControl";
+import Input from "@material-ui/core/Input";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import FormLabel from "@material-ui/core/FormLabel";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faMousePointer from "@fortawesome/fontawesome-free-solid/faMousePointer";
+import faCubes from "@fortawesome/fontawesome-free-solid/faCubes";
+import faTable from "@fortawesome/fontawesome-free-solid/faTable";
 
 import MouseScroll from "../../../components/SVG/MouseScroll";
 import RightClick from "../../../components/SVG/RightClick";
@@ -31,6 +43,7 @@ export default class MenuPanel extends Component {
 
       // If true = panel is slided in
       this.state = {
+         displayMode: "3D",
          slidedIn: false,
          selectedScene: "",
          showHappyInfoBox: false,
@@ -39,9 +52,11 @@ export default class MenuPanel extends Component {
 
       this.toggleSlide = this.toggleSlide.bind(this);
       this.goBack = this.goBack.bind(this);
-      this.sceneOnClick = this.sceneOnClick.bind(this);
+      this.sceneChange = this.sceneChange.bind(this);
+      this.displayChange = this.displayChange.bind(this);
       this.toggleDropdowns = this.toggleDropdowns.bind(this);
       this.onHappyBtn = this.onHappyBtn.bind(this);
+      this.renderDisplayModeToggle = this.renderDisplayModeToggle.bind(this);
    }
 
    toggleSlide() {
@@ -56,25 +71,62 @@ export default class MenuPanel extends Component {
       dispatch(resetSelectedApp());
    }
 
-   sceneOnClick(scene) {
+   toggleDropdowns(forceClose = false) {
+      const { forceCloseFormPanel } = this.props;
+      let { showDdScenes } = this.state;
+      forceCloseFormPanel();
+      showDdScenes = forceClose ? false : !showDdScenes;
+      this.setState({ showDdScenes });
+   }
+
+   handleDropdown = event => {
+      this.setState({ anchorEl: event.currentTarget });
+   };
+
+   handleClose = () => {
+      this.setState({ anchorEl: null });
+   };
+
+   onHappyBtn(container = "") {
+      const { saveClicked } = this.props;
+      const { showHappyInfoBox } = this.state;
+      if (!saveClicked) {
+         if (container === "happyBtnCont") {
+            if (!showHappyInfoBox) return;
+         }
+         this.setState({ showHappyInfoBox: !showHappyInfoBox });
+      }
+   }
+
+   sceneChange(e) {
+      const sceneName = e.target.value;
+      let scene;
       const {
          loadScene,
          selectScene,
          dispatch,
          accessToken,
-         selectedApp: { _id },
+         selectedApp: { _id, scenes },
          activeClickedElem
       } = this.props;
-      const sceneId = scene._id;
+
+      //Get scene's ID
+      scenes.some(s => {
+         if (s.name === sceneName) {
+            scene = s;
+            return true;
+         }
+         return false;
+      });
 
       // Get scene's placements
-      dispatch(getPlacements(_id, sceneId, accessToken));
+      dispatch(getPlacements(_id, scene._id, accessToken));
 
       // Hide Menu panel
       // this.toggleSlide();
 
       // Change dropdown scene display
-      this.setState({ selectedScene: scene.name });
+      this.setState({ selectedScene: sceneName });
 
       // Set Scene (parent parent component /Scene index) selectedScene state
       selectScene(scene);
@@ -88,86 +140,95 @@ export default class MenuPanel extends Component {
       }, 1500);
    }
 
-   toggleDropdowns(forceClose = false) {
-      const { forceCloseFormPanel } = this.props;
-      let { showDdScenes } = this.state;
-      forceCloseFormPanel();
-      showDdScenes = forceClose ? false : !showDdScenes;
-      this.setState({ showDdScenes });
+   displayChange(e) {
+      const { setDisplayMode } = this.props;
+      this.setState({ displayMode: e.target.value });
+
+      // for /Scene (grandparent) to know which display mode is selected
+      setDisplayMode(e.target.value);
    }
 
    renderScenesSelect() {
-      const { asyncLoading, selectedApp } = this.props;
-      let { selectedScene, showDdScenes } = this.state;
+      const { selectedApp } = this.props;
+      let { selectedScene } = this.state;
       const { scenes } = selectedApp;
-      const loadingIcon = <p>Loading...</p>;
-      let dropdown = "";
 
-      dropdown = scenes.map(scene => {
+      const allScenes = scenes.map(scene => {
          const { name } = scene;
          return (
-            <a
-               className="dropdown-item mb"
-               onClick={this.sceneOnClick.bind(null, scene)}
-               key={name}
-            >
+            <MenuItem value={name} key={name} className="mb">
                {name}
-            </a>
+            </MenuItem>
          );
       });
 
-      if (asyncLoading) {
-         dropdown = loadingIcon;
-      }
-
-      if (selectedScene.length === 0) {
-         selectedScene = "Select your scene";
-      }
-
-      let showDropdown = showDdScenes ? "show" : "";
-
       return (
-         <div
-            className="btn-group"
-            onMouseLeave={this.toggleDropdowns.bind(null, true)}
-         >
-            <button
-               type="button"
-               className="btn btn-secondary dropdown-title mb"
+         <FormControl className="fw" id="scenesDropdown">
+            <InputLabel htmlFor="scene-helper" className="mb">
+               Scene selection
+            </InputLabel>
+            <Select
+               value={selectedScene}
+               onChange={this.sceneChange}
+               input={<Input name="scene" id="scene-helper" />}
+               className="mb"
             >
-               {selectedScene}
-            </button>
-            <button
-               type="button"
-               className="btn btn-secondary dropdown-toggle dropdown-toggle-split mb"
-               onClick={this.toggleDropdowns.bind(null, false)}
-            >
-               <span className="sr-only">{selectedScene}</span>
-            </button>
-            <div
-               className={`dropdown-menu ${showDropdown}`}
-               onMouseLeave={this.toggleDropdowns.bind(null, true)}
-            >
-               {dropdown}
-            </div>
-         </div>
+               <MenuItem value="" className="mb">
+                  <em>Please select a scene</em>
+               </MenuItem>
+               {allScenes}
+            </Select>
+         </FormControl>
       );
-
-      // return scenes.map( scene => {
-      //     const { name } = scene;
-      //     return <button className="btn btn-light" onClick={this.sceneOnClick.bind(null, scene)} key={name}>{name}</button>
-      // });
    }
 
-   onHappyBtn(container = "") {
-      const { saveClicked } = this.props;
-      const { showHappyInfoBox } = this.state;
-      if (!saveClicked) {
-         if (container === "happyBtnCont") {
-            if (!showHappyInfoBox) return;
-         }
-         this.setState({ showHappyInfoBox: !showHappyInfoBox });
-      }
+   renderDisplayModeToggle() {
+      const { asyncLoading } = this.props;
+      const { displayMode } = this.state;
+
+      const style3D = displayMode === "3D" ? { background: "#f2f2f2" } : {};
+      const styleRaw = displayMode === "raw" ? { background: "#f2f2f2" } : {};
+
+      return (
+         <FormControl component="fieldset" id="displayRadios">
+            <FormLabel component="legend" className="mb">
+               Display Mode
+            </FormLabel>
+            <RadioGroup
+               aria-label="display"
+               name="display1"
+               value={displayMode}
+               onChange={this.displayChange}
+            >
+               <FormControlLabel
+                  style={style3D}
+                  value="3D"
+                  control={<Radio className="hidden" />}
+                  disabled={asyncLoading}
+                  label={
+                     <div className="radio-btn">
+                        <FontAwesomeIcon className="faIcon" icon={faCubes} />
+                        <br />
+                        3D
+                     </div>
+                  }
+               />
+               <FormControlLabel
+                  style={styleRaw}
+                  value="raw"
+                  control={<Radio className="hidden" />}
+                  disabled={asyncLoading}
+                  label={
+                     <div className="radio-btn">
+                        <FontAwesomeIcon className="faIcon" icon={faTable} />
+                        <br />
+                        Raw data
+                     </div>
+                  }
+               />
+            </RadioGroup>
+         </FormControl>
+      );
    }
 
    renderControls() {
@@ -203,10 +264,10 @@ export default class MenuPanel extends Component {
    }
 
    render() {
-      const { selectedApp, location, mouseOnPanel, sceneMounted } = this.props;
+      const { selectedApp, location, sceneMounted } = this.props;
+      const { displayMode } = this.state;
 
       if (!selectedApp || Object.keys(selectedApp).length < 3) {
-         alert("No app selected!");
          return (
             <Redirect
                to={{
@@ -219,7 +280,7 @@ export default class MenuPanel extends Component {
 
       const { slidedIn, showHappyInfoBox } = this.state;
 
-      const slideAnim = slidedIn ? "slideOutLeft" : "slideInLeft";
+      const slideAnim = slidedIn ? "slidePanelOutLeft" : "slidePanelInLeft";
       const arrow = slidedIn ? "right" : "left";
 
       const happyInfoBoxStyle = showHappyInfoBox
@@ -227,11 +288,7 @@ export default class MenuPanel extends Component {
          : { display: "none" };
 
       return (
-         <div
-            className={`container panel ${slideAnim} menu-panel`}
-            onMouseEnter={mouseOnPanel}
-            onMouseLeave={mouseOnPanel}
-         >
+         <div className={`container panel ${slideAnim} menu-panel`}>
             <div
                className={`panel-toggle-btn cc ${arrow}`}
                onClick={this.toggleSlide}
@@ -247,7 +304,7 @@ export default class MenuPanel extends Component {
 
             {this.renderScenesSelect()}
 
-            <hr />
+            <br />
 
             <div
                id="happy-btn"
@@ -265,30 +322,11 @@ export default class MenuPanel extends Component {
                >
                   Finish Editing
                </NavLink>
-               {/* {saveClicked && (
-                  <NavLink
-                     exact
-                     to={routeCodes.VALIDATION}
-                     className="btn btn-dark"
-                  >
-                     Finish Editing
-                  </NavLink>
-               )}
-
-               {!saveClicked && (
-                  <div
-                     id="disabledBtnContainer"
-                     onMouseEnter={this.onHappyBtn}
-                     onMouseLeave={this.onHappyBtn}
-                  >
-                     <button className="btn btn-dark" disabled>
-                        Finish Editing
-                     </button>
-                  </div>
-               )} */}
             </div>
 
-            {sceneMounted && this.renderControls()}
+            {this.renderDisplayModeToggle()}
+
+            {sceneMounted && displayMode === "3D" && this.renderControls()}
          </div>
       );
    }

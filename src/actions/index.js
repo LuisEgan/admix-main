@@ -395,14 +395,12 @@ export const getApps = (accessToken, filterBy = []) => dispatch => {
       //    api
       //       .isAdmin(accessToken)
       //       .then(response => {
-      //          console.log("response: ", response);
       //          if (response.status) {
       //             api
       //                .getAppsAdmin(accessToken, data)
       //                .then(data => dispatch(showApps(data)))
       //                .catch(error => dispatch(asyncError(error)));
       //          } else {
-      //             console.log("data: ", data);
       //             api
       //                .getApps(accessToken, data)
       //                .then(data => dispatch(showApps(data)))
@@ -538,28 +536,33 @@ export const updatePlacements = (accessToken, data) => dispatch => {
 export const getReportData = (isAdmin, appsIds, accessToken) => dispatch => {
       dispatch(asyncStart());
 
-      // const currentDate = new Date();
+      const currentDate = new Date();
 
-      // const data = {
-      //       startDate: {
-      //             year: 2018,
-      //             month: 1,
-      //             day: 1
-      //       },
-      //       endDate: {
-      //             year: currentDate.getFullYear(),
-      //             month: currentDate.getMonth(),
-      //             day: currentDate.getDate()
-      //       }
-      // }
+      const data = {
+            startDate: {
+                  year: 2018,
+                  month: 1,
+                  day: 1
+            },
+            endDate: {
+                  year: currentDate.getFullYear(),
+                  month: currentDate.getMonth(),
+                  day: currentDate.getDate()
+            }
+      }
 
-      // api
-      //       .getReportData(accessToken, data)
-      //       .then(res => dispatch(sendReportData(res)))
-      //       .catch(error => dispatch(asyncError(error)));
+      api
+            .getReportData(accessToken, data)
+            .then(res => {
+                  dispatch(sendReportData(res))
+            })
+            .catch(error => {
+                  console.log('error: ', error);
+                  dispatch(asyncError(error))
+            });
 
-      const reportData = api.getReportData(appsIds);
-      dispatch(sendReportData(reportData));
+      // const reportData = api.getReportData(appsIds);
+      // dispatch(sendReportData(reportData));
 };
 
 export const setInitialReportApp = appId => dispatch => {

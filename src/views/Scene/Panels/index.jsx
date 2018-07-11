@@ -63,12 +63,25 @@ class Panels extends Component {
       this.setState(state);
    }
 
+   // MENU PANEL METHODS -------------------------------------
+
+   // FORM PANEL METHODS -------------------------------------
+
    forceCloseFormPanel() {
       this.FormPanel.forceClose();
    }
 
+   renderFormDropdown(input) {
+      this.FormPanel.renderDropdown(input);
+   }
+
+   renderFormActiveToggle() {
+      this.FormPanel.renderActiveToggle();
+   }
+
    render() {
       const {
+         asyncLoading,
          selectedApp,
          savedApps,
          loadScene,
@@ -80,13 +93,30 @@ class Panels extends Component {
          clickedPlacement,
          sceneMounted,
          mouseOnPanel,
-         updateClickedPlacement
+         updateClickedPlacement,
+         setDisplayMode
       } = this.props;
 
       const { saveClicked } = this.state;
 
       return (
          <div>
+            <MenuPanel
+               asyncLoading={asyncLoading}
+               mouseOnPanel={mouseOnPanel}
+               loadScene={loadScene}
+               dispatch={dispatch}
+               selectedApp={selectedApp}
+               slidesManager={this.slidesManager}
+               selectScene={selectScene}
+               accessToken={accessToken}
+               activeClickedElem={this.activeClickedElem}
+               saveClicked={saveClicked}
+               sceneMounted={sceneMounted}
+               forceCloseFormPanel={this.forceCloseFormPanel}
+               setDisplayMode={setDisplayMode}
+            />
+
             <FormPanel
                ref={i => (this.FormPanel = i)}
                mouseOnPanel={mouseOnPanel}
@@ -100,25 +130,6 @@ class Panels extends Component {
                sceneMounted={sceneMounted}
                updateClickedPlacement={updateClickedPlacement}
                activeClickedElem={this.activeClickedElem}
-            />
-
-            {/* <Instructions
-                    slidesManager={this.slidesManager}
-                    sceneClicked={sceneClicked}
-                /> */}
-
-            <MenuPanel
-               mouseOnPanel={mouseOnPanel}
-               loadScene={loadScene}
-               dispatch={dispatch}
-               selectedApp={selectedApp}
-               slidesManager={this.slidesManager}
-               selectScene={selectScene}
-               accessToken={accessToken}
-               activeClickedElem={this.activeClickedElem}
-               saveClicked={saveClicked}
-               sceneMounted={sceneMounted}
-               forceCloseFormPanel={this.forceCloseFormPanel}
             />
          </div>
       );

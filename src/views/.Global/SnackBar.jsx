@@ -35,7 +35,7 @@ class SnackBar extends Component {
    }
 
    render() {
-      let { isSnackBarOpen, asyncData, asyncError } = this.props;
+      let { isSnackBarOpen, asyncData, asyncError, isLoggedIn } = this.props;
       let { smiley } = this.state;
 
       let snackbarClass = "";
@@ -48,12 +48,12 @@ class SnackBar extends Component {
       return (
          <Snackbar
             id="snackbar"
-            className={snackbarClass}
+            className={`${snackbarClass} mb`}
             anchorOrigin={{
                vertical: "bottom",
                horizontal: "right"
             }}
-            open={isSnackBarOpen}
+            open={isLoggedIn ? isSnackBarOpen : false}
             autoHideDuration={5000}
             onClose={this.handleClose}
             ContentProps={{

@@ -39,6 +39,8 @@ import faEye from "@fortawesome/fontawesome-free-solid/faEye";
 import faMoneyCheckAlt from "@fortawesome/fontawesome-free-solid/faMoneyCheckAlt";
 import faUniversity from "@fortawesome/fontawesome-free-solid/faUniversity";
 
+import AdmixLoading from "../../components/SVG/AdmixLoading";
+
 import BankDetails from "./BankDetails";
 
 import {
@@ -142,7 +144,6 @@ class Profile extends Component {
                      initialValue !== "password" &&
                      initialValue !== "email"
                   ) {
-                     console.log("initialValue: ", initialValue);
                      dispatch(change("profileForm", initialValue, ""));
                   }
                }
@@ -270,6 +271,7 @@ class Profile extends Component {
          }
          label = "Name";
       } else if (input.name === "email") {
+         input.value = initialValues.email;
          const warningStyle = isWarningVisible
             ? { color: "red", opacity: 1 }
             : { color: "red", opacity: 0 };
@@ -310,6 +312,7 @@ class Profile extends Component {
                disabled={disabled}
                helperText={helperText}
                type={type}
+               className="mb"
             />
          </div>
       );
@@ -351,12 +354,25 @@ class Profile extends Component {
                                  onDrop={this.onImageDrop}
                                  className="dropzone"
                               >
-                                 <img
-                                    src={userData.cloudinaryImgURL}
-                                    onError={e => (e.target.src = defaultImg)}
-                                    alt="+"
-                                 />
-                                 <FontAwesomeIcon icon={faEdit} />
+                                 {!asyncLoading && (
+                                    <React.Fragment>
+                                       <img
+                                          src={userData.cloudinaryImgURL}
+                                          onError={e =>
+                                             (e.target.src = defaultImg)
+                                          }
+                                          alt="+"
+                                       />
+                                       <FontAwesomeIcon
+                                          className="fa"
+                                          icon={faEdit}
+                                       />
+                                    </React.Fragment>
+                                 )}
+
+                                 {asyncLoading && (
+                                    <AdmixLoading loadingText="" />
+                                 )}
                               </Dropzone>
                            </div>
                         </div>
@@ -378,11 +394,12 @@ class Profile extends Component {
                                  <h2 className="sst">Personal Information</h2>
                               </div>
                            </ExpansionPanelSummary>
-                           <ExpansionPanelDetails>
+                           <ExpansionPanelDetails className="mb">
                               <div className="expansionPanelDetails-container">
                                  <Field
                                     name="userName"
                                     component={this.renderField}
+                                    className="mb"
                                  />
                                  <Field
                                     name="email"
@@ -400,6 +417,7 @@ class Profile extends Component {
                                        helperText={passhelperText}
                                        type={passInputType}
                                        value={initialValues.password}
+                                       readOnly={true}
                                     />
                                     <FontAwesomeIcon
                                        icon={faEye}
@@ -470,7 +488,10 @@ class Profile extends Component {
                                     className="fadeIn"
                                  >
                                     <FormControl>
-                                       <InputLabel htmlFor="region-helper">
+                                       <InputLabel
+                                          htmlFor="region-helper"
+                                          className="mb"
+                                       >
                                           Region
                                        </InputLabel>
                                        <Select
@@ -485,17 +506,20 @@ class Profile extends Component {
                                                 id="region-helper"
                                              />
                                           }
+                                          className="mb"
                                        >
-                                          <MenuItem value="">
+                                          <MenuItem className="mb" value="">
                                              <em>Please select a region</em>
                                           </MenuItem>
-                                          <MenuItem value="usa">
+                                          <MenuItem className="mb" value="usa">
                                              United States of America
                                           </MenuItem>
-                                          <MenuItem value="uk">
+                                          <MenuItem className="mb" value="uk">
                                              Uniter Kingdom
                                           </MenuItem>
-                                          <MenuItem value="eu">Europe</MenuItem>
+                                          <MenuItem className="mb" value="eu">
+                                             Europe
+                                          </MenuItem>
                                        </Select>
                                        <FormHelperText>
                                           Don't see your country yet? You can
@@ -534,6 +558,7 @@ class Profile extends Component {
                         variant="contained"
                         color="primary"
                         onClick={this.handleSubmit}
+                        className="mb"
                      >
                         Save
                      </Button>
