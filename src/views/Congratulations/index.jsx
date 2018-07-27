@@ -17,7 +17,7 @@ export default class Congratulations extends Component {
          return (
             <Redirect
                to={{
-                  pathname: routeCodes.SETUP,
+                  pathname: routeCodes.MYAPPS,
                   state: { from: location }
                }}
             />
@@ -40,7 +40,7 @@ export default class Congratulations extends Component {
                      <br />
                      follow the progress of your campaign. <br />
                   </h3>
-                  <a href="/setup" className="btn btn-dark">
+                  <a href="/myapps" className="btn btn-dark">
                      Go to dashboard
                   </a>
                </div>

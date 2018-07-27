@@ -53,6 +53,7 @@ class Report extends Component {
          show: "pe",
          from: new Date(),
          to: new Date(),
+         initialDateSetup: false,
          doLoadScene: false,
          isSceneLoaded: false,
          isLoadingScene: false,
@@ -68,20 +69,10 @@ class Report extends Component {
       this.show = this.show.bind(this);
       this.changeDate = this.changeDate.bind(this);
       this.quickFilter = this.quickFilter.bind(this);
+
+      this.TJSclear = this.TJSclear.bind(this);
       this.doLoadScene = this.doLoadScene.bind(this);
       this.moveCamera = this.moveCamera.bind(this);
-      this.TrackballControlsEnableWheel = this.TrackballControlsEnableWheel.bind(
-         this
-      );
-      this.TrackballControlsDisableWheel = this.TrackballControlsDisableWheel.bind(
-         this
-      );
-      this.noPointerLockControlsRotation = this.noPointerLockControlsRotation.bind(
-         this
-      );
-      this.yesPointerLockControlsRotation = this.yesPointerLockControlsRotation.bind(
-         this
-      );
 
       this.addEventListeners = this.addEventListeners.bind(this);
       this.disposeEventListeners = this.disposeEventListeners.bind(this);
@@ -96,7 +87,6 @@ class Report extends Component {
       const { apps, initialReportAppId } = this.props;
       let selectedApps = {};
       let allAppsSelected = false;
-      this.quickFilter("a");
 
       const userApps = {};
       apps.forEach(app => {
@@ -121,23 +111,41 @@ class Report extends Component {
       this.disposeEventListeners();
    }
 
-   // =========
-   // WebGL Methods
-   // =========
+   static getDerivedStateFromProps(nextProps, prevState) {
+      const { reportData } = nextProps;
+      const { initialDateSetup } = prevState;
+
+      if (Object.keys(reportData).length > 0 && !initialDateSetup) {
+         const keys = Object.keys(reportData).sort();
+         const first = keys[0];
+         const last = keys[keys.length - 1];
+         return {
+            initialDateSetup: true,
+            from: new Date(first),
+            to: new Date(last)
+         };
+      }
+
+      return null;
+   }
+
+   // WebGL Methods -----------------------------------------
+
+   TJSclear() {
+      this.webGL.clear({});
+      this.setState({
+         doLoadScene: false,
+         isSceneLoaded: false,
+         isLoadingScene: false
+      });
+   }
+
    doLoadScene(selectedScene) {
       this.webGL.loadScene(selectedScene);
    }
 
    moveCamera(selectedPlacement) {
       this.webGL.moveCamera(selectedPlacement);
-   }
-
-   TrackballControlsEnableWheel() {
-      this.webGL.TrackballControlsEnableWheel();
-   }
-
-   TrackballControlsDisableWheel() {
-      this.webGL.TrackballControlsDisableWheel();
    }
 
    confirmSceneLoaded(isSceneLoaded) {
@@ -152,13 +160,6 @@ class Report extends Component {
       this.setState({ progressLoadingScene: loadingProgress });
    }
 
-   noPointerLockControlsRotation() {
-      this.webGL.noPointerLockControlsRotation();
-   }
-   yesPointerLockControlsRotation() {
-      this.webGL.yesPointerLockControlsRotation();
-   }
-
    addEventListeners() {
       this.webGL.addEventListeners();
    }
@@ -167,9 +168,8 @@ class Report extends Component {
       this.webGL.disposeEventListeners();
    }
 
-   // =========
-   // Date manipulation
-   // =========
+   // Date manipulation -----------------------------------------
+
    parseDate(date) {
       return date.toISOString().split("T")[0];
    }
@@ -197,9 +197,8 @@ class Report extends Component {
       this.setState(newState);
    }
 
-   // =========
-   // Data manipulation
-   // =========
+   // Data manipulation -----------------------------------------
+
    filteredData(customFrom = null, customTo = null) {
       const { reportData } = this.props;
       const { from, to, selectedApps } = this.state;
@@ -212,25 +211,15 @@ class Report extends Component {
       let filteredDataObj = {};
 
       if (!_.isEmpty(reportData)) {
-         console.log("\n\n================================\n\n");
-         console.log("reportData: ", reportData);
          filteredDates.forEach(date => {
             const parsedDate = this.parseDate(date);
-            console.log("parsedDate: ", parsedDate);
-            console.log(
-               "reportData[" + parsedDate + "]: ",
-               reportData[parsedDate]
-            );
 
             // check if there's data (from db) in the date specified by user
             if (reportData[parsedDate]) {
-               console.log("IN");
                // loop through each app data in each report date specified by user
                for (let appId in reportData[parsedDate]) {
                   // check if the app is among the selected apps by the user
                   if (selectedApps[appId]) {
-                     console.log("IN - IN");
-
                      if (!filteredDataObj[parsedDate])
                         filteredDataObj[parsedDate] = {};
                      filteredDataObj[parsedDate][appId] = _.cloneDeep(
@@ -239,13 +228,11 @@ class Report extends Component {
                   }
                }
             } else {
-               console.log("OUT");
                filteredDataObj[parsedDate] = null;
             }
          });
       }
 
-      console.log("filteredDataObj: ", filteredDataObj);
       return filteredDataObj;
    }
 
@@ -355,9 +342,8 @@ class Report extends Component {
       }
    }
 
-   // =========
-   // Render Methods
-   // =========
+   // Render Methods -----------------------------------------
+
    renderAppsDropdown() {
       const { userApps, selectedApps, allAppsSelected } = this.state;
       const selectedAppsDisplay = [];
@@ -435,7 +421,8 @@ class Report extends Component {
          isLoad_webgl,
          reportData,
          userData,
-         selectedApp
+         selectedApp,
+         placementsByApp
       } = this.props;
 
       const owAct = show("ow") ? "active" : "";
@@ -561,25 +548,15 @@ class Report extends Component {
                   reportData={reportData}
                   dispatch={dispatch}
                   accessToken={accessToken}
+                  TJSclear={this.TJSclear}
                   selectedApp={selectedApp}
                   selectedApps={selectedApps}
+                  placementsByApp={placementsByApp}
                   filteredReportData={filteredData()}
                   fromDate={from}
                   toDate={to}
                   doLoadScene={this.doLoadScene}
                   moveCamera={this.moveCamera}
-                  TrackballControlsEnableWheel={
-                     this.TrackballControlsEnableWheel
-                  }
-                  TrackballControlsDisableWheel={
-                     this.TrackballControlsDisableWheel
-                  }
-                  noPointerLockControlsRotation={
-                     this.noPointerLockControlsRotation
-                  }
-                  yesPointerLockControlsRotation={
-                     this.yesPointerLockControlsRotation
-                  }
                   addEventListeners={this.addEventListeners}
                   disposeEventListeners={this.disposeEventListeners}
                   isSceneLoaded={isSceneLoaded}
@@ -601,6 +578,7 @@ const mapStateToProps = state => ({
    accessToken: state.app.get("accessToken"),
    userData: state.app.get("userData"),
    selectedApp: state.app.get("selectedApp"),
+   placementsByApp: state.app.get("placementsByApp"),
    reportData: state.app.get("reportData"),
    initialReportAppId: state.app.get("initialReportAppId"),
    isLoad_webgl: state.app.get("load_webgl")

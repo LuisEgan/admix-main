@@ -21,10 +21,12 @@ import {
       REGISTER_SUCCESS,
       APPS_SUCCESS,
       SELECT_APP,
+      UPDATE_APP,
       RESET_SELECTED_APP,
       SAVE_APP,
       SET_PLACEMENT,
       SET_PLACEMENTS,
+      SET_PLACEMENTS_BY_APP,
       SAVE_INPUTS,
       RESET_SAVED_INPUTS,
       TOGGLE_APP_STATUS,
@@ -51,12 +53,13 @@ export const initialState = Map({
       userData: {},
       apps: [],
       selectedApp: {},
+      placementsByApp: {},
       savedApps: [],
       savedInputs: [],
       load_webgl: false,
       reportData: {},
       initialReportAppId: [],
-      userImgURL: ""
+      userImgURL: "",
 });
 
 const actionsMap = {
@@ -303,6 +306,22 @@ const actionsMap = {
                   })
             );
       },
+      [UPDATE_APP]: (state, data) => {
+            const asyncData = {
+                  mssg: "App updated!"
+            };
+            const isSnackBarOpen = true;
+
+            const asyncLoading = false;
+            return state.merge(
+                  Map({
+                        asyncLoading,
+                        asyncData,
+                        isSnackBarOpen
+                  })
+            );
+      },
+
       [RESET_SELECTED_APP]: state => {
             const selectedApp = {};
             return state.merge(
@@ -396,7 +415,7 @@ const actionsMap = {
                               const placementToPush = _.cloneDeep(placements[i]);
                               placementToPush.addedPrefix = false;
 
-                              if (!placementToPush.placementName.includes(ADMIX_OBJ_PREFIX)) {
+                              if (placementToPush.placementName && !placementToPush.placementName.includes(ADMIX_OBJ_PREFIX)) {
                                     placementToPush.addedPrefix = true;
                                     placementToPush.placementName =
                                           ADMIX_OBJ_PREFIX + placementToPush.placementName;
@@ -411,6 +430,17 @@ const actionsMap = {
                   Map({
                         selectedApp,
                         asyncLoading
+                  })
+            );
+      },
+      [SET_PLACEMENTS_BY_APP]: (state, data) => {
+            const placementsByApp = data.data.data;
+
+            const asyncLoading = false;
+            return state.merge(
+                  Map({
+                        asyncLoading,
+                        placementsByApp
                   })
             );
       },
@@ -446,12 +476,13 @@ const actionsMap = {
 
       [TOGGLE_APP_STATUS]: (state, data) => {
             let apps = state.get("apps");
+            const updatedApp = data.data.data;
             const {
                   _id
-            } = data.data.data;
+            } = updatedApp;
             apps = apps.map(app => {
                   if (app._id === _id) {
-                        app.isActive = !app.isActive;
+                        app = updatedApp;
                   }
                   return app;
             });
@@ -466,17 +497,25 @@ const actionsMap = {
       },
 
       [UPDATE_PLACEMENTS]: (state, data) => {
-            const savedInputs = [];
+            // this are for when there's a validation page
+            // const savedInputs = [];
+            // const selectedApp = {};
+            // const apps = [];
+
             const asyncLoading = false;
-            const selectedApp = {};
-            const apps = [];
+            const asyncData = {
+                  mssg: "Success! Placements saved!"
+            };
+            const isSnackBarOpen = true;
 
             return state.merge(
                   Map({
-                        savedInputs,
+                        // savedInputs,
+                        // selectedApp,
+                        // apps,
                         asyncLoading,
-                        selectedApp,
-                        apps
+                        asyncData,
+                        isSnackBarOpen
                   })
             );
       },
@@ -561,7 +600,7 @@ const actionsMap = {
                         userImgURL,
                   })
             );
-      }
+      },
 };
 
 export default function reducer(state = initialState, action = {}) {

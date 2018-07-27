@@ -184,7 +184,7 @@ class Menu extends Component {
                            <MenuItem onClick={this.handleClose}>
                               <NavLink
                                  exact
-                                 to={routeCodes.SETUP}
+                                 to={routeCodes.MYAPPS}
                                  onClick={this.handleClose}
                                  className="mb mui-dropdown-item"
                               >

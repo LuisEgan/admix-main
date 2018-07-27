@@ -2,7 +2,8 @@ import React from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
 
 import Login from "../views/Login";
-import Setup from "../views/Setup";
+import MyApps from "../views/MyApps";
+import Info from "../views/Info";
 import Scene from "../views/Scene";
 import Validation from "../views/Validation";
 import Congratulations from "../views/Congratulations";
@@ -19,7 +20,8 @@ const publicPath = "/";
 
 export const routeCodes = {
    LOGIN: `${publicPath}login`,
-   SETUP: `${publicPath}setup`,
+   MYAPPS: `${publicPath}myapps`,
+   INFO: `${publicPath}info`,
    SCENE: `${publicPath}scene`,
    VALIDATION: `${publicPath}validation`,
    CONGRATULATIONS: `${publicPath}congratulations`,
@@ -57,7 +59,7 @@ const LoginRoute = ({ component: Component, isLoggedIn, ...rest }) => (
          return isLoggedIn ? (
             <Redirect
                to={{
-                  pathname: "/setup",
+                  pathname: "/myapps",
                   state: { from: props.location }
                }}
             />
@@ -82,12 +84,17 @@ export default props => {
          <PrivateRoute
             exact
             path={publicPath}
-            component={Setup}
+            component={MyApps}
             isLoggedIn={isLoggedIn}
          />
          <PrivateRoute
-            path={routeCodes.SETUP}
-            component={Setup}
+            path={routeCodes.MYAPPS}
+            component={MyApps}
+            isLoggedIn={isLoggedIn}
+         />
+         <PrivateRoute
+            path={routeCodes.INFO}
+            component={Info}
             isLoggedIn={isLoggedIn}
          />
          <PrivateRoute

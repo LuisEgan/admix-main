@@ -1,11 +1,49 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Pie } from "react-chartjs-2";
-import { selectApp, getPlacements } from "../../../actions";
+import { selectApp, getPlacementsByApp } from "../../../actions";
+import ReactTable from "react-table";
+import "react-table/react-table.css";
 
 import AdmixLoading from "../../../components/SVG/AdmixLoading";
 
 import { colors } from "../../../assets/data/colorsArr";
+
+const initialGeneralState = {
+   selectedAppsLength: 0,
+   loadedScene: "",
+   selectedPlacement: "",
+   sceneClicked: false
+};
+
+const initialAppsState = {
+   lastClickedAppId: "",
+   clickedAppId: "",
+   appsPieData: {},
+   appsPieOpts: {},
+   appsTableData: []
+};
+
+const initialScenesState = {
+   scenesPieData: {},
+   scenesPieOpts: {},
+   scenesTableData: []
+};
+
+const initialPlacementsState = {
+   placementNamesUpdate: true,
+   placementsNamesById: {},
+   placementsPieData: {},
+   placementsPieOpts: {},
+   placementsTableData: []
+};
+
+const initialState = {
+   ...initialGeneralState,
+   ...initialAppsState,
+   ...initialScenesState,
+   ...initialPlacementsState
+};
 
 export default class Performance extends Component {
    static propTypes = {
@@ -15,25 +53,7 @@ export default class Performance extends Component {
    constructor(props) {
       super(props);
 
-      this.state = {
-         selectedApps: {},
-         loadedScene: "",
-         selectedPlacement: "",
-         sceneClicked: false,
-
-         clickedAppId: "",
-         appsPieData: {},
-         appsPieOpts: {},
-         appsTableData: [],
-
-         scenesPieData: {},
-         scenesPieOpts: {},
-         scenesTableData: [],
-
-         placementsPieData: {},
-         placementsPieOpts: {},
-         placementsTableData: []
-      };
+      this.state = initialState;
 
       this.pieColorsAssigned = false;
 
@@ -45,8 +65,8 @@ export default class Performance extends Component {
       this.addEventListeners = this.addEventListeners.bind(this);
       this.disposeEventListeners = this.disposeEventListeners.bind(this);
 
-      this.setScenesData = this.setScenesData.bind(this);
-      this.setPlacementsData = this.setPlacementsData.bind(this);
+      // this.setScenesData = this.setScenesData.bind(this);
+      // this.setPlacementsData = this.setPlacementsData.bind(this);
       this.renderScenesTable = this.renderScenesTable.bind(this);
       this.renderPlacementsTable = this.renderPlacementsTable.bind(this);
    }
@@ -64,150 +84,75 @@ export default class Performance extends Component {
       return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
    };
 
-   componentDidMount() {
-      const { filteredReportData } = this.props;
-      this.setAppsData(filteredReportData);
-   }
-
-   componentWillReceiveProps(nextProps) {
-      const { clickedAppId, loadedScene } = this.state;
+   static getDerivedStateFromProps(nextProps, prevSate) {
+      const {
+         selectedAppsLength,
+         clickedAppId,
+         lastClickedAppId,
+         placementNamesUpdate
+      } = prevSate;
       const { filteredReportData, selectedApps, isLoadingScene } = nextProps;
 
-      if (Object.keys(selectedApps).length > 0 && !isLoadingScene) {
-         this.setAppsData(filteredReportData, selectedApps);
-         this.setScenesData(filteredReportData, clickedAppId);
-         this.setPlacementsData(filteredReportData, loadedScene);
-      }
-   }
+      let newState = null;
 
-   onAppElementsClick(e) {
-      const { filteredReportData, dispatch, accessToken } = this.props;
-      const { clickedAppId } = this.state;
+      if (!isLoadingScene) {
+         // if the selected apps (on the left panel) changed
+         if (
+            selectedAppsLength !== Object.keys(selectedApps).length &&
+            Object.keys(filteredReportData).length > 0
+         ) {
+            newState = {
+               ...initialState,
+               selectedAppsLength: Object.keys(selectedApps).length,
+               ...Performance.setAppsData(filteredReportData, selectedApps)
+            };
+            nextProps.TJSclear();
+         }
 
-      if (e[0]) {
-         const {
-            _model: { label },
-            _chart: {
-               options: { appClickId }
-            }
-         } = e[0];
-         if (appClickId[label] !== clickedAppId) {
-            this.setState({ clickedAppId: appClickId[label] });
-            this.setScenesData(filteredReportData, appClickId[label]);
-            dispatch(selectApp(appClickId[label], accessToken));
+         // if the clicked app (on the Apps pie chart) changed
+         // reset only the placements data since onAppElementsClick will set the scene's data
+         else if (clickedAppId !== lastClickedAppId) {
+            newState = {
+               ...initialPlacementsState,
+               lastClickedAppId: clickedAppId
+            };
+         }
+
+         if (
+            Object.keys(nextProps.placementsByApp).length > 0 &&
+            placementNamesUpdate
+         ) {
+            newState = newState ? newState : {};
+
+            const placementsNamesById = {};
+
+            nextProps.placementsByApp.forEach(placement => {
+               placementsNamesById[placement._id] = placement.placementName;
+            });
+
+            newState = {
+               ...newState,
+               placementNamesUpdate: false,
+               ...Performance.setScenesData(
+                  filteredReportData,
+                  clickedAppId,
+                  placementsNamesById
+               )
+            };
          }
       }
+
+      return newState;
    }
 
-   onSceneElementsClick(e) {
-      const {
-         selectedApp,
-         doLoadScene,
-         filteredReportData
-      } = this.props;
-      const { loadedScene } = this.state;
-      let selectedScene = {};
+   // SET DATA ---------------------------------------------
 
-      if (Object.keys(selectedApp).length > 0) {
-         if (e[0]) {
-            const {
-               _model: { label },
-               _chart: {
-                  options: { sceneClickId }
-               }
-            } = e[0];
-            if (sceneClickId[label] !== loadedScene) {
-               selectedApp.scenes.some(scene => {
-                  if (sceneClickId[label] === scene._id) {
-                     selectedScene = scene;
-                     return true;
-                  }
-                  return false;
-               });
-               doLoadScene(selectedScene);
-               document.body.style.cursor = "alias";
-
-               this.setPlacementsData(filteredReportData, sceneClickId[label]);
-
-               this.setState({
-                  loadedScene: sceneClickId[label],
-                  sceneClicked: true
-               });
-            }
-         }
-      }
-   }
-
-   onPlacementElementsClick(e) {
-      const { selectedPlacement } = this.state;
-
-      if (e[0]) {
-         const {
-            _model: { label },
-            _chart: {
-               options: { placementClickId }
-            }
-         } = e[0];
-         //    moveCamera("__advirObj__banner2");
-         if (placementClickId[label] !== selectedPlacement) {
-            // moveCamera(label);
-            this.setState({ selectedPlacement: placementClickId[label] });
-         }
-      }
-   }
-
-   // CONTROLS
-   ControlsRotationToggle(toggle) {
-      const {
-         isSceneLoaded,
-         noPointerLockControlsRotation,
-         yesPointerLockControlsRotation
-      } = this.props;
-
-      if (isSceneLoaded) {
-         if (toggle === "enable") {
-            // TrackballControlsEnableWheel();
-            yesPointerLockControlsRotation();
-         } else {
-            // TrackballControlsDisableWheel();
-            noPointerLockControlsRotation();
-         }
-      }
-   }
-
-   addEventListeners() {
-      const { addEventListeners, isSceneLoaded, isLoadingScene } = this.props;
-
-      addEventListeners();
-      (isSceneLoaded || isLoadingScene) &&
-         (document.body.style.cursor = "alias");
-   }
-
-   disposeEventListeners() {
-      const { disposeEventListeners } = this.props;
-
-      disposeEventListeners();
-      document.body.style.cursor = "default";
-   }
-
-   // SET DATA
-
-   setAppsData(filteredReportData, selectedApps) {
-      const { accessToken, dispatch, selectedApp } = this.props;
-
+   static setAppsData(filteredReportData, selectedApps) {
       const pieBackgroundColors = [];
       const pieLabels = [];
       const pieData = [];
 
       let uniqueApps = {};
-
-      if (Object.keys(selectedApp).length > 0) {
-         selectedApp.scenes.forEach(scene => {
-            console.log("selectedApp._id: ", selectedApp._id);
-            console.log("scene._id: ", scene._id);
-            dispatch(getPlacements(selectedApp._id, scene._id, accessToken));
-         });
-      }
 
       // group data by appId
       for (let date in filteredReportData) {
@@ -284,17 +229,19 @@ export default class Performance extends Component {
          appClickId
       };
 
-      this.setState({
+      return {
          appsPieData,
          appsPieOpts,
          appsTableData
-      });
+      };
    }
 
    // this also sets placementsTableData
-   setScenesData(filteredReportData, clickedAppId) {
-      // const { clickedAppId } = this.state;
-      const { selectedApp } = this.props;
+   static setScenesData(
+      filteredReportData,
+      clickedAppId,
+      placementsNamesById = {}
+   ) {
       const pieBackgroundColors = [];
       const pieLabels = [];
       const pieData = [];
@@ -304,24 +251,7 @@ export default class Performance extends Component {
       // this is for all the placements table
       let uniquePlacements = {};
 
-      let placementsSet = false;
-      const placementsNamesById = {};
-
-      if (selectedApp.scenes && selectedApp.scenes[0].placements) {
-         // add Placements names into filteredReportData
-         selectedApp.scenes.forEach(scene => {
-            scene.placements.forEach(placement => {
-               if (!placementsNamesById[placement._id]) {
-                  placementsNamesById[placement._id] = placement.placementName;
-               }
-            });
-         });
-         console.log("placementsNamesById: ", placementsNamesById);
-         placementsSet = true;
-      }
-
       // group data by scene
-      console.log("filteredReportData: ", filteredReportData);
       for (let date in filteredReportData) {
          for (let appId in filteredReportData[date]) {
             if (appId === clickedAppId) {
@@ -396,10 +326,8 @@ export default class Performance extends Component {
                      uniquePlacements[item.keys.plaid].impressionUnique =
                         item.impressionUnique;
 
-                     if (placementsSet) {
-                        uniquePlacements[item.keys.plaid].placementName =
-                           placementsNamesById[item.keys.plaid];
-                     }
+                     uniquePlacements[item.keys.plaid].placementName =
+                        placementsNamesById[item.keys.plaid];
                   }
                });
             }
@@ -445,29 +373,32 @@ export default class Performance extends Component {
       // ========
 
       let placementsTableData = [];
-      for (let placement in uniquePlacements) {
-         let placementsTableDataItem = {};
-         scenesTableData.some(scene => {
-            if (scene.sceneId === uniquePlacements[placement].sceneId) {
-               placementsTableDataItem.sceneLabel = scene.label;
-               return true;
-            }
-            return false;
-         });
 
-         placementsTableDataItem.label =
-            uniquePlacements[placement].placementId;
-         placementsTableDataItem.revenue = uniquePlacements[
-            placement
-         ].revenue.toFixed(4);
-         placementsTableDataItem.impression =
-            uniquePlacements[placement].impression;
-         placementsTableDataItem.impressionUnique =
-            uniquePlacements[placement].impressionUnique;
+      if (Object.keys(placementsNamesById).length > 0) {
+         for (let placement in uniquePlacements) {
+            let placementsTableDataItem = {};
+            scenesTableData.some(scene => {
+               if (scene.sceneId === uniquePlacements[placement].sceneId) {
+                  placementsTableDataItem.sceneLabel = scene.label;
+                  return true;
+               }
+               return false;
+            });
 
-         placementsTableData[
-            placementsTableData.length
-         ] = placementsTableDataItem;
+            placementsTableDataItem.label =
+               uniquePlacements[placement].placementName;
+            placementsTableDataItem.revenue = uniquePlacements[
+               placement
+            ].revenue.toFixed(4);
+            placementsTableDataItem.impression =
+               uniquePlacements[placement].impression;
+            placementsTableDataItem.impressionUnique =
+               uniquePlacements[placement].impressionUnique;
+
+            placementsTableData[
+               placementsTableData.length
+            ] = placementsTableDataItem;
+         }
       }
 
       const scenesPieData = {
@@ -486,15 +417,15 @@ export default class Performance extends Component {
          sceneClickId
       };
 
-      this.setState({
+      return {
          scenesPieData,
          scenesPieOpts,
          scenesTableData,
          placementsTableData
-      });
+      };
    }
 
-   setPlacementsData(filteredReportData, loadedScene) {
+   static setPlacementsData(filteredReportData, loadedScene) {
       // const { loadedScene } = this.state;
 
       const pieBackgroundColors = [];
@@ -561,10 +492,138 @@ export default class Performance extends Component {
          placementClickId
       };
 
-      this.setState({ placementsPieData, placementsPieOpts });
+      return { placementsPieData, placementsPieOpts };
+
+      // this.setState({ placementsPieData, placementsPieOpts });
    }
 
-   // RENDER
+   // ON CHART CLICK ---------------------------------------------
+
+   onAppElementsClick(e) {
+      const { filteredReportData, dispatch, accessToken } = this.props;
+      const { clickedAppId } = this.state;
+
+      if (e[0]) {
+         const {
+            _model: { label },
+            _chart: {
+               options: { appClickId }
+            }
+         } = e[0];
+         if (appClickId[label] !== clickedAppId) {
+            dispatch(selectApp(appClickId[label], accessToken));
+            dispatch(getPlacementsByApp(appClickId[label], accessToken));
+            this.setState({
+               clickedAppId: appClickId[label],
+               placementNamesUpdate: true,
+               ...Performance.setScenesData(
+                  filteredReportData,
+                  appClickId[label]
+               )
+            });
+         }
+      }
+   }
+
+   onSceneElementsClick(e) {
+      const { selectedApp, doLoadScene, filteredReportData } = this.props;
+      const { loadedScene } = this.state;
+      let selectedScene = {};
+
+      if (Object.keys(selectedApp).length > 0) {
+         if (e[0]) {
+            const {
+               _model: { label },
+               _chart: {
+                  options: { sceneClickId }
+               }
+            } = e[0];
+            if (sceneClickId[label] !== loadedScene) {
+               selectedApp.scenes.some(scene => {
+                  if (sceneClickId[label] === scene._id) {
+                     selectedScene = scene;
+                     return true;
+                  }
+                  return false;
+               });
+               doLoadScene(selectedScene);
+               document.body.style.cursor = "alias";
+
+               this.setState({
+                  loadedScene: sceneClickId[label],
+                  sceneClicked: true,
+                  ...Performance.setPlacementsData(
+                     filteredReportData,
+                     sceneClickId[label]
+                  )
+               });
+            }
+         }
+      }
+   }
+
+   onPlacementElementsClick(e) {
+      const { selectedPlacement } = this.state;
+
+      if (e[0]) {
+         const {
+            _model: { label },
+            _chart: {
+               options: { placementClickId }
+            }
+         } = e[0];
+         //    moveCamera("__advirObj__banner2");
+         if (placementClickId[label] !== selectedPlacement) {
+            // moveCamera(label);
+            this.setState({ selectedPlacement: placementClickId[label] });
+         }
+      }
+   }
+
+   // CONTROLS ---------------------------------------------
+
+   ControlsRotationToggle(toggle) {
+      const {
+         isSceneLoaded,
+         noPointerLockControlsRotation,
+         yesPointerLockControlsRotation
+      } = this.props;
+
+      if (isSceneLoaded) {
+         if (toggle === "enable") {
+            // TrackballControlsEnableWheel();
+            yesPointerLockControlsRotation();
+         } else {
+            // TrackballControlsDisableWheel();
+            noPointerLockControlsRotation();
+         }
+      }
+   }
+
+   addEventListeners() {
+      const { addEventListeners, isSceneLoaded, isLoadingScene } = this.props;
+
+      if (isSceneLoaded || isLoadingScene) {
+         addEventListeners();
+
+         document.body.style.cursor = "alias";
+      }
+   }
+
+   disposeEventListeners() {
+      const {
+         disposeEventListeners,
+         isSceneLoaded,
+         isLoadingScene
+      } = this.props;
+
+      if (isSceneLoaded || isLoadingScene) {
+         disposeEventListeners();
+         document.body.style.cursor = "default";
+      }
+   }
+
+   // RENDER ---------------------------------------------
 
    renderDropdown() {
       return (
@@ -594,71 +653,112 @@ export default class Performance extends Component {
    }
 
    renderScenesTable() {
+      const { asyncLoading, selectedApp } = this.props;
+
       const { scenesTableData } = this.state;
 
+      const Header = selectedApp.name
+         ? `${selectedApp.name}'s Scenes`
+         : "Your App's Scenes";
+
       return (
-         <table className="table table-bordered reportTable">
-            <thead>
-               <tr className="sst">
-                  <th scope="col">Scene name</th>
-                  <th scope="col">Impressions</th>
-                  <th scope="col">Revenue</th>
-                  <th scope="col">Uniques</th>
-               </tr>
-            </thead>
-            <tbody>
-               {scenesTableData.map(data => {
-                  const { label, revenue, impression, impressionUnique } = data;
-                  return (
-                     <tr className="mb" key={label}>
-                        <td>{label}</td>
-                        <td>{impression}</td>
-                        <td>$ {revenue}</td>
-                        <td>{impressionUnique}</td>
-                     </tr>
-                  );
-               })}
-            </tbody>
-         </table>
+         <ReactTable
+            data={scenesTableData}
+            noDataText={asyncLoading ? "Loading..." : "No scenes here"}
+            columns={[
+               {
+                  Header,
+                  columns: [
+                     {
+                        Header: "Scene Name",
+                        accessor: "label",
+                        minWidth: 150
+                     },
+                     {
+                        Header: "Impressions",
+                        accessor: "impression",
+                        sortMethod: (a, b) => {
+                           return a > b ? -1 : 1;
+                        }
+                     },
+                     {
+                        Header: "Revenue",
+                        accessor: "revenue",
+                        sortMethod: (a, b) => {
+                           return a > b ? -1 : 1;
+                        }
+                     },
+                     {
+                        Header: "Uniques",
+                        accessor: "impressionUnique",
+                        minWidth: 40,
+                        sortMethod: (a, b) => {
+                           return a > b ? -1 : 1;
+                        }
+                     }
+                  ]
+               }
+            ]}
+            defaultPageSize={5}
+            className="-striped -highlight"
+         />
       );
    }
 
    renderPlacementsTable() {
+      const { asyncLoading, selectedApp } = this.props;
       const { placementsTableData } = this.state;
 
+      const Header = selectedApp.name
+         ? `${selectedApp.name}'s Placements`
+         : "Your App's placements";
+
       return (
-         <table className="table table-bordered reportTable">
-            <thead>
-               <tr className="sst">
-                  <th scope="col">Placement name</th>
-                  <th scope="col">Impressions</th>
-                  <th scope="col">Revenue</th>
-                  <th scope="col">Uniques</th>
-               </tr>
-            </thead>
-            <tbody>
-               {placementsTableData.map(data => {
-                  const {
-                     sceneLabel,
-                     label,
-                     revenue,
-                     impression,
-                     impressionUnique
-                  } = data;
-                  return (
-                     <tr
-                        className="mb"
-                        key={`${label} (${sceneLabel}) ${Math.random()}`}
-                     >
-                        <td>{`${label} (${sceneLabel})`}</td>
-                        <td>{impression}</td>
-                        <td>$ {revenue}</td>
-                        <td>{impressionUnique}</td>
-                     </tr>
-                  );
-               })}
-            </tbody>
-         </table>
+         <ReactTable
+            data={placementsTableData}
+            noDataText={asyncLoading ? "Loading..." : "No placements here"}
+            columns={[
+               {
+                  Header,
+                  columns: [
+                     {
+                        Header: "Placement Name",
+                        accessor: "label",
+                        minWidth: 150
+                     },
+                     {
+                        Header: "Scene",
+                        accessor: "sceneLabel",
+                        minWidth: 50
+                     },
+                     {
+                        Header: "Impressions",
+                        accessor: "impression",
+                        sortMethod: (a, b) => {
+                           return a > b ? -1 : 1;
+                        }
+                     },
+                     {
+                        Header: "Revenue",
+                        accessor: "revenue",
+                        sortMethod: (a, b) => {
+                           return a > b ? -1 : 1;
+                        }
+                     },
+                     {
+                        Header: "Uniques",
+                        accessor: "impressionUnique",
+                        minWidth: 40,
+                        sortMethod: (a, b) => {
+                           return a > b ? -1 : 1;
+                        }
+                     }
+                  ]
+               }
+            ]}
+            defaultPageSize={10}
+            className="-striped -highlight"
+         />
       );
    }
 
@@ -783,7 +883,6 @@ export default class Performance extends Component {
             <div id="performance-tables">
                {this.renderScenesTable()}
                {this.renderPlacementsTable()}
-               {/* <ReportTable reportData={placementsData} /> */}
             </div>
          </div>
       );

@@ -43,7 +43,16 @@ class Panels extends Component {
 
       this.slidesManager = this.slidesManager.bind(this);
       this.activeClickedElem = this.activeClickedElem.bind(this);
+
+      // MENU PANEL ---------------------------
+
+      this.forceCloseMenuPanel = this.forceCloseMenuPanel.bind(this);
+
+      // FORM PANEL ---------------------------
       this.forceCloseFormPanel = this.forceCloseFormPanel.bind(this);
+      this.handleActiveChangeFormPanel = this.handleActiveChangeFormPanel.bind(
+         this
+      );
    }
 
    slidesManager(panel) {
@@ -65,10 +74,23 @@ class Panels extends Component {
 
    // MENU PANEL METHODS -------------------------------------
 
+   forceCloseMenuPanel() {
+      this.MenuPanel.toggleSlide("close");
+   }
+
    // FORM PANEL METHODS -------------------------------------
 
    forceCloseFormPanel() {
-      this.FormPanel.forceClose();
+      this.FormPanel.toggleSlide("close");
+   }
+
+   handleActiveChangeFormPanel(event) {
+      this.FormPanel.handleActiveChange("isActiveFromParent", event);
+   }
+
+   changeDropdownValueFormPanel(dropdown, event) {
+      dropdown += "FromParent";
+      this.FormPanel.changeDropdownValue(dropdown, event);
    }
 
    renderFormDropdown(input) {
@@ -85,16 +107,22 @@ class Panels extends Component {
          selectedApp,
          savedApps,
          loadScene,
+         isSceneLoading,
+         sceneLoadingError,
          dispatch,
          accessToken,
          selectScene,
          selectedScene,
          onSave,
          clickedPlacement,
+         savedInputs,
          sceneMounted,
          mouseOnPanel,
          updateClickedPlacement,
-         setDisplayMode
+         setDisplayMode,
+         displayMode,
+         rawDataChangeDropdownValue,
+         rawDataChangeActive
       } = this.props;
 
       const { saveClicked } = this.state;
@@ -102,10 +130,14 @@ class Panels extends Component {
       return (
          <div>
             <MenuPanel
+               ref={i => (this.MenuPanel = i)}
                asyncLoading={asyncLoading}
                mouseOnPanel={mouseOnPanel}
                loadScene={loadScene}
+               isSceneLoading={isSceneLoading}
+               sceneLoadingError={sceneLoadingError}
                dispatch={dispatch}
+               savedInputs={savedInputs}
                selectedApp={selectedApp}
                slidesManager={this.slidesManager}
                selectScene={selectScene}
@@ -115,6 +147,7 @@ class Panels extends Component {
                sceneMounted={sceneMounted}
                forceCloseFormPanel={this.forceCloseFormPanel}
                setDisplayMode={setDisplayMode}
+               displayMode={displayMode}
             />
 
             <FormPanel
@@ -130,6 +163,9 @@ class Panels extends Component {
                sceneMounted={sceneMounted}
                updateClickedPlacement={updateClickedPlacement}
                activeClickedElem={this.activeClickedElem}
+               rawDataChangeDropdownValue={rawDataChangeDropdownValue}
+               rawDataChangeActive={rawDataChangeActive}
+               displayMode={displayMode}
             />
          </div>
       );
@@ -144,4 +180,9 @@ const mapStateToProps = state => ({
    savedInputs: state.app.get("savedInputs")
 });
 
-export default connect(mapStateToProps)(Panels);
+export default connect(
+   mapStateToProps,
+   null,
+   null,
+   { withRef: true }
+)(Panels);

@@ -45,7 +45,7 @@ class Validation extends Component {
          _id,
          platformName,
          name,
-         isActive: false // false to activate it because the action takes the opposite of what's sent
+         isActive: false
       };
       dispatch(toggleAppStatus(appDetails, accessToken));
 

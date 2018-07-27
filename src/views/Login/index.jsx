@@ -98,7 +98,7 @@ class Login extends Component {
    handleLogin() {
       const { dispatch } = this.props;
       const { email, password } = this.state;
-      dispatch(login(email, password));
+      dispatch(login(email.toLowerCase(), password));
    }
 
    handleSignup() {

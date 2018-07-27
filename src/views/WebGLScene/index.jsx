@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-
-import TrackballControls from "../../assets/webgl/modules/three-trackballcontrols";
+import { ADMIX_OBJ_PREFIX } from "../../utils/constants";
 
 export default class WebGLScene extends Component {
    static propTypes = {
@@ -23,10 +22,10 @@ export default class WebGLScene extends Component {
          loadingError: null,
          selectedScene: {},
          postProcessingSet: false,
-         eventListenersSet: false,
-         clickedPlacement: {}
+         eventListenersSet: false
       };
 
+      // THREEJS BASICS
       this.start = this.start.bind(this);
       this.stop = this.stop.bind(this);
       this.animate = this.animate.bind(this);
@@ -46,8 +45,6 @@ export default class WebGLScene extends Component {
       this.setPostProcessing = this.setPostProcessing.bind(this);
 
       //CONTROLS
-      this.enableControls = this.enableControls.bind(this);
-      this.disableControls = this.disableControls.bind(this);
       this.enableOrbitControls = this.enableOrbitControls.bind(this);
       this.addEventListeners = this.addEventListeners.bind(this);
       this.disposeEventListeners = this.disposeEventListeners.bind(this);
@@ -61,10 +58,28 @@ export default class WebGLScene extends Component {
       // POST-PROCESSING
       this.checkIntersection = this.checkIntersection.bind(this);
       this.addSelectedObject = this.addSelectedObject.bind(this);
+
+      // VARIABLES
+      this.xhrCurrentTarget = "";
+      this.abortedObjs = {};
+      this.lastObjURL = "";
    }
 
-   /////////////////////////////////////
-   /////////////////////////////////////
+   componentDidMount() {
+      const { THREE } = window;
+
+      this.mouse = new THREE.Vector2();
+      this.raycaster = new THREE.Raycaster();
+      this.selectedObjects = [];
+
+      this.intersected = null;
+   }
+
+   componentWillUnmount() {
+      this.unmountWebGL();
+   }
+
+   // THREEJS BASICS ------------------------------------
 
    start() {
       if (!this.frameId) {
@@ -84,12 +99,104 @@ export default class WebGLScene extends Component {
       }
    }
 
-   /////////////////////////////////////
-   /////////////////////////////////////
+   renderScene() {
+      // this.renderer.autoClear = true;
+      // this.renderer.setClearColor(0xfff0f0);
+      // this.renderer.setClearAlpha(0.0);
+      this.scene.updateMatrixWorld();
+      if (this.composer) {
+         this.composer.render();
+      } else {
+         this.renderer.render(this.scene, this.camera);
+      }
+   }
 
-   // =====================
-   // <EVENT LISTENERS>
-   // =====================
+   TJSquickSetup() {
+      this.setCamera();
+      this.setScene();
+      this.setRenderer();
+      this.setLights();
+      this.setGround();
+      this.setState({ TJSsetup: true });
+   }
+
+   TJSreset() {
+      const { THREE } = window;
+      this.camera = null;
+      this.scene = null;
+      this.renderer = null;
+      this.composer = null;
+      this.frameId = null;
+      this.mouse = new THREE.Vector2();
+      this.raycaster = new THREE.Raycaster();
+      this.selectedObjects = [];
+      this.intersected = null;
+      this.setState({ TJSsetup: false });
+   }
+
+   setCamera() {
+      const { THREE, innerWidth, innerHeight } = window;
+
+      const camera = new THREE.PerspectiveCamera(
+         75,
+         innerWidth / innerHeight,
+         1,
+         1000
+      );
+
+      // Setting a new camera position will affect the controls rotation
+      camera.position.set(0, 20, 20);
+      camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+      this.camera = camera;
+   }
+
+   setScene() {
+      const { THREE } = window;
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xcccccc);
+      scene.fog = new THREE.FogExp2(0xcccccc, 0.002);
+      this.scene = scene;
+   }
+
+   setRenderer() {
+      const { THREE, innerWidth, innerHeight } = window;
+      const renderer = new THREE.WebGLRenderer({ antialias: false });
+      renderer.setSize(
+         innerWidth * this.windowMultiplier,
+         innerHeight * this.windowMultiplier
+      );
+      this.renderer = renderer;
+   }
+
+   setLights() {
+      const { THREE } = window;
+
+      // LIGHTS
+      var light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 0.75);
+      light.position.set(0.5, 1, 0.75);
+      this.scene.add(light);
+   }
+
+   setGround() {
+      const { THREE } = window;
+
+      // GROUND
+      const groundGeo = new THREE.PlaneBufferGeometry(1000, 1000);
+      const groundMat = new THREE.MeshPhongMaterial({
+         color: 0xffffff,
+         specular: 0x050505
+      });
+      groundMat.color.setHSL(0.095, 1, 0.75);
+
+      const ground = new THREE.Mesh(groundGeo, groundMat);
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = -0.5;
+      this.scene.add(ground);
+   }
+
+   // EVENT LISTENERS ------------------------------------
+
    onWindowResize() {
       const width = window.innerWidth;
       const height = window.innerHeight;
@@ -167,64 +274,8 @@ export default class WebGLScene extends Component {
          }
       }
    }
-   // =====================
-   // </EVENT LISTENERS>
-   // =====================
 
-   /////////////////////////////////////
-   /////////////////////////////////////
-
-   // =====================
-   // <SETUP>
-   // =====================
-   setCamera() {
-      const { THREE, innerWidth, innerHeight } = window;
-      const camera = new THREE.PerspectiveCamera(
-         45,
-         innerWidth / innerHeight,
-         0.1,
-         100
-      );
-      camera.position.set(0, 20, 20);
-      this.camera = camera;
-   }
-
-   setScene() {
-      const { THREE } = window;
-      const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xcccccc);
-      scene.fog = new THREE.FogExp2(0xcccccc, 0.002);
-
-      // LIGHTS
-      var light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 0.75);
-      light.position.set(0.5, 1, 0.75);
-      scene.add(light);
-
-      // GROUND
-      const groundGeo = new THREE.PlaneBufferGeometry(1000, 1000);
-      const groundMat = new THREE.MeshPhongMaterial({
-         color: 0xffffff,
-         specular: 0x050505
-      });
-      groundMat.color.setHSL(0.095, 1, 0.75);
-
-      const ground = new THREE.Mesh(groundGeo, groundMat);
-      ground.rotation.x = -Math.PI / 2;
-      ground.position.y = -0.5;
-      scene.add(ground);
-
-      this.scene = scene;
-   }
-
-   setRenderer() {
-      const { THREE, innerWidth, innerHeight } = window;
-      const renderer = new THREE.WebGLRenderer({ antialias: false });
-      renderer.setSize(
-         innerWidth * this.windowMultiplier,
-         innerHeight * this.windowMultiplier
-      );
-      this.renderer = renderer;
-   }
+   // SETUP ------------------------------------
 
    setEventListeners() {
       const { eventListenersSet } = this.state;
@@ -274,59 +325,8 @@ export default class WebGLScene extends Component {
          this.setState({ postProcessingSet: true });
       }
    }
-   // =====================
-   // </SETUP>
-   // =====================
 
-   /////////////////////////////////////
-   /////////////////////////////////////
-
-   // =====================
-   // <CONTROLS>
-   // =====================
-   enableControls() {
-      const { THREE } = window;
-
-      const controls = new TrackballControls(this.camera);
-      controls.rotateSpeed = 0.5;
-      controls.zoomSpeed = 0.7;
-      controls.panSpeed = 1.2;
-      controls.noZoom = false;
-      controls.noPan = false;
-      controls.dampingFactor = 1.25;
-      controls.staticMoving = true;
-      controls.keys = [65, 83, 68];
-      // controls.enableDamping = true;
-      // controls.dynamicDampingFactor = 0.8;
-
-      // const radius = 5;
-      // controls.minDistance = radius * 1.1;
-      // controls.maxDistance = radius * 100;
-      controls.target = new THREE.Vector3(0, 0, -1);
-      this.controls = controls;
-      this.TrackballControlsDisableWheel();
-      // this.controls = null;
-   }
-
-   disableControls() {
-      this.controls.dispose();
-      this.controls = null;
-   }
-
-   TrackballControlsEnableWheel() {
-      // this.controls.startWheel();
-   }
-
-   TrackballControlsDisableWheel() {
-      // this.controls.stopWheel();
-   }
-
-   noPointerLockControlsRotation() {
-      // this.controls && this.controls.noRotation();
-   }
-   yesPointerLockControlsRotation() {
-      // this.controls && this.controls.yesRotation();
-   }
+   // CONTROLS ------------------------------------
 
    //    gotta include <script src="./THREEJS/PointerLockControls.min.js"></script>   in /public/index.html for this to work
    enablePointerLockControls({ iYawX, iYawY, iYawZ, iYawRot, iPitchRot }) {
@@ -403,103 +403,66 @@ export default class WebGLScene extends Component {
    disposeEventListeners() {
       this.controls && this.controls.dispose();
    }
-   // =====================
-   // </CONTROLS>
-   // =====================
 
-   /////////////////////////////////////
-   /////////////////////////////////////
-
-   // =====================
-   // <SCENE>
-   // =====================
+   // SCENE ------------------------------------
    selectScene(selectedScene) {
       this.setState({ selectedScene });
    }
 
    loadScene(selectedScene) {
+      const { xhrCurrentTarget } = this;
       const { THREE } = window;
-      const { sceneMounted } = this.state;
+
       const {
          userData,
          confirmSceneLoaded,
          isLoadingScene,
          progressLoadingScene
       } = this.props;
+
+      const { TJSsetup, sceneMounted, isSceneLoading } = this.state;
+
+      if (isSceneLoading) {
+         xhrCurrentTarget.abort();
+         this.abortedObjs[this.lastObjURL] = "Not loaded";
+      }
+
       const userId = userData._id;
 
-      const selectedObject = this.scene.getObjectByName("userLoadedScene");
-
-      // Check is there was a scene loaded
-      if (selectedObject) {
-         this.clear();
-         this.loadScene(selectedScene);
+      // Check if there was a scene loaded
+      if (TJSsetup) {
+         this.clear({ loadScene: true, selectedScene });
          confirmSceneLoaded(false);
-
          return;
       }
 
-      // const PLControlsConfig = {
-      //    iYawX: 0,
-      //    iYawY: 0,
-      //    iYawZ: 0,
-      //    iYawRot: 0,
-      //    iPitchRot: 0
-      // };
+      this.TJSquickSetup();
+      this.start();
+
       // this.enablePointerLockControls(PLControlsConfig);
       this.enableOrbitControls({ lookAtX: 70, lookAtY: 0, lookAtZ: 0 });
-
-      if (!sceneMounted) {
-         this.mount.appendChild(this.renderer.domElement);
-         this.setEventListeners();
-      }
-      this.setPostProcessing();
-
-      // LOAD OBJECT
-      const onProgress = xhr => {
-         const loadingProgress = Math.round((xhr.loaded / xhr.total) * 100);
-         progressLoadingScene(loadingProgress);
-         isLoadingScene(true);
-         this.setState({ loadingProgress });
-      };
-
-      const onError = error => {
-         const loadingProgress = null;
-         const loadingError = "Error! Scene could not be loaded";
-         this.setState({ loadingProgress, loadingError });
-      };
-
-      const onLoad = object => {
-         const loadingProgress = 0;
-         const loadingError = null;
-
-         object.name = "userLoadedScene";
-         object.position.set(0, 0, 0);
-         object.traverse(
-            function(child) {
-               if (child.name.includes("__advirObj__")) {
-                  let material = new THREE.MeshBasicMaterial({
-                     color: 0xffff00
-                  });
-                  child.material = material;
-                  this[child.name] = child;
-               }
-            }.bind(this)
-         );
-
-         //  this.controls.noRotation();
-         this.setState({ loadingProgress, loadingError, sceneMounted: true });
-         confirmSceneLoaded(true);
-         isLoadingScene(false);
-         this.scene.add(object);
-      };
 
       // GET .OBJ AND .MTL URL
       const dns = "https://s3.us-east-2.amazonaws.com/advirbucket";
       let renderPath = `${dns}/${userId}/${selectedScene._id}/`;
 
+      let objTimestamp = Date.now();
+
       let objUrl = `${selectedScene.name}.obj`;
+      const objUrlWithoutTimestamp = objUrl;
       let mtlUrl = `${selectedScene.name}.mtl`;
+
+      if (this.abortedObjs[objUrlWithoutTimestamp]) {
+         if (this.abortedObjs[objUrl] === "Not loaded") {
+            // new timestamp for fetching a 'new' url
+            objUrl += `?${objTimestamp}`;
+         } else {
+            // if the obj was once aborted but its value is a string, then that's the timesptamp that was used for fully load (the second time the object was attempted to load)
+            objUrl += `?${this.abortedObjs[objUrlWithoutTimestamp]}`;
+         }
+      }
+
+      this.lastObjURL = objUrlWithoutTimestamp;
 
       if (userData.email.value === "eganluis@gmail.com") {
          renderPath = "./modelTest/";
@@ -509,37 +472,164 @@ export default class WebGLScene extends Component {
 
       const mtlLoader = new THREE.MTLLoader();
       mtlLoader.setPath(renderPath);
-      mtlLoader.load(mtlUrl, materials => {
+      mtlLoader.setCrossOrigin(true);
+
+      // MTL LOADER FUNCTIONS
+
+      const MTLonLoad = materials => {
          materials.preload();
          const objLoader = new THREE.OBJLoader();
          objLoader.setMaterials(materials);
          objLoader.setPath(renderPath);
+
          objLoader.load(
             objUrl,
-            onLoad.bind(this),
-            onProgress.bind(this),
-            onError.bind(this)
+            OBJonLoad.bind(this),
+            OBJonProgress.bind(this),
+            OBJonError.bind(this)
          );
-      });
+      };
+
+      const MTLonProgress = xhr => {
+         isLoadingScene(true);
+         this.setState({ isSceneLoading: true, sceneLoadingError: "" });
+      };
+
+      const MTLonError = sceneLoadingError => {
+         const loadingProgress = null;
+         sceneLoadingError = `
+        Email: ${userData.email.value} --
+        sid: ${selectedScene._id} --
+        On: .mtl --
+        Status: ${sceneLoadingError.currentTarget.status} --
+        Mssg: ${sceneLoadingError.currentTarget.statusText}`;
+         isLoadingScene(false);
+
+         this.setState({
+            loadingProgress,
+            sceneLoadingError,
+            isSceneLoading: false,
+            displayMode: "raw"
+         });
+      };
+
+      // OBJ LOADER FUNCTIONS
+      const OBJonProgress = xhr => {
+         const loadingProgress = Math.round((xhr.loaded / xhr.total) * 100);
+         this.xhrCurrentTarget = xhr.currentTarget;
+         progressLoadingScene(loadingProgress);
+
+         this.setState({
+            loadingProgress,
+            sceneLoadingError: ""
+         });
+      };
+
+      const OBJonError = sceneLoadingError => {
+         const loadingProgress = null;
+         sceneLoadingError = `
+      Email: ${userData.email.value} --
+      sid: ${selectedScene._id} --
+      On: .obj --
+      Status: ${sceneLoadingError.currentTarget.status} --
+      Mssg: ${sceneLoadingError.currentTarget.statusText}`;
+         isLoadingScene(false);
+
+         this.setState({
+            loadingProgress,
+            sceneLoadingError,
+            isSceneLoading: false,
+            displayMode: "raw"
+         });
+      };
+
+      const OBJonLoad = object => {
+         // Disable loading feedback
+         const loadingProgress = 0;
+
+         object.name = "userLoadedScene";
+         object.position.set(0, 0, 0);
+         var material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+         object.traverse(function(child) {
+            if (
+               child instanceof THREE.Mesh &&
+               child.name.includes(ADMIX_OBJ_PREFIX)
+            ) {
+               child.material = material;
+            }
+         });
+
+         this.scene.add(object);
+
+         if (!sceneMounted) {
+            this.mount && this.mount.appendChild(this.renderer.domElement);
+            this.setEventListeners();
+            this.setPostProcessing();
+         }
+
+         if (this.abortedObjs[objUrlWithoutTimestamp]) {
+            // if the obj was finally let to load, store the timestamp for quick load using cache
+            this.abortedObjs[objUrlWithoutTimestamp] = objTimestamp;
+         }
+
+         // For parent
+         isLoadingScene(false);
+         confirmSceneLoaded(true);
+
+         this.setState({
+            loadingProgress,
+            sceneLoadingError: "",
+            sceneMounted: true,
+            isSceneLoading: false
+         });
+      };
+
+      mtlLoader.load(
+         mtlUrl,
+         MTLonLoad.bind(this),
+         MTLonProgress.bind(this),
+         MTLonError.bind(this)
+      );
    }
 
-   renderScene() {
-      // this.renderer.autoClear = true;
-      // this.renderer.setClearColor(0xfff0f0);
-      // this.renderer.setClearAlpha(0.0);
-      this.scene.updateMatrixWorld();
-      if (this.composer) {
-         this.composer.render();
-      } else {
-         this.renderer.render(this.scene, this.camera);
-      }
-   }
-
-   clear() {
+   clear({ loadScene, selectedScene }) {
+      const { eventListenersSet } = this.state;
+      this.stop();
+      
       // Clear object name from form
-      this.controls.dispose();
-      var selectedObject = this.scene.getObjectByName("userLoadedScene");
-      this.scene.remove(selectedObject);
+      if(this.scene) {
+        var selectedObject = this.scene.getObjectByName("userLoadedScene");
+        this.scene.remove(selectedObject);        
+      }
+
+      if (eventListenersSet) {
+         window.removeEventListener("resize", this.onWindowResize, false);
+         window.removeEventListener("mousemove", this.onTouchMove);
+         window.removeEventListener("touchmove", this.onTouchMove);
+         window.removeEventListener("click", this.onObjectClick);
+      }
+
+      if (this.mount && this.renderer) {
+         if (this.renderer.domElement.parentNode === this.mount) {
+            this.mount.removeChild(this.renderer.domElement);
+         }
+      }
+
+      this.controls && this.controls.dispose();
+      this.TJSreset();
+
+      this.setState(
+         {
+            sceneMounted: false,
+            eventListenersSet: false,
+            postProcessingSet: false,
+            sceneLoadingError: "",
+            isSceneLoading: false
+         },
+         () => {
+            loadScene && this.loadScene(selectedScene);
+         }
+      );
    }
 
    moveCamera(selectedPlacement) {
@@ -578,16 +668,8 @@ export default class WebGLScene extends Component {
       // After movement, turn to the placement
       this.controls.getObject().rotation.y = -1.5708;
    }
-   // =====================
-   // </SCENE>
-   // =====================
 
-   /////////////////////////////////////
-   /////////////////////////////////////
-
-   // =====================
-   // <POST-PROCESSING>
-   // =====================
+   // POST-PROCESSING ------------------------------------
 
    checkIntersection() {
       this.raycaster.setFromCamera(this.mouse, this.camera);
@@ -602,17 +684,6 @@ export default class WebGLScene extends Component {
       this.outlinePass.selectedObjects = this.selectedObjects;
    }
 
-   // =====================
-   // </POST-PROCESSING>
-   // =====================
-
-   /////////////////////////////////////
-   /////////////////////////////////////
-
-   componentDidMount() {
-      this.mountWebGL();
-   }
-
    mountWebGL() {
       const { THREE } = window;
 
@@ -623,8 +694,6 @@ export default class WebGLScene extends Component {
       this.selectedObjects = [];
       this.mouse = new THREE.Vector2();
       this.raycaster = new THREE.Raycaster();
-
-      // this.enableControls();
 
       this.start();
    }
@@ -643,10 +712,6 @@ export default class WebGLScene extends Component {
          this.controls.dispose();
          this.setState({ sceneMounted: false });
       }
-   }
-
-   componentWillUnmount() {
-      this.unmountWebGL();
    }
 
    render() {
@@ -674,3 +739,72 @@ export default class WebGLScene extends Component {
       );
    }
 }
+
+// const selectedObject = this.scene.getObjectByName("userLoadedScene");
+
+// // Check is there was a scene loaded
+// if (selectedObject) {
+//    this.clear();
+//    this.loadScene(selectedScene);
+//    confirmSceneLoaded(false);
+
+//    return;
+// }
+
+// if (!sceneMounted) {
+//    this.mount.appendChild(this.renderer.domElement);
+//    this.setEventListeners();
+// }
+// this.setPostProcessing();
+
+// LOAD OBJECT
+// const onProgress = xhr => {
+//    const loadingProgress = Math.round((xhr.loaded / xhr.total) * 100);
+//    progressLoadingScene(loadingProgress);
+//    isLoadingScene(true);
+//    this.setState({ loadingProgress });
+// };
+
+// const onError = error => {
+//    const loadingProgress = null;
+//    const loadingError = "Error! Scene could not be loaded";
+//    this.setState({ loadingProgress, loadingError });
+// };
+
+// const onLoad = object => {
+//    const loadingProgress = 0;
+//    const loadingError = null;
+
+//    object.name = "userLoadedScene";
+//    object.position.set(0, 0, 0);
+//    object.traverse(
+//       function(child) {
+//          if (child.name.includes("__advirObj__")) {
+//             let material = new THREE.MeshBasicMaterial({
+//                color: 0xffff00
+//             });
+//             child.material = material;
+//             this[child.name] = child;
+//          }
+//       }.bind(this)
+//    );
+
+//    //  this.controls.noRotation();
+//    this.setState({ loadingProgress, loadingError, sceneMounted: true });
+//    confirmSceneLoaded(true);
+//    isLoadingScene(false);
+//    this.scene.add(object);
+// };
+
+// mtlLoader.load(mtlUrl, materials => {
+//    materials.preload();
+//    const objLoader = new THREE.OBJLoader();
+//    objLoader.setMaterials(materials);
+//    objLoader.setPath(renderPath);
+//    objLoader.load(
+//       objUrl,
+//       onLoad.bind(this),
+//       onProgress.bind(this),
+//       onError.bind(this)
+//    );
+// });

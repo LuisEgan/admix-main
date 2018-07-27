@@ -22,10 +22,12 @@ export const REGISTER_REQUEST = "USERS_REGISTER_REQUEST",
       APPS_SUCCESS = "USERS_APPS_SUCCESS",
       APPS_ERROR = "USERS_APPS_SUCCESS_FAILURE",
       SELECT_APP = "SELECT_APP",
+      UPDATE_APP = "UPDATE_APP",
       RESET_SELECTED_APP = "RESET_SELECTED_APP",
       SAVE_APP = "SAVE_APP",
       SET_PLACEMENT = "SET_PLACEMENT",
       SET_PLACEMENTS = "SET_PLACEMENTS",
+      SET_PLACEMENTS_BY_APP = "SET_PLACEMENTS_BY_APP",
       SAVE_INPUTS = "SAVE_INPUTS",
       RESET_SAVED_INPUTS = "RESET_SAVED_INPUTS",
       TOGGLE_APP_STATUS = "TOGGLE_APP_STATUS",
@@ -177,6 +179,18 @@ const doSelectApp = (appId, data) => {
       }
 };
 
+const doUpdateApp = data => {
+      if (data.status) {
+            return {
+                  type: UPDATE_APP,
+                  data
+            };
+      } else {
+            return asyncError(data);
+      }
+};
+
+
 export const resetSelectedApp = () => ({
       type: RESET_SELECTED_APP
 });
@@ -195,6 +209,17 @@ const setPlacements = data => {
       if (data.status) {
             return {
                   type: SET_PLACEMENTS,
+                  data
+            };
+      } else {
+            return asyncError(data);
+      }
+};
+
+const setPlacementsByApp = data => {
+      if (data.status) {
+            return {
+                  type: SET_PLACEMENTS_BY_APP,
                   data
             };
       } else {
@@ -276,9 +301,7 @@ const updateUserRes = (data) => {
       }
 }
 
-// ===========================
-// FETCH
-// ===========================
+// FETCH =============================================
 
 export function async () {
       return function (dispatch) {
@@ -422,18 +445,8 @@ export const getUserData = accessToken => dispatch => {
 export const toggleAppStatus = (appDetails, accessToken) => dispatch => {
       dispatch(asyncStart());
 
-      const {
-            platformName,
-            name,
-            isActive
-      } = appDetails;
-      const data = {
-            platformName,
-            name,
-            isActive: !isActive
-      };
       api
-            .toggleAppStatus(accessToken, data)
+            .toggleAppStatus(accessToken, appDetails)
             .then(data => {
                   dispatch(doToggleAppStatus(data));
             })
@@ -490,9 +503,7 @@ export const updateUser = (userId, update, accessToken) => dispatch => {
 
 }
 
-// ===========================
-// SELECT APP
-// ===========================
+// APPS =============================================
 
 export const selectApp = (appId, accessToken) => dispatch => {
       dispatch(asyncStart());
@@ -504,6 +515,15 @@ export const selectApp = (appId, accessToken) => dispatch => {
       api
             .getScenes(accessToken, data)
             .then(res => dispatch(doSelectApp(appId, res)))
+            .catch(error => dispatch(asyncError(error)));
+};
+
+export const updateApp = (appData, accessToken) => dispatch => {
+      dispatch(asyncStart());
+
+      api
+            .updateApp(accessToken, appData)
+            .then(res => dispatch(doUpdateApp(res)))
             .catch(error => dispatch(asyncError(error)));
 };
 
@@ -520,6 +540,18 @@ export const getPlacements = (appId, sceneId, accessToken) => dispatch => {
             .catch(error => dispatch(asyncError(error)));
 };
 
+export const getPlacementsByApp = (appId, accessToken) => dispatch => {
+      dispatch(asyncStart());
+      const data = {
+            appId
+      };
+
+      api
+            .getPlacements(accessToken, data)
+            .then(res => dispatch(setPlacementsByApp(res)))
+            .catch(error => dispatch(asyncError(error)));
+};
+
 export const updatePlacements = (accessToken, data) => dispatch => {
       dispatch(asyncStart());
 
@@ -529,9 +561,7 @@ export const updatePlacements = (accessToken, data) => dispatch => {
             .catch(error => dispatch(asyncError(error)));
 };
 
-// ===========================
-// REPORT
-// ===========================
+// REPORT =============================================
 
 export const getReportData = (isAdmin, appsIds, accessToken) => dispatch => {
       dispatch(asyncStart());

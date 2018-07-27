@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import _ from "lodash";
 import { saveInputs } from "../../actions/";
 import { ADMIX_OBJ_PREFIX } from "../../utils/constants";
+import STR from "../../utils/strFuncs";
 import ReactTable from "react-table";
 import "react-table/react-table.css";
 
@@ -18,6 +19,7 @@ import Panels from "./Panels";
 
 import monkey from "../../assets/img/See_No_Evil_Monkey_Emoji.png";
 import monkeyArrow from "../../assets/img/monkeyArrow.png";
+import exportObj from "../../assets/img/exportOBJ.png";
 
 import AdmixLoading from "../../components/SVG/AdmixLoading";
 
@@ -55,15 +57,17 @@ class Scene extends Component {
       super(props);
 
       this.state = {
-         displayMode: "3D",
+         displayMode: "raw",
          initialSet: false,
+         TJSsetup: false,
 
          sceneMounted: false,
+         sceneLoadingError: "",
+         isSceneLoading: false,
          isMouseOnPanel: false,
          status: true,
          animate: false,
          loadingProgress: 0,
-         loadingError: null,
          selectedScene: {},
          postProcessingSet: false,
          eventListenersSet: false,
@@ -81,6 +85,13 @@ class Scene extends Component {
       this.start = this.start.bind(this);
       this.stop = this.stop.bind(this);
       this.animate = this.animate.bind(this);
+      this.TJSquickSetup = this.TJSquickSetup.bind(this);
+      this.TJSreset = this.TJSreset.bind(this);
+      this.setCamera = this.setCamera.bind(this);
+      this.setRenderer = this.setRenderer.bind(this);
+      this.setScene = this.setScene.bind(this);
+      this.setLights = this.setLights.bind(this);
+      this.setGround = this.setGround.bind(this);
 
       // EVENT LISTENERS --------------
       this.onWindowResize = this.onWindowResize.bind(this);
@@ -119,75 +130,24 @@ class Scene extends Component {
       this.renderRawDataTable = this.renderRawDataTable.bind(this);
 
       this.isALTdown = false;
+      this.xhrCurrentTarget = "";
+      this.abortedObjs = {};
+      this.lastObjURL = "";
    }
 
    componentDidMount() {
-      const { THREE, innerWidth, innerHeight } = window;
+      this.Panels = this.Panels.getWrappedInstance();
 
-      // CAMERA
-      const camera = new THREE.PerspectiveCamera(
-         75,
-         window.innerWidth / window.innerHeight,
-         1,
-         1000
-      );
-
-      // Setting a new camera position will affect the controls rotation
-      camera.position.set(0, 20, 20);
-      camera.lookAt(new THREE.Vector3(0, 0, 0));
-      // camera.up = new THREE.Vector3(0, 0, 1);
-
-      // RENDERER
-      const renderer = new THREE.WebGLRenderer({ antialias: false });
-      renderer.setSize(innerWidth, innerHeight);
-      renderer.shadowMap.enabled = true;
-      // renderer.setPixelRatio( window.devicePixelRatio );
-      // renderer.setClearColor('#000000');
-
-      // SCENE
-      const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xcccccc);
-      scene.fog = new THREE.FogExp2(0xcccccc, 0.002);
-      // scene.add(new THREE.AxesHelper(20));
-
-      // LIGHTS
-      var light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 0.75);
-      light.position.set(0.5, 1, 0.75);
-      scene.add(light);
-
-      // GROUND
-      const groundGeo = new THREE.PlaneBufferGeometry(1000, 1000);
-      const groundMat = new THREE.MeshPhongMaterial({
-         color: 0xffffff,
-         specular: 0x050505
-      });
-      groundMat.color.setHSL(0.095, 1, 0.75);
-
-      const ground = new THREE.Mesh(groundGeo, groundMat);
-      ground.rotation.x = -Math.PI / 2;
-      ground.position.y = -0.5;
-      scene.add(ground);
+      const { THREE } = window;
 
       // POST-PROCESSING
-      const composer = null;
+      this.composer = null;
 
-      const selectedObjects = [];
-      const mouse = new THREE.Vector2();
-      const raycaster = new THREE.Raycaster();
+      this.mouse = new THREE.Vector2();
+      this.raycaster = new THREE.Raycaster();
+      this.selectedObjects = [];
 
-      this.camera = camera;
-      this.scene = scene;
-
-      this.mouse = mouse;
-      this.raycaster = raycaster;
-      this.selectedObjects = selectedObjects;
       this.intersected = null;
-      this.composer = composer;
-      this.renderer = renderer;
-
-      // this.enableControls();
-
-      this.start();
    }
 
    componentWillUnmount() {
@@ -207,10 +167,14 @@ class Scene extends Component {
    static getDerivedStateFromProps(nextProps, prevSate) {
       const { selectedApp } = nextProps;
       const { selectedScene, initialSet } = prevSate;
-      console.log('selectedScene._id: ', selectedScene._id);
-      console.log('initialSet: ', initialSet);
+      let emptyPlacements = false;
 
-      if (selectedApp.scenes[0].placements && !initialSet) {
+      if (
+         selectedApp.scenes &&
+         selectedApp.scenes[0] &&
+         selectedApp.scenes[0].placements &&
+         !initialSet
+      ) {
          const subCatsDropdownByPlacementId = {};
          const catsSelectedByPlacementId = {};
          const subCatsSelectedByPlacementId = {};
@@ -219,6 +183,7 @@ class Scene extends Component {
          // set the placements to the selectedScene
          selectedApp.scenes.some(scene => {
             if (scene._id === selectedScene._id) {
+               emptyPlacements = scene.placements.length === 0;
                selectedScene.placements = scene.placements;
                scene.placements.forEach(placement => {
                   // set the sub-categories dropdowns for each placement depending on their category
@@ -227,8 +192,11 @@ class Scene extends Component {
 
                   // set the values of each dropdown
                   catsSelectedByPlacementId[placement._id] = placement.category;
-                  subCatsSelectedByPlacementId[placement._id] =
-                     placement.subCategory[0];
+                  subCatsSelectedByPlacementId[placement._id] = Array.isArray(
+                     placement.subCategory
+                  )
+                     ? placement.subCategory[0]
+                     : placement.subCategory;
 
                   // isActive values
                   activeByPlacementId[placement._id] = placement.isActive;
@@ -238,11 +206,8 @@ class Scene extends Component {
             return false;
          });
 
-         console.log("here");
-         console.log('catsSelectedByPlacementId: ', catsSelectedByPlacementId);
-
          return {
-            initialSet: true,
+            initialSet: !emptyPlacements,
             selectedScene,
             subCatsDropdownByPlacementId,
             catsSelectedByPlacementId,
@@ -268,9 +233,32 @@ class Scene extends Component {
    animate() {
       this.renderScene();
       this.frameId = window.requestAnimationFrame(this.animate);
-      if (!!this.controls) {
+      if (this.controls) {
          this.controls.update();
       }
+   }
+
+   TJSquickSetup() {
+      this.setCamera();
+      this.setScene();
+      this.setRenderer();
+      this.setLights();
+      this.setGround();
+      this.setState({ TJSsetup: true });
+   }
+
+   TJSreset() {
+      const { THREE } = window;
+      this.camera = null;
+      this.scene = null;
+      this.renderer = null;
+      this.composer = null;
+      this.frameId = null;
+      this.mouse = new THREE.Vector2();
+      this.raycaster = new THREE.Raycaster();
+      this.selectedObjects = [];
+      this.intersected = null;
+      this.setState({ TJSsetup: false });
    }
 
    renderScene() {
@@ -282,6 +270,71 @@ class Scene extends Component {
       } else {
          this.renderer.render(this.scene, this.camera);
       }
+   }
+
+   setCamera() {
+      const { THREE, innerWidth, innerHeight } = window;
+
+      // CAMERA
+      const camera = new THREE.PerspectiveCamera(
+         75,
+         innerWidth / innerHeight,
+         1,
+         1000
+      );
+
+      // Setting a new camera position will affect the controls rotation
+      camera.position.set(0, 20, 20);
+      camera.lookAt(new THREE.Vector3(0, 0, 0));
+      // camera.up = new THREE.Vector3(0, 0, 1);
+
+      this.camera = camera;
+   }
+
+   setRenderer() {
+      const { THREE, innerWidth, innerHeight } = window;
+
+      // RENDERER
+      const renderer = new THREE.WebGLRenderer({ antialias: false });
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.shadowMap.enabled = true;
+      // renderer.setPixelRatio( window.devicePixelRatio );
+      // renderer.setClearColor('#000000');
+      this.renderer = renderer;
+   }
+
+   setScene() {
+      const { THREE } = window;
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xcccccc);
+      scene.fog = new THREE.FogExp2(0xcccccc, 0.002);
+      this.scene = scene;
+   }
+
+   setLights() {
+      const { THREE } = window;
+
+      // LIGHTS
+      var light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 0.75);
+      light.position.set(0.5, 1, 0.75);
+      this.scene.add(light);
+   }
+
+   setGround() {
+      const { THREE } = window;
+
+      // GROUND
+      const groundGeo = new THREE.PlaneBufferGeometry(1000, 1000);
+      const groundMat = new THREE.MeshPhongMaterial({
+         color: 0xffffff,
+         specular: 0x050505
+      });
+      groundMat.color.setHSL(0.095, 1, 0.75);
+
+      const ground = new THREE.Mesh(groundGeo, groundMat);
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = -0.5;
+      this.scene.add(ground);
    }
 
    // EVENT LISTENERS ---------------------------------------------
@@ -420,7 +473,13 @@ class Scene extends Component {
    // CONTROLS ---------------------------------------------
 
    //    gotta include <script src="./THREEJS/PointerLockControls.min.js"></script>   in /public/index.html for this to work
-   enablePointerLockControls({ iYawX, iYawY, iYawZ, iYawRot, iPitchRot }) {
+   enablePointerLockControls({
+      iYawX = 0,
+      iYawY = 0,
+      iYawZ = 0,
+      iYawRot = 0,
+      iPitchRot = 0
+   }) {
       const { THREE } = window;
 
       // Position is given by the yawObject position, the camera doesn't move! (it must be at (0,0,0))
@@ -544,7 +603,16 @@ class Scene extends Component {
    }
 
    setDisplayMode(displayMode) {
-      this.setState({ displayMode });
+      const { selectedScene, sceneMounted } = this.state;
+      this.setState({ displayMode }, () => {
+         if (
+            Object.keys(selectedScene).length > 0 &&
+            displayMode === "3D" &&
+            !sceneMounted
+         ) {
+            // this.loadScene();
+         }
+      });
    }
 
    // SCENE MANIPULATION ---------------------------------------------
@@ -603,117 +671,219 @@ class Scene extends Component {
    }
 
    loadScene() {
-      const { displayMode, sceneMounted, selectedScene } = this.state;
+      const { xhrCurrentTarget } = this;
+      const {
+         TJSsetup,
+         sceneMounted,
+         selectedScene,
+         isSceneLoading
+      } = this.state;
       const { userData } = this.props;
 
-      if (displayMode === "3D") {
-         const userId = userData._id;
+      const { THREE } = window;
 
-         const { THREE } = window;
+      const userId = userData._id;
 
-         const selectedObject = this.scene.getObjectByName("userLoadedScene");
+      if (isSceneLoading) {
+         xhrCurrentTarget.abort();
+         this.abortedObjs[this.lastObjURL] = "Not loaded";
+      }
 
-         // Check is there was a scene loaded
-         if (selectedObject) {
-            this.clear();
-            this.loadScene();
-            return;
+      // const selectedObject = this.scene
+      //    ? this.scene.getObjectByName("userLoadedScene")
+      //    : null;
+
+      // Check if there was a scene loaded
+      if (TJSsetup) {
+         this.clear({ loadScene: true });
+         return;
+      }
+
+      this.TJSquickSetup();
+      this.start();
+
+      this.enableOrbitControls({ lookAtX: 0, lookAtY: 0, lookAtZ: 0 });
+
+      // GET .OBJ AND .MTL URL
+      const dns = "https://s3.us-east-2.amazonaws.com/advirbucket";
+      let renderPath = `${dns}/${userId}/${selectedScene._id}/`;
+
+      let objTimestamp = Date.now();
+
+      let objUrl = `${selectedScene.name}.obj`;
+      const objUrlWithoutTimestamp = objUrl;
+      let mtlUrl = `${selectedScene.name}.mtl`;
+
+      if (this.abortedObjs[objUrlWithoutTimestamp]) {
+         if (this.abortedObjs[objUrl] === "Not loaded") {
+            // new timestamp for fetching a 'new' url
+            objUrl += `?${objTimestamp}`;
+         } else {
+            // if the obj was once aborted but its value is a string, then that's the timesptamp that was used for fully load (the second time the object was attempted to load)
+            objUrl += `?${this.abortedObjs[objUrlWithoutTimestamp]}`;
          }
+      }
 
-         // this.enablePointerLockControls({
-         //    iYawX: 0,
-         //    iYawY: 0,
-         //    iYawZ: 0,
-         //    iYawRot: 0,
-         //    iPitchRot: 0
-         // });
+      this.lastObjURL = objUrlWithoutTimestamp;
 
-         this.enableOrbitControls({ lookAtX: 0, lookAtY: 0, lookAtZ: 0 });
+      if (userData.email.value === "eganluis@gmail.com") {
+         renderPath = "./modelTest/";
+         objUrl = `exportObjScene1.obj`;
+         mtlUrl = `exportObjScene1.mtl`;
+      }
+
+      // THREE.ImageUtils.crossOrigin = "anonymous";
+
+      const mtlLoader = new THREE.MTLLoader();
+      mtlLoader.setPath(renderPath);
+      mtlLoader.setCrossOrigin(true);
+
+      // MTL LOADER FUNCTIONS
+
+      const MTLonLoad = materials => {
+         materials.preload();
+         const objLoader = new THREE.OBJLoader();
+         objLoader.setMaterials(materials);
+         objLoader.setPath(renderPath);
+
+         objLoader.load(
+            objUrl,
+            OBJonLoad.bind(this),
+            OBJonProgress.bind(this),
+            OBJonError.bind(this)
+         );
+      };
+
+      const MTLonProgress = xhr => {
+         this.setState({ isSceneLoading: true, sceneLoadingError: "" });
+      };
+
+      const MTLonError = sceneLoadingError => {
+         const loadingProgress = null;
+         sceneLoadingError = `
+         Email: ${userData.email.value} --
+         sid: ${selectedScene._id} --
+         On: .mtl --
+         Status: ${sceneLoadingError.currentTarget.status} --
+         Mssg: ${sceneLoadingError.currentTarget.statusText}`;
+
+         this.setState({
+            loadingProgress,
+            sceneLoadingError,
+            isSceneLoading: false,
+            displayMode: "raw"
+         });
+      };
+
+      // OBJ LOADER FUNCTIONS
+      const OBJonProgress = xhr => {
+         const loadingProgress = Math.round((xhr.loaded / xhr.total) * 100);
+         this.xhrCurrentTarget = xhr.currentTarget;
+
+         this.setState({
+            loadingProgress,
+            sceneLoadingError: ""
+         });
+      };
+
+      const OBJonError = sceneLoadingError => {
+         const loadingProgress = null;
+         sceneLoadingError = `
+         Email: ${userData.email.value} --
+         sid: ${selectedScene._id} --
+         On: .obj --
+         Status: ${sceneLoadingError.currentTarget.status} --
+         Mssg: ${sceneLoadingError.currentTarget.statusText}`;
+
+         this.setState({
+            loadingProgress,
+            sceneLoadingError,
+            isSceneLoading: false,
+            displayMode: "raw"
+         });
+      };
+
+      const OBJonLoad = object => {
+         // Disable loading feedback
+         const loadingProgress = 0;
+
+         object.name = "userLoadedScene";
+         object.position.set(0, 0, 0);
+         var material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+         object.traverse(function(child) {
+            if (
+               child instanceof THREE.Mesh &&
+               child.name.includes(ADMIX_OBJ_PREFIX)
+            ) {
+               child.material = material;
+            }
+         });
+
+         this.scene.add(object);
 
          if (!sceneMounted) {
-            this.mount.appendChild(this.renderer.domElement);
+            this.mount && this.mount.appendChild(this.renderer.domElement);
             this.setEventListeners();
             this.setPostProcessing();
          }
 
-         // LOAD OBJECT
-         const onProgress = xhr => {
-            const loadingProgress = Math.round((xhr.loaded / xhr.total) * 100);
-            this.setState({ loadingProgress });
-         };
-
-         const onError = error => {
-            const loadingProgress = null;
-            const loadingError = "Error! Scene could not be loaded";
-            this.setState({ loadingProgress, loadingError });
-         };
-
-         const onLoad = object => {
-            // Disable loading feedback
-            const loadingProgress = 0;
-            const loadingError = null;
-
-            object.name = "userLoadedScene";
-            object.position.set(0, 0, 0);
-            var material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-            object.traverse(function(child) {
-               if (
-                  child instanceof THREE.Mesh &&
-                  child.name.includes(ADMIX_OBJ_PREFIX)
-               ) {
-                  child.material = material;
-               }
-            });
-
-            this.scene.add(object);
-            this.setState({
-               loadingProgress,
-               loadingError,
-               sceneMounted: true
-            });
-         };
-
-         // GET .OBJ AND .MTL URL
-         const dns = "https://s3.us-east-2.amazonaws.com/advirbucket";
-         let renderPath = `${dns}/${userId}/${selectedScene._id}/`;
-
-         let objUrl = `${selectedScene.name}.obj`;
-         let mtlUrl = `${selectedScene.name}.mtl`;
-
-         if (userData.email.value === "eganluis@gmail.com") {
-            renderPath = "./modelTest/";
-            objUrl = `exportObjScene1.obj`;
-            mtlUrl = `exportObjScene1.mtl`;
+         if (this.abortedObjs[objUrlWithoutTimestamp]) {
+            // if the obj was finally let to load, store the timestamp for quick load using cache
+            this.abortedObjs[objUrlWithoutTimestamp] = objTimestamp;
          }
 
-         // THREE.ImageUtils.crossOrigin = "anonymous";
-
-         const mtlLoader = new THREE.MTLLoader();
-         mtlLoader.setPath(renderPath);
-         mtlLoader.setCrossOrigin(true);
-
-         mtlLoader.load(mtlUrl, materials => {
-            materials.preload();
-            const objLoader = new THREE.OBJLoader();
-            objLoader.setMaterials(materials);
-            objLoader.setPath(renderPath);
-
-            objLoader.load(
-               objUrl,
-               onLoad.bind(this),
-               onProgress.bind(this),
-               onError.bind(this)
-            );
+         this.setState({
+            loadingProgress,
+            sceneLoadingError: "",
+            sceneMounted: true,
+            isSceneLoading: false
          });
-      }
+      };
+
+      mtlLoader.load(
+         mtlUrl,
+         MTLonLoad.bind(this),
+         MTLonProgress.bind(this),
+         MTLonError.bind(this)
+      );
    }
 
-   clear() {
+   clear({ loadScene }) {
+      const { eventListenersSet } = this.state;
+      this.stop();
       // Clear object name from form
-      this.controls.dispose();
-      this.setState({ clickedPlacement: {}, sceneMounted: false });
       var selectedObject = this.scene.getObjectByName("userLoadedScene");
-      this.scene.remove(selectedObject);
+
+      if (eventListenersSet) {
+         window.removeEventListener("resize", this.onWindowResize, false);
+         window.removeEventListener("mousemove", this.onTouchMove);
+         window.removeEventListener("touchmove", this.onTouchMove);
+         window.removeEventListener("click", this.onObjectClick);
+      }
+
+      if (this.mount && this.renderer) {
+         if (this.renderer.domElement.parentNode === this.mount) {
+            this.mount.removeChild(this.renderer.domElement);
+         }
+      }
+
+      this.controls && this.controls.dispose();
+      this.scene && this.scene.remove(selectedObject);
+      this.TJSreset();
+
+      this.setState(
+         {
+            clickedPlacement: {},
+            sceneMounted: false,
+            eventListenersSet: false,
+            postProcessingSet: false,
+            sceneLoadingError: "",
+            isSceneLoading: false
+         },
+         () => {
+            loadScene && this.loadScene();
+         }
+      );
    }
 
    // RAW DATA ---------------------------------------------
@@ -721,14 +891,22 @@ class Scene extends Component {
    changeActive(placementId, event) {
       const { activeByPlacementId } = this.state;
 
+      const isFromChild = placementId.indexOf("FromChild") >= 0;
+      placementId = placementId.split("FromChild")[0];
+
       const newActives = _.cloneDeep(activeByPlacementId);
       newActives[placementId] = event.target.checked;
 
-      this.setState({ activeByPlacementId: newActives });
-      this.onSave(placementId);
+      // if this function is called from the child, then the changes there are already done
+      !isFromChild &&
+         this.Panels.wrappedInstance.handleActiveChangeFormPanel(event);
+
+      this.setState({ activeByPlacementId: newActives }, () => {
+         !isFromChild && this.onSave(placementId);
+      });
    }
 
-   changeDropdownValue(input, placementId, e) {
+   changeDropdownValue(dropdown, placementId, e) {
       const { value } = e.target;
       let {
          catsSelectedByPlacementId,
@@ -736,7 +914,11 @@ class Scene extends Component {
          subCatsDropdownByPlacementId
       } = this.state;
 
-      if (input === "category") {
+      const isFromChild =
+         dropdown === "categoryFromChild" ||
+         dropdown === "subCategoryFromChild";
+
+      if (dropdown === "category" || dropdown === "categoryFromChild") {
          catsSelectedByPlacementId[placementId] = value;
          subCatsDropdownByPlacementId[placementId] = dbSubCategories[value];
          subCatsSelectedByPlacementId[placementId] = "";
@@ -744,13 +926,17 @@ class Scene extends Component {
          subCatsSelectedByPlacementId[placementId] = value;
       }
 
+      // if this function is called from the child, then the changes there are already done
+      !isFromChild &&
+         this.Panels.wrappedInstance.changeDropdownValueFormPanel(dropdown, e);
+
       this.setState({
          catsSelectedByPlacementId,
          subCatsSelectedByPlacementId,
          subCatsDropdownByPlacementId
       });
 
-      this.onSave(placementId);
+      !isFromChild && this.onSave(placementId);
    }
 
    onSave(placementId) {
@@ -812,6 +998,7 @@ class Scene extends Component {
    }
 
    renderRawDataTable() {
+      const { asyncLoading, savedInputs } = this.props;
       const {
          selectedScene,
          noPlacementsDataMssg,
@@ -821,10 +1008,14 @@ class Scene extends Component {
          activeByPlacementId
       } = this.state;
 
-      const isActiveToggle = placementId => {
+      const isActiveToggle = (placementId, savedInputsActive = null) => {
          return (
             <Switch
-               checked={activeByPlacementId[placementId]}
+               checked={
+                  savedInputsActive
+                     ? savedInputsActive
+                     : activeByPlacementId[placementId]
+               }
                onChange={this.changeActive.bind(null, placementId)}
                value={placementId}
                color="primary"
@@ -832,15 +1023,26 @@ class Scene extends Component {
          );
       };
 
-      const renderDropdown = (input, placementId) => {
+      const renderDropdown = (
+         input,
+         placementId,
+         savedInputsCat = null,
+         savedInputsSubCat = null
+      ) => {
          let value, toMap;
 
          if (input === "category") {
             toMap = dbCategories;
-            value = catsSelectedByPlacementId[placementId];
+            value = savedInputsCat
+               ? savedInputsCat
+               : catsSelectedByPlacementId[placementId];
          } else {
-            toMap = subCatsDropdownByPlacementId[placementId];
-            value = subCatsSelectedByPlacementId[placementId];
+            toMap = savedInputsSubCat
+               ? dbSubCategories[savedInputsCat]
+               : subCatsDropdownByPlacementId[placementId];
+            value = savedInputsSubCat
+               ? savedInputsSubCat
+               : subCatsSelectedByPlacementId[placementId];
          }
 
          const dropdown = toMap
@@ -886,14 +1088,65 @@ class Scene extends Component {
 
       let dataItem = {};
 
+      let savedInputsByPlacementId = {};
+
+      // Check the savedInputs in this session to load the changes done
+      savedInputs.forEach(input => {
+         savedInputsByPlacementId[input.placementId] = {};
+
+         savedInputsByPlacementId[input.placementId].placementName =
+            input.placementName;
+
+         savedInputsByPlacementId[input.placementId].placementType =
+            input.placementType;
+
+         savedInputsByPlacementId[input.placementId].isActive = input.isActive;
+
+         savedInputsByPlacementId[input.placementId].category = input.category;
+
+         savedInputsByPlacementId[
+            input.placementId
+         ].subCategory = Array.isArray(input.subCategory)
+            ? input.subCategory[0]
+            : input.subCategory;
+      });
+
+      let name, format, isActive, category, subCategory;
+
       selectedScene.placements &&
          selectedScene.placements.forEach(placement => {
+            if (savedInputsByPlacementId[placement._id]) {
+               name = STR.withoutPrefix(
+                  savedInputsByPlacementId[placement._id].placementName
+               );
+               format = savedInputsByPlacementId[placement._id].placementType;
+               isActive = savedInputsByPlacementId[placement._id].isActive;
+               category = savedInputsByPlacementId[placement._id].category;
+               subCategory =
+                  savedInputsByPlacementId[placement._id].subCategory;
+            } else {
+               name = STR.withoutPrefix(placement.placementName);
+               format = placement.placementType;
+               isActive = null;
+               category = null;
+               subCategory = null;
+            }
             dataItem = {
-               name: placement.placementName,
-               format: placement.placementType,
-               active: isActiveToggle(placement._id),
-               category: renderDropdown("category", placement._id),
-               subCategory: renderDropdown("subCategory", placement._id)
+               name,
+               format,
+               active: isActiveToggle(placement._id, isActive),
+               category: renderDropdown(
+                  "category",
+                  placement._id,
+                  category,
+                  subCategory
+               ),
+               subCategory: renderDropdown(
+                  "subCategory",
+                  placement._id,
+                  category,
+                  subCategory
+               )
             };
             data.push(dataItem);
             dataItem = {};
@@ -904,30 +1157,40 @@ class Scene extends Component {
             <div id="rawDataTable">
                <ReactTable
                   data={data}
-                  noDataText={`${noPlacementsDataMssg}`}
+                  noDataText={
+                     asyncLoading ? "Loading..." : noPlacementsDataMssg
+                  }
                   columns={[
                      {
                         Header: "Edit placement",
                         columns: [
                            {
                               Header: "Name",
-                              accessor: "name"
+                              accessor: "name",
+                              minWidth: 150
                            },
                            {
                               Header: "Format",
-                              accessor: "format"
+                              accessor: "format",
+                              minWidth: 50
                            },
                            {
                               Header: "Active",
-                              accessor: "active"
+                              accessor: "active",
+                              minWidth: 40,
+                              sortMethod: (a, b) => {
+                                 return a.props.checked ? -1 : 1;
+                              }
                            },
                            {
                               Header: "Category",
-                              accessor: "category"
+                              accessor: "category",
+                              sortable: false
                            },
                            {
                               Header: "Sub category",
-                              accessor: "subCategory"
+                              accessor: "subCategory",
+                              sortable: false
                            }
                         ]
                      }
@@ -948,13 +1211,44 @@ class Scene extends Component {
       );
    }
 
+   renderSceneLoadingError() {
+      const { sceneLoadingError } = this.state;
+
+      return (
+         <div id="scene-loading-error" className="mb">
+            <span className="st">404: Export not found!</span>
+            <hr />
+            This happens when an export has not been done. You can do it ticking
+            this here: <br />
+            <img src={exportObj} alt="exportObj" /> <br />
+            <br />
+            Note: if you <em>did</em> export it and it still not showing, please
+            send us an email to{" "}
+            <a href="mailto:support@admix.in">support@admix.in</a> with this
+            text: <br />
+            <div className="code">
+               <code>
+                  Scene not loaded -. <br />
+                  {sceneLoadingError}
+               </code>
+            </div>
+            <br />
+            We will sort it out as fast as we can{" "}
+            <span role="img" aria-label="hammer">
+               🔨
+            </span>
+         </div>
+      );
+   }
+
    render() {
       let {
          loadingProgress,
-         loadingError,
          selectedScene,
+         isSceneLoading,
          clickedPlacement,
          sceneMounted,
+         sceneLoadingError,
          displayMode
       } = this.state;
       // const barColor = "#157cc1";
@@ -964,6 +1258,14 @@ class Scene extends Component {
             ? 0
             : loadingProgress;
 
+      // const renderSceneLoadingError =
+      //    sceneLoadingError !== "" && displayMode === "3D";
+
+      const renderNothingToSee = Object.keys(selectedScene).length <= 0;
+
+      const renderRawDataTable =
+         Object.keys(selectedScene).length > 0 && displayMode === "raw";
+
       return (
          <div
             id="webgl"
@@ -972,8 +1274,11 @@ class Scene extends Component {
             tabIndex="0"
          >
             <Panels
+               ref={i => (this.Panels = i)}
                mouseOnPanel={this.mouseOnPanel}
                loadScene={this.loadScene}
+               sceneLoadingError={sceneLoadingError}
+               isSceneLoading={isSceneLoading}
                selectScene={this.selectScene}
                selectedScene={selectedScene}
                onSave={this.onSave}
@@ -981,6 +1286,9 @@ class Scene extends Component {
                sceneMounted={sceneMounted}
                updateClickedPlacement={this.updateClickedPlacement}
                setDisplayMode={this.setDisplayMode}
+               rawDataChangeDropdownValue={this.changeDropdownValue}
+               rawDataChangeActive={this.changeActive}
+               displayMode={displayMode}
             />
 
             {loadingProgress && (
@@ -991,15 +1299,11 @@ class Scene extends Component {
                </div>
             )}
 
-            {loadingError && (
-               <div id="scene-loading" className="progressbar-container">
-                  {`${loadingError}`}
-               </div>
-            )}
+            {/* {renderSceneLoadingError && this.renderSceneLoadingError()} */}
 
-            {!sceneMounted && displayMode === "3D" && this.renderNothingToSee()}
+            {renderNothingToSee && this.renderNothingToSee()}
 
-            {displayMode === "raw" && this.renderRawDataTable()}
+            {renderRawDataTable && this.renderRawDataTable()}
 
             <div
                className="placemeni-img"

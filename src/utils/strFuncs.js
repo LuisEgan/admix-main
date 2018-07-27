@@ -1,3 +1,7 @@
+import {
+    ADMIX_OBJ_PREFIX
+} from './constants';
+
 const isAtleast = (str, limit) => {
     return str.length >= limit;
 };
@@ -25,11 +29,19 @@ const capitalizeFirstLetter = str => {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+const withoutPrefix = str => {
+    return str.replace(
+        ADMIX_OBJ_PREFIX,
+        ""
+    );
+}
+
 export default {
     isAtleast,
     hasLetter,
     hasOnlyLetters,
     hasNumber,
     isValidEmail,
-    capitalizeFirstLetter
+    capitalizeFirstLetter,
+    withoutPrefix
 };

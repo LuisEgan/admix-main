@@ -76,7 +76,7 @@ export default class FormPanel extends Component {
    componentWillReceiveProps(nextProps) {
       let { savedInputs, slidedIn } = this.state;
       const oldClickedPlacement = this.props.clickedPlacement;
-      const { clickedPlacement } = nextProps;
+      const { clickedPlacement, displayMode } = nextProps;
 
       const propsToSave = [
          "appId",
@@ -105,13 +105,27 @@ export default class FormPanel extends Component {
          ? dbSubCategories[savedInputs.category]
          : [];
 
-      this.setState({ savedInputs, slidedIn, subCategories });
+      // only open, or keep opened, the panel if the display mode is 3D
+      if (displayMode !== "raw") {
+         this.setState({ savedInputs, slidedIn, subCategories });
+      } else {
+         this.setState({ savedInputs, subCategories });
+      }
    }
 
-   toggleSlide() {
+   toggleSlide(forceAction) {
       let { slidedIn } = this.state;
-      slidedIn = !slidedIn;
-      // slidesManager("FormPanel");
+
+      if (forceAction === "close") {
+         // if it was already closed, don't close it
+         !slidedIn && (slidedIn = true);
+      } else if (forceAction === "open") {
+         // if it was already open, don't open it
+         slidedIn && (slidedIn = false);
+      } else {
+         slidedIn = !slidedIn;
+      }
+
       this.setState({ slidedIn });
    }
 
@@ -135,19 +149,27 @@ export default class FormPanel extends Component {
    }
 
    handleActiveChange(input, e) {
+      const { rawDataChangeActive } = this.props;
       const { savedInputs } = this.state;
       let {
          target: { value }
       } = e;
 
-      if (input === "isActive") {
+      const isFromParent = input === "isActiveFromParent";
+
+      if (input === "isActive" || input === "isActiveFromParent") {
          value = e.target.checked;
       }
 
-      console.log("savedInputs: ", savedInputs);
+      input = input === "isActiveFromParent" ? "isActive" : input;
+
+      // if this function is called from the parent, then the changes there are already done
+      !isFromParent &&
+         rawDataChangeActive(savedInputs.placementId + "FromChild", e);
+
       savedInputs[input] = value;
       this.setState({ savedInputs, animating: true });
-      this.onSave();
+      !isFromParent && this.onSave();
 
       setTimeout(() => {
          this.setState({ animating: false });
@@ -192,19 +214,28 @@ export default class FormPanel extends Component {
    }
 
    changeDropdownValue(dropdown, e) {
-      const { value } = e.target;
+      const { rawDataChangeDropdownValue } = this.props;
       const { savedInputs } = this.state;
+      const { value } = e.target;
       const newState = { savedInputs };
 
-      if (dropdown === "category") {
+      const isFromParent =
+         dropdown === "categoryFromParent" ||
+         dropdown === "subCategoryFromParent";
+
+      if (dropdown === "category" || dropdown === "categoryFromParent") {
          newState.savedInputs.category = value;
          newState.subCategories = dbSubCategories[value];
       } else {
          newState.savedInputs.subCategory = value;
       }
 
+      // if this function is called from the parent, then the changes there are already done
+      !isFromParent &&
+         rawDataChangeDropdownValue(dropdown, savedInputs.placementId, e);
+
       this.setState(newState);
-      this.onSave();
+      !isFromParent && this.onSave();
    }
 
    renderDropdown(input) {
@@ -364,7 +395,7 @@ export default class FormPanel extends Component {
 
    render() {
       const { slidedIn } = this.state;
-      const { sceneMounted, mouseOnPanel } = this.props;
+      const { sceneMounted, mouseOnPanel, displayMode } = this.props;
 
       const slideAnim = sceneMounted
          ? slidedIn === "closed"
@@ -374,6 +405,7 @@ export default class FormPanel extends Component {
                : "slidePanelInRight"
          : "closed";
       const arrow = slidedIn ? "left" : "right";
+      const arrowVisible = displayMode === "raw" ? "hidden" : "";
 
       if (!sceneMounted) {
          return <div />;
@@ -387,7 +419,7 @@ export default class FormPanel extends Component {
             onMouseLeave={mouseOnPanel}
          >
             <div
-               className={`panel-toggle-btn cc ${arrow}`}
+               className={`panel-toggle-btn cc ${arrow} ${arrowVisible}`}
                onClick={this.toggleSlide}
             />
 
