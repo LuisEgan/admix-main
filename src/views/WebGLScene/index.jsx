@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { ADMIX_OBJ_PREFIX } from "../../utils/constants";
+import C from "../../utils/constants";
 
 export default class WebGLScene extends Component {
    static propTypes = {
@@ -553,7 +553,7 @@ export default class WebGLScene extends Component {
          object.traverse(function(child) {
             if (
                child instanceof THREE.Mesh &&
-               child.name.includes(ADMIX_OBJ_PREFIX)
+               child.name.includes(C.ADMIX_OBJ_PREFIX)
             ) {
                child.material = material;
             }

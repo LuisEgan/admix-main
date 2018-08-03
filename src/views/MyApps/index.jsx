@@ -11,8 +11,10 @@ import {
    getReportData,
    setInitialReportApp,
    resetSavedInputs,
+   resetSelectedApp,
    setUserImgURL
 } from "../../actions";
+import C from "../../utils/constants";
 import { CLOUDINARY_IMG_URL } from "../../config/cloudinary";
 
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
@@ -21,10 +23,9 @@ import faSearchPlus from "@fortawesome/fontawesome-free-solid/faSearchPlus";
 import faPlus from "@fortawesome/fontawesome-free-solid/faPlus";
 import faMinus from "@fortawesome/fontawesome-free-solid/faMinus";
 
-import Unity from "../../assets/img/unity-logo_20.png";
-// import Unreal from "../../assets/img/Unreal-Engine-Logo_60x60.png";
-
 import AdmixLoading from "../../components/SVG/AdmixLoading";
+
+import admix from "../../assets/img/default_pic.jpg";
 
 const getFirstUpper = str => {
    for (let i = 0; i < str.length; i++) {
@@ -38,11 +39,6 @@ const getFirstUpper = str => {
 const capitalizeFirstLetter = string => {
    return string.charAt(0).toUpperCase() + string.slice(1);
 };
-
-// const enginesImgs = {
-//    Unity,
-//    Unreal
-// };
 
 // @connect(state => ({
 //   apps: state.app.get("apps"),
@@ -103,6 +99,8 @@ class MyApps extends Component {
 
       const allAppsIds = apps.map(app => app._id);
       this.setState({ allAppsIds, activeApps });
+
+      dispatch(resetSelectedApp());
       dispatch(getApps(accessToken));
       dispatch(getUserData(accessToken));
       dispatch(setUserImgURL(CLOUDINARY_IMG_URL + userData._id + ".png"));
@@ -137,11 +135,11 @@ class MyApps extends Component {
       const { dispatch, accessToken } = this.props;
 
       let { _id, platformName, name, isActive, appState, storeurl } = app;
-      appState = isActive ? "inactive" : "active";
+      appState = isActive ? C.APP_STATES.inactive : C.APP_STATES.live;
 
       if (storeurl !== undefined && appState !== undefined) {
          if (!isActive && storeurl === "") {
-            appState = "pending";
+            appState = C.APP_STATES.pending;
          }
       }
 
@@ -303,24 +301,32 @@ class MyApps extends Component {
               "isActive",
               "platformName"
            ]
-         : //  : ["name", "isActive", "platformName"];
-           ["name", "appEngine", "isActive", "platformName"];
+         : ["name", "isActive", "appEngine"];
+      //      ["name", "appEngine", "isActive", "platformName"];
 
-      const appEnginesOpts = [
-         <option value="Unity" key="unity">
-            Unity
-         </option>,
-         <option value="unreal" key="unreal">
-            Unreal
-         </option>
-      ];
+      const appEnginesOpts = Object.keys(C.APP_ENGINES_IMGS).map(engine => {
+         return (
+            <option value={engine} key={engine}>
+               {engine}
+            </option>
+         );
+      });
+
+      // const appEnginesOpts = [
+      //    <option value="Unity" key="unity">
+      //       Unity
+      //    </option>,
+      //    <option value="Unreal" key="unreal">
+      //       Unreal
+      //    </option>
+      // ];
 
       const appStatusOpts = [
-         <option value="inactive" key="inactive">
-            Inactive
-         </option>,
-         <option value="live" key="live">
+         <option value={C.APP_STATES.live} key={C.APP_STATES.live}>
             Live
+         </option>,
+         <option value={C.APP_STATES.inactive} key={C.APP_STATES.inactive}>
+            Inactive
          </option>
       ];
 
@@ -340,7 +346,7 @@ class MyApps extends Component {
                         f === "isActive" ||
                         f === "platformName"
                      ) {
-                        let opts;
+                        let opts = [];
                         switch (f) {
                            case "appEngine":
                               opts = appEnginesOpts;
@@ -420,8 +426,9 @@ class MyApps extends Component {
          let dataOn = "Live";
 
          if (storeurl !== undefined && appState !== undefined) {
-            isPendingStyle = appState === "pending" ? "pendingState" : "";
-            dataOn = appState === "pending" ? "Need info" : "Live";
+            isPendingStyle =
+               appState === C.APP_STATES.pending ? "pendingState" : "";
+            dataOn = appState === C.APP_STATES.pending ? "Need info" : "Live";
          }
 
          const infoBtnClass =
@@ -434,7 +441,15 @@ class MyApps extends Component {
             >
                <div className="engine-logo">
                   {/* <img src={enginesImgs[app.appEngine]} alt="Engine" /> */}
-                  <img src={Unity} alt="Engine" />
+                  <img
+                     src={
+                        app.appEngine
+                           ? C.APP_ENGINES_IMGS[app.appEngine]
+                           : admix
+                     }
+                     className="unselectable"
+                     alt="Engine"
+                  />
                </div>
 
                <div className="app-name mb">{name}</div>

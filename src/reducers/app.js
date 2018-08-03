@@ -2,9 +2,7 @@ import {
       Map
 } from "immutable";
 import _ from "lodash";
-import {
-      ADMIX_OBJ_PREFIX
-} from "../utils/constants";
+import C from "../utils/constants";
 
 import {
       ACTION,
@@ -259,13 +257,11 @@ const actionsMap = {
             return state.merge(Map(initialState));
       },
       [APPS_SUCCESS]: (state, action) => {
-            const selectedApp = {};
             const asyncLoading = false;
             return state.merge(
                   Map({
                         apps: action.data.data,
                         asyncLoading,
-                        selectedApp
                   })
             );
       },
@@ -415,10 +411,10 @@ const actionsMap = {
                               const placementToPush = _.cloneDeep(placements[i]);
                               placementToPush.addedPrefix = false;
 
-                              if (placementToPush.placementName && !placementToPush.placementName.includes(ADMIX_OBJ_PREFIX)) {
+                              if (placementToPush.placementName && !placementToPush.placementName.includes(C.ADMIX_OBJ_PREFIX)) {
                                     placementToPush.addedPrefix = true;
                                     placementToPush.placementName =
-                                          ADMIX_OBJ_PREFIX + placementToPush.placementName;
+                                          C.ADMIX_OBJ_PREFIX + placementToPush.placementName;
                               }
                               scene.placements.push(placementToPush);
                         }
@@ -476,6 +472,8 @@ const actionsMap = {
 
       [TOGGLE_APP_STATUS]: (state, data) => {
             let apps = state.get("apps");
+            let selectedApp = state.get("selectedApp");
+
             const updatedApp = data.data.data;
             const {
                   _id
@@ -487,10 +485,16 @@ const actionsMap = {
                   return app;
             });
 
+            if (Object.keys(selectedApp).length > 0) {
+                  selectedApp.isActive = updatedApp.isActive;
+                  selectedApp.appState = updatedApp.appState;
+            }
+
             const asyncLoading = false;
             return state.merge(
                   Map({
                         apps,
+                        selectedApp,
                         asyncLoading
                   })
             );

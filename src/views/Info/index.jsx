@@ -52,7 +52,7 @@ class Profile extends Component {
 
       let appState;
       if (values.storeurl === "") {
-         appState = "pending";
+         appState = isActive ? "pending" : "inactive";
       } else {
          appState = isActive ? "active" : "inactive";
       }

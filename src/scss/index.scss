@@ -42,6 +42,14 @@ body {
     line-height: 1 !important;
 }
 
+img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+}
+
 $grey-border: #eee;
 $grey-text: #aaa;
 $black: #000;
@@ -310,7 +318,49 @@ p {
 
 /******************************************************/
 
-/***************ROOT CONTAINERS************************/
+/********************MATERIAL UI***********************/
+
+/******************************************************/
+
+.switchBase-active {
+    color: blue !important;
+}
+
+.checked-active {
+    color: blue !important;
+}
+
+.bar-active {
+    background-color: blue !important;
+}
+
+.switchBase-inactive {
+    color: gray !important;
+}
+
+.checked-inactive {
+    color: gray !important;
+}
+
+.bar-inactive {
+    background-color: gray !important;
+}
+
+.switchBase-pending {
+    color: orange !important;
+}
+
+.checked-pending {
+    color: orange !important;
+}
+
+.bar-pending {
+    background-color: orange !important;
+}
+
+/******************************************************/
+
+/*******************ROOT CONTAINERS********************/
 
 /******************************************************/
 
@@ -683,6 +733,38 @@ $inputsFontSize: calc(0.45em+0.3vw);
         width: 100%;
         margin: 1%;
     }
+    #menu-panel-footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        margin-left: -20px;
+        padding: 7% 10%;
+        color: white;
+        a {
+            color: #a6a6a6;
+        }
+        >div {
+            &:nth-child(2) {
+                margin-left: -14px;
+                display: flex;
+                align-items: center;
+                a {
+                    width: 30%;
+                    font-size: .7em;
+                    margin: 0 5%;
+                    padding: 3% 0%;
+                }
+            }
+            &:last-child() {
+                a {
+                    width: 100%;
+                }
+            }
+        }
+        .btn {
+            background: white;
+        }
+    }
 }
 
 .menu-panel-vertical-cover {
@@ -872,10 +954,10 @@ $inputsFontSize: calc(0.45em+0.3vw);
 }
 
 .webglControls {
-    position: absolute;
-    width: 100%;
-    left: 0;
-    bottom: 5%;
+    // position: absolute;
+    // width: 100%;
+    // left: 0;
+    // bottom: 5%;
     padding: 7%;
     div {
         display: flex;
@@ -1125,10 +1207,9 @@ $inputsFontSize: calc(0.45em+0.3vw);
                         padding: 15%;
                         background-color: #d9d9d9;
                         border-radius: 100%;
-                        -webkit-filter: invert(1);
                         width: 100%;
-                        max-width: 60px;
-                        filter: invert(1);
+                        max-width: 60px; // filter: invert(1);
+                        // -webkit-filter: invert(1);
                     }
                 }
                 .app-name {

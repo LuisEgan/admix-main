@@ -1,6 +1,4 @@
-import {
-    ADMIX_OBJ_PREFIX
-} from './constants';
+import C from './constants';
 
 const isAtleast = (str, limit) => {
     return str.length >= limit;
@@ -31,7 +29,7 @@ const capitalizeFirstLetter = str => {
 
 const withoutPrefix = str => {
     return str.replace(
-        ADMIX_OBJ_PREFIX,
+        C.ADMIX_OBJ_PREFIX,
         ""
     );
 }

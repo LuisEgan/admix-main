@@ -4,7 +4,7 @@ import { Redirect } from "react-router-dom";
 import { routeCodes } from "../../config/routes";
 import PropTypes from "prop-types";
 import { updatePlacements, toggleAppStatus } from "../../actions";
-import { ADMIX_OBJ_PREFIX } from "../../utils/constants";
+import C from "../../utils/constants";
 
 import cool from "../../assets/img/Sunglasses_Emoji_40.png";
 import coolLoad from "../../assets/img/Sunglasses_Emoji_load.png";
@@ -52,7 +52,7 @@ class Validation extends Component {
       const parsedInputs = savedInputs.map(input => {
          if (input.addedPrefix) {
             input.placementName = input.placementName.replace(
-               ADMIX_OBJ_PREFIX,
+               C.ADMIX_OBJ_PREFIX,
                ""
             );
          }

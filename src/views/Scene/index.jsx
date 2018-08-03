@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import _ from "lodash";
 import { saveInputs } from "../../actions/";
-import { ADMIX_OBJ_PREFIX } from "../../utils/constants";
+import C from "../../utils/constants";
 import STR from "../../utils/strFuncs";
 import ReactTable from "react-table";
 import "react-table/react-table.css";
@@ -72,6 +72,7 @@ class Scene extends Component {
          postProcessingSet: false,
          eventListenersSet: false,
          clickedPlacement: {},
+         placementsByName: {},
 
          noPlacementsDataMssg: "👈 Select your scene!",
          catDropdownByPlacementId: {},
@@ -179,6 +180,7 @@ class Scene extends Component {
          const catsSelectedByPlacementId = {};
          const subCatsSelectedByPlacementId = {};
          const activeByPlacementId = {};
+         const placementsByName = {};
 
          // set the placements to the selectedScene
          selectedApp.scenes.some(scene => {
@@ -186,6 +188,9 @@ class Scene extends Component {
                emptyPlacements = scene.placements.length === 0;
                selectedScene.placements = scene.placements;
                scene.placements.forEach(placement => {
+                  // set placementsByName
+                  placementsByName[placement.placementName] = placement;
+
                   // set the sub-categories dropdowns for each placement depending on their category
                   subCatsDropdownByPlacementId[placement._id] =
                      dbSubCategories[placement.category];
@@ -209,6 +214,7 @@ class Scene extends Component {
          return {
             initialSet: !emptyPlacements,
             selectedScene,
+            placementsByName,
             subCatsDropdownByPlacementId,
             catsSelectedByPlacementId,
             subCatsSelectedByPlacementId,
@@ -357,7 +363,7 @@ class Scene extends Component {
 
    addSelectedObject(object) {
       this.selectedObjects = [];
-      if (object.name.includes(ADMIX_OBJ_PREFIX)) {
+      if (object.name.includes(C.ADMIX_OBJ_PREFIX)) {
          this.selectedObjects.push(object);
       }
       this.outlinePass.selectedObjects = this.selectedObjects;
@@ -401,7 +407,7 @@ class Scene extends Component {
 
          if (intersects.length > 0 && !!intersects[0].object.material.color) {
             const intersected = intersects[0].object;
-            if (intersected.name.includes(ADMIX_OBJ_PREFIX)) {
+            if (intersected.name.includes(C.ADMIX_OBJ_PREFIX)) {
                // Change previous selected to material (if there's a previous)
                if (this.intersected) {
                   this.intersected.material = this.intersected.currentMaterial;
@@ -564,10 +570,11 @@ class Scene extends Component {
       // key = ALT
       if (e.keyCode === 18 && !this.isALTdown) {
          document.body.style.cursor = "move";
-         this.controls.mouseButtons = {
-            ORBIT: THREE.MOUSE.RIGHT,
-            PAN: THREE.MOUSE.LEFT
-         };
+         this.controls &&
+            (this.controls.mouseButtons = {
+               ORBIT: THREE.MOUSE.RIGHT,
+               PAN: THREE.MOUSE.LEFT
+            });
       }
    }
    handleKeyUp(e) {
@@ -634,10 +641,10 @@ class Scene extends Component {
             this.camera
          );
          outlinePass.edgeStrength = 10;
-         outlinePass.edgeGlow = 0;
+         outlinePass.edgeGlow = 0.5;
          outlinePass.edgeThickness = 1;
          outlinePass.pulsePeriod = 0;
-         outlinePass.visibleEdgeColor = new THREE.Color("#ff0000");
+         outlinePass.visibleEdgeColor = new THREE.Color("#ff3300");
          outlinePass.hiddenEdgeColor = new THREE.Color("#190a05");
          this.outlinePass = outlinePass;
          this.composer.addPass(outlinePass);
@@ -676,7 +683,8 @@ class Scene extends Component {
          TJSsetup,
          sceneMounted,
          selectedScene,
-         isSceneLoading
+         isSceneLoading,
+         placementsByName
       } = this.state;
       const { userData } = this.props;
 
@@ -809,13 +817,18 @@ class Scene extends Component {
 
          object.name = "userLoadedScene";
          object.position.set(0, 0, 0);
-         var material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+         var imgMaterial = new THREE.MeshBasicMaterial({ color: "#009900" });
+         var vidMaterial = new THREE.MeshBasicMaterial({ color: "#990000" });
          object.traverse(function(child) {
             if (
                child instanceof THREE.Mesh &&
-               child.name.includes(ADMIX_OBJ_PREFIX)
+               child.name.includes(C.ADMIX_OBJ_PREFIX)
             ) {
-               child.material = material;
+               child.material = placementsByName[child.name]
+                  ? placementsByName[child.name].placementType === "banner"
+                     ? imgMaterial
+                     : vidMaterial
+                  : imgMaterial;
             }
          });
 

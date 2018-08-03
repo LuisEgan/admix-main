@@ -5,6 +5,7 @@
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",
+        "nsbuild": "cross-env GENERATE_SOURCEMAP=false && npm run build",
         "test": "react-scripts test --env=jsdom",
         "eject": "react-scripts eject",
         "dev": "concurrently \"gulp sass:watch\" \"npm start\"",
