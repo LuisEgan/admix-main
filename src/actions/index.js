@@ -403,34 +403,25 @@ export const setNewEmail = ({
             .catch(error => dispatch(asyncError(error)));
 };
 
-export const getApps = (accessToken, filterBy = []) => dispatch => {
+export const getApps = (accessToken, filterBy = [], isAdmin = false) => dispatch => {
       dispatch(asyncStart());
 
       const data = {
             filterBy
       };
 
-      api
-            .getApps(accessToken, data)
-            .then(data => dispatch(showApps(data)))
-            .catch(error => dispatch(asyncError(error)));
+      if (!isAdmin) {
+            api
+                  .getApps(accessToken, data)
+                  .then(data => dispatch(showApps(data)))
+                  .catch(error => dispatch(asyncError(error)));
+      } else {
+            api
+                  .getAppsAdmin(accessToken, data)
+                  .then(data => dispatch(showApps(data)))
+                  .catch(error => dispatch(asyncError(error)));
+      }
 
-      //    api
-      //       .isAdmin(accessToken)
-      //       .then(response => {
-      //          if (response.status) {
-      //             api
-      //                .getAppsAdmin(accessToken, data)
-      //                .then(data => dispatch(showApps(data)))
-      //                .catch(error => dispatch(asyncError(error)));
-      //          } else {
-      //             api
-      //                .getApps(accessToken, data)
-      //                .then(data => dispatch(showApps(data)))
-      //                .catch(error => dispatch(asyncError(error)));
-      //          }
-      //       })
-      //       .catch(error => dispatch(asyncError(error)));
 };
 
 export const getUserData = accessToken => dispatch => {

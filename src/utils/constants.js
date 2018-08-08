@@ -17,8 +17,7 @@ const APP_STATES = {
 const APP_ENGINES_IMGS = {
     Unity,
     Unreal,
-    // "High Fidelity": HiFi,
-    "High-Fidelity": HiFi,
+    "High Fidelity": HiFi,
     Desktop,
     // WindowsEditor,
     // Android

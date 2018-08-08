@@ -90,7 +90,8 @@ class MyApps extends Component {
    }
 
    componentDidMount() {
-      const { apps, dispatch, accessToken, userData } = this.props;
+      let { apps, dispatch, accessToken, userData } = this.props;
+      apps = Array.isArray(apps) ? apps : [];
       const activeApps = [];
       apps.forEach(app => {
          const { _id, isActive } = app;
@@ -109,7 +110,8 @@ class MyApps extends Component {
    }
 
    static getDerivedStateFromProps(nextProps, prevState) {
-      const { apps } = nextProps;
+      let { apps } = nextProps;
+      apps = Array.isArray(apps) ? apps : [];
       const activeApps = [];
       apps.forEach(app => {
          const { _id, isActive } = app;
@@ -201,6 +203,8 @@ class MyApps extends Component {
       this.setState({ appSelected: true, redirect: "REPORT" });
    }
 
+   // FILTER ----------------------------------------------
+
    toggleFilter() {
       const { showFilter } = this.state;
 
@@ -227,17 +231,18 @@ class MyApps extends Component {
    }
 
    deleteFilter(i) {
-      const { accessToken, dispatch } = this.props;
+      const { accessToken, dispatch, userData } = this.props;
       const { filterBy } = this.state;
       filterBy.splice(i, 1);
       const userUsedFilter = filterBy.length !== 0;
       this.setState({ filterBy, userUsedFilter });
-      dispatch(getApps(accessToken, filterBy));
+      dispatch(getApps(accessToken, filterBy, userData.isAdmin));
    }
 
    setFilter({ filterIndex, attr }, e) {
-      const { accessToken, dispatch } = this.props;
+      const { accessToken, dispatch, userData } = this.props;
       let { filterBy } = this.state;
+      const usedAttr = !!filterBy[filterIndex][attr];
 
       let {
          target: { value }
@@ -252,16 +257,34 @@ class MyApps extends Component {
 
       filterBy[filterIndex][attr] = value;
 
-      filterBy.length === 1 &&
-         value.length === 0 &&
-         dispatch(getApps(accessToken, []));
-
       this.setState({ filterBy });
 
-      if (attr === "name") {
-         value.length >= 3 && dispatch(getApps(accessToken, filterBy));
+      // check if it's an empty filter
+      let isEmpty = true;
+      let filter;
+      for (let i = 0; i < filterBy.length; i++) {
+         filter = filterBy[i];
+         for (let filterItem in filter) {
+            if (filter[filterItem] !== "") {
+               isEmpty = false;
+               break;
+            }
+         }
+         if (!isEmpty) break;
+      }
+
+      filterBy = isEmpty ? [] : filterBy;
+
+      if (
+         attr === "name" ||
+         attr === "_id" ||
+         attr === "email.value" ||
+         attr === "userName"
+      ) {
+         (value.length >= 3 || usedAttr) &&
+            dispatch(getApps(accessToken, filterBy, userData.isAdmin));
       } else {
-         dispatch(getApps(accessToken, filterBy));
+         dispatch(getApps(accessToken, filterBy, userData.isAdmin));
       }
    }
 
@@ -276,6 +299,12 @@ class MyApps extends Component {
             case "_id":
                str = "App Id";
                break;
+            case "platformName":
+               str = "Platform";
+               break;
+            case "email.value":
+               str = "User Email";
+               break;
             default:
          }
 
@@ -285,17 +314,18 @@ class MyApps extends Component {
       };
 
       const {
-         location: { search }
+         //    location: { search },
+         userData
       } = this.props;
       let { filterBy } = this.state;
 
-      const isAdmin = search === "?iamanadmin";
+      // const isAdmin = search === "?iamanadmin";
 
-      const filterTypes = isAdmin
+      const filterTypes = userData.isAdmin
          ? [
               "name",
-              "_id",
-              "userId",
+              //   "_id",
+              "email.value",
               "userName",
               "appEngine",
               "isActive",
@@ -362,7 +392,7 @@ class MyApps extends Component {
 
                         return (
                            <div key={f}>
-                              <span className="sst">{_parseFilterName(f)}</span>
+                              <span className="mb">{_parseFilterName(f)}</span>
                               <select
                                  className="form-control"
                                  onChange={this.setFilter.bind(null, {
@@ -379,7 +409,7 @@ class MyApps extends Component {
                      }
                      return (
                         <div key={f}>
-                           <span className="sst">{_parseFilterName(f)}</span>
+                           <span className="mb">{_parseFilterName(f)}</span>
                            <input
                               className="form-control"
                               type="text"
@@ -410,8 +440,11 @@ class MyApps extends Component {
       );
    }
 
+   // RENDER ----------------------------------------------
+
    renderApps() {
       let { apps, selectedApp } = this.props;
+      apps = Array.isArray(apps) ? apps : [];
 
       const appsRe = apps.slice().reverse();
 
@@ -512,6 +545,7 @@ class MyApps extends Component {
                         appId: _id,
                         redirect: "SCENE"
                      })}
+                     onMouseLeave={this.hideEditInfoBox.bind(null, _id)}
                      onMouseEnter={this.showEditInfoBox.bind(null, _id)}
                   >
                      Setup
@@ -626,12 +660,12 @@ class MyApps extends Component {
 
                {!showContent && <AdmixLoading loadingText="Loading" />}
 
-               {!anyApps && userData._id && showContent && this.renderNoApps()}
-
                {filterBy.length > 0 && this.renderFilter()}
 
                {anyApps &&
                   showContent && <div id="apps-list">{this.renderApps()}</div>}
+
+               {!anyApps && userData._id && showContent && this.renderNoApps()}
             </div>
          </div>
       );
