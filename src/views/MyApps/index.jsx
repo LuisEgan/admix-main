@@ -90,7 +90,7 @@ class MyApps extends Component {
       const allAppsIds = apps.map(app => app._id);
       this.setState({ allAppsIds, activeApps, filterBy: appsFilterBy || [] });
 
-      appsFilterBy.length === 0 && dispatch(getApps(accessToken));
+      (!appsFilterBy || appsFilterBy.length === 0) && dispatch(getApps(accessToken));
       dispatch(resetSelectedApp());
       dispatch(getUserData(accessToken));
       dispatch(setUserImgURL(CLOUDINARY_IMG_URL + userData._id + ".png"));
@@ -561,12 +561,12 @@ class MyApps extends Component {
                   </button>
 
                   {/* REPORT COMMENTED */}
-                  {/* <button
+                  <button
                      className="btn btn-dark mb"
                      onClick={this.getReportData.bind(null, _id)}
                   >
                      Report
-                  </button> */}
+                  </button>
                </div>
             </div>
          );
@@ -650,12 +650,12 @@ class MyApps extends Component {
                      <span className="mb">Filter</span>
                   </div>
                   {/* REPORT COMMENTED */}
-                  {/* <button
+                  <button
                      className="btn btn-dark sst"
                      onClick={this.getReportData.bind(null, allAppsIds)}
                   >
                      <FontAwesomeIcon icon={faGlobe} /> &nbsp; Global Report
-                  </button> */}
+                  </button>
                </div>
 
                {!showContent && <AdmixLoading loadingText="Loading" />}

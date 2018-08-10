@@ -14,15 +14,15 @@ export default class Congratulations extends Component {
                         <img src={unity} alt="unity" />
                         <a
                            className="btn btn-dark"
-                           href="https://admix.in/plugins/Admix.Unity_rev1.2_Release.rar"
+                           href="https://admix.in/plugins/Admix.Unity_Rev1.3-Release_videoFix.rar"
                            target="_blank"
                            rel="noopener noreferrer"
                         >
                            Admix for Unity
                         </a>
                         <p className="mb">
-                           Admix.Unity_rev1.2_Release.rar - 12MB <br /> Unity
-                           2017.f.1.10 and above
+                           Admix.Unity_Rev1.3-Release_videoFix - 8MB <br />{" "}
+                           Unity 2017.f.1.10 and above
                         </p>
                      </div>
 
