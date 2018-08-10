@@ -34,6 +34,15 @@ const withoutPrefix = str => {
     );
 }
 
+const getFirstUpper = str => {
+    for (let i = 0; i < str.length; i++) {
+       if (str.charAt(i) === str.charAt(i).toUpperCase()) {
+          return i;
+       }
+    }
+    return -1;
+ };
+
 export default {
     isAtleast,
     hasLetter,
@@ -41,5 +50,6 @@ export default {
     hasNumber,
     isValidEmail,
     capitalizeFirstLetter,
-    withoutPrefix
+    withoutPrefix,
+    getFirstUpper
 };

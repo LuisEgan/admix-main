@@ -12,9 +12,11 @@ import {
    setInitialReportApp,
    resetSavedInputs,
    resetSelectedApp,
-   setUserImgURL
+   setUserImgURL,
+   setAppsFilterBy
 } from "../../actions";
 import C from "../../utils/constants";
+import STR from "../../utils/strFuncs";
 import { CLOUDINARY_IMG_URL } from "../../config/cloudinary";
 
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
@@ -26,19 +28,6 @@ import faMinus from "@fortawesome/fontawesome-free-solid/faMinus";
 import AdmixLoading from "../../components/SVG/AdmixLoading";
 
 import admix from "../../assets/img/default_pic.jpg";
-
-const getFirstUpper = str => {
-   for (let i = 0; i < str.length; i++) {
-      if (str.charAt(i) === str.charAt(i).toUpperCase()) {
-         return i;
-      }
-   }
-   return -1;
-};
-
-const capitalizeFirstLetter = string => {
-   return string.charAt(0).toUpperCase() + string.slice(1);
-};
 
 // @connect(state => ({
 //   apps: state.app.get("apps"),
@@ -90,7 +79,7 @@ class MyApps extends Component {
    }
 
    componentDidMount() {
-      let { apps, dispatch, accessToken, userData } = this.props;
+      let { apps, dispatch, accessToken, userData, appsFilterBy } = this.props;
       apps = Array.isArray(apps) ? apps : [];
       const activeApps = [];
       apps.forEach(app => {
@@ -99,10 +88,10 @@ class MyApps extends Component {
       });
 
       const allAppsIds = apps.map(app => app._id);
-      this.setState({ allAppsIds, activeApps });
+      this.setState({ allAppsIds, activeApps, filterBy: appsFilterBy || [] });
 
+      appsFilterBy.length === 0 && dispatch(getApps(accessToken));
       dispatch(resetSelectedApp());
-      dispatch(getApps(accessToken));
       dispatch(getUserData(accessToken));
       dispatch(setUserImgURL(CLOUDINARY_IMG_URL + userData._id + ".png"));
       dispatch(resetSavedInputs());
@@ -258,6 +247,7 @@ class MyApps extends Component {
       filterBy[filterIndex][attr] = value;
 
       this.setState({ filterBy });
+      dispatch(setAppsFilterBy(filterBy));
 
       // check if it's an empty filter
       let isEmpty = true;
@@ -290,7 +280,7 @@ class MyApps extends Component {
 
    renderFilter() {
       const _parseFilterName = str => {
-         const uppIndex = getFirstUpper(str);
+         const uppIndex = STR.getFirstUpper(str);
 
          switch (str) {
             case "name":
@@ -308,16 +298,20 @@ class MyApps extends Component {
             default:
          }
 
-         return `${capitalizeFirstLetter(
+         return `${STR.capitalizeFirstLetter(
             str.substring(0, uppIndex)
          )} ${str.substring(uppIndex, str.length)}`;
       };
 
-      const {
+      let {
          //    location: { search },
-         userData
+         userData,
+         appsFilterBy
       } = this.props;
       let { filterBy } = this.state;
+
+      appsFilterBy = appsFilterBy || [];
+      filterBy = Object.keys(appsFilterBy).length > 0 ? appsFilterBy : filterBy;
 
       // const isAdmin = search === "?iamanadmin";
 
@@ -464,8 +458,14 @@ class MyApps extends Component {
             dataOn = appState === C.APP_STATES.pending ? "Need info" : "Live";
          }
 
-         const infoBtnClass =
-            isPendingStyle !== "" && isActive ? "btn-pending" : "btn-dark";
+         let infoBtnClass;
+
+         if (isPendingStyle !== "" && isActive) {
+            // infoBtnClass = "btn-pending btn-blink-orange";
+            infoBtnClass = "btn-pending";
+         } else {
+            infoBtnClass = "btn-dark";
+         }
 
          return (
             <div
@@ -540,13 +540,13 @@ class MyApps extends Component {
 
                   <button
                      className="btn btn-dark mb"
-                     disabled={isActive}
                      onClick={this.selectApp.bind(null, {
                         appId: _id,
                         redirect: "SCENE"
                      })}
-                     onMouseLeave={this.hideEditInfoBox.bind(null, _id)}
-                     onMouseEnter={this.showEditInfoBox.bind(null, _id)}
+                     //       disabled={isActive}
+                     //    onMouseLeave={this.hideEditInfoBox.bind(null, _id)}
+                     //    onMouseEnter={this.showEditInfoBox.bind(null, _id)}
                   >
                      Setup
                   </button>
@@ -561,12 +561,12 @@ class MyApps extends Component {
                   </button>
 
                   {/* REPORT COMMENTED */}
-                  <button
+                  {/* <button
                      className="btn btn-dark mb"
                      onClick={this.getReportData.bind(null, _id)}
                   >
                      Report
-                  </button>
+                  </button> */}
                </div>
             </div>
          );
@@ -650,12 +650,12 @@ class MyApps extends Component {
                      <span className="mb">Filter</span>
                   </div>
                   {/* REPORT COMMENTED */}
-                  <button
+                  {/* <button
                      className="btn btn-dark sst"
                      onClick={this.getReportData.bind(null, allAppsIds)}
                   >
                      <FontAwesomeIcon icon={faGlobe} /> &nbsp; Global Report
-                  </button>
+                  </button> */}
                </div>
 
                {!showContent && <AdmixLoading loadingText="Loading" />}
@@ -674,6 +674,7 @@ class MyApps extends Component {
 
 const mapStateToProps = state => ({
    apps: state.app.get("apps"),
+   appsFilterBy: state.app.get("appsFilterBy"),
    selectedApp: state.app.get("selectedApp"),
    accessToken: state.app.get("accessToken"),
    asyncLoading: state.app.get("asyncLoading"),

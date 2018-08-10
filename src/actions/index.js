@@ -40,6 +40,7 @@ export const REGISTER_REQUEST = "USERS_REGISTER_REQUEST",
       SET_USER_IMG_URL = "SET_USER_IMG_URL",
       USER_IMG_UPLOAD = "USER_IMG_UPLOAD",
       SNACKBAR_TOGGLE = "SNACKBAR_TOGGLE",
+      SET_APPS_FILTER_BY = "SET_APPS_FILTER_BY",      
       PERSIST_REHYDRATE = "persist/REHYDRATE";
 
 // Test action
@@ -152,9 +153,6 @@ function doSetEmail(data) {
             return asyncError(data);
       }
 }
-
-
-
 
 function showApps(data) {
       if (data.status) {
@@ -299,6 +297,13 @@ const updateUserRes = (data) => {
       } else {
             return asyncError(data);
       }
+}
+
+export const setAppsFilterBy = data => {
+      return {
+            type: SET_APPS_FILTER_BY,
+            data
+      };
 }
 
 // FETCH =============================================

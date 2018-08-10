@@ -263,7 +263,7 @@ export default class MenuPanel extends Component {
          appState,
          storeurl
       } = selectedApp;
-      appState = isActive ? "inactive" : C.APP_STATES.live;
+      appState = isActive ? C.APP_STATES.inactive : C.APP_STATES.live;
 
       if (storeurl !== undefined && appState !== undefined) {
          if (!isActive && storeurl === "") {
@@ -443,7 +443,7 @@ export default class MenuPanel extends Component {
 
       let footerMssg =
          appState === C.APP_STATES.pending ||
-         appState === "inactive" ||
+         appState === C.APP_STATES.inactive ||
          !isActive
             ? "Your app isn’t generating revenue yet"
             : "Your app is starting to generate revenue";
@@ -452,13 +452,13 @@ export default class MenuPanel extends Component {
          appState !== undefined
             ? appState
             : storeurl !== undefined || storeurl !== ""
-               ? "inactive"
+               ? C.APP_STATES.inactive
                : C.APP_STATES.pending;
 
       let footerStyle;
 
       switch (footerActiveMssg) {
-         case "inactive":
+         case C.APP_STATES.inactive:
             footerStyle = { background: "#a6a6a6" };
             break;
          case C.APP_STATES.pending:

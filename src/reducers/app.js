@@ -36,7 +36,8 @@ import {
       UPDATE_USER,
       USER_IMG_UPLOAD,
       SET_USER_IMG_URL,
-      SNACKBAR_TOGGLE
+      SNACKBAR_TOGGLE,
+      SET_APPS_FILTER_BY
 } from "../actions";
 
 export const initialState = Map({
@@ -58,6 +59,7 @@ export const initialState = Map({
       reportData: {},
       initialReportAppId: [],
       userImgURL: "",
+      appsFilterBy: []
 });
 
 const actionsMap = {
@@ -76,6 +78,16 @@ const actionsMap = {
             return state.merge(
                   Map({
                         isSnackBarOpen: !isSnackBarOpen
+                  })
+            );
+      },
+
+      [SET_APPS_FILTER_BY]: (state, action) => {
+            const appsFilterBy = action.data;
+
+            return state.merge(
+                  Map({
+                        appsFilterBy
                   })
             );
       },
@@ -258,9 +270,10 @@ const actionsMap = {
       },
       [APPS_SUCCESS]: (state, action) => {
             const asyncLoading = false;
+            const apps = Array.isArray(action.data.data) ? action.data.data : [];
             return state.merge(
                   Map({
-                        apps: action.data.data,
+                        apps,
                         asyncLoading,
                   })
             );

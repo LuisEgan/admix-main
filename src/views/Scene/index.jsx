@@ -734,11 +734,11 @@ class Scene extends Component {
 
       this.lastObjURL = objUrlWithoutTimestamp;
 
-      if (userData.email.value === "eganluis@gmail.com") {
-         renderPath = "./modelTest/";
-         objUrl = `exportObjScene1.obj`;
-         mtlUrl = `exportObjScene1.mtl`;
-      }
+      // if (userData.email.value === "eganluis@gmail.com") {
+      //    renderPath = "./modelTest/";
+      //    objUrl = `exportObjScene1.obj`;
+      //    mtlUrl = `exportObjScene1.mtl`;
+      // }
 
       // THREE.ImageUtils.crossOrigin = "anonymous";
 

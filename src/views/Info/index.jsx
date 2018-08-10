@@ -12,6 +12,7 @@ import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 
 import STR from "../../utils/strFuncs";
+import C from "../../utils/constants";
 
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faAngleUp from "@fortawesome/fontawesome-free-solid/faAngleUp";
@@ -52,9 +53,9 @@ class Profile extends Component {
 
       let appState;
       if (values.storeurl === "") {
-         appState = isActive ? "pending" : "inactive";
+         appState = isActive ? C.APP_STATES.pending : C.APP_STATES.inactive;
       } else {
-         appState = isActive ? "active" : "inactive";
+         appState = isActive ? C.APP_STATES.live : C.APP_STATES.inactive;
       }
 
       const appData = {
