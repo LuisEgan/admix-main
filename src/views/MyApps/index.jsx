@@ -79,7 +79,14 @@ class MyApps extends Component {
    }
 
    componentDidMount() {
-      let { apps, dispatch, accessToken, userData, appsFilterBy } = this.props;
+      let {
+         apps,
+         dispatch,
+         accessToken,
+         adminToken,
+         userData,
+         appsFilterBy
+      } = this.props;
       apps = Array.isArray(apps) ? apps : [];
       const activeApps = [];
       apps.forEach(app => {
@@ -90,7 +97,8 @@ class MyApps extends Component {
       const allAppsIds = apps.map(app => app._id);
       this.setState({ allAppsIds, activeApps, filterBy: appsFilterBy || [] });
 
-      (!appsFilterBy || appsFilterBy.length === 0) && dispatch(getApps(accessToken));
+      (!appsFilterBy || appsFilterBy.length === 0) &&
+         dispatch(getApps({ accessToken, adminToken }));
       dispatch(resetSelectedApp());
       dispatch(getUserData(accessToken));
       dispatch(setUserImgURL(CLOUDINARY_IMG_URL + userData._id + ".png"));
@@ -181,14 +189,22 @@ class MyApps extends Component {
       const {
          dispatch,
          accessToken,
-         location: { search }
+         location: { search },
+         userData
       } = this.props;
 
       const isAdmin = search === "?iamanadmin";
-      dispatch(getReportData(isAdmin, appsIds, accessToken));
+      dispatch(
+         getReportData({
+            isAdmin,
+            appsIds,
+            accessToken,
+            publisherId: userData._id
+         })
+      );
 
       dispatch(setInitialReportApp(appsIds));
-      dispatch(getApps(accessToken));
+      // dispatch(getApps({accessToken}));
       this.setState({ appSelected: true, redirect: "REPORT" });
    }
 
@@ -220,16 +236,16 @@ class MyApps extends Component {
    }
 
    deleteFilter(i) {
-      const { accessToken, dispatch, userData } = this.props;
+      const { accessToken, adminToken, dispatch } = this.props;
       const { filterBy } = this.state;
       filterBy.splice(i, 1);
       const userUsedFilter = filterBy.length !== 0;
       this.setState({ filterBy, userUsedFilter });
-      dispatch(getApps(accessToken, filterBy, userData.isAdmin));
+      dispatch(getApps({ accessToken, filterBy, adminToken }));
    }
 
    setFilter({ filterIndex, attr }, e) {
-      const { accessToken, dispatch, userData } = this.props;
+      const { accessToken, adminToken, dispatch } = this.props;
       let { filterBy } = this.state;
       const usedAttr = !!filterBy[filterIndex][attr];
 
@@ -272,9 +288,9 @@ class MyApps extends Component {
          attr === "userName"
       ) {
          (value.length >= 3 || usedAttr) &&
-            dispatch(getApps(accessToken, filterBy, userData.isAdmin));
+            dispatch(getApps({ accessToken, filterBy, adminToken }));
       } else {
-         dispatch(getApps(accessToken, filterBy, userData.isAdmin));
+         dispatch(getApps({ accessToken, filterBy, adminToken }));
       }
    }
 
@@ -603,7 +619,7 @@ class MyApps extends Component {
 
             {userUsedFilter && (
                <React.Fragment>
-                  <h3 className="st">You dont't seem to have that app.</h3>
+                  <h3 className="st">You don't seem to have that app.</h3>
                   <h2 className="mb">
                      Check your spelling or the filter combinations.
                   </h2>
@@ -677,6 +693,7 @@ const mapStateToProps = state => ({
    appsFilterBy: state.app.get("appsFilterBy"),
    selectedApp: state.app.get("selectedApp"),
    accessToken: state.app.get("accessToken"),
+   adminToken: state.app.get("adminToken"),
    asyncLoading: state.app.get("asyncLoading"),
    userData: state.app.get("userData")
 });

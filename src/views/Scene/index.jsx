@@ -249,7 +249,7 @@ class Scene extends Component {
       this.setScene();
       this.setRenderer();
       this.setLights();
-      this.setGround();
+      // this.setGround();
       this.setState({ TJSsetup: true });
    }
 
@@ -303,7 +303,7 @@ class Scene extends Component {
       // RENDERER
       const renderer = new THREE.WebGLRenderer({ antialias: false });
       renderer.setSize(innerWidth, innerHeight);
-      renderer.shadowMap.enabled = true;
+      // renderer.shadowMap.enabled = true;
       // renderer.setPixelRatio( window.devicePixelRatio );
       // renderer.setClearColor('#000000');
       this.renderer = renderer;
@@ -313,7 +313,7 @@ class Scene extends Component {
       const { THREE } = window;
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0xcccccc);
-      scene.fog = new THREE.FogExp2(0xcccccc, 0.002);
+      // scene.fog = new THREE.FogExp2(0xcccccc, 0.002);
       this.scene = scene;
    }
 

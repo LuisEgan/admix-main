@@ -40,7 +40,7 @@ export const REGISTER_REQUEST = "USERS_REGISTER_REQUEST",
       SET_USER_IMG_URL = "SET_USER_IMG_URL",
       USER_IMG_UPLOAD = "USER_IMG_UPLOAD",
       SNACKBAR_TOGGLE = "SNACKBAR_TOGGLE",
-      SET_APPS_FILTER_BY = "SET_APPS_FILTER_BY",      
+      SET_APPS_FILTER_BY = "SET_APPS_FILTER_BY",
       PERSIST_REHYDRATE = "persist/REHYDRATE";
 
 // Test action
@@ -408,21 +408,25 @@ export const setNewEmail = ({
             .catch(error => dispatch(asyncError(error)));
 };
 
-export const getApps = (accessToken, filterBy = [], isAdmin = false) => dispatch => {
+export const getApps = ({
+      accessToken,
+      filterBy,
+      adminToken
+}) => dispatch => {
       dispatch(asyncStart());
 
       const data = {
-            filterBy
+            filterBy: filterBy || []
       };
 
-      if (!isAdmin) {
+      if (!adminToken) {
             api
                   .getApps(accessToken, data)
                   .then(data => dispatch(showApps(data)))
                   .catch(error => dispatch(asyncError(error)));
       } else {
             api
-                  .getAppsAdmin(accessToken, data)
+                  .getAppsAdmin(accessToken, adminToken, data)
                   .then(data => dispatch(showApps(data)))
                   .catch(error => dispatch(asyncError(error)));
       }
@@ -548,18 +552,30 @@ export const getPlacementsByApp = (appId, accessToken) => dispatch => {
             .catch(error => dispatch(asyncError(error)));
 };
 
-export const updatePlacements = (accessToken, data) => dispatch => {
+export const updatePlacements = ({
+      accessToken,
+      data,
+      adminToken
+}) => dispatch => {
       dispatch(asyncStart());
 
-      api
-            .updatePlacements(accessToken, data)
-            .then(res => dispatch(pushPlacements(res)))
-            .catch(error => dispatch(asyncError(error)));
+      if (!adminToken) {
+            api
+                  .updatePlacements(accessToken, data)
+                  .then(res => dispatch(pushPlacements(res)))
+                  .catch(error => dispatch(asyncError(error)));
+      } else {
+            api
+                  .updatePlacementsAdmin(accessToken, adminToken, data)
+                  .then(data => dispatch(showApps(data)))
+                  .catch(error => dispatch(asyncError(error)));
+      }
+
 };
 
 // REPORT =============================================
 
-export const getReportData = (isAdmin, appsIds, accessToken) => dispatch => {
+export const getReportData = ({isAdmin, appsIds, accessToken, publisherId}) => dispatch => {
       dispatch(asyncStart());
 
       const currentDate = new Date();
@@ -574,7 +590,8 @@ export const getReportData = (isAdmin, appsIds, accessToken) => dispatch => {
                   year: currentDate.getFullYear(),
                   month: currentDate.getMonth(),
                   day: currentDate.getDate()
-            }
+            },
+            publisherId
       }
 
       api

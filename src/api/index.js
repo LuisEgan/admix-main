@@ -2,8 +2,8 @@
 // import reportData from "../assets/data/placementDailyReport-total.json";
 
 // const dns = "http://ec2-52-15-223-69.us-east-2.compute.amazonaws.com:3005";
-// const dns = "http://ec2-52-15-223-69.us-east-2.compute.amazonaws.com:3006";
-const dns = "https://api.admix.in";
+const dns = "http://ec2-52-15-223-69.us-east-2.compute.amazonaws.com:3006";
+// const dns = "https://api.admix.in";
 // const dns = "https://api.admix.in:3005";
 
 function async () {
@@ -142,11 +142,12 @@ function updateApp(accessToken, data) {
     }).then(response => response.json());
 }
 
-function getAppsAdmin(accessToken, data) {
+function getAppsAdmin(accessToken, adminToken, data) {
     return fetch(dns + "/api/v1/user/getAppsAdmin", {
         method: "POST",
         headers: new Headers({
             "x-access-token": accessToken,
+            "x-admin-token": adminToken,
             "Content-Type": "application/json"
         }),
         body: JSON.stringify(data)

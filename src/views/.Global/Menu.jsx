@@ -42,6 +42,7 @@ class Menu extends Component {
 
       this.handleLogout = this.handleLogout.bind(this);
       this.toggleDropdowns = this.toggleDropdowns.bind(this);
+      this.isSub = this.isSub.bind(this);
    }
 
    static getDerivedStateFromProps(nextProps, prevSate) {
@@ -95,17 +96,21 @@ class Menu extends Component {
       this.setState({ anchorEl: null });
    };
 
+   isSub(page) {
+      const {
+         location: { pathname }
+      } = this.props;
+      return pathname.indexOf(page) > 0 ? "sub" : "";
+   }
+
    render() {
       let { showDropdown } = this.state;
       const { anchorEl } = this.state;
       const open = Boolean(anchorEl);
 
       const {
-         location: { pathname },
          isLoggedIn,
          userData,
-         userImgURL,
-         asyncLoading
       } = this.props;
 
       showDropdown = showDropdown ? "show" : "";
@@ -121,7 +126,42 @@ class Menu extends Component {
                   </div>
                </div>
 
-               <div className="cc" id="steps-container" />
+               <div className="cc mb" id="pages-container">
+                  {isLoggedIn && (
+                     <React.Fragment>
+                        <div className={`${this.isSub("myapps")}`}>
+                           <NavLink
+                              exact
+                              to={routeCodes.MYAPPS}
+                              onClick={this.handleClose}
+                              className="mb mui-dropdown-item"
+                           >
+                              My Apps
+                           </NavLink>
+                        </div>
+                        <div className={`${this.isSub("profile")}`}>
+                           <NavLink
+                              exact
+                              to={routeCodes.PROFILE}
+                              onClick={this.handleClose}
+                              className="mb mui-dropdown-item"
+                           >
+                              My Profile
+                           </NavLink>
+                        </div>
+                        <div className={`${this.isSub("download")}`}>
+                           <NavLink
+                              exact
+                              to={routeCodes.DOWNLOAD}
+                              onClick={this.handleClose}
+                              className="mb mui-dropdown-item"
+                           >
+                              Download
+                           </NavLink>
+                        </div>
+                     </React.Fragment>
+                  )}
+               </div>
 
                <div id="dropdown-container">
                   <IconButton
@@ -167,53 +207,27 @@ class Menu extends Component {
                               </NavLink>
                            </MenuItem>
                            <MenuItem onClick={this.handleClose}>
-                              <NavLink
+                              {/* <NavLink
                                  exact
                                  to={routeCodes.LOGIN}
                                  onClick={this.handleClose.bind(null, true)}
                                  className="mb mui-dropdown-item"
+                                 >
+                                 Login
+                              </NavLink> */}
+                              <a
+                                 onClick={this.handleClose.bind(null, true)}
+                                 className="mb mui-dropdown-item"
+                                 href="/login"
                               >
                                  Login
-                              </NavLink>
+                              </a>
                            </MenuItem>
                         </React.Fragment>
                      )}
 
                      {isLoggedIn && (
                         <React.Fragment>
-                           <MenuItem onClick={this.handleClose}>
-                              <NavLink
-                                 exact
-                                 to={routeCodes.MYAPPS}
-                                 onClick={this.handleClose}
-                                 className="mb mui-dropdown-item"
-                              >
-                                 My Apps
-                              </NavLink>
-                           </MenuItem>
-
-                           <MenuItem onClick={this.handleClose}>
-                              <NavLink
-                                 exact
-                                 to={routeCodes.PROFILE}
-                                 onClick={this.handleClose}
-                                 className="mb mui-dropdown-item"
-                              >
-                                 My Profile
-                              </NavLink>
-                           </MenuItem>
-
-                           <MenuItem onClick={this.handleClose}>
-                              <NavLink
-                                 exact
-                                 to={routeCodes.DOWNLOAD}
-                                 onClick={this.handleClose}
-                                 className="mb mui-dropdown-item"
-                              >
-                                 Download
-                              </NavLink>
-                           </MenuItem>
-
                            <MenuItem onClick={this.handleClose}>
                               <a
                                  onClick={this.handleLogout}
@@ -235,95 +249,6 @@ class Menu extends Component {
                      <FontAwesomeIcon icon={faCaretDown} />
                   </span>
                </div>
-
-               {/* <div
-                  className=""
-                  id="dropdown-container"
-                  onMouseLeave={this.toggleDropdowns.bind(null, true)}
-               >
-                  <div className="dropdown">
-                     <button
-                        className="btn btn-secondary dropdown-toggle"
-                        type="button"
-                        onClick={this.toggleDropdowns.bind(null, false)}
-                     >
-                        <span className="sst">
-                           {userData.name === undefined ||
-                           userData.name === "" ||
-                           !userData.name
-                              ? "Hello!"
-                              : "Hi, " + userData.name + "!"}
-                        </span>
-                     </button>
-                     <div className={`dropdown-menu ${showDropdown}`}>
-                        {!isLoggedIn && (
-                           <React.Fragment>
-                              <NavLink
-                                 exact
-                                 to={routeCodes.DOWNLOAD}
-                                 className="dropdown-item"
-                                 onClick={this.toggleDropdowns.bind(null, true)}
-                              >
-                                 Download
-                              </NavLink>
-                              <NavLink
-                                 exact
-                                 to={routeCodes.LOGIN}
-                                 className="dropdown-item"
-                                 onClick={this.toggleDropdowns.bind(null, true)}
-                              >
-                                 Login
-                              </NavLink>
-                           </React.Fragment>
-                        )}
-
-                        {isLoggedIn && (
-                           <React.Fragment>
-                              <NavLink
-                                 exact
-                                 to={routeCodes.SETUP}
-                                 className="dropdown-item"
-                                 onClick={this.toggleDropdowns.bind(null, true)}
-                              >
-                                 My Apps
-                              </NavLink>
-
-                              <NavLink
-                                 exact
-                                 to={routeCodes.PROFILE}
-                                 className="dropdown-item"
-                                 onClick={this.toggleDropdowns.bind(null, true)}
-                              >
-                                 My Profile
-                              </NavLink>
-
-                              <NavLink
-                                 exact
-                                 to={routeCodes.DOWNLOAD}
-                                 className="dropdown-item"
-                                 onClick={this.toggleDropdowns.bind(null, true)}
-                              >
-                                 Download
-                              </NavLink>
-                              <a
-                                 className="dropdown-item"
-                                 onClick={this.handleLogout}
-                              >
-                                 Logout
-                              </a>
-                           </React.Fragment>
-                        )}
-                     </div>
-                  </div>
-                  {isLoggedIn &&
-                     userData._id && (
-                        <img
-                           src={userData.cloudinaryImgURL}
-                           onError={e => (e.target.src = defaultImg)}
-                           alt="Login"
-                        />
-                     )}
-               </div> */}
             </div>
          </div>
       );
@@ -342,3 +267,38 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps)(Menu);
+
+{
+   /* <MenuItem onClick={this.handleClose}>
+   <NavLink
+      exact
+      to={routeCodes.MYAPPS}
+      onClick={this.handleClose}
+      className="mb mui-dropdown-item"
+   >
+      My Apps
+   </NavLink>
+</MenuItem>
+
+<MenuItem onClick={this.handleClose}>
+   <NavLink
+      exact
+      to={routeCodes.PROFILE}
+      onClick={this.handleClose}
+      className="mb mui-dropdown-item"
+   >
+      My Profile
+   </NavLink>
+</MenuItem>
+
+<MenuItem onClick={this.handleClose}>
+   <NavLink
+      exact
+      to={routeCodes.DOWNLOAD}
+      onClick={this.handleClose}
+      className="mb mui-dropdown-item"
+   >
+      Download
+   </NavLink>
+</MenuItem> */
+}

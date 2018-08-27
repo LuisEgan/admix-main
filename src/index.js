@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/es/integration/react";
 
 import "./index.css";
+import "react-table/react-table.css";
 
 // bootstrap
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";

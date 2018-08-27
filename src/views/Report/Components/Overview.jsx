@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Line } from "react-chartjs-2";
-
-import ReportTable from "./ReportTable";
+import ReactTable from "react-table";
 
 export default class Overview extends Component {
    static propTypes = {
@@ -24,6 +23,9 @@ export default class Overview extends Component {
       this.calcFillRate = this.calcFillRate.bind(this);
       this.calcERPM = this.calcERPM.bind(this);
       this.previousPeriodsTableData = this.previousPeriodsTableData.bind(this);
+      this.renderPreviousPeriodsTable = this.renderPreviousPeriodsTable.bind(
+         this
+      );
       this.toggleInfoBox = this.toggleInfoBox.bind(this);
       this.renderQicon = this.renderQicon.bind(this);
       this.renderGraph = this.renderGraph.bind(this);
@@ -88,7 +90,7 @@ export default class Overview extends Component {
          }
       }
       sum = sum ? sum : 0;
-      return sum.toFixed(4);
+      return Number.isInteger(sum) ? Math.round(sum) : sum.toFixed(2);
    }
 
    calcFillRate() {
@@ -113,6 +115,7 @@ export default class Overview extends Component {
 
    previousPeriodsTableData() {
       const { previousPeriods } = this.props;
+      // console.log("previousPeriods: ", previousPeriods);
       let tableData = [];
 
       let tableDataItemCounter = 0;
@@ -147,7 +150,7 @@ export default class Overview extends Component {
 
                      // get the sum of all impressions of that date
                      iDateSum = period[date][appId][i]["impression"]
-                        ? period[date][appId][i]["revenue"] + iDateSum
+                        ? period[date][appId][i]["impression"] + iDateSum
                         : iDateSum;
                   }
                }
@@ -163,7 +166,7 @@ export default class Overview extends Component {
                growth: 0
             },
             revenue: {
-               value: rDateSum,
+               value: Number(rDateSum).toFixed(2),
                growth: 0
             }
          };
@@ -191,6 +194,126 @@ export default class Overview extends Component {
       });
 
       return tableData;
+   }
+
+   renderPreviousPeriodsTable() {
+      const { asyncLoading } = this.props;
+      let reportData = this.previousPeriodsTableData();
+
+      if (reportData[0].previousPeriods === "") return null;
+
+      const parseGrowth = val => {
+         val = val === "Infinity" ? 100 : val;
+         return val === Infinity || !val || val === "NaN" || isNaN(val)
+            ? "-"
+            : val + "%";
+      };
+
+      // growth class
+      const gc = growth => {
+         if (growth > 0) {
+            return "pos";
+         } else if (growth < 0) {
+            return "neg";
+         }
+
+         return "neut";
+      };
+
+      reportData = reportData.map(item => {
+         const impressions = (
+            <div className="perc">
+               {item.impressions.value}
+               <span className={`${gc(item.impressions.growth)}`}>
+                  {parseGrowth(item.impressions.growth)}
+               </span>
+            </div>
+         );
+
+         const newItem = {
+            ...item,
+            impressions
+         };
+
+         return newItem;
+      });
+
+      return (
+         <ReactTable
+            data={reportData}
+            noDataText={asyncLoading ? "Loading..." : "No data here"}
+            columns={[
+               {
+                  Header: "Previous Periods",
+                  columns: [
+                     {
+                        Header: "Periods",
+                        accessor: "previousPeriods",
+                        minWidth: 50,
+                        sortable: false
+                     },
+                     {
+                        Header: "Impressions",
+                        accessor: "impressions",
+                        sortMethod: (a, b) => {
+                           return a > b ? -1 : 1;
+                        }
+                     },
+                     {
+                        Header: "Revenue",
+                        accessor: "revenue.value",
+                        sortMethod: (a, b) => {
+                           return a > b ? -1 : 1;
+                        }
+                     }
+                  ]
+               }
+            ]}
+            defaultPageSize={7}
+            className="-striped -highlight"
+         />
+      );
+
+      // return (
+      //    <table className="table table-bordered reportTable">
+      //       <thead>
+      //          <tr className="sst">
+      //             <th scope="col">Previous periods</th>
+      //             <th scope="col">Impressions</th>
+      //             <th scope="col">Revenue</th>
+      //             <th scope="col">Impressions</th>
+      //          </tr>
+      //       </thead>
+      //       <tbody>
+      //          {reportData.map(data => {
+      //             const { previousPeriods, impressions, revenue } = data;
+      //             return (
+      //                <tr className="mb" key={previousPeriods}>
+      //                   <td>{previousPeriods}</td>
+      //                   <td>
+      //                      {impressions.value}
+      //                      <span className={`perc ${gc(impressions.growth)}`}>
+      //                         {parseGrowth(impressions.growth)}
+      //                      </span>
+      //                   </td>
+      //                   <td>
+      //                      $ {revenue.value}
+      //                      <span className={`perc ${gc(revenue.growth)}`}>
+      //                         {parseGrowth(revenue.growth)}
+      //                      </span>
+      //                   </td>
+      //                   <td>
+      //                      {impressions.value}
+      //                      <span className={`perc ${gc(impressions.growth)}`}>
+      //                         {parseGrowth(impressions.growth)}
+      //                      </span>
+      //                   </td>
+      //                </tr>
+      //             );
+      //          })}
+      //       </tbody>
+      //    </table>
+      // );
    }
 
    renderQicon(input) {
@@ -329,6 +452,7 @@ export default class Overview extends Component {
 
    render() {
       const { calcSumOf } = this;
+      const { quickFilter } = this.props;
 
       return (
          <div id="overview">
@@ -387,9 +511,7 @@ export default class Overview extends Component {
                </div>
             </div>
 
-            <div id="overview-bot">
-               <ReportTable reportData={this.previousPeriodsTableData()} />
-            </div>
+            <div id="overview-bot">{quickFilter !== "a" && this.renderPreviousPeriodsTable()}</div>
          </div>
       );
    }

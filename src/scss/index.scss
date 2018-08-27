@@ -335,8 +335,7 @@ p {
 
 .btn-blink {
     position: relative;
-
-    &::after{
+    &::after {
         content: '';
         position: absolute;
         border: solid 10px black;
@@ -351,12 +350,10 @@ p {
 
 .btn-blink-orange {
     @extend .btn-blink;
-
     &::after {
         border: solid 10px orange;
     }
 }
-
 
 /******************************************************/
 
@@ -431,7 +428,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
         display: flex;
         height: 100%;
         padding: 0;
-        margin: 0 auto;
+        max-width: unset;
         width: 100%;
         >div {
             height: 100%;
@@ -446,6 +443,37 @@ $inputsFontSize: calc(0.45em+0.3vw);
                 max-width: 200px;
                 min-width: 100px; // -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
                 // filter: grayscale(100%);
+            }
+        }
+        #pages-container {
+            width: 55%;
+            >div {
+                padding: 0 2%;
+                min-width: 150px;
+                text-align: center;
+            }
+            a {
+                position: relative;
+                &::after {
+                    @extend .fadeIn;
+                    content: '';
+                    width: 100%;
+                    position: absolute;
+                    bottom: -6px;
+                    left: 0;
+                }
+                &:hover {
+                    &::after {
+                        border-bottom: solid #f2f2f2;
+                    }
+                }
+            }
+            .sub {
+                a {
+                    &::after {
+                        border-bottom: solid black;
+                    }
+                }
             }
         }
         #steps-container {
@@ -1786,6 +1814,22 @@ $inputsFontSize: calc(0.45em+0.3vw);
         color: red;
     }
     span.neut {
+        color: #b6b6b6;
+    }
+}
+
+.perc {
+    width: 100%;
+    span {
+        float: right;
+    }
+    .pos {
+        color: #0ccc06;
+    }
+    .neg {
+        color: red;
+    }
+    .neut {
         color: #b6b6b6;
     }
 }

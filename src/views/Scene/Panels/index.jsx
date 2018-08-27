@@ -177,7 +177,7 @@ const mapStateToProps = state => ({
    selectedApp: state.app.get("selectedApp"),
    savedApps: state.app.get("savedApps"),
    accessToken: state.app.get("accessToken"),
-   savedInputs: state.app.get("savedInputs")
+   savedInputs: state.app.get("savedInputs")   
 });
 
 export default connect(

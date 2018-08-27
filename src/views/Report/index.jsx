@@ -50,10 +50,11 @@ class Report extends Component {
       super(props);
 
       this.state = {
-         show: "pe",
+         show: "ov",
          from: new Date(),
          to: new Date(),
          initialDateSetup: false,
+         quickFilter: "a",
          doLoadScene: false,
          isSceneLoaded: false,
          isLoadingScene: false,
@@ -101,9 +102,6 @@ class Report extends Component {
          allAppsSelected = true;
       }
 
-      // for test
-      // userApps["c882ce87-d8eb-45c0-b6ef-2cade5bb8fdc"] = "AYY LMAO";
-
       this.setState({ userApps, selectedApps, allAppsSelected });
    }
 
@@ -118,11 +116,11 @@ class Report extends Component {
       if (Object.keys(reportData).length > 0 && !initialDateSetup) {
          const keys = Object.keys(reportData).sort();
          const first = keys[0];
-         const last = keys[keys.length - 1];
+         //    const last = keys[keys.length - 1];
          return {
             initialDateSetup: true,
-            from: new Date(first),
-            to: new Date(last)
+            from: new Date(first)
+            // to: new Date(last)
          };
       }
 
@@ -171,7 +169,15 @@ class Report extends Component {
    // Date manipulation -----------------------------------------
 
    parseDate(date) {
-      return date.toISOString().split("T")[0];
+      let parseMonth = (date.getMonth() + 1).toString();
+      parseMonth = parseMonth.length === 1 ? `0${parseMonth}` : parseMonth;
+
+      let parseDay = date.getDate().toString();
+      parseDay = parseDay.length === 1 ? `0${parseDay}` : parseDay;
+
+      const parsedDate = date.getFullYear() + "-" + parseMonth + "-" + parseDay;
+      return parsedDate;
+      // return date.toISOString().split("T")[0];
    }
 
    getDates = (startDate, stopDate) => {
@@ -220,11 +226,14 @@ class Report extends Component {
                for (let appId in reportData[parsedDate]) {
                   // check if the app is among the selected apps by the user
                   if (selectedApps[appId]) {
-                     if (!filteredDataObj[parsedDate])
+                     if (!filteredDataObj[parsedDate]) {
                         filteredDataObj[parsedDate] = {};
+                     }
                      filteredDataObj[parsedDate][appId] = _.cloneDeep(
                         reportData[parsedDate][appId]
                      );
+                  } else {
+                     filteredDataObj[parsedDate] = null;
                   }
                }
             } else {
@@ -244,15 +253,13 @@ class Report extends Component {
       let daysInterval = this.getDates(from, to).daysInterval;
       daysInterval = daysInterval === 0 ? 1 : daysInterval;
 
-      let intervalCounter = 1;
-      for (let i = 0; i < max; i++) {
+      for (let i = 1; i <= max; i++) {
          previousPeriods.push(
             this.filteredData(
-               takeDays(from, daysInterval * intervalCounter),
-               takeDays(to, daysInterval * intervalCounter)
+               takeDays(from, daysInterval * i),
+               takeDays(to, daysInterval * i)
             )
          );
-         intervalCounter++;
       }
 
       return previousPeriods;
@@ -283,7 +290,7 @@ class Report extends Component {
          const yesterday = new Date();
          const lastWeek = new Date();
          yesterday.setDate(yesterday.getDate() - 1);
-         lastWeek.setDate(lastWeek.getDate() - 7);
+         lastWeek.setDate(lastWeek.getDate() - 6);
 
          switch (filter) {
             case "t":
@@ -298,12 +305,15 @@ class Report extends Component {
             case "a":
                const keys = Object.keys(reportData).sort();
                const first = keys[0];
-               const last = keys[keys.length - 1];
-               newState = { from: new Date(first), to: new Date(last) };
+               //    const last = keys[keys.length - 1];
+               newState = { from: new Date(first) };
+               //    newState = { from: new Date(first), to: new Date(last) };
                break;
             default:
                return;
          }
+
+         newState.quickFilter = filter;
 
          this.setState(newState);
       }
@@ -412,7 +422,8 @@ class Report extends Component {
          isSceneLoaded,
          isLoadingScene,
          progressLoadingScene,
-         selectedApps
+         selectedApps,
+         quickFilter
       } = this.state;
 
       const {
@@ -425,7 +436,7 @@ class Report extends Component {
          placementsByApp
       } = this.props;
 
-      const owAct = show("ow") ? "active" : "";
+      const owAct = show("ov") ? "active" : "";
       const perAct = show("pe") ? "active" : "";
       // const anAct = show("an") ? "active" : "";
 
@@ -513,7 +524,7 @@ class Report extends Component {
                <div className="list-group sst">
                   <a
                      className={`list-group-item list-group-item-action ${owAct}`}
-                     onClick={this.changeView.bind(null, "ow")}
+                     onClick={this.changeView.bind(null, "ov")}
                   >
                      Overview
                   </a>
@@ -536,10 +547,11 @@ class Report extends Component {
                /> */}
             </div>
 
-            <ToggleDisplay show={show("ow")}>
+            <ToggleDisplay show={show("ov")}>
                <Overview
                   filteredReportData={filteredData()}
                   previousPeriods={previousPeriods(7)}
+                  quickFilter={quickFilter}
                />
             </ToggleDisplay>
 

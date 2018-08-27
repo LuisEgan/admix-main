@@ -541,6 +541,7 @@ const actionsMap = {
             const asyncLoading = false;
             const reportData = {};
 
+            console.log('data: ', data);
             data.data.data.forEach(elem => {
                   const elemClone = _.cloneDeep(elem);
                   const {

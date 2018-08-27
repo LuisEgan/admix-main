@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import { Pie } from "react-chartjs-2";
 import { selectApp, getPlacementsByApp } from "../../../actions";
 import ReactTable from "react-table";
-import "react-table/react-table.css";
 
 import AdmixLoading from "../../../components/SVG/AdmixLoading";
 

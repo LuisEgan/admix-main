@@ -14,7 +14,7 @@ export default class Congratulations extends Component {
                         <img src={unity} alt="unity" />
                         <a
                            className="btn btn-dark"
-                           href="https://admix.in/plugins/Admix.Unity_Rev1.3-Release_videoFix.rar"
+                           href="https://admix.in/wp-content/uploads/2018/08/Admix_Unity.rar"
                            target="_blank"
                            rel="noopener noreferrer"
                         >
@@ -45,7 +45,7 @@ export default class Congratulations extends Component {
                      <h2 className="sst">
                         Check out our Starter’s Guide{" "}
                         <a
-                           href="https://admix.in/pdf/Admix starter guide BETA.pdf"
+                           href="https://admix.in/wp-content/uploads/2018/08/Admix_Starter_Guide.pdf"
                            target="_blank"
                            rel="noopener noreferrer"
                         >

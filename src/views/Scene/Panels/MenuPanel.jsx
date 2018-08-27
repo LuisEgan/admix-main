@@ -7,9 +7,9 @@ import {
    getPlacements,
    resetSelectedApp,
    toggleAppStatus,
-   updatePlacements,
-   selectApp,
-   getApps
+   updatePlacements
+   //    selectApp,
+   //    getApps
 } from "../../../actions/";
 import C from "../../../utils/constants";
 
@@ -64,7 +64,7 @@ export default class MenuPanel extends Component {
          showDdScenes: false
       };
 
-      this.selectApp = this.selectApp.bind(this);
+      // this.selectApp = this.selectApp.bind(this);
       this.toggleSlide = this.toggleSlide.bind(this);
       this.goBack = this.goBack.bind(this);
       this.sceneChange = this.sceneChange.bind(this);
@@ -96,7 +96,7 @@ export default class MenuPanel extends Component {
          });
 
          oldSavedInputs = _.cloneDeep(savedInputs);
-         dispatch(updatePlacements(accessToken, parsedInputs));
+         dispatch(updatePlacements({accessToken, parsedInputs}));
       }
 
       return null;
@@ -121,23 +121,23 @@ export default class MenuPanel extends Component {
       this.setState({ slidedIn });
    }
 
-   selectApp() {
-      const {
-         dispatch,
-         accessToken,
-         selectedApp: { _id, storeurl }
-      } = this.props;
-      const { appSelected, oldStoreurl } = this.state;
+   //    selectApp() {
+   //       const {
+   //          dispatch,
+   //          accessToken,
+   //          selectedApp: { _id, storeurl },
+   //       } = this.props;
+   //       const { appSelected, oldStoreurl } = this.state;
 
-      if (!appSelected) {
-         const interval = setInterval(() => {
-            if (storeurl !== oldStoreurl) clearInterval(interval);
-            dispatch(getApps(accessToken));
-            dispatch(selectApp(_id, accessToken));
-         }, 5000);
-         this.setState({ appSelected: true, interval, oldStoreurl: storeurl });
-      }
-   }
+   //       if (!appSelected) {
+   //          const interval = setInterval(() => {
+   //             if (storeurl !== oldStoreurl) clearInterval(interval);
+   //             dispatch(getApps(accessToken));
+   //             dispatch(selectApp(_id, accessToken));
+   //          }, 5000);
+   //          this.setState({ appSelected: true, interval, oldStoreurl: storeurl });
+   //       }
+   //    }
 
    goBack() {
       const { dispatch } = this.props;
@@ -249,7 +249,7 @@ export default class MenuPanel extends Component {
       });
 
       savedInputs.length !== 0 &&
-         dispatch(updatePlacements(accessToken, parsedInputs));
+         dispatch(updatePlacements({accessToken, parsedInputs}));
    }
 
    changeActive(event) {

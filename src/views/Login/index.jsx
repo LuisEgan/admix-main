@@ -482,7 +482,7 @@ class Login extends Component {
                         <div>
                            I have read to Admix’s &nbsp;
                            <a
-                              href="http://admix.in/pdf/terms.pdf"
+                              href="https://admix.in/wp-content/uploads/2018/08/terms-1.pdf"
                               target="_blank"
                               rel="noopener noreferrer"
                            >
@@ -490,7 +490,7 @@ class Login extends Component {
                            </a>
                            &nbsp; and &nbsp;
                            <a
-                              href="http://admix.in/pdf/privacy.pdf"
+                              href="https://admix.in/wp-content/uploads/2018/08/privacy-1.pdf"
                               target="_blank"
                               rel="noopener noreferrer"
                            >
