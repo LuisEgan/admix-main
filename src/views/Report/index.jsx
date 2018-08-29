@@ -109,6 +109,18 @@ class Report extends Component {
       this.disposeEventListeners();
    }
 
+   shouldComponentUpdate(nextProps, nextState, nextContext) {
+      const { from, to, selectedApps } = this.state;
+      if (
+         from !== nextState.from ||
+         to !== nextState.to ||
+         Object.keys(selectedApps).length === 0
+      ) {
+         return true;
+      }
+      return false;
+   }
+
    static getDerivedStateFromProps(nextProps, prevState) {
       const { reportData } = nextProps;
       const { initialDateSetup } = prevState;
@@ -119,7 +131,8 @@ class Report extends Component {
          //    const last = keys[keys.length - 1];
          return {
             initialDateSetup: true,
-            from: new Date(first)
+            from: new Date(first),
+            to: new Date()
             // to: new Date(last)
          };
       }
@@ -181,9 +194,12 @@ class Report extends Component {
    }
 
    getDates = (startDate, stopDate) => {
+      startDate.setHours(0, 0, 0, 0);
+      stopDate.setHours(0, 0, 0, 0);
       const dateArray = [];
       let currentDate = startDate;
       let daysInterval = 0;
+
       while (currentDate <= stopDate) {
          dateArray.push(currentDate);
          currentDate = addDays(currentDate, 1);
@@ -216,7 +232,7 @@ class Report extends Component {
 
       let filteredDataObj = {};
 
-      if (!_.isEmpty(reportData)) {
+      if (!_.isEmpty(reportData) && !_.isEmpty(selectedApps)) {
          filteredDates.forEach(date => {
             const parsedDate = this.parseDate(date);
 
@@ -305,8 +321,8 @@ class Report extends Component {
             case "a":
                const keys = Object.keys(reportData).sort();
                const first = keys[0];
+               newState = { from: new Date(first), to: new Date() };
                //    const last = keys[keys.length - 1];
-               newState = { from: new Date(first) };
                //    newState = { from: new Date(first), to: new Date(last) };
                break;
             default:
@@ -444,6 +460,8 @@ class Report extends Component {
          ? { display: "block" }
          : { display: "none" };
 
+      const filteredReportData = filteredData();
+
       return (
          <div id="report">
             <div style={performanceShow}>
@@ -549,7 +567,7 @@ class Report extends Component {
 
             <ToggleDisplay show={show("ov")}>
                <Overview
-                  filteredReportData={filteredData()}
+                  filteredReportData={filteredReportData}
                   previousPeriods={previousPeriods(7)}
                   quickFilter={quickFilter}
                />
@@ -564,7 +582,7 @@ class Report extends Component {
                   selectedApp={selectedApp}
                   selectedApps={selectedApps}
                   placementsByApp={placementsByApp}
-                  filteredReportData={filteredData()}
+                  filteredReportData={filteredReportData}
                   fromDate={from}
                   toDate={to}
                   doLoadScene={this.doLoadScene}

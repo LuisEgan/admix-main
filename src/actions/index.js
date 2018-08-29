@@ -594,6 +594,7 @@ export const getReportData = ({isAdmin, appsIds, accessToken, publisherId}) => d
             publisherId
       }
 
+      console.log('data: ', data);
       api
             .getReportData(accessToken, data)
             .then(res => {

@@ -59,7 +59,7 @@ class MyApps extends Component {
 
          filterBy: [],
          showFilter: true,
-         userUsedFilter: false
+         userUsedFilter: false,
       };
 
       this.showContent = this.showContent.bind(this);
@@ -185,7 +185,7 @@ class MyApps extends Component {
       this.setState({ appSelected: true, redirect });
    }
 
-   getReportData(appsIds) {
+   getReportData({ appsIds, userId }) {
       const {
          dispatch,
          accessToken,
@@ -194,12 +194,13 @@ class MyApps extends Component {
       } = this.props;
 
       const isAdmin = search === "?iamanadmin";
+
       dispatch(
          getReportData({
             isAdmin,
             appsIds,
             accessToken,
-            publisherId: userData._id
+            publisherId: userId || userData._id
          })
       );
 
@@ -261,7 +262,7 @@ class MyApps extends Component {
             : value;
 
       filterBy[filterIndex][attr] = value;
-
+      
       this.setState({ filterBy });
       dispatch(setAppsFilterBy(filterBy));
 
@@ -460,7 +461,7 @@ class MyApps extends Component {
 
       return appsRe.map((app, i) => {
          //  if (i > 0) return;
-         let { _id, name, isActive, appState, storeurl } = app;
+         let { _id, userId, name, isActive, appState, storeurl } = app;
 
          const selectedAppClass =
             selectedApp && selectedApp._id === _id ? "app-selected" : "";
@@ -579,7 +580,10 @@ class MyApps extends Component {
                   {/* REPORT COMMENTED */}
                   <button
                      className="btn btn-dark mb"
-                     onClick={this.getReportData.bind(null, _id)}
+                     onClick={this.getReportData.bind(null, {
+                        appsIds: _id,
+                        userId
+                     })}
                   >
                      Report
                   </button>
@@ -636,7 +640,7 @@ class MyApps extends Component {
          appSelected,
          redirect,
          allAppsIds,
-         filterBy
+         filterBy,
       } = this.state;
       const anyApps = apps.length > 0;
 
@@ -652,6 +656,8 @@ class MyApps extends Component {
          );
       }
 
+      const renderGlobal = filterBy.length === 0;
+
       return (
          <div className="step-container" id="apps">
             <div className="container">
@@ -666,12 +672,16 @@ class MyApps extends Component {
                      <span className="mb">Filter</span>
                   </div>
                   {/* REPORT COMMENTED */}
-                  <button
-                     className="btn btn-dark sst"
-                     onClick={this.getReportData.bind(null, allAppsIds)}
-                  >
-                     <FontAwesomeIcon icon={faGlobe} /> &nbsp; Global Report
-                  </button>
+                  {renderGlobal && (
+                     <button
+                        className="btn btn-dark sst"
+                        onClick={this.getReportData.bind(null, {
+                           appsIds: allAppsIds
+                        })}
+                     >
+                        <FontAwesomeIcon icon={faGlobe} /> &nbsp; Global Report
+                     </button>
+                  )}
                </div>
 
                {!showContent && <AdmixLoading loadingText="Loading" />}

@@ -381,8 +381,8 @@ export default class Overview extends Component {
             }
          }
 
-         revenueData.push(rDateSum);
-         impressionsData.push(iDateSum);
+         revenueData.push(rDateSum.toFixed(2));
+         impressionsData.push(iDateSum.toFixed(2));
       }
 
       const data = {
@@ -511,7 +511,9 @@ export default class Overview extends Component {
                </div>
             </div>
 
-            <div id="overview-bot">{quickFilter !== "a" && this.renderPreviousPeriodsTable()}</div>
+            <div id="overview-bot">
+               {quickFilter !== "a" && this.renderPreviousPeriodsTable()}
+            </div>
          </div>
       );
    }
