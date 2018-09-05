@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51 (57462) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 18</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <circle id="path-1" cx="20" cy="20" r="20"></circle>
+        <filter x="-20.0%" y="-10.0%" width="140.0%" height="140.0%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="0" dy="4" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0.0392156863   0 0 0 0 0.121568627   0 0 0 0 0.266666667  0 0 0 0.16 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="My-profile" transform="translate(-372.000000, -412.000000)">
+            <g id="Group-16" transform="translate(266.000000, 160.000000)">
+                <g id="Group-6" transform="translate(110.000000, 252.000000)">
+                    <g id="Group-18">
+                        <g id="Oval">
+                            <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+                            <use fill="#14B9BE" fill-rule="evenodd" xlink:href="#path-1"></use>
+                        </g>
+                        <path d="M27.0911666,17.3055188 L26.653353,17.7424611 L22.2552248,13.349042 L22.6930385,12.9120998 C23.477617,12.1262193 24.6217369,11.8187262 25.694419,12.1054503 C26.7671012,12.3921744 27.6053798,13.2295554 27.8934832,14.30216 C28.1815867,15.3747645 27.8757454,16.5196385 27.0911666,17.3055188 L27.0911666,17.3055188 Z M25.2409541,19.1552742 L22.3231959,22.0718886 L18.3888703,26.0053684 C17.89129,26.4618819 17.2960793,26.7987312 16.648611,26.9902382 L12.8042472,27.9511111 C12.5880178,28.0466759 12.3353081,27.9995404 12.1680413,27.8324458 C12.0007745,27.6653512 11.9533184,27.4126301 12.0485688,27.196211 L13.0101595,23.3527192 C13.2010535,22.7048249 13.5378717,22.1093198 13.9947405,21.6119494 L17.929066,17.6784695 L20.8468242,14.7618552 L25.2409541,19.1552742 Z" id="Pencil-Filled-Icon" fill="#FFFFFF"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="40px" height="40px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51 (57462) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 13</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="UI-/-Apps-/-List-2---smoll-2" transform="translate(-732.000000, -20.000000)">
+            <g id="UI-/-Apps-/-List-2">
+                <g id="Group-13" transform="translate(732.000000, 20.000000)">
+                    <g id="UI-/-Apps-/-List-/-Info-state">
+                        <g id="info">
+                            <rect id="Rectangle-6" stroke="#EDEDED" stroke-width="2" x="1" y="1" width="38" height="38" rx="19"></rect>
+                            <g id="Info-Circle" transform="translate(12.000000, 12.000000)">
+                                <polygon id="Shape" points="0 0 16.000008 0 16.000008 16.000008 0 16.000008"></polygon>
+                                <path d="M12.714073,3.28595498 C15.3175677,5.88944961 15.3175677,10.1105584 12.714073,12.7140264 C10.1105784,15.317521 5.88946961,15.317521 3.28600164,12.7140264 C0.682507008,10.1105317 0.682507008,5.88942294 3.28600164,3.28595498 C5.88949628,0.682460341 10.1106051,0.682460341 12.714073,3.28595498" id="Shape" fill="#53627C"></path>
+                                <path d="M8.000004,11.333339 C7.63181715,11.333339 7.333337,11.0348589 7.333337,10.666672 L7.333337,7.333337 C7.333337,6.96515015 7.63181715,6.66667 8.000004,6.66667 C8.36819085,6.66667 8.666671,6.96515015 8.666671,7.333337 L8.666671,10.666672 C8.666671,11.0348589 8.36819085,11.333339 8.000004,11.333339 Z" id="Shape" fill="#FFFFFF"></path>
+                                <path d="M8.000004,6.000003 C7.63181715,6.000003 7.333337,5.70152285 7.333337,5.333336 C7.333337,4.96514915 7.63181715,4.666669 8.000004,4.666669 C8.36819085,4.666669 8.666671,4.96514915 8.666671,5.333336 C8.666671,5.70152285 8.36819085,6.000003 8.000004,6.000003 Z" id="Shape" fill="#FFFFFF"></path>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

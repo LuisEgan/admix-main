@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51 (57462) - http://www.bohemiancoding.com/sketch -->
+    <title>Shape</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="My-apps" transform="translate(-36.000000, -331.000000)" fill="#FFFFFF">
+            <g id="Group-9" transform="translate(15.000000, 147.000000)">
+                <g id="Group-14" transform="translate(0.000000, 184.000000)">
+                    <g id="download-icon" transform="translate(21.000000, 0.000000)">
+                        <path d="M3,21.0075 C3,21.0045 21,21 21,21 C20.994,21 21,13.5 21,13.5 C21,12.672 21.672,12 22.5,12 C23.328,12 24,12.672 24,13.5 L24,21.0075 C24,22.65 22.65,24 21,24 L3,24 C1.341,24 0,22.665 0,21.0075 L0,13.5 C0,12.672 0.672,12 1.5,12 C2.328,12 3,12.672 3,13.5 L3,21.0075 Z M10.5,10.1205 L7.059,6.4005 C6.474,5.808 5.5245,5.808 4.938,6.4005 C4.353,6.9945 4.353,7.956 4.938,8.5485 L10.41,14.3205 C10.8345,14.7495 11.397,14.9865 12,14.9865 C12.6,14.9865 13.167,14.7495 13.59,14.3205 L19.0605,8.5455 C19.6455,7.9545 19.6455,6.993 19.0605,6.4005 C18.4755,5.8065 17.526,5.8065 16.9395,6.4005 L13.5,10.116 L13.5,1.5 C13.5,0.672 12.8295,1.77635684e-15 12,1.77635684e-15 C11.175,1.77635684e-15 10.5,0.672 10.5,1.5 L10.5,10.1205 Z" id="Shape"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

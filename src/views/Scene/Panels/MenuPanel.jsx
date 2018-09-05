@@ -96,7 +96,7 @@ export default class MenuPanel extends Component {
          });
 
          oldSavedInputs = _.cloneDeep(savedInputs);
-         dispatch(updatePlacements({accessToken, parsedInputs}));
+         dispatch(updatePlacements({accessToken, data: parsedInputs}));
       }
 
       return null;
@@ -249,7 +249,7 @@ export default class MenuPanel extends Component {
       });
 
       savedInputs.length !== 0 &&
-         dispatch(updatePlacements({accessToken, parsedInputs}));
+         dispatch(updatePlacements({accessToken, data: parsedInputs}));
    }
 
    changeActive(event) {

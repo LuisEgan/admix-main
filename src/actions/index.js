@@ -348,6 +348,24 @@ export function signup(name, email, password) {
       };
 }
 
+export const resendSignUpEmail = ({
+      userEmail,
+      userName
+}) => dispatch => {
+      dispatch(asyncStart());
+
+      const data = {
+            userEmail,
+            userName
+      };
+      api
+            .resendSignUpEmail(data)
+            .then(data => dispatch(doSignup(data)))
+            .catch(error => dispatch(asyncError(error)));
+};
+
+
+
 export const forgotPass = email => dispatch => {
       dispatch(asyncStart());
 
@@ -560,6 +578,7 @@ export const updatePlacements = ({
       dispatch(asyncStart());
 
       if (!adminToken) {
+            console.log('data: ', data);
             api
                   .updatePlacements(accessToken, data)
                   .then(res => dispatch(pushPlacements(res)))
@@ -575,7 +594,12 @@ export const updatePlacements = ({
 
 // REPORT =============================================
 
-export const getReportData = ({isAdmin, appsIds, accessToken, publisherId}) => dispatch => {
+export const getReportData = ({
+      isAdmin,
+      appsIds,
+      accessToken,
+      publisherId
+}) => dispatch => {
       dispatch(asyncStart());
 
       const currentDate = new Date();

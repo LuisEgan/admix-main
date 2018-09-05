@@ -1,7 +1,13 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { login, signup, forgotPass, resetAsync } from "../../actions";
+import {
+   login,
+   signup,
+   resendSignUpEmail,
+   forgotPass,
+   resetAsync
+} from "../../actions";
 import ToggleDisplay from "react-toggle-display";
 import STR from "../../utils/strFuncs";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
@@ -50,6 +56,7 @@ class Login extends Component {
       this.handleClick = this.handleClick.bind(this);
       this.handleLogin = this.handleLogin.bind(this);
       this.handleSignup = this.handleSignup.bind(this);
+      this.resendSignUpEmail = this.resendSignUpEmail.bind(this);
 
       this.handleInputChange = this.handleInputChange.bind(this);
       this.handleforgotPass = this.handleforgotPass.bind(this);
@@ -105,6 +112,11 @@ class Login extends Component {
       const { dispatch } = this.props;
       const { name, email, password } = this.state;
       dispatch(signup(name, email, password));
+   }
+
+   resendSignUpEmail() {
+      const { dispatch, signupInfo } = this.props;
+      dispatch(resendSignUpEmail(signupInfo));
    }
 
    handleforgotPass() {
@@ -174,8 +186,10 @@ class Login extends Component {
    }
 
    render() {
-      const { asyncData, asyncError, asyncLoading } = this.props;
-
+      let { asyncData, asyncError, asyncLoading } = this.props;
+      // asyncData = {};
+      // asyncData.mssg = "Success! Now, please confirm your email.";
+      
       const {
          show,
          passInputType,
@@ -523,7 +537,7 @@ class Login extends Component {
                   </div>
 
                   {/* BUTTON */}
-                  <div className="login-btn cc">
+                  <div className="login-btn">
                      {/* loading */}
                      {asyncLoading && loadingIcon}
 
@@ -532,7 +546,15 @@ class Login extends Component {
 
                      {/* success message */}
                      {asyncData !== null &&
-                        !asyncError && <p>{asyncData.mssg}</p>}
+                        !asyncError && !asyncLoading && (
+                           <React.Fragment>
+                              <p>{asyncData.mssg}</p>
+                              <p>
+                                 Didn't get the email?{" "}
+                                 <a onClick={this.resendSignUpEmail}><u>Resend.</u></a>
+                              </p>
+                           </React.Fragment>
+                        )}
 
                      {/* button */}
                      {!asyncLoading &&
@@ -568,7 +590,7 @@ const mapStateToProps = state => ({
    asyncData: state.app.get("asyncData"),
    asyncError: state.app.get("asyncError"),
    asyncLoading: state.app.get("asyncLoading"),
-   counter: state.app.get("counter"),
+   signupInfo: state.app.get("signupInfo"),
    isLoggedIn: state.app.get("isLoggedIn")
 });
 

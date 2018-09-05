@@ -60,6 +60,16 @@ function signup(data) {
     }).then(response => response.json());
 }
 
+function resendSignUpEmail(data) {
+    return fetch(dns + "/api/v1/user/resendSignUpEmail", {
+        method: "POST",
+        headers: new Headers({
+            "Content-Type": "application/json"
+        }),
+        body: JSON.stringify(data)
+    }).then(response => response.json());
+}
+
 const updateUser = (accessToken, data) =>
     fetch(`${dns}/api/v1/user/updateUser`, {
         method: "PUT",
@@ -224,6 +234,7 @@ export default {
     isAdmin,
     login,
     signup,
+    resendSignUpEmail,
     updateUser,
     forgotPass,
     changeEmail,

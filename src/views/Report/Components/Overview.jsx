@@ -471,7 +471,7 @@ export default class Overview extends Component {
                            {this.renderQicon("impressions")}
                         </div>
                         <div>
-                           <h3 className="st">{calcSumOf("revenue")}</h3>
+                           <h3 className="st">{calcSumOf("revenue")} €</h3>
                            <h6 className="mb">net revenue</h6>
                            {this.renderQicon("revenue")}
                         </div>

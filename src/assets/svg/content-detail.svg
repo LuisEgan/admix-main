@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="13px" height="17px" viewBox="0 0 13 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51 (57462) - http://www.bohemiancoding.com/sketch -->
+    <title>File</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="App-info" transform="translate(-289.000000, -523.000000)" fill="#000000" fill-rule="nonzero">
+            <g id="Group-6" transform="translate(266.000000, 500.000000)">
+                <g id="File" transform="translate(24.000000, 24.000000)">
+                    <g id="Group-15">
+                        <g id="Group-19" transform="translate(-1.000000, -1.000000)">
+                            <path d="M2,2 L2,15 L8,15 C9.69532374,15 11,13.6921885 11,12 L11,2 L2,2 Z M13,0 L13,12 C13,14.7956848 10.8009693,17 8,17 L-1.63424829e-12,17 L-1.63424829e-12,0 L13,0 Z" id="Shape"></path>
+                            <polygon id="Shape" points="4.333328 5.999995 4.333328 3.999995 9.666656 3.999995 9.666656 5.999995"></polygon>
+                            <polygon id="Shape" points="4.333328 8.666659 4.333328 6.666659 9.666656 6.666659 9.666656 8.666659"></polygon>
+                            <polygon id="Shape" points="4.333328 11.333323 4.333328 9.333323 8.333324 9.333323 8.333324 11.333323"></polygon>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

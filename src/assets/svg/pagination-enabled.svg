@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51 (57462) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 20</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Edit-placement" transform="translate(-695.000000, -729.000000)" stroke-width="2">
+            <g id="Group-13" transform="translate(478.000000, 729.000000)">
+                <g id="Group-11" transform="translate(217.000000, 0.000000)">
+                    <g id="Group-17">
+                        <g id="Group-20">
+                            <path d="M24,1 C11.2974508,1 1,11.2974508 1,24 C1,36.7025492 11.2974508,47 24,47 C36.7025492,47 47,36.7025492 47,24 C47,11.2974508 36.7025492,1 24,1 Z" id="Rectangle-5" stroke="#EDEDED" fill="#FFFFFF"></path>
+                            <polyline id="Shape-Copy-10" stroke="#0A1F44" transform="translate(24.333328, 23.666664) rotate(-90.000000) translate(-24.333328, -23.666664) " points="19 21 24.333328 26.333328 29.666656 21"></polyline>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
