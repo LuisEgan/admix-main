@@ -60,7 +60,9 @@ class Report extends Component {
          isLoadingScene: false,
          progressLoadingScene: 0,
          userApps: {},
+         oldSelectedApps: {},
          selectedApps: {},
+         selectedAppsLength: 0,
          allAppsSelected: false
       };
 
@@ -102,7 +104,12 @@ class Report extends Component {
          allAppsSelected = true;
       }
 
-      this.setState({ userApps, selectedApps, allAppsSelected });
+      this.setState({
+         userApps,
+         selectedApps,
+         allAppsSelected,
+         selectedAppsLength: Object.keys(selectedApps).length
+      });
    }
 
    componentWillUnmount() {
@@ -110,11 +117,12 @@ class Report extends Component {
    }
 
    shouldComponentUpdate(nextProps, nextState, nextContext) {
-      const { from, to, selectedApps, show } = this.state;
+      const { from, to, selectedApps, show, selectedAppsLength } = this.state;
       if (
          from !== nextState.from ||
          to !== nextState.to ||
          Object.keys(selectedApps).length === 0 ||
+         selectedAppsLength !== nextState.selectedAppsLength ||
          show !== nextState.show
       ) {
          return true;
@@ -366,7 +374,11 @@ class Report extends Component {
             allAppsSelected = true;
          }
 
-         this.setState({ selectedApps, allAppsSelected });
+         this.setState({
+            selectedApps,
+            allAppsSelected,
+            selectedAppsLength: Object.keys(selectedApps).length
+         });
       }
    }
 
