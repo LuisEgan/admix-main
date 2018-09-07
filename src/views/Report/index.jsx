@@ -110,11 +110,12 @@ class Report extends Component {
    }
 
    shouldComponentUpdate(nextProps, nextState, nextContext) {
-      const { from, to, selectedApps } = this.state;
+      const { from, to, selectedApps, show } = this.state;
       if (
          from !== nextState.from ||
          to !== nextState.to ||
-         Object.keys(selectedApps).length === 0
+         Object.keys(selectedApps).length === 0 ||
+         show !== nextState.show
       ) {
          return true;
       }
@@ -288,6 +289,7 @@ class Report extends Component {
       } else if (view === "pe" && show !== "pe") {
          // this.webGL.mountWebGL();
       }
+
       this.setState({ show: view });
    }
 
