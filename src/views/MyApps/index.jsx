@@ -20,14 +20,10 @@ import STR from "../../utils/strFuncs";
 import { CLOUDINARY_IMG_URL } from "../../config/cloudinary";
 
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
-import faGlobe from "@fortawesome/fontawesome-free-solid/faGlobe";
-import faSearchPlus from "@fortawesome/fontawesome-free-solid/faSearchPlus";
 import faPlus from "@fortawesome/fontawesome-free-solid/faPlus";
 import faMinus from "@fortawesome/fontawesome-free-solid/faMinus";
 
-import AdmixLoading from "../../components/SVG/AdmixLoading";
-
-import admix from "../../assets/img/default_pic.jpg";
+import SVG from "../../components/SVG";
 
 // @connect(state => ({
 //   apps: state.app.get("apps"),
@@ -59,7 +55,7 @@ class MyApps extends Component {
 
          filterBy: [],
          showFilter: true,
-         userUsedFilter: false,
+         userUsedFilter: false
       };
 
       this.showContent = this.showContent.bind(this);
@@ -262,7 +258,7 @@ class MyApps extends Component {
             : value;
 
       filterBy[filterIndex][attr] = value;
-      
+
       this.setState({ filterBy });
       dispatch(setAppsFilterBy(filterBy));
 
@@ -475,31 +471,13 @@ class MyApps extends Component {
             dataOn = appState === C.APP_STATES.pending ? "Need info" : "Live";
          }
 
-         let infoBtnClass;
-
-         if (isPendingStyle !== "" && isActive) {
-            // infoBtnClass = "btn-pending btn-blink-orange";
-            infoBtnClass = "btn-pending";
-         } else {
-            infoBtnClass = "btn-dark";
-         }
-
          return (
             <div
                className={`app-select-container ${selectedAppClass}`}
                key={_id}
             >
                <div className="engine-logo">
-                  {/* <img src={enginesImgs[app.appEngine]} alt="Engine" /> */}
-                  <img
-                     src={
-                        app.appEngine
-                           ? C.APP_ENGINES_IMGS[app.appEngine]
-                           : admix
-                     }
-                     className="unselectable"
-                     alt="Engine"
-                  />
+                  {C.LOGOS[app.appEngine]}
                </div>
 
                <div className="app-name mb">{name}</div>
@@ -556,36 +534,30 @@ class MyApps extends Component {
                   </div>
 
                   <button
-                     className="btn btn-dark mb"
                      onClick={this.selectApp.bind(null, {
                         appId: _id,
                         redirect: "SCENE"
                      })}
-                     //       disabled={isActive}
-                     //    onMouseLeave={this.hideEditInfoBox.bind(null, _id)}
-                     //    onMouseEnter={this.showEditInfoBox.bind(null, _id)}
                   >
-                     Setup
+                     {SVG.setup}
                   </button>
                   <button
-                     className={`btn mb ${infoBtnClass}`}
                      onClick={this.selectApp.bind(null, {
                         appId: _id,
                         redirect: "INFO"
                      })}
                   >
-                     App Info
+                     {SVG.info}
                   </button>
 
                   {/* REPORT COMMENTED */}
                   <button
-                     className="btn btn-dark mb"
                      onClick={this.getReportData.bind(null, {
                         appsIds: _id,
                         userId
                      })}
                   >
-                     Report
+                     {SVG.report}
                   </button>
                </div>
             </div>
@@ -640,7 +612,7 @@ class MyApps extends Component {
          appSelected,
          redirect,
          allAppsIds,
-         filterBy,
+         filterBy
       } = this.state;
       const anyApps = apps.length > 0;
 
@@ -661,30 +633,35 @@ class MyApps extends Component {
       return (
          <div className="step-container" id="apps">
             <div className="container">
-               <div id="apps-myApps">
+               <div id="apps-header">
                   <h3 className="st sc-h3">My apps</h3>
-                  <div
+               </div>
+
+               <div id="apps-buttons">
+                  <button
                      id="filter"
-                     className="unselectable"
+                     className="mb unselectable"
                      onClick={this.addFilter}
                   >
-                     <FontAwesomeIcon icon={faSearchPlus} /> &nbsp;
-                     <span className="mb">Filter</span>
-                  </div>
+                     {SVG.filter} &nbsp;
+                     <span className="mb">Filter selection</span>
+                  </button>
+
                   {/* REPORT COMMENTED */}
                   {renderGlobal && (
                      <button
-                        className="btn btn-dark sst"
+                        className="mb"
                         onClick={this.getReportData.bind(null, {
                            appsIds: allAppsIds
                         })}
                      >
-                        <FontAwesomeIcon icon={faGlobe} /> &nbsp; Global Report
+                        {SVG.globalReport} &nbsp; 
+                        <span className="mb">Global Report</span>
                      </button>
                   )}
                </div>
 
-               {!showContent && <AdmixLoading loadingText="Loading" />}
+               {!showContent && SVG.AdmixLoading({loadingText:"Loading"})}
 
                {filterBy.length > 0 && this.renderFilter()}
 

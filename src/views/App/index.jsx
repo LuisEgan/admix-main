@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 
 import Routes from "../../config/routes";
 import Menu from "../.Global/Menu";
+import SideMenu from "../.Global/SideMenu";
 import Snackbar from "../.Global/SnackBar";
 
 // @withRouter()
@@ -33,6 +34,7 @@ class App extends Component {
                onRef={ref => (this.menu = ref)}
             />
             <div id="Page">
+               <SideMenu location={location} history={history} />
                <div id="content">
                   <Routes
                      isLoggedIn={isLoggedIn}

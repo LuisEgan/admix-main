@@ -127,7 +127,7 @@ class Menu extends Component {
                </div>
 
                <div className="cc mb" id="pages-container">
-                  {isLoggedIn && (
+                  {/* {isLoggedIn && (
                      <React.Fragment>
                         <div className={`${this.isSub("myapps")}`}>
                            <NavLink
@@ -160,7 +160,7 @@ class Menu extends Component {
                            </NavLink>
                         </div>
                      </React.Fragment>
-                  )}
+                  )} */}
                </div>
 
                <div id="dropdown-container">
