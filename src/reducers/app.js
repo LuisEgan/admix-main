@@ -48,6 +48,8 @@ export const initialState = Map({
       asyncData: null,
       isLoggedIn: false,
       accessToken: "",
+      adminToken: "",
+      signupInfo: "",
       userData: {},
       apps: [],
       selectedApp: {},
@@ -271,10 +273,9 @@ const actionsMap = {
       },
       [LOGOUT_SUCCESS]: (state, action) => {
 
-            initialState.adminToken = "";
-            initialState.signupInfo = "";
-            
-            return state.merge(Map(initialState));
+            return state.merge(Map(
+                  initialState
+            ));
       },
       [APPS_SUCCESS]: (state, action) => {
             const asyncLoading = false;
