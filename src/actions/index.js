@@ -578,7 +578,6 @@ export const updatePlacements = ({
       dispatch(asyncStart());
 
       if (!adminToken) {
-            console.log('data: ', data);
             api
                   .updatePlacements(accessToken, data)
                   .then(res => dispatch(pushPlacements(res)))
@@ -618,14 +617,12 @@ export const getReportData = ({
             publisherId
       }
 
-      console.log('data: ', data);
       api
             .getReportData(accessToken, data)
             .then(res => {
                   dispatch(sendReportData(res))
             })
             .catch(error => {
-                  console.log('error: ', error);
                   dispatch(asyncError(error))
             });
 

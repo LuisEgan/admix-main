@@ -19,9 +19,13 @@ import C from "../../utils/constants";
 import STR from "../../utils/strFuncs";
 import { CLOUDINARY_IMG_URL } from "../../config/cloudinary";
 
-import FontAwesomeIcon from "@fortawesome/react-fontawesome";
-import faPlus from "@fortawesome/fontawesome-free-solid/faPlus";
-import faMinus from "@fortawesome/fontawesome-free-solid/faMinus";
+import Input from "@material-ui/core/Input";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
+import { KeyboardArrowDown } from '@material-ui/icons';
+
+
+import ToggleButton from "../../components/ToggleButton";
 
 import SVG from "../../components/SVG";
 
@@ -277,6 +281,7 @@ class MyApps extends Component {
       }
 
       filterBy = isEmpty ? [] : filterBy;
+      console.log("filterBy: ", filterBy);
 
       if (
          attr === "name" ||
@@ -341,55 +346,84 @@ class MyApps extends Component {
          : ["name", "isActive", "appEngine"];
       //      ["name", "appEngine", "isActive", "platformName"];
 
-      const appEnginesOpts = Object.keys(C.APP_ENGINES_IMGS).map(engine => {
-         return (
-            <option value={engine} key={engine}>
-               {engine}
-            </option>
-         );
-      });
+      // const appEnginesOpts = Object.keys(C.APP_ENGINES_IMGS).map(engine => {
+      //    return (
+      //       <option value={engine} key={engine}>
+      //          {engine}
+      //       </option>
+      //    );
+      // });
 
-      // const appEnginesOpts = [
-      //    <option value="Unity" key="unity">
-      //       Unity
+      // const appStatusOpts = [
+      //    <option value={C.APP_STATES.live} key={C.APP_STATES.live}>
+      //       Live
       //    </option>,
-      //    <option value="Unreal" key="unreal">
-      //       Unreal
+      //    <option value={C.APP_STATES.inactive} key={C.APP_STATES.inactive}>
+      //       Inactive
       //    </option>
       // ];
 
+      // const platformOpts = [
+      //    <option value="Android" key="android">
+      //       Android
+      //    </option>
+      // ];
+
+      const appEnginesOpts = Object.keys(C.APP_ENGINES_IMGS).map(engine => {
+         return (
+            <MenuItem value={engine} key={engine} className="mb">
+               {engine}
+            </MenuItem>
+         );
+      });
+
       const appStatusOpts = [
-         <option value={C.APP_STATES.live} key={C.APP_STATES.live}>
+         <MenuItem
+            value={C.APP_STATES.live}
+            key={C.APP_STATES.live}
+            className="mb"
+         >
             Live
-         </option>,
-         <option value={C.APP_STATES.inactive} key={C.APP_STATES.inactive}>
+         </MenuItem>,
+         <MenuItem
+            value={C.APP_STATES.inactive}
+            key={C.APP_STATES.inactive}
+            className="mb"
+         >
             Inactive
-         </option>
+         </MenuItem>
       ];
 
       const platformOpts = [
-         <option value="Android" key="android">
+         <MenuItem value="Android" key="android" className="mb">
             Android
-         </option>
+         </MenuItem>
       ];
 
       return (
          <div className="filter-container fadeIn">
             {filterBy.map((filter, i) => (
                <div className="filter" key={`${filter}-${i}`}>
-                  {filterTypes.map(f => {
+                  {filterTypes.map(filterType => {
                      if (
-                        f === "appEngine" ||
-                        f === "isActive" ||
-                        f === "platformName"
+                        filterType === "appEngine" ||
+                        filterType === "isActive" ||
+                        filterType === "platformName"
                      ) {
                         let opts = [];
-                        switch (f) {
+                        let selectValue = filter[filterType];
+                        switch (filterType) {
                            case "appEngine":
                               opts = appEnginesOpts;
                               break;
                            case "isActive":
                               opts = appStatusOpts;
+                              selectValue =
+                                 filter[filterType] === ""
+                                    ? ""
+                                    : filter[filterType]
+                                       ? C.APP_STATES.live
+                                       : C.APP_STATES.inactive;
                               break;
                            case "platformName":
                               opts = platformOpts;
@@ -398,9 +432,11 @@ class MyApps extends Component {
                         }
 
                         return (
-                           <div key={f}>
-                              <span className="mb">{_parseFilterName(f)}</span>
-                              <select
+                           <div key={filterType}>
+                              <span className="mb">
+                                 {_parseFilterName(filterType)}
+                              </span>
+                              {/* <select
                                  className="form-control"
                                  onChange={this.setFilter.bind(null, {
                                     filterIndex: i,
@@ -410,36 +446,69 @@ class MyApps extends Component {
                               >
                                  <option value="" />
                                  {opts.map(opt => opt)}
-                              </select>
+                              </select> */}
+
+                              <Select
+                                 value={selectValue}
+                                 onChange={this.setFilter.bind(null, {
+                                    filterIndex: i,
+                                    attr: filterType
+                                 })}
+                                 className="mb"
+                                 classes={{ root: "mui-select-root" }}
+                                 disableUnderline={true}
+                                 IconComponent={KeyboardArrowDown}
+                              >
+                                 <MenuItem value="" className="mb" />
+                                 {opts.map(opt => opt)}
+                              </Select>
                            </div>
                         );
                      }
                      return (
-                        <div key={f}>
-                           <span className="mb">{_parseFilterName(f)}</span>
-                           <input
+                        <div key={filterType}>
+                           <span className="mb">
+                              {_parseFilterName(filterType)}
+                           </span>
+                           {/* <input
                               className="form-control"
                               type="text"
-                              value={filter[f]}
+                              value={filter[filterType]}
                               onChange={this.setFilter.bind(null, {
                                  filterIndex: i,
-                                 attr: f
+                                 attr: filterType
                               })}
+                              placeholder={`Search by${_parseFilterName(
+                                 filterType
+                              )}`}
+                           /> */}
+                           <Input
+                              placeholder={`Search by${_parseFilterName(
+                                 filterType
+                              )}`}
+                              value={filter[filterType]}
+                              onChange={this.setFilter.bind(null, {
+                                 filterIndex: i,
+                                 attr: filterType
+                              })}
+                              disableUnderline={true}
+                              classes={{ root: "mui-input-root" }}
                            />
                         </div>
                      );
                   })}
-                  <div className="cc trash">
-                     <FontAwesomeIcon
-                        icon={faPlus}
-                        onClick={this.addFilter}
-                        className="trash-plus"
-                     />
-                     <FontAwesomeIcon
-                        icon={faMinus}
-                        onClick={this.deleteFilter.bind(null, i)}
-                        className="trash-minus"
-                     />
+                  <div>
+                     <div>
+                        <button onClick={this.addFilter} className="SVGbtn">
+                           {SVG.plus}
+                        </button>
+                        <button
+                           onClick={this.deleteFilter.bind(null, i)}
+                           className="SVGbtn"
+                        >
+                           {SVG.minus}
+                        </button>
+                     </div>
                   </div>
                </div>
             ))}
@@ -456,19 +525,27 @@ class MyApps extends Component {
       const appsRe = apps.slice().reverse();
 
       return appsRe.map((app, i) => {
-         //  if (i > 0) return;
          let { _id, userId, name, isActive, appState, storeurl } = app;
 
          const selectedAppClass =
             selectedApp && selectedApp._id === _id ? "app-selected" : "";
 
          let isPendingStyle = "";
-         let dataOn = "Live";
 
          if (storeurl !== undefined && appState !== undefined) {
             isPendingStyle =
                appState === C.APP_STATES.pending ? "pendingState" : "";
-            dataOn = appState === C.APP_STATES.pending ? "Need info" : "Live";
+         }
+
+         switch (appState) {
+            case "inactive":
+               appState = "Off";
+               break;
+            case "pending":
+               appState = "Need Info";
+               break;
+            default:
+               appState = "Live";
          }
 
          return (
@@ -476,89 +553,53 @@ class MyApps extends Component {
                className={`app-select-container ${selectedAppClass}`}
                key={_id}
             >
-               <div className="engine-logo">
-                  {C.LOGOS[app.appEngine]}
+               <div id="app-select-info">
+                  <div className="engine-logo">{C.LOGOS[app.appEngine]}</div>
+                  <div className="app-name mb">{name}</div>
                </div>
-
-               <div className="app-name mb">{name}</div>
-
-               <div className="app-status mb">
-                  <div className="active-switch clearfix toggleBtn">
-                     <div className="toggles">
-                        <input
-                           type="checkbox"
-                           style={{ display: "none" }}
-                           name={_id}
-                           id={_id}
-                           className="ios-toggle"
-                           checked={isActive}
+               <div id="app-select-buttons">
+                  <div>{appState}</div>
+                  <div>
+                     <div className="app-status mb">
+                        <ToggleButton
+                           inputName={_id}
+                           isChecked={isActive}
                            onChange={this.handleOnSwitch.bind(null, app)}
-                        />
-                        <label
-                           htmlFor={_id}
-                           className={`checkbox-label ${isPendingStyle}`}
-                           data-on={dataOn}
-                           data-off="Inactive"
+                           labelClass={isPendingStyle}
                         />
                      </div>
-                     {/* {isPendingStyle !== "" &&
-                        isActive && (
-                           <span className="mb">
-                              (missing store URL, add it&nbsp;
-                              <a
-                                 onClick={this.selectApp.bind(null, {
-                                    appId: _id,
-                                    redirect: "INFO"
-                                 })}
-                              >
-                                 here
-                              </a>)
-                           </span>
-                        )} */}
-                  </div>
-               </div>
-
-               <div
-                  className="app-buttons"
-                  onMouseLeave={this.hideEditInfoBox.bind(null, _id)}
-               >
-                  <div
-                     className="info-box mb"
-                     id={_id}
-                     style={{ display: "none" }}
-                     ref={infoBox => {
-                        this[_id] = infoBox;
-                     }}
-                  >
-                     Turn off the campaign before editing!
                   </div>
 
-                  <button
-                     onClick={this.selectApp.bind(null, {
-                        appId: _id,
-                        redirect: "SCENE"
-                     })}
-                  >
-                     {SVG.setup}
-                  </button>
-                  <button
-                     onClick={this.selectApp.bind(null, {
-                        appId: _id,
-                        redirect: "INFO"
-                     })}
-                  >
-                     {SVG.info}
-                  </button>
+                  <div>
+                     <div className="app-buttons">
+                        <button
+                           onClick={this.selectApp.bind(null, {
+                              appId: _id,
+                              redirect: "SCENE"
+                           })}
+                        >
+                           {SVG.setup}
+                        </button>
+                        <button
+                           onClick={this.selectApp.bind(null, {
+                              appId: _id,
+                              redirect: "INFO"
+                           })}
+                        >
+                           {SVG.info}
+                        </button>
 
-                  {/* REPORT COMMENTED */}
-                  <button
-                     onClick={this.getReportData.bind(null, {
-                        appsIds: _id,
-                        userId
-                     })}
-                  >
-                     {SVG.report}
-                  </button>
+                        {/* REPORT COMMENTED */}
+                        <button
+                           onClick={this.getReportData.bind(null, {
+                              appsIds: _id,
+                              userId
+                           })}
+                        >
+                           {SVG.report}
+                        </button>
+                     </div>
+                  </div>
                </div>
             </div>
          );
@@ -655,13 +696,13 @@ class MyApps extends Component {
                            appsIds: allAppsIds
                         })}
                      >
-                        {SVG.globalReport} &nbsp; 
+                        {SVG.globalReport} &nbsp;
                         <span className="mb">Global Report</span>
                      </button>
                   )}
                </div>
 
-               {!showContent && SVG.AdmixLoading({loadingText:"Loading"})}
+               {!showContent && SVG.AdmixLoading({ loadingText: "Loading" })}
 
                {filterBy.length > 0 && this.renderFilter()}
 

@@ -128,7 +128,7 @@ class Panels extends Component {
       const { saveClicked } = this.state;
 
       return (
-         <div>
+         <div id="scene-panels">
             <MenuPanel
                ref={i => (this.MenuPanel = i)}
                asyncLoading={asyncLoading}

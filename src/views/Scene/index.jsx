@@ -7,14 +7,16 @@ import C from "../../utils/constants";
 import STR from "../../utils/strFuncs";
 import ReactTable from "react-table";
 import "react-table/react-table.css";
+import FormPanel from "./Panels/FormPanel";
+import MenuPanel from "./Panels/MenuPanel";
 
 import Switch from "@material-ui/core/Switch";
-import FormControl from "@material-ui/core/FormControl";
 import Input from "@material-ui/core/Input";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
+import { KeyboardArrowDown } from "@material-ui/icons";
 
-import Panels from "./Panels";
+// import Panels from "./Panels";
 // import Progress from "react-progressbar";
 
 import monkey from "../../assets/img/See_No_Evil_Monkey_Emoji.png";
@@ -22,6 +24,7 @@ import monkeyArrow from "../../assets/img/monkeyArrow.png";
 import exportObj from "../../assets/img/exportOBJ.png";
 
 import AdmixLoading from "../../components/SVG/AdmixLoading";
+import SVG from "../../components/SVG";
 
 import dbCategories from "./Panels/categories.json";
 import dbSubCategories from "./Panels/subCategories.json";
@@ -122,6 +125,13 @@ class Scene extends Component {
       this.updateClickedPlacement = this.updateClickedPlacement.bind(this);
       this.setDisplayMode = this.setDisplayMode.bind(this);
 
+      // PANELS --------------
+      this.forceCloseFormPanel = this.forceCloseFormPanel.bind(this);
+      this.toggleActiveFormPanel = this.toggleActiveFormPanel.bind(this);
+      this.changeDropdownValueFormPanel = this.changeDropdownValueFormPanel.bind(
+         this
+      );
+
       // RAW DATA --------------
       this.changeActive = this.changeActive.bind(this);
       this.changeDropdownValue = this.changeDropdownValue.bind(this);
@@ -137,7 +147,7 @@ class Scene extends Component {
    }
 
    componentDidMount() {
-      this.Panels = this.Panels.getWrappedInstance();
+      // this.Panels = this.Panels.getWrappedInstance();
 
       const { THREE } = window;
 
@@ -397,13 +407,16 @@ class Scene extends Component {
    }
 
    onObjectClick(e) {
+      console.log("e: ", e);
       const { THREE } = window;
       e.stopImmediatePropagation();
       const { isMouseOnPanel } = this.state;
 
       // Check if mouse is on one of the side panels and avoid clicking on an object if so
+      console.log("isMouseOnPanel: ", isMouseOnPanel);
       if (!isMouseOnPanel) {
          const intersects = this.checkIntersection();
+         console.log("intersects: ", intersects);
 
          if (intersects.length > 0 && !!intersects[0].object.material.color) {
             const intersected = intersects[0].object;
@@ -899,39 +912,44 @@ class Scene extends Component {
       );
    }
 
+   // PANELS ---------------------------------------------
+   forceCloseFormPanel() {
+      this.FormPanel.toggleSlide("close");
+   }
+
+   toggleActiveFormPanel() {
+      this.FormPanel.toggleActive({ save: false });
+   }
+
+   changeDropdownValueFormPanel(dropdown, e) {
+      this.FormPanel.changeDropdownValue(dropdown, e);
+   }
+
    // RAW DATA ---------------------------------------------
 
-   changeActive(placementId, event) {
+   changeActive({ placementId, save }) {
       const { activeByPlacementId } = this.state;
 
-      const isFromChild = placementId.indexOf("FromChild") >= 0;
-      placementId = placementId.split("FromChild")[0];
-
       const newActives = _.cloneDeep(activeByPlacementId);
-      newActives[placementId] = event.target.checked;
-
-      // if this function is called from the child, then the changes there are already done
-      !isFromChild &&
-         this.Panels.wrappedInstance.handleActiveChangeFormPanel(event);
+      newActives[placementId] = !activeByPlacementId[placementId];
 
       this.setState({ activeByPlacementId: newActives }, () => {
-         !isFromChild && this.onSave(placementId);
+         if (save) {
+            this.onSave(placementId);
+            this.toggleActiveFormPanel();
+         }
       });
    }
 
-   changeDropdownValue(dropdown, placementId, e) {
-      const { value } = e.target;
+   changeDropdownValue({ dropdown, save, placementId, newValue }, e) {
+      const value = newValue ? newValue : e.target.value;
       let {
          catsSelectedByPlacementId,
          subCatsSelectedByPlacementId,
          subCatsDropdownByPlacementId
       } = this.state;
 
-      const isFromChild =
-         dropdown === "categoryFromChild" ||
-         dropdown === "subCategoryFromChild";
-
-      if (dropdown === "category" || dropdown === "categoryFromChild") {
+      if (dropdown === "category") {
          catsSelectedByPlacementId[placementId] = value;
          subCatsDropdownByPlacementId[placementId] = dbSubCategories[value];
          subCatsSelectedByPlacementId[placementId] = "";
@@ -939,17 +957,23 @@ class Scene extends Component {
          subCatsSelectedByPlacementId[placementId] = value;
       }
 
-      // if this function is called from the child, then the changes there are already done
-      !isFromChild &&
-         this.Panels.wrappedInstance.changeDropdownValueFormPanel(dropdown, e);
-
-      this.setState({
-         catsSelectedByPlacementId,
-         subCatsSelectedByPlacementId,
-         subCatsDropdownByPlacementId
-      });
-
-      !isFromChild && this.onSave(placementId);
+      this.setState(
+         {
+            catsSelectedByPlacementId,
+            subCatsSelectedByPlacementId,
+            subCatsDropdownByPlacementId
+         },
+         () => {
+            if (save) {
+               this.onSave(placementId);
+               this.changeDropdownValueFormPanel({
+                  dropdown,
+                  newValue: value,
+                  save: false
+               });
+            }
+         }
+      );
    }
 
    onSave(placementId) {
@@ -1029,7 +1053,10 @@ class Scene extends Component {
                      ? savedInputsActive
                      : activeByPlacementId[placementId]
                }
-               onChange={this.changeActive.bind(null, placementId)}
+               onChange={this.changeActive.bind(null, {
+                  placementId,
+                  save: true
+               })}
                value={placementId}
                color="primary"
             />
@@ -1069,31 +1096,31 @@ class Scene extends Component {
             : "";
 
          return (
-            <FormControl className="fw">
-               <Select
-                  value={value}
-                  onChange={this.changeDropdownValue.bind(
-                     null,
-                     input,
-                     placementId
-                  )}
-                  input={
-                     <Input
-                        name={`${input}-${placementId}`}
-                        id={`${input}-${placementId}-helper`}
-                     />
-                  }
-                  className="mb"
-               >
-                  <MenuItem value="" className="mb">
-                     <em>
-                        Please select a{" "}
-                        {input === "category" ? "Category" : "Sub-Category"}
-                     </em>
-                  </MenuItem>
-                  {dropdown}
-               </Select>
-            </FormControl>
+            <Select
+               value={value}
+               onChange={this.changeDropdownValue.bind(null, {
+                  dropdown: input,
+                  placementId,
+                  save: true
+               })}
+               input={
+                  <Input
+                     name={`${input}-${placementId}`}
+                     id={`${input}-${placementId}-helper`}
+                  />
+               }
+               classes={{ root: "mui-select-root" }}
+               disableUnderline={true}
+               IconComponent={KeyboardArrowDown}
+            >
+               <MenuItem value="" className="mb">
+                  <em>
+                     Please select a{" "}
+                     {input === "category" ? "Category" : "Sub-Category"}
+                  </em>
+               </MenuItem>
+               {dropdown}
+            </Select>
          );
       };
 
@@ -1165,6 +1192,30 @@ class Scene extends Component {
             dataItem = {};
          });
 
+      const paginationPrevious = props => {
+         const { disabled } = props;
+
+         return disabled ? (
+            <button {...props}>{SVG.paginationDisabled}</button>
+         ) : (
+            <button {...props} className="hundred80">
+               {SVG.paginationEnabled}
+            </button>
+         );
+      };
+
+      const paginationNext = props => {
+         const { disabled } = props;
+
+         return disabled ? (
+            <button {...props} className="hundred80">
+               {SVG.paginationDisabled}
+            </button>
+         ) : (
+            <button {...props}>{SVG.paginationEnabled}</button>
+         );
+      };
+
       return (
          <div id="rawDataTable-cont">
             <div id="rawDataTable">
@@ -1180,36 +1231,48 @@ class Scene extends Component {
                            {
                               Header: "Name",
                               accessor: "name",
-                              minWidth: 150
+                              minWidth: 150,
+                              className: "left mb",
+                              headerClassName: "upper-left-corner"
                            },
                            {
                               Header: "Format",
                               accessor: "format",
-                              minWidth: 50
-                           },
-                           {
-                              Header: "Active",
-                              accessor: "active",
-                              minWidth: 40,
-                              sortMethod: (a, b) => {
-                                 return a.props.checked ? -1 : 1;
-                              }
+                              // minWidth: 50,
+                              className: "mb",
+                              headerClassName: "upper"
                            },
                            {
                               Header: "Category",
                               accessor: "category",
-                              sortable: false
+                              sortable: false,
+                              className: "mb",
+                              headerClassName: "upper"
                            },
                            {
                               Header: "Sub category",
                               accessor: "subCategory",
-                              sortable: false
+                              sortable: false,
+                              className: "mb",
+                              headerClassName: "upper"
+                           },
+                           {
+                              Header: "Active",
+                              headerClassName: "upper-right-corner",
+                              className: "right mb",
+                              accessor: "active",
+                              // minWidth: 40,
+                              sortMethod: (a, b) => {
+                                 return a.props.checked ? -1 : 1;
+                              }
                            }
                         ]
                      }
                   ]}
                   defaultPageSize={10}
                   className="-striped -highlight"
+                  PreviousComponent={paginationPrevious}
+                  NextComponent={paginationNext}
                />
             </div>
             <br />
@@ -1255,6 +1318,15 @@ class Scene extends Component {
    }
 
    render() {
+      const {
+         asyncLoading,
+         selectedApp,
+         savedApps,
+         dispatch,
+         accessToken,
+         savedInputs
+      } = this.props;
+
       let {
          loadingProgress,
          selectedScene,
@@ -1286,31 +1358,37 @@ class Scene extends Component {
             onKeyUp={this.handleKeyUp}
             tabIndex="0"
          >
-            <Panels
-               ref={i => (this.Panels = i)}
-               mouseOnPanel={this.mouseOnPanel}
-               loadScene={this.loadScene}
-               sceneLoadingError={sceneLoadingError}
-               isSceneLoading={isSceneLoading}
-               selectScene={this.selectScene}
-               selectedScene={selectedScene}
+            <MenuPanel
+               // functions
                onSave={this.onSave}
-               clickedPlacement={clickedPlacement}
-               sceneMounted={sceneMounted}
-               updateClickedPlacement={this.updateClickedPlacement}
+               loadScene={this.loadScene}
+               selectScene={this.selectScene}
+               mouseOnPanel={this.mouseOnPanel}
                setDisplayMode={this.setDisplayMode}
-               rawDataChangeDropdownValue={this.changeDropdownValue}
+               forceCloseFormPanel={this.forceCloseFormPanel}
                rawDataChangeActive={this.changeActive}
+               updateClickedPlacement={this.updateClickedPlacement}
+               rawDataChangeDropdownValue={this.changeDropdownValue}
+               // props
+               asyncLoading={asyncLoading}
+               isSceneLoading={isSceneLoading}
+               sceneLoadingError={sceneLoadingError}
+               dispatch={dispatch}
+               savedInputs={savedInputs}
+               selectedApp={selectedApp}
+               accessToken={accessToken}
+               // state
+               sceneMounted={sceneMounted}
                displayMode={displayMode}
             />
 
-            {loadingProgress && (
-               <div id="scene-loading" className="progressbar-container">
-                  {/* <Progress completed={loadingProgress} color={barColor} /> */}
-                  <AdmixLoading />
-                  {`${loadingProgress}% loaded`}
-               </div>
-            )}
+            {loadingProgress !== 0 &&
+               loadingProgress && (
+                  <div id="scene-loading" className="progressbar-container">
+                     <AdmixLoading />
+                     {`${loadingProgress}% loaded`}
+                  </div>
+               )}
 
             {/* {renderSceneLoadingError && this.renderSceneLoadingError()} */}
 
@@ -1319,10 +1397,29 @@ class Scene extends Component {
             {renderRawDataTable && this.renderRawDataTable()}
 
             <div
-               className="placemeni-img"
+               id="scene-webglMount"
                ref={mount => {
                   this.mount = mount;
                }}
+            />
+
+            <FormPanel
+               ref={i => (this.FormPanel = i)}
+               // functions
+               onSave={this.onSave}
+               mouseOnPanel={this.mouseOnPanel}
+               rawDataChangeActive={this.changeActive}
+               updateClickedPlacement={this.updateClickedPlacement}
+               rawDataChangeDropdownValue={this.changeDropdownValue}
+               // props
+               selectedApp={selectedApp}
+               dispatch={dispatch}
+               selectedScene={selectedScene}
+               savedApps={savedApps}
+               // state
+               clickedPlacement={clickedPlacement}
+               sceneMounted={sceneMounted}
+               displayMode={displayMode}
             />
          </div>
       );
@@ -1330,6 +1427,7 @@ class Scene extends Component {
 }
 
 const mapStateToProps = state => ({
+   accessToken: state.app.get("accessToken"),
    asyncData: state.app.get("asyncData"),
    asyncError: state.app.get("asyncError"),
    asyncLoading: state.app.get("asyncLoading"),
@@ -1341,3 +1439,23 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps)(Scene);
+
+// {
+//    <Panels
+//                ref={i => (this.Panels = i)}
+//                onSave={this.onSave}
+//                loadScene={this.loadScene}
+//                selectScene={this.selectScene}
+//                mouseOnPanel={this.mouseOnPanel}
+//                setDisplayMode={this.setDisplayMode}
+//                rawDataChangeActive={this.changeActive}
+//                updateClickedPlacement={this.updateClickedPlacement}
+//                rawDataChangeDropdownValue={this.changeDropdownValue}
+//                sceneLoadingError={sceneLoadingError}
+//                isSceneLoading={isSceneLoading}
+//                selectedScene={selectedScene}
+//                clickedPlacement={clickedPlacement}
+//                sceneMounted={sceneMounted}
+//                displayMode={displayMode}
+//             />
+// }

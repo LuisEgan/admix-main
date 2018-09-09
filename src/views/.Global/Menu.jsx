@@ -108,10 +108,7 @@ class Menu extends Component {
       const { anchorEl } = this.state;
       const open = Boolean(anchorEl);
 
-      const {
-         isLoggedIn,
-         userData,
-      } = this.props;
+      const { isLoggedIn, userData } = this.props;
 
       showDropdown = showDropdown ? "show" : "";
 

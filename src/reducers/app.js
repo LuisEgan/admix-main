@@ -149,7 +149,6 @@ const actionsMap = {
                   userName: to.name,
                   userEmail: to.email
             }
-            console.log('signupInfo: ', signupInfo);
 
             const asyncLoading = false;
             const asyncData = {
