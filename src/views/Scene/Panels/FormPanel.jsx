@@ -7,6 +7,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import { KeyboardArrowDown } from "@material-ui/icons";
 
+import SVG from "../../../components/SVG";
 import ToggleButton from "../../../components/ToggleButton";
 
 import dbCategories from "./categories.json";
@@ -354,8 +355,7 @@ export default class FormPanel extends Component {
                ? "slidePanelOutRight"
                : "slidePanelInRight"
          : "closed";
-      const arrow = slidedIn ? "left" : "right";
-      const arrowVisible = displayMode === "raw" ? "hidden" : "";
+      const rotateAnim = slidedIn ? "rotate90" : "rotate270";
 
       if (!sceneMounted) {
          return <div />;
@@ -368,10 +368,14 @@ export default class FormPanel extends Component {
             onMouseEnter={mouseOnPanel}
             onMouseLeave={mouseOnPanel}
          >
-            <div
-               className={`panel-toggle-btn cc ${arrow} ${arrowVisible}`}
-               onClick={this.toggleSlide}
-            />
+            {displayMode === "3D" && (
+               <div
+                  className={`panel-toggle-btn cc`}
+                  onClick={this.toggleSlide}
+               >
+                  <div className={`${rotateAnim}`}>{SVG.caretDown}</div>
+               </div>
+            )}
 
             <div id="form-title">
                <div>
@@ -385,7 +389,10 @@ export default class FormPanel extends Component {
 
             <div id="form-footer">
                <div id="form-footer-text" className="mb">
-                  <span role="img" aria-label="bulb">💡</span> Click on other placements in the scene to edit!
+                  <span role="img" aria-label="bulb">
+                     💡
+                  </span>{" "}
+                  Click on other placements in the scene to edit!
                </div>
             </div>
          </div>

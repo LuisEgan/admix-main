@@ -9,8 +9,9 @@ import ReactTable from "react-table";
 import "react-table/react-table.css";
 import FormPanel from "./Panels/FormPanel";
 import MenuPanel from "./Panels/MenuPanel";
+import Breadcrumbs from "../../components/Breadcrumbs";
+import ToggleButton from "../../components/ToggleButton";
 
-import Switch from "@material-ui/core/Switch";
 import Input from "@material-ui/core/Input";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
@@ -1035,7 +1036,7 @@ class Scene extends Component {
    }
 
    renderRawDataTable() {
-      const { asyncLoading, savedInputs } = this.props;
+      const { asyncLoading, savedInputs, selectedApp } = this.props;
       const {
          selectedScene,
          noPlacementsDataMssg,
@@ -1045,21 +1046,46 @@ class Scene extends Component {
          activeByPlacementId
       } = this.state;
 
+      const breadcrumbs = ["My apps", selectedApp.name];
+
       const isActiveToggle = (placementId, savedInputsActive = null) => {
+            const label = savedInputsActive
+            ? savedInputsActive ? "Live" : "Off"
+            : activeByPlacementId[placementId] ? "Live" : "Off"
          return (
-            <Switch
-               checked={
-                  savedInputsActive
-                     ? savedInputsActive
-                     : activeByPlacementId[placementId]
-               }
-               onChange={this.changeActive.bind(null, {
-                  placementId,
-                  save: true
-               })}
-               value={placementId}
-               color="primary"
-            />
+            <div className="table-toggles">
+               <div>{label}</div>
+               <div>
+                  <div className="app-status mb">
+                     <ToggleButton
+                        inputName={placementId}
+                        isChecked={
+                           savedInputsActive
+                              ? savedInputsActive
+                              : activeByPlacementId[placementId]
+                        }
+                        onChange={this.changeActive.bind(null, {
+                           placementId,
+                           save: true
+                        })}
+                     />
+                  </div>
+               </div>
+            </div>
+
+            // <Switch
+            //    checked={
+            //       savedInputsActive
+            //          ? savedInputsActive
+            //          : activeByPlacementId[placementId]
+            //    }
+            //    onChange={this.changeActive.bind(null, {
+            //       placementId,
+            //       save: true
+            //    })}
+            //    value={placementId}
+            //    color="primary"
+            // />
          );
       };
 
@@ -1218,6 +1244,7 @@ class Scene extends Component {
 
       return (
          <div id="rawDataTable-cont">
+            <Breadcrumbs breadcrumbs={breadcrumbs} />
             <div id="rawDataTable">
                <ReactTable
                   data={data}
@@ -1257,7 +1284,7 @@ class Scene extends Component {
                               headerClassName: "upper"
                            },
                            {
-                              Header: "Active",
+                              Header: "Status",
                               headerClassName: "upper-right-corner",
                               className: "right mb",
                               accessor: "active",

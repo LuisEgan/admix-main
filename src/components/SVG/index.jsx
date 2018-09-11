@@ -677,14 +677,14 @@ const paginationEnabled = (
       <g
          id="Page-1"
          stroke="none"
-         stroke-width="1"
+         strokeWidth="1"
          fill="none"
-         fill-rule="evenodd"
+         fillRule="evenodd"
       >
          <g
             id="Edit-placement"
             transform="translate(-695.000000, -729.000000)"
-            stroke-width="2"
+            strokeWidth="2"
          >
             <g id="Group-13" transform="translate(478.000000, 729.000000)">
                <g id="Group-11" transform="translate(217.000000, 0.000000)">
@@ -716,14 +716,14 @@ const paginationDisabled = (
       <g
          id="Page-1"
          stroke="none"
-         stroke-width="1"
+         strokeWidth="1"
          fill="none"
-         fill-rule="evenodd"
+         fillRule="evenodd"
       >
          <g
             id="Edit-placement"
             transform="translate(-478.000000, -729.000000)"
-            stroke-width="2"
+            strokeWidth="2"
          >
             <g id="Group-13" transform="translate(478.000000, 729.000000)">
                <g id="Group-18">
@@ -748,6 +748,20 @@ const paginationDisabled = (
    </svg>
 );
 
+const checkmark = (
+    <svg width="16px" height="16px" viewBox="0 0 16 16">
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="App-info" transform="translate(-312.000000, -417.000000)" fill="#00D664">
+            <g id="Group-4" transform="translate(266.000000, 278.000000)">
+                <g id="Ok-Circle-Filled" transform="translate(46.000000, 139.000000)">
+                    <path d="M8,16 C12.418278,16 16,12.418278 16,8 C16,3.581722 12.418278,0 8,0 C3.581722,0 0,3.581722 0,8 C0,12.418278 3.581722,16 8,16 L8,16 L8,16 L8,16 L8,16 Z M7.000375,11 C7.401331,11 7.77829,10.8423722 8.060259,10.5570459 L11.707532,6.724179 C12.097489,6.3291118 12.097489,5.6906194 11.707532,5.2955522 C11.316575,4.9014826 10.683644,4.9014826 10.293687,5.2955522 L7.000375,8.7722599 L5.707063,7.2955522 C5.317106,6.9014826 4.684175,6.9014826 4.293218,7.2955522 C3.902261,7.6906194 3.902261,8.3291118 4.293218,8.724179 L5.939491,10.5570459 C6.22346,10.8423722 6.598419,11 7.000375,11 L7.000375,11 L7.000375,11 L7.000375,11 L7.000375,11 Z" id="Ok-Circle-Filled-Icon"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+ );
+
 export default {
    AdmixLoading,
    MouseScroll,
@@ -768,5 +782,6 @@ export default {
    data,
    cube,
    paginationEnabled,
-   paginationDisabled
+   paginationDisabled,
+   checkmark
 };

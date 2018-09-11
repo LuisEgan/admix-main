@@ -22,8 +22,7 @@ import { CLOUDINARY_IMG_URL } from "../../config/cloudinary";
 import Input from "@material-ui/core/Input";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
-import { KeyboardArrowDown } from '@material-ui/icons';
-
+import { KeyboardArrowDown } from "@material-ui/icons";
 
 import ToggleButton from "../../components/ToggleButton";
 

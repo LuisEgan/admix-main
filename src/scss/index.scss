@@ -431,6 +431,48 @@ p {
       }
 }
 
+@keyframes rotate90 {
+      from {
+            transform: rotate(0deg);
+      }
+
+      to {
+            transform: rotate(90deg)
+      }
+}
+
+.rotate90 {
+      animation: rotate90 1s forwards;
+}
+
+@keyframes rotate180 {
+      from {
+            transform: rotate(0deg);
+      }
+
+      to {
+            transform: rotate(180deg)
+      }
+}
+
+.rotate180 {
+      animation: rotate180 1s forwards;
+}
+
+@keyframes rotate270 {
+      from {
+            transform: rotate(0deg);
+      }
+
+      to {
+            transform: rotate(270deg)
+      }
+}
+
+.rotate270 {
+      animation: rotate270 1s forwards;
+}
+
 /******************************************************/
 /********************MATERIAL UI***********************/
 /******************************************************/
@@ -489,7 +531,7 @@ p {
 /******************************************************/
 /*******************ROOT CONTAINERS********************/
 /******************************************************/
-$sidesPadding: 7%;
+$sidesPadding: 10%;
 $minWidth: 700px;
 // $arrowSize: calc(3px+0.35vw);
 $arrowSize: 0.85vw;
@@ -729,6 +771,17 @@ $inputsFontSize: calc(0.45em+0.3vw);
 
             &::after {
                   border-left: solid #f2f2f2;
+            }
+      }
+}
+
+.breadcrumbs {
+      display: flex;
+
+      >div {
+            &:nth-child(2n) {
+                  transform: rotate(-90deg);
+                  padding: 0 10px;
             }
       }
 }
@@ -1139,8 +1192,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
                         background: transparent;
                         padding-bottom: 1vh;
                   }
-
-                  &:nth-child(2) {}
             }
       }
 
@@ -1300,13 +1351,12 @@ $inputsFontSize: calc(0.45em+0.3vw);
       }
 
       >.container {
-            padding: 2% 14%;
+            padding: 2% $sidesPadding;
 
             #apps-header {
                   display: flex;
                   position: relative;
                   align-items: center;
-                  padding: 1% 0;
 
                   #filter {
                         position: absolute;
@@ -1489,7 +1539,8 @@ $inputsFontSize: calc(0.45em+0.3vw);
             }
 
             .panel-toggle-btn {
-                  right: -4vw;
+                  right: -40px;
+                  border-radius: 0 5px 5px 0;
             }
 
             #scene-title {
@@ -1687,7 +1738,8 @@ $inputsFontSize: calc(0.45em+0.3vw);
             }
 
             .panel-toggle-btn {
-                  left: -4vw;
+                  left: -40px;
+                  border-radius: 5px 0 0 5px;
             }
 
             #form-title {
@@ -1786,9 +1838,11 @@ $inputsFontSize: calc(0.45em+0.3vw);
 
       .panel-toggle-btn {
             position: absolute;
-            width: 4vw;
-            top: calc(3% + 2.5vw);
-            background-color: transparent;
+            background-color: #FFFFFF;
+            opacity: 0.9;
+            width: 40px;
+            height: 40px;
+            top: 20px;
 
             &:hover {
                   cursor: pointer;
@@ -1877,7 +1931,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
             width: 20vw;
             position: absolute;
             right: 30%;
-            top: 45vh;
+            top: 40vh;
             text-align: center;
 
             #arrow {
@@ -1920,6 +1974,23 @@ $inputsFontSize: calc(0.45em+0.3vw);
                   margin-left: 25%;
             }
 
+            .breadcrumbs {
+                  margin: 5% 0 20px 25%;
+                  padding: 0 5px;
+            }
+
+            .table-toggles {
+                  display: flex;
+                  align-items: center;
+                  justify-content: flex-end;
+
+                  >div {
+                        &:last-child {
+                              margin-left: 10px;
+                        }
+                  }
+            }
+
             #rawDataTable {
                   width: 72%;
                   margin-left: 25%;
@@ -1934,6 +2005,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
                         .rt-table {
                               .-headerGroups {
                                     border: 0;
+                                    padding-bottom: 5vh;
 
                                     div {
                                           color: #0A1F44;
@@ -1972,6 +2044,11 @@ $inputsFontSize: calc(0.45em+0.3vw);
                         .mui-select-root {
                               background: transparent;
                               border: none;
+
+                              >div {
+                                    padding-right: 24px;
+                                    padding-left: 5px;
+                              }
                         }
 
                         $tableBorder: rgba(179, 179, 179, .1);
@@ -2034,7 +2111,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
                                           outline: none;
                                     }
                               }
-                              
+
                               .hundred80 {
                                     svg {
                                           transform: rotate(180deg);
@@ -2042,7 +2119,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
                               }
 
                               .-pagination {
-                                    > div {
+                                    >div {
                                           top: 50%;
                                           transform: translateY(-50%);
                                     }
@@ -2590,7 +2667,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
       }
 
       .simple-container {
-            padding: 0 2%;
+            padding: 2% $sidesPadding;
 
             >div {
                   background-color: transparent;
@@ -2685,7 +2762,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
       }
 
       .simple-container {
-            padding: 0 2%;
+            padding: 2% $sidesPadding;
             min-height: 90vh;
 
             >div {
@@ -2694,8 +2771,36 @@ $inputsFontSize: calc(0.45em+0.3vw);
                   margin-top: 0;
             }
 
+            #info-header {
+                  display: flex;
+                  justify-content: space-between;
+
+                  svg {
+                        padding: 15%;
+
+                        g {
+                              fill: #000;
+                        }
+                  }
+
+                  >div {
+                        &:first-child {
+                              display: flex;
+                              align-items: center;
+
+                              h3 {
+                                    padding-left: 15px;
+                              }
+                        }
+                  }
+            }
+
+            .breadcrumbs {
+                  padding-bottom: 22px;
+            }
+
             .container {
-                  padding: 0vh 3vw;
+                  padding-top: 32px;
                   width: 100%;
                   position: relative;
 
@@ -2706,14 +2811,36 @@ $inputsFontSize: calc(0.45em+0.3vw);
                   .expansionPanelDetails-container {
                         width: 100%;
                         text-align: left;
+                        margin-top: 15px;
 
                         >div {
                               display: flex;
+                              margin-top: 15px;
+                        }
+
+                        >span {
+                              margin: 5px 0;
+                        }
+
+                        .input {
+                              input {
+                                    width: 100%;
+                              }
+
+                              >div {
+                                    width: 100%
+                              }
                         }
                   }
 
                   .ExpansionPanel {
-                        margin: 1vw;
+                        border-radius: 10px;
+
+                        >div {
+                              &:first-child {
+                                    border-bottom: solid #EDEDED;
+                              }
+                        }
 
                         .sectionIcon {
                               margin-right: 2vw;
@@ -2729,77 +2856,106 @@ $inputsFontSize: calc(0.45em+0.3vw);
 /* **************************************************** */
 #download {
       .container {
-            padding: 0 $sidesPadding;
+            padding: 2% $sidesPadding;
 
             div {
                   display: flex;
+                  text-align: center;
             }
 
-            h2 {
-                  color: black;
-            }
+            &:first-child {
+                  >div {
+                        justify-content: space-between;
 
-            a.disabled {
-                  color: white;
-            }
+                        >div {
+                              border-radius: 10px;
+                              flex-flow: column;
+                              justify-content: space-between;
+                              width: 30%;
+                              padding: 3% 0;
 
-            ul {
-                  list-style-type: square;
-
-                  li {
-                        padding: 5px;
-                  }
-
-                  ul {
-                        margin-left: 10%;
-                        margin-top: 2%;
+                              >div {
+                                    padding: 0 10%;
+                              }
+                        }
                   }
             }
 
-            >div {
-                  display: flex;
-                  flex-wrap: wrap;
-                  justify-content: space-evenly;
+            &:last-child {
+                  span {
+                        margin-bottom: 20px;
+                  }
+                  .subtitle {
+                        margin: 5px 0;
+                  }
+            }
+
+            .subtitle {
+                  color: #14B9BE;
+            }
+
+            #download-unity,
+            #download-ue {
+                  span {
+                        color: white;
+                  }
+
+                  button,
+                  a {
+                        background-color: #FFFFFF;
+                        border-radius: 50px;
+                        box-shadow: 0 3px 4px 0 rgba(10, 31, 68, 0.1), 0 0 1px 0 rgba(10, 31, 68, 0.08);
+                        border: 0;
+                        color: black;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        padding: 10px;
+                        min-width: unset;
+                        width: 100%;
+                        text-align: center;
+                  }
+
+                  >div {
+                        margin: 10px 0;
+                        justify-content: center;
+                        min-height: 25%;
+                  }
+            }
+
+            #download-unity {
+                  background-image: linear-gradient(135.78deg, #002590 0%, #1388B7 50.87%, #56C4C6 100%);
+            }
+
+            #download-ue {
+                  background-image: linear-gradient(135.78deg, #0A1F44 0%, #758196 100%);
+
+                  span {
+                        color: white;
+                  }
 
                   a {
-                        // max-width: 50px;
-                        width: unset;
+                        color: #C9CED6;
 
-                        &:visited {
-                              color: $blueAdmix;
+                        &:hover {
+                              cursor: not-allowed;
                         }
                   }
 
                   >div {
-                        text-align: left;
-                        width: 50%;
-                        min-width: 350px;
-                        text-align: center;
-
-                        >div {
-                              flex-flow: column;
-                              padding: 0 2%;
-
-                              img {
-                                    display: block;
-                                    margin: 0 auto;
-                                    padding: 0;
-                                    height: 80px;
-                                    width: 80px;
-                              }
-
-                              p {
-                                    padding: 5%;
-                              }
+                        &:nth-child(2) {
+                              padding: 0 3%;
                         }
+                  }
+            }
 
-                        &:first-child {
-                              justify-content: center;
-                        }
+            #download-help {
+                  div {
+                        justify-content: center;
+                  }
 
-                        &:last-child {
-                              flex-flow: column;
-                        }
+                  a {
+                        color: #14B9BE;
                   }
             }
       }
@@ -2809,6 +2965,20 @@ $inputsFontSize: calc(0.45em+0.3vw);
 /* ****************CUSTOM COMPONENTS******************* */
 /* **************************************************** */
 $ballSize: 20px;
+
+.gradient-btn {
+      background-image: linear-gradient(135.78deg, #002590 0%, #1388B7 50.87%, #56C4C6 100%);
+      border-radius: 50px;
+      width: 103px;
+      height: 48px;
+      color: white;
+      box-shadow: none;
+      border: 0;
+
+      &:focus {
+            outline: none;
+      }
+}
 
 .toggleBtn {
 
@@ -2942,6 +3112,28 @@ $ballSize: 20px;
             &:checked+label:after {
                   opacity: 1;
             }
+      }
+}
+
+.input {
+      border: 2px solid #EDEDED;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+
+      input {
+            border: 0;
+
+            &:focus {
+                  outline: none;
+            }
+      }
+
+      #input-icon {
+            display: flex;
+            align-items: center;
+            max-width: 30px;
+            margin: 0 15px;
       }
 }
 

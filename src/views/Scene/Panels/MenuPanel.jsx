@@ -153,7 +153,7 @@ export default class MenuPanel extends Component {
          selectScene,
          dispatch,
          accessToken,
-         selectedApp: { _id, scenes },
+         selectedApp: { _id, scenes }
       } = this.props;
       const { selectedScene } = this.state;
 
@@ -457,19 +457,23 @@ export default class MenuPanel extends Component {
    }
 
    render() {
-      const { selectedApp } = this.props;
+      const { selectedApp, displayMode } = this.props;
 
       const { slidedIn } = this.state;
 
       const slideAnim = slidedIn ? "slidePanelOutLeft" : "slidePanelInLeft";
-      const arrow = slidedIn ? "right" : "left";
+      const rotateAnim = slidedIn ? "rotate270" : "rotate90";
 
       return (
          <div id="scene-menu-panel" className={`panel ${slideAnim}`}>
-            <div
-               className={`panel-toggle-btn cc ${arrow}`}
-               onClick={this.toggleSlide}
-            />
+            {displayMode === "3D" && (
+               <div
+                  className={`panel-toggle-btn cc`}
+                  onClick={this.toggleSlide}
+               >
+                  <div className={`${rotateAnim}`}>{SVG.caretDown}</div>
+               </div>
+            )}
 
             <div id="scene-title">
                <div>
