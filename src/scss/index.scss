@@ -524,7 +524,8 @@ p {
       }
 
       >svg {
-            fill: #14B9BE
+            fill: #14B9BE;
+            margin-right: 5px;
       }
 }
 
@@ -544,6 +545,10 @@ $inputsFontSize: calc(0.45em+0.3vw);
       display: flex;
       flex-flow: column;
       min-width: $minWidth;
+}
+
+.container {
+      max-width: unset;
 }
 
 #headerMenu {
@@ -1054,47 +1059,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
       margin: 2% 0;
       border-radius: 5px;
 
-      hr {
-            margin-bottom: 0;
-      }
-
-      svg {
-            font-size: 2em;
-
-            &:hover {
-                  cursor: pointer;
-            }
-      }
-
-      >div {
-            &:not(:first-child) {
-                  margin-top: 2%;
-            }
-      }
-
-      .filter-header {
-            display: flex;
-            align-items: center;
-            position: relative;
-
-            >div {
-                  &:not(:first-child) {
-                        float: right;
-                        position: absolute;
-                  }
-            }
-
-            #plus {
-                  right: 5%;
-                  color: #3ad07f;
-            }
-
-            #go {
-                  right: 0%;
-                  color: #5077e1;
-            }
-      }
-
       .filter {
             position: relative;
             display: flex;
@@ -1103,9 +1067,8 @@ $inputsFontSize: calc(0.45em+0.3vw);
             height: 100px;
             padding: 0 3%;
 
-            input,
-            select {
-                  margin-top: 6px;
+            span {
+                  margin-bottom: 6px;
             }
 
             >div {
@@ -1133,12 +1096,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
                                     }
                               }
                         }
-                  }
-
-                  .mui-select-root,
-                  .mui-input-root {
-                        height: 50px;
-                        margin: 7px 0;
                   }
             }
       }
@@ -1372,17 +1329,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
             #apps-buttons {
                   display: flex;
                   justify-content: space-between;
-
-                  button {
-                        border: 0;
-                        background-color: #ffffff;
-                        border-radius: 50px;
-                        box-shadow: 0 3px 4px 0 rgba(10, 31, 68, 0.10000000149011612),
-                              0 0 1px 0 rgba(10, 31, 68, 0.07999999821186066);
-                        width: 181px;
-                        height: 48px;
-                        color: #0a1f44;
-                  }
             }
 
             #apps-list {
@@ -1408,8 +1354,8 @@ $inputsFontSize: calc(0.45em+0.3vw);
                         }
 
                         #app-select-info {
+                              width: 50%;
                               .engine-logo {
-                                    margin: 0 2%;
                                     width: 4vw;
                                     max-width: 40px;
 
@@ -2966,6 +2912,21 @@ $inputsFontSize: calc(0.45em+0.3vw);
 /* **************************************************** */
 $ballSize: 20px;
 
+.white-btn {
+      border: 0;
+      background-color: #ffffff;
+      border-radius: 50px;
+      box-shadow: 0 3px 4px 0 rgba(10, 31, 68, 0.10000000149011612),
+            0 0 1px 0 rgba(10, 31, 68, 0.07999999821186066);
+      width: 181px;
+      height: 48px;
+      color: #0a1f44;
+
+      &:focus {
+            outline: none;
+      }
+}
+
 .gradient-btn {
       background-image: linear-gradient(135.78deg, #002590 0%, #1388B7 50.87%, #56C4C6 100%);
       border-radius: 50px;
@@ -3028,11 +2989,11 @@ $ballSize: 20px;
                   z-index: 1;
                   line-height: 34px;
                   text-indent: 40px;
-                  height: 32px;
-                  width: 32px;
+                  height: 27px;
+                  width: 27px;
                   border-radius: 100%;
-                  top: 0px;
-                  left: 0px;
+                  top: 2px;
+                  left: 2px;
                   right: auto;
                   background: white;
                   box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2), 0 0 0 2px #C9CED6;
@@ -3059,7 +3020,7 @@ $ballSize: 20px;
 
       .ios-toggle:checked+.checkbox-label:before {
             // left: calc(100% - 20px);
-            left: 23px;
+            left: 25px;
             box-shadow: 0 0 0 2px transparent, 0 3px 3px rgba(0, 0, 0, 0.3);
       }
 
@@ -3117,12 +3078,19 @@ $ballSize: 20px;
 
 .input {
       border: 2px solid #EDEDED;
+      border-radius: 5px;
       padding: 10px;
       display: flex;
       align-items: center;
+      min-height: 50px;
 
       input {
             border: 0;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
 
             &:focus {
                   outline: none;

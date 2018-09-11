@@ -25,6 +25,8 @@ class App extends Component {
    render() {
       const { isLoggedIn, location, history } = this.props;
 
+      const contentStyle = !isLoggedIn ? {width: "100%"} : {};
+
       return (
          <div className="App">
             <Menu
@@ -35,7 +37,7 @@ class App extends Component {
             />
             <div id="Page">
                <SideMenu location={location} history={history} />
-               <div id="content">
+               <div id="content" style={contentStyle}>
                   <Routes
                      isLoggedIn={isLoggedIn}
                      location={location}

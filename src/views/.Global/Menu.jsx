@@ -112,6 +112,8 @@ class Menu extends Component {
 
       showDropdown = showDropdown ? "show" : "";
 
+      if(!isLoggedIn) return null;
+
       return (
          <div id="headerMenu">
             <div className="container">
@@ -124,40 +126,6 @@ class Menu extends Component {
                </div>
 
                <div className="cc mb" id="pages-container">
-                  {/* {isLoggedIn && (
-                     <React.Fragment>
-                        <div className={`${this.isSub("myapps")}`}>
-                           <NavLink
-                              exact
-                              to={routeCodes.MYAPPS}
-                              onClick={this.handleClose}
-                              className="mb mui-dropdown-item"
-                           >
-                              My Apps
-                           </NavLink>
-                        </div>
-                        <div className={`${this.isSub("profile")}`}>
-                           <NavLink
-                              exact
-                              to={routeCodes.PROFILE}
-                              onClick={this.handleClose}
-                              className="mb mui-dropdown-item"
-                           >
-                              My Profile
-                           </NavLink>
-                        </div>
-                        <div className={`${this.isSub("download")}`}>
-                           <NavLink
-                              exact
-                              to={routeCodes.DOWNLOAD}
-                              onClick={this.handleClose}
-                              className="mb mui-dropdown-item"
-                           >
-                              Download
-                           </NavLink>
-                        </div>
-                     </React.Fragment>
-                  )} */}
                </div>
 
                <div id="dropdown-container">
@@ -166,9 +134,7 @@ class Menu extends Component {
                      aria-haspopup="true"
                      color="inherit"
                   >
-                     {!isLoggedIn && <FontAwesomeIcon icon={faUser} />}
-
-                     {isLoggedIn &&
+                     {
                         userData._id && (
                            <img
                               src={userData.cloudinaryImgURL}
@@ -191,40 +157,6 @@ class Menu extends Component {
                      open={open}
                      onClose={this.handleClose}
                   >
-                     {!isLoggedIn && (
-                        <React.Fragment>
-                           <MenuItem onClick={this.handleClose}>
-                              <NavLink
-                                 exact
-                                 to={routeCodes.DOWNLOAD}
-                                 onClick={this.handleClose.bind(null, true)}
-                                 className="mb mui-dropdown-item"
-                              >
-                                 Download
-                              </NavLink>
-                           </MenuItem>
-                           <MenuItem onClick={this.handleClose}>
-                              {/* <NavLink
-                                 exact
-                                 to={routeCodes.LOGIN}
-                                 onClick={this.handleClose.bind(null, true)}
-                                 className="mb mui-dropdown-item"
-                                 >
-                                 Login
-                              </NavLink> */}
-                              <a
-                                 onClick={this.handleClose.bind(null, true)}
-                                 className="mb mui-dropdown-item"
-                                 href="/login"
-                              >
-                                 Login
-                              </a>
-                           </MenuItem>
-                        </React.Fragment>
-                     )}
-
-                     {isLoggedIn && (
-                        <React.Fragment>
                            <MenuItem onClick={this.handleClose}>
                               <a
                                  onClick={this.handleLogout}
@@ -234,8 +166,6 @@ class Menu extends Component {
                                  Logout
                               </a>
                            </MenuItem>
-                        </React.Fragment>
-                     )}
                   </MUIMenu>
                   <span className="sst" onClick={this.handleDropdown}>
                      {userData.name === undefined ||

@@ -19,22 +19,14 @@ import C from "../../utils/constants";
 import STR from "../../utils/strFuncs";
 import { CLOUDINARY_IMG_URL } from "../../config/cloudinary";
 
-import Input from "@material-ui/core/Input";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import { KeyboardArrowDown } from "@material-ui/icons";
 
 import ToggleButton from "../../components/ToggleButton";
-
+import Input from "../../components/Input";
 import SVG from "../../components/SVG";
 
-// @connect(state => ({
-//   apps: state.app.get("apps"),
-//   selectedApp: state.app.get("selectedApp"),
-//   accessToken: state.app.get("accessToken"),
-//   asyncLoading: state.app.get("asyncLoading"),
-//   userData: state.app.get("userData")
-// }))
 class MyApps extends Component {
    static propTypes = {
       apps: PropTypes.array,
@@ -297,6 +289,7 @@ class MyApps extends Component {
 
    renderFilter() {
       const _parseFilterName = str => {
+         console.log("str: ", str);
          const uppIndex = STR.getFirstUpper(str);
 
          switch (str) {
@@ -312,12 +305,19 @@ class MyApps extends Component {
             case "email.value":
                str = "User Email";
                break;
+            case "appEngine":
+               str = "Engine";
+               break;
+            case "isActive":
+               str = "Status";
+               break;
             default:
+               str = `${STR.capitalizeFirstLetter(
+                  str.substring(0, uppIndex)
+               )} ${str.substring(uppIndex, str.length)}`;
          }
 
-         return `${STR.capitalizeFirstLetter(
-            str.substring(0, uppIndex)
-         )} ${str.substring(uppIndex, str.length)}`;
+         return str;
       };
 
       let {
@@ -344,29 +344,6 @@ class MyApps extends Component {
            ]
          : ["name", "isActive", "appEngine"];
       //      ["name", "appEngine", "isActive", "platformName"];
-
-      // const appEnginesOpts = Object.keys(C.APP_ENGINES_IMGS).map(engine => {
-      //    return (
-      //       <option value={engine} key={engine}>
-      //          {engine}
-      //       </option>
-      //    );
-      // });
-
-      // const appStatusOpts = [
-      //    <option value={C.APP_STATES.live} key={C.APP_STATES.live}>
-      //       Live
-      //    </option>,
-      //    <option value={C.APP_STATES.inactive} key={C.APP_STATES.inactive}>
-      //       Inactive
-      //    </option>
-      // ];
-
-      // const platformOpts = [
-      //    <option value="Android" key="android">
-      //       Android
-      //    </option>
-      // ];
 
       const appEnginesOpts = Object.keys(C.APP_ENGINES_IMGS).map(engine => {
          return (
@@ -400,7 +377,7 @@ class MyApps extends Component {
       ];
 
       return (
-         <div className="filter-container fadeIn">
+         <div className="filter-container fadeIn mb">
             {filterBy.map((filter, i) => (
                <div className="filter" key={`${filter}-${i}`}>
                   {filterTypes.map(filterType => {
@@ -432,20 +409,7 @@ class MyApps extends Component {
 
                         return (
                            <div key={filterType}>
-                              <span className="mb">
-                                 {_parseFilterName(filterType)}
-                              </span>
-                              {/* <select
-                                 className="form-control"
-                                 onChange={this.setFilter.bind(null, {
-                                    filterIndex: i,
-                                    attr: f
-                                 })}
-                                 defaultValue={filter[f]}
-                              >
-                                 <option value="" />
-                                 {opts.map(opt => opt)}
-                              </select> */}
+                              <span>{_parseFilterName(filterType)}</span>
 
                               <Select
                                  value={selectValue}
@@ -453,7 +417,6 @@ class MyApps extends Component {
                                     filterIndex: i,
                                     attr: filterType
                                  })}
-                                 className="mb"
                                  classes={{ root: "mui-select-root" }}
                                  disableUnderline={true}
                                  IconComponent={KeyboardArrowDown}
@@ -466,23 +429,9 @@ class MyApps extends Component {
                      }
                      return (
                         <div key={filterType}>
-                           <span className="mb">
-                              {_parseFilterName(filterType)}
-                           </span>
-                           {/* <input
-                              className="form-control"
-                              type="text"
-                              value={filter[filterType]}
-                              onChange={this.setFilter.bind(null, {
-                                 filterIndex: i,
-                                 attr: filterType
-                              })}
-                              placeholder={`Search by${_parseFilterName(
-                                 filterType
-                              )}`}
-                           /> */}
+                           <span>{_parseFilterName(filterType)}</span>
                            <Input
-                              placeholder={`Search by${_parseFilterName(
+                              placeholder={`Search by ${_parseFilterName(
                                  filterType
                               )}`}
                               value={filter[filterType]}
@@ -490,8 +439,6 @@ class MyApps extends Component {
                                  filterIndex: i,
                                  attr: filterType
                               })}
-                              disableUnderline={true}
-                              classes={{ root: "mui-input-root" }}
                            />
                         </div>
                      );
@@ -549,12 +496,12 @@ class MyApps extends Component {
 
          return (
             <div
-               className={`app-select-container ${selectedAppClass}`}
+               className={`app-select-container mb ${selectedAppClass}`}
                key={_id}
             >
-               <div id="app-select-info">
+               <div id="app-select-info" className="text-truncate">
                   <div className="engine-logo">{C.LOGOS[app.appEngine]}</div>
-                  <div className="app-name mb">{name}</div>
+                  <div className="app-name">{name}</div>
                </div>
                <div id="app-select-buttons">
                   <div>{appState}</div>
@@ -680,23 +627,23 @@ class MyApps extends Component {
                <div id="apps-buttons">
                   <button
                      id="filter"
-                     className="mb unselectable"
+                     className="mb unselectable white-btn"
                      onClick={this.addFilter}
                   >
                      {SVG.filter} &nbsp;
-                     <span className="mb">Filter selection</span>
+                     <span>Filter selection</span>
                   </button>
 
                   {/* REPORT COMMENTED */}
                   {renderGlobal && (
                      <button
-                        className="mb"
+                        className="mb unselectable white-btn"
                         onClick={this.getReportData.bind(null, {
                            appsIds: allAppsIds
                         })}
                      >
                         {SVG.globalReport} &nbsp;
-                        <span className="mb">Global Report</span>
+                        <span>Global Report</span>
                      </button>
                   )}
                </div>

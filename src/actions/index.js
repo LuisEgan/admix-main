@@ -617,6 +617,7 @@ export const getReportData = ({
             publisherId
       }
 
+      console.log('data: ', data);
       api
             .getReportData(accessToken, data)
             .then(res => {
