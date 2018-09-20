@@ -1049,9 +1049,13 @@ class Scene extends Component {
       const breadcrumbs = ["My apps", selectedApp.name];
 
       const isActiveToggle = (placementId, savedInputsActive = null) => {
-            const label = savedInputsActive
-            ? savedInputsActive ? "Live" : "Off"
-            : activeByPlacementId[placementId] ? "Live" : "Off"
+         const label = savedInputsActive
+            ? savedInputsActive
+               ? "Live"
+               : "Off"
+            : activeByPlacementId[placementId]
+               ? "Live"
+               : "Off";
          return (
             <div className="table-toggles">
                <div>{label}</div>
@@ -1259,12 +1263,14 @@ class Scene extends Component {
                               Header: "Name",
                               accessor: "name",
                               minWidth: 150,
+                              sortable: false,
                               className: "left mb",
                               headerClassName: "upper-left-corner"
                            },
                            {
                               Header: "Format",
                               accessor: "format",
+                              sortable: false,
                               // minWidth: 50,
                               className: "mb",
                               headerClassName: "upper"
@@ -1287,6 +1293,7 @@ class Scene extends Component {
                               Header: "Status",
                               headerClassName: "upper-right-corner",
                               className: "right mb",
+                              sortable: false,
                               accessor: "active",
                               // minWidth: 40,
                               sortMethod: (a, b) => {

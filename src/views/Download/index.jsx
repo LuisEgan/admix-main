@@ -5,10 +5,12 @@ export default class Congratulations extends Component {
    render() {
       return (
          <div className="step-container" id="download">
-            <div className="container">
-               <h3 className="st">Download</h3>
+            <div className="step-title">
+               <h3 className="st sc-h3">Download</h3>
+            </div>
 
-               <div>
+            <div>
+               <div className="download-top-section">
                    <div id="download-unity">
                        <div>{SVG.logoUnity}</div>
                        <div><span className="sst">Admix for Unity</span></div>
@@ -41,7 +43,7 @@ export default class Congratulations extends Component {
                </div>
 
 
-               <div className="mb">
+               <div className="mb download-bottom-section">
                    <div>
                        <span className="subtitle">VERSION</span>
                        <span>Admix.Unity_Rev1.3-Release_videoFix</span>

@@ -23,12 +23,13 @@ import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
-import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import Select from "@material-ui/core/Select";
+import Input from "@material-ui/core/Input";
 
+import CustomInput from "../../components/Input";
 import STR from "../../utils/strFuncs";
 
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
@@ -50,6 +51,7 @@ import {
 
 import defaultImg from "../../assets/img/default_pic.jpg";
 import paypal from "../../assets/img/paypal.png";
+import SVG from "../../components/SVG";
 
 let passhelperText;
 
@@ -257,13 +259,10 @@ class Profile extends Component {
    }
 
    renderField(field) {
-      const { initialValues, asyncLoading } = this.props;
-      const { clicked, isWarningVisible } = this.state;
+      const { initialValues } = this.props;
       const { input } = field;
 
       let label = input.name;
-      let helperText;
-      let type = "text";
 
       if (input.name === "userName") {
          if (input.value.length === 0) {
@@ -272,48 +271,13 @@ class Profile extends Component {
          label = "Name";
       } else if (input.name === "email") {
          input.value = initialValues.email;
-         const warningStyle = isWarningVisible
-            ? { color: "red", opacity: 1 }
-            : { color: "red", opacity: 0 };
-         helperText = (
-            <span>
-               Want to change your email?
-               <a
-                  onClick={this.handleUserUpdate.bind(null, "email")}
-                  onMouseEnter={() => {
-                     this.setState({ isWarningVisible: true });
-                  }}
-                  onMouseLeave={() => {
-                     this.setState({ isWarningVisible: false });
-                  }}
-               >
-                  {asyncLoading && clicked === "email"
-                     ? " ...Loading"
-                     : " Click here."}
-               </a>
-               <span style={warningStyle}>
-                  &nbsp;Warning! Your account will become inactive and you will
-                  have to verify your new email before logging in again (this
-                  will log you out).
-               </span>
-            </span>
-         );
+         label = "Email";
       }
 
-      const disabled = input.name === "email";
-
       return (
-         <div className="redux-form-inputs-container">
-            <TextField
-               {...input}
-               id={input.name}
-               label={STR.capitalizeFirstLetter(label)}
-               margin="normal"
-               disabled={disabled}
-               helperText={helperText}
-               type={type}
-               className="mb"
-            />
+         <div>
+            <span className="input-label">{label}</span>
+            <CustomInput {...input} className="mb" id={input.name} />
          </div>
       );
    }
@@ -322,66 +286,66 @@ class Profile extends Component {
       const { initialValues, asyncLoading, userData } = this.props;
       const { passInputType, clicked, isWarningVisible, payment } = this.state;
 
-      passhelperText = (
-         <span>
-            Want to change your password?
-            <a onClick={this.handleUserUpdate.bind(null, "password")}>
-               {asyncLoading && clicked === "password"
-                  ? " ...Loading"
-                  : " Click here."}
-            </a>
-         </span>
-      );
-
       const payBanksStyle =
          payment.option === "bank" ? { display: "block" } : { display: "none" };
 
       const payBanksDetailsStyle =
          payment.region !== "" ? { display: "block" } : { display: "none" };
 
+      const warningStyle = isWarningVisible
+         ? { color: "red", opacity: 1 }
+         : { color: "red", opacity: 0 };
+
       return (
          <div className="step-container" id="profile">
-            <div className="container simple-container">
-               <h3 className="st">My profile</h3>
+            <form onSubmit={this.handleSubmit}>
+               <div className="step-title">
+                  <h3 className="st sc-h3">My profile</h3>
+                  <button type="submit" className="mb gradient-btn">
+                     Save
+                  </button>
+               </div>
+
                <div>
-                  <form onSubmit={this.handleSubmit}>
-                     <div className="container">
-                        <div id="image-drop-container">
-                           <div className="image-drop">
-                              <Dropzone
-                                 multiple={false}
-                                 accept="image/*"
-                                 onDrop={this.onImageDrop}
-                                 className="dropzone"
-                              >
-                                 {!asyncLoading && (
-                                    <React.Fragment>
-                                       <img
-                                          src={userData.cloudinaryImgURL}
-                                          onError={e =>
-                                             (e.target.src = defaultImg)
-                                          }
-                                          alt="+"
-                                       />
-                                       <FontAwesomeIcon
-                                          className="fa"
-                                          icon={faEdit}
-                                       />
-                                    </React.Fragment>
-                                 )}
+                  <div>
+                     <div className="image-drop-container">
+                        <div className="image-drop">
+                           <Dropzone
+                              multiple={false}
+                              accept="image/*"
+                              onDrop={this.onImageDrop}
+                              className="dropzone"
+                           >
+                              {!asyncLoading && (
+                                 <React.Fragment>
+                                    <img
+                                       src={userData.cloudinaryImgURL}
+                                       onError={e =>
+                                          (e.target.src = defaultImg)
+                                       }
+                                       alt="+"
+                                    />
+                                    {/* {SVG.edit} */}
+                                    <FontAwesomeIcon
+                                       className="fa"
+                                       icon={faEdit}
+                                    />
+                                 </React.Fragment>
+                              )}
 
-                                 {asyncLoading && (
-                                    <AdmixLoading loadingText="" />
-                                 )}
-                              </Dropzone>
-                           </div>
+                              {asyncLoading && SVG.AdmixLoading({})}
+                           </Dropzone>
                         </div>
-
+                     </div>
+                  </div>
+                  <div>
+                     <div className="mb">
                         {/* PERSONAL INFORMATION */}
 
                         <ExpansionPanel
                            className="ExpansionPanel"
                            defaultExpanded={true}
+                           classes={{ root: "mui-expansionPanel-root" }}
                         >
                            <ExpansionPanelSummary
                               expandIcon={<FontAwesomeIcon icon={faAngleUp} />}
@@ -394,37 +358,93 @@ class Profile extends Component {
                                  <h2 className="sst">Personal Information</h2>
                               </div>
                            </ExpansionPanelSummary>
-                           <ExpansionPanelDetails className="mb">
+                           <ExpansionPanelDetails>
                               <div className="expansionPanelDetails-container">
-                                 <Field
-                                    name="userName"
-                                    component={this.renderField}
-                                    className="mb"
-                                 />
-                                 <Field
-                                    name="email"
-                                    component={this.renderField}
-                                    asyncLoading={asyncLoading}
-                                    clicked={clicked}
-                                    isWarningVisible={isWarningVisible}
-                                 />
-                                 <div className="redux-form-inputs-container">
-                                    <TextField
-                                       id="password"
-                                       label="Password"
-                                       margin="normal"
-                                       disabled={true}
-                                       helperText={passhelperText}
-                                       type={passInputType}
-                                       value={initialValues.password}
-                                       readOnly={true}
+                                 <div>
+                                    <Field
+                                       name="userName"
+                                       component={this.renderField}
                                     />
-                                    <FontAwesomeIcon
-                                       icon={faEye}
-                                       onMouseEnter={this.togglePassInputType}
-                                       onMouseLeave={this.togglePassInputType}
-                                       className="password-eye"
+                                    <Field
+                                       name="email"
+                                       component={this.renderField}
+                                       asyncLoading={asyncLoading}
+                                       isWarningVisible={isWarningVisible}
                                     />
+                                    <div>
+                                       <TextField
+                                          id="password"
+                                          label="Password"
+                                          margin="normal"
+                                          disabled={true}
+                                          // helperText={passhelperText}
+                                          type={passInputType}
+                                          value={initialValues.password}
+                                          readOnly={true}
+                                       />
+                                       <FontAwesomeIcon
+                                          icon={faEye}
+                                          onMouseEnter={
+                                             this.togglePassInputType
+                                          }
+                                          onMouseLeave={
+                                             this.togglePassInputType
+                                          }
+                                          className="password-eye"
+                                       />
+                                    </div>
+                                 </div>
+                                 <div>
+                                    <div />
+                                    <div>
+                                       <span className="profile-helper-text">
+                                          Want to change your email?
+                                          <a
+                                             onClick={this.handleUserUpdate.bind(
+                                                null,
+                                                "email"
+                                             )}
+                                             onMouseEnter={() => {
+                                                this.setState({
+                                                   isWarningVisible: true
+                                                });
+                                             }}
+                                             onMouseLeave={() => {
+                                                this.setState({
+                                                   isWarningVisible: false
+                                                });
+                                             }}
+                                          >
+                                             {asyncLoading &&
+                                             clicked === "email"
+                                                ? " ...Loading"
+                                                : " Click here."}
+                                          </a>
+                                          <span style={warningStyle}>
+                                             &nbsp;Warning! Your account will
+                                             become inactive and you will have
+                                             to verify your new email before
+                                             logging in again (this will log you
+                                             out).
+                                          </span>
+                                       </span>
+                                    </div>
+                                    <div>
+                                       <span className="profile-helper-text">
+                                          Want to change your password?
+                                          <a
+                                             onClick={this.handleUserUpdate.bind(
+                                                null,
+                                                "password"
+                                             )}
+                                          >
+                                             {asyncLoading &&
+                                             clicked === "password"
+                                                ? " ...Loading"
+                                                : " Click here."}
+                                          </a>
+                                       </span>
+                                    </div>
                                  </div>
                               </div>
                            </ExpansionPanelDetails>
@@ -435,6 +455,7 @@ class Profile extends Component {
                         <ExpansionPanel
                            className="ExpansionPanel"
                            defaultExpanded={false}
+                           classes={{ root: "mui-expansionPanel-root" }}
                         >
                            <ExpansionPanelSummary
                               expandIcon={<FontAwesomeIcon icon={faAngleUp} />}
@@ -485,15 +506,12 @@ class Profile extends Component {
                                  <div
                                     id="profile-pay-banks"
                                     style={payBanksStyle}
-                                    className="fadeIn"
+                                    className="fadeIn mb"
                                  >
                                     <FormControl>
-                                       <InputLabel
-                                          htmlFor="region-helper"
-                                          className="mb"
-                                       >
+                                       <div className="input-title mb">
                                           Region
-                                       </InputLabel>
+                                       </div>
                                        <Select
                                           value={payment.region}
                                           onChange={this.paymentChange.bind(
@@ -506,20 +524,19 @@ class Profile extends Component {
                                                 id="region-helper"
                                              />
                                           }
-                                          className="mb"
+                                          classes={{ root: "mui-select-root" }}
+                                          disableUnderline={true}
                                        >
-                                          <MenuItem className="mb" value="">
+                                          <MenuItem value="">
                                              <em>Please select a region</em>
                                           </MenuItem>
-                                          <MenuItem className="mb" value="usa">
+                                          <MenuItem value="usa">
                                              United States of America
                                           </MenuItem>
-                                          <MenuItem className="mb" value="uk">
+                                          <MenuItem value="uk">
                                              Uniter Kingdom
                                           </MenuItem>
-                                          <MenuItem className="mb" value="eu">
-                                             Europe
-                                          </MenuItem>
+                                          <MenuItem value="eu">Europe</MenuItem>
                                        </Select>
                                        <FormHelperText>
                                           Don't see your country yet? You can
@@ -553,18 +570,9 @@ class Profile extends Component {
 
                         <br />
                      </div>
-
-                     <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={this.handleSubmit}
-                        className="mb"
-                     >
-                        Save
-                     </Button>
-                  </form>
+                  </div>
                </div>
-            </div>
+            </form>
          </div>
       );
    }

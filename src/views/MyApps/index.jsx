@@ -272,7 +272,6 @@ class MyApps extends Component {
       }
 
       filterBy = isEmpty ? [] : filterBy;
-      console.log("filterBy: ", filterBy);
 
       if (
          attr === "name" ||
@@ -287,9 +286,9 @@ class MyApps extends Component {
       }
    }
 
+   // RENDER ----------------------------------------------
    renderFilter() {
       const _parseFilterName = str => {
-         console.log("str: ", str);
          const uppIndex = STR.getFirstUpper(str);
 
          switch (str) {
@@ -462,8 +461,6 @@ class MyApps extends Component {
       );
    }
 
-   // RENDER ----------------------------------------------
-
    renderApps() {
       let { apps, selectedApp } = this.props;
       apps = Array.isArray(apps) ? apps : [];
@@ -494,13 +491,18 @@ class MyApps extends Component {
                appState = "Live";
          }
 
+         console.log("app.appEngine: ", app.appEngine);
+         const appEngineLogo = app.appEngine
+            ? C.LOGOS[app.appEngine]
+            : C.LOGOS.Admix;
+
          return (
             <div
                className={`app-select-container mb ${selectedAppClass}`}
                key={_id}
             >
                <div id="app-select-info" className="text-truncate">
-                  <div className="engine-logo">{C.LOGOS[app.appEngine]}</div>
+                  <div className="engine-logo">{appEngineLogo}</div>
                   <div className="app-name">{name}</div>
                </div>
                <div id="app-select-buttons">
@@ -593,7 +595,7 @@ class MyApps extends Component {
    }
 
    render() {
-      const { location, apps, asyncLoading, userData } = this.props;
+      const { location, apps, adminToken, asyncLoading, userData } = this.props;
       const {
          showContent,
          appSelected,
@@ -615,48 +617,47 @@ class MyApps extends Component {
          );
       }
 
-      const renderGlobal = filterBy.length === 0;
+      const renderGlobal =
+         adminToken && adminToken.length > 0 ? filterBy.length === 0 : true;
 
       return (
          <div className="step-container" id="apps">
-            <div className="container">
-               <div id="apps-header">
-                  <h3 className="st sc-h3">My apps</h3>
-               </div>
-
-               <div id="apps-buttons">
-                  <button
-                     id="filter"
-                     className="mb unselectable white-btn"
-                     onClick={this.addFilter}
-                  >
-                     {SVG.filter} &nbsp;
-                     <span>Filter selection</span>
-                  </button>
-
-                  {/* REPORT COMMENTED */}
-                  {renderGlobal && (
-                     <button
-                        className="mb unselectable white-btn"
-                        onClick={this.getReportData.bind(null, {
-                           appsIds: allAppsIds
-                        })}
-                     >
-                        {SVG.globalReport} &nbsp;
-                        <span>Global Report</span>
-                     </button>
-                  )}
-               </div>
-
-               {!showContent && SVG.AdmixLoading({ loadingText: "Loading" })}
-
-               {filterBy.length > 0 && this.renderFilter()}
-
-               {anyApps &&
-                  showContent && <div id="apps-list">{this.renderApps()}</div>}
-
-               {!anyApps && userData._id && showContent && this.renderNoApps()}
+            <div id="apps-header" className="step-title">
+               <h3 className="st sc-h3">My apps</h3>
             </div>
+
+            <div id="apps-buttons">
+               <button
+                  id="filter"
+                  className="mb unselectable white-btn"
+                  onClick={this.addFilter}
+               >
+                  {SVG.filter} &nbsp;
+                  <span>Filter selection</span>
+               </button>
+
+               {/* REPORT COMMENTED */}
+               {renderGlobal && (
+                  <button
+                     className="mb unselectable white-btn"
+                     onClick={this.getReportData.bind(null, {
+                        appsIds: allAppsIds
+                     })}
+                  >
+                     {SVG.globalReport} &nbsp;
+                     <span>Global Report</span>
+                  </button>
+               )}
+            </div>
+
+            {!showContent && SVG.AdmixLoading({ loadingText: "Loading" })}
+
+            {filterBy.length > 0 && this.renderFilter()}
+
+            {anyApps &&
+               showContent && <div id="apps-list">{this.renderApps()}</div>}
+
+            {!anyApps && userData._id && showContent && this.renderNoApps()}
          </div>
       );
    }

@@ -11,6 +11,8 @@ import IconButton from "@material-ui/core/IconButton";
 import MenuItem from "@material-ui/core/MenuItem";
 import MUIMenu from "@material-ui/core/Menu";
 
+import SVG from "../../components/SVG";
+
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faUser from "@fortawesome/fontawesome-free-solid/faUser";
 import faCaretDown from "@fortawesome/fontawesome-free-solid/faCaretDown";
@@ -112,7 +114,7 @@ class Menu extends Component {
 
       showDropdown = showDropdown ? "show" : "";
 
-      if(!isLoggedIn) return null;
+      if (!isLoggedIn) return null;
 
       return (
          <div id="headerMenu">
@@ -125,24 +127,10 @@ class Menu extends Component {
                   </div>
                </div>
 
-               <div className="cc mb" id="pages-container">
-               </div>
+               <div className="cc mb" id="pages-container" />
 
-               <div id="dropdown-container">
-                  <IconButton
-                     aria-owns={open ? "menu-appbar" : null}
-                     aria-haspopup="true"
-                     color="inherit"
-                  >
-                     {
-                        userData._id && (
-                           <img
-                              src={userData.cloudinaryImgURL}
-                              onError={e => (e.target.src = defaultImg)}
-                              alt="Login"
-                           />
-                        )}
-                  </IconButton>
+               <div id="dropdown-container" className="mb">
+                  
                   <MUIMenu
                      id="menu-appbar"
                      anchorEl={anchorEl}
@@ -157,23 +145,37 @@ class Menu extends Component {
                      open={open}
                      onClose={this.handleClose}
                   >
-                           <MenuItem onClick={this.handleClose}>
-                              <a
-                                 onClick={this.handleLogout}
-                                 className="mb mui-dropdown-item"
-                                 href="/login"
-                              >
-                                 Logout
-                              </a>
-                           </MenuItem>
+                     <MenuItem onClick={this.handleClose}>
+                        <a
+                           onClick={this.handleLogout}
+                           className="mb mui-dropdown-item"
+                           href="/login"
+                        >
+                           Logout
+                        </a>
+                     </MenuItem>
                   </MUIMenu>
-                  <span className="sst" onClick={this.handleDropdown}>
+                  
+                  <IconButton
+                     aria-owns={open ? "menu-appbar" : null}
+                     aria-haspopup="true"
+                     color="inherit"
+                  >
+                     {userData._id && (
+                        <img
+                           src={userData.cloudinaryImgURL}
+                           onError={e => (e.target.src = defaultImg)}
+                           alt="Login"
+                        />
+                     )}
+                  </IconButton>
+                  <span onClick={this.handleDropdown}>
                      {userData.name === undefined ||
                      userData.name === "" ||
                      !userData.name
                         ? "Hello!"
                         : "Hi, " + userData.name}{" "}
-                     <FontAwesomeIcon icon={faCaretDown} />
+                     {SVG.caretDown}
                   </span>
                </div>
             </div>

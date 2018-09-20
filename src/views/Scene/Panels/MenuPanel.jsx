@@ -417,17 +417,20 @@ export default class MenuPanel extends Component {
                ? C.APP_STATES.inactive
                : C.APP_STATES.pending;
 
-      let footerStyle;
+      let footerStyle, isPendingStyle;
 
       switch (footerActiveMssg) {
          case C.APP_STATES.inactive:
             footerStyle = { background: "#F5F7FA" };
             break;
          case C.APP_STATES.pending:
-            footerStyle = { background: "#ffc266" };
+            footerStyle = { background: "#ffebcc" };
+            isPendingStyle = {
+               boxShadow: "inset 0 0 0 20px orange, 0 0 0 2px orange"
+            };
             break;
          default:
-            footerStyle = { background: "#47a9eb", color: "white" };
+            footerStyle = { background: "#ccffe4" };
       }
 
       return (
@@ -437,20 +440,23 @@ export default class MenuPanel extends Component {
                   inputName={"app"}
                   isChecked={isActive}
                   onChange={this.changeActive}
-                  labelClass={"isPendingStyle"}
+                  labelStyle={isPendingStyle}
                />
                {/* <span>{footerActiveMssg}</span> */}
-               {footerActiveMssg === C.APP_STATES.pending && (
-                  <NavLink exact to={routeCodes.INFO} className="mb">
-                     Add URL
-                  </NavLink>
-               )}
             </div>
             <div>{footerMssg}</div>
             <div>
-               <NavLink exact to={routeCodes.MYAPPS} className="mb">
-                  Back to dashboard
-               </NavLink>
+               {footerActiveMssg === C.APP_STATES.pending && (
+                  <NavLink exact to={routeCodes.INFO} className="white-btn">
+                     Add URL
+                  </NavLink>
+               )}
+
+               {footerActiveMssg !== C.APP_STATES.pending && (
+                  <NavLink exact to={routeCodes.MYAPPS} className="white-btn">
+                     Back to dashboard
+                  </NavLink>
+               )}
             </div>
          </div>
       );

@@ -6,7 +6,8 @@ const ToggleButton = ({
    onChange,
    root1class,
    root2class,
-   labelClass
+   labelClass,
+   labelStyle
 }) => {
    root1class = root1class ? root1class : "";
    root2class = root2class ? root2class : "";
@@ -26,6 +27,7 @@ const ToggleButton = ({
             <label
                htmlFor={inputName}
                className={`checkbox-label ${labelClass}`}
+               style={labelStyle}
                //   data-on={dataOn}
                //   data-off="Inactive"
             />

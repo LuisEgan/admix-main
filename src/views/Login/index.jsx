@@ -8,80 +8,69 @@ import {
    forgotPass,
    resetAsync
 } from "../../actions";
+import { Field, reduxForm, reset } from "redux-form";
+
+import Input from "../../components/Input";
+
 import ToggleDisplay from "react-toggle-display";
 import STR from "../../utils/strFuncs";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faEye from "@fortawesome/fontawesome-free-solid/faEye";
+import admixLogo from "../../assets/img/logo.png";
 
-// @connect(state => ({
-//    asyncData: state.app.get("asyncData"),
-//    asyncError: state.app.get("asy      ncError"),
-//    asyncLoading: state.app.get("asyncLoading"),
-//    counter: state.app.get("counter"),
-//    isLoggedIn: state.app.get("isLoggedIn")
-// }))
 class Login extends Component {
    static propTypes = {
       asyncData: PropTypes.object,
       asyncError: PropTypes.string,
       asyncLoading: PropTypes.bool,
       counter: PropTypes.number,
-      animate: PropTypes.bool,
       isLoggedIn: PropTypes.bool,
       // from react-redux connect
       dispatch: PropTypes.func
    };
    constructor(props) {
       super(props);
+
       this.state = {
-         email: "",
-         password: "",
-         passInputType: "password",
-         confirmPassword: "",
-         regValidation: {
-            isValidName: "",
-            isValidEmail: "",
-            is8: "",
-            hasLetter: "",
-            hasNumber: "",
-            arePassSame: "",
-            policy: false,
-            consent: false
-         },
+         policy: false,
+         consent: false,
          registerBtnDisabled: true,
-         name: "",
-         show: "login",
-         animate: false
+         passInputType: "password",
+         show: "login"
       };
-      this.handleClick = this.handleClick.bind(this);
+
       this.handleLogin = this.handleLogin.bind(this);
+      this.handleforgotPass = this.handleforgotPass.bind(this);
       this.handleSignup = this.handleSignup.bind(this);
       this.resendSignUpEmail = this.resendSignUpEmail.bind(this);
 
-      this.handleInputChange = this.handleInputChange.bind(this);
-      this.handleforgotPass = this.handleforgotPass.bind(this);
+      this.resetAsync = this.resetAsync.bind(this);
       this.togglePassInputType = this.togglePassInputType.bind(this);
       this.toggleView = this.toggleView.bind(this);
-      this.handleFocus = this.handleFocus.bind(this);
-      this.handleKeyPress = this.handleKeyPress.bind(this);
-      this.hardFocus = this.hardFocus.bind(this);
+
+      this.toggleCheckbox = this.toggleCheckbox.bind(this);
+      this.enableRegisterBtn = this.enableRegisterBtn.bind(this);
+
+      this.eye = this.eye.bind(this);
+
+      this.renderField = this.renderField.bind(this);
+      this.renderFields = this.renderFields.bind(this);
    }
 
    componentDidMount() {
       const {
-         location: { search }
+         location: { search },
+         dispatch
       } = this.props;
       const show = search.split("?")[1];
       (show === "register" || show === "forgotPass") && this.setState({ show });
+      dispatch(resetAsync());
+      dispatch(reset("loginForm"));
    }
 
-   handleClick() {
-      this.setState({
-         show: !this.state.show,
-         email: "",
-         password: "",
-         name: ""
-      });
+   resetAsync() {
+      const { dispatch } = this.props;
+      dispatch(resetAsync());
    }
 
    toggleView(show, e) {
@@ -102,496 +91,519 @@ class Login extends Component {
       this.setState({ passInputType });
    }
 
-   handleLogin() {
-      const { dispatch } = this.props;
-      const { email, password } = this.state;
-      dispatch(login(email.toLowerCase(), password));
-   }
-
-   handleSignup() {
-      const { dispatch } = this.props;
-      const { name, email, password } = this.state;
-      dispatch(signup(name, email, password));
-   }
-
    resendSignUpEmail() {
       const { dispatch, signupInfo } = this.props;
       dispatch(resendSignUpEmail(signupInfo));
    }
 
-   handleforgotPass() {
-      const { dispatch } = this.props;
-      const { email } = this.state;
-      dispatch(forgotPass(email));
+   toggleCheckbox(checkbox) {
+      const newState = this.state;
+      newState[checkbox] = !newState[checkbox];
+      this.setState(newState);
    }
 
-   handleInputChange(input, e) {
-      const state = this.state;
-      const inputValue = e.target.value;
+   // ERROS HANDLING ---------------------------------------------------------
 
-      const inputParsed = input.replace("Reg", "");
-      state[inputParsed] = inputValue;
-      state.registerBtnDisabled = false;
+   isError({ input, asyncError }) {
+      if (
+         input === "emailLogin" &&
+         (asyncError === "Invalid Username" ||
+            asyncError === "User Not Found" ||
+            asyncError === "Invalid Username or Password")
+      )
+         return true;
+      else if (
+         input === "passLogin" &&
+         (asyncError === "Invalid Password" ||
+            asyncError === "Invalid Username or Password")
+      )
+         return true;
+      else if (input === "emailForgot" && asyncError === "User Not Found")
+         return true;
+      else if (input === "emailReg" && asyncError === "User Already Exists")
+         return true;
 
-      if (input === "nameReg") {
-         state.regValidation.isValidName = STR.hasOnlyLetters(inputValue);
-      } else if (input === "emailReg") {
-         state.regValidation.isValidEmail = STR.isValidEmail(inputValue);
-      } else if (input === "passwordReg") {
-         state.regValidation.is8 = STR.isAtleast(inputValue, 8);
-         state.regValidation.hasLetter = STR.hasLetter(inputValue);
-         state.regValidation.hasNumber = STR.hasNumber(inputValue);
-         state.regValidation.arePassSame = state.confirmPassword === inputValue;
-      } else if (input === "confirmPasswordReg") {
-         state.regValidation.arePassSame = state.password === inputValue;
-      } else {
-         // for policy and consent
-         state.regValidation[input] = !state.regValidation[input];
-      }
-
-      for (let validation in state.regValidation) {
-         if (!state.regValidation[validation]) {
-            state.registerBtnDisabled = true;
-         }
-      }
-
-      if (state.name === "") state.registerBtnDisabled = true;
-
-      this.setState(state);
+      return false;
    }
 
-   handleFocus(e) {
-      const { asyncError, dispatch } = this.props;
-
-      if (asyncError !== "") {
-         dispatch(resetAsync());
-      }
-   }
-
-   handleKeyPress(e) {
-      const { show } = this.state;
-      if (e.key === "Enter") {
-         if (show === "login") {
-            this.handleLogin();
-         } else if (show === "register") {
-            this.handleSignup();
-         } else if (show === "forgotPass") {
-            this.handleforgotPass();
-         }
-      }
-   }
-
-   hardFocus(input) {
-      this[input].focus();
-   }
-
-   render() {
-      let { asyncData, asyncError, asyncLoading } = this.props;
-      // asyncData = {};
-      // asyncData.mssg = "Success! Now, please confirm your email.";
-      
+   enableRegisterBtn() {
       const {
-         show,
-         passInputType,
-         regValidation: {
-            isValidName,
-            isValidEmail,
-            is8,
-            hasLetter,
-            hasNumber,
-            arePassSame
+         reduxForm: {
+            loginForm: { syncErrors, values }
+         }
+      } = this.props;
+      const { policy, consent } = this.state;
+      const { nameReg, emailReg, passReg1, passReg2 } = values;
+
+      if (nameReg && emailReg && passReg1 && passReg2) {
+         return !syncErrors && policy && consent;
+      }
+      return false;
+   }
+
+   // ICONS ---------------------------------------------------------
+
+   eye() {
+      return (
+         <FontAwesomeIcon
+            icon={faEye}
+            onMouseEnter={this.togglePassInputType}
+            onMouseLeave={this.togglePassInputType}
+            className="password-eye"
+         />
+      );
+   }
+
+   // HANDLES ---------------------------------------------------------
+
+   handleLogin(e) {
+      if (e) e.preventDefault();
+      let {
+         reduxForm: {
+            loginForm: {
+               values: { emailLogin, passLogin }
+            }
          },
-         registerBtnDisabled
-      } = this.state;
+         dispatch
+      } = this.props;
 
-      // const loading = <i className="fa fa-cog fa-spin"></i>;
-      const loadingIcon = <p>Loading...</p>;
+      dispatch(login(emailLogin.toLowerCase(), passLogin));
+   }
 
-      const showLogin = show === "login";
-      const showLostPast = show === "forgotPass";
-      const showRegister = show === "register";
+   handleforgotPass(e) {
+      if (e) e.preventDefault();
+      let {
+         reduxForm: {
+            loginForm: {
+               values: { emailForgot }
+            }
+         },
+         dispatch
+      } = this.props;
 
-      // for register validation
+      dispatch(forgotPass(emailForgot));
+   }
+
+   handleSignup(values) {
+      const { dispatch } = this.props;
+      const { nameReg, emailReg, passReg1 } = values;
+
+      if (nameReg && emailReg && passReg1) {
+         dispatch(signup(nameReg, emailReg, passReg1));
+      }
+   }
+
+   // RENDER ---------------------------------------------------------
+
+   renderField(field) {
+      const {
+         input,
+         type,
+         meta: { error }
+      } = field;
+      let label, guideline;
+      let guidelineStyle = {};
+
       const goodStyle = { color: "green" };
       const badStyle = { color: "red" };
 
-      // name
-      const isValidNameStyle =
-         isValidName === "" ? {} : isValidName ? goodStyle : badStyle;
+      const _registerGuidelineStyle = guideline => {
+         if (error && input.value.length > 0) {
+            return error.indexOf(guideline) > -1 ? badStyle : goodStyle;
+         } else {
+            return input.value.length > 0 ? goodStyle : {};
+         }
+      };
 
-      // email
-      const isValidEmailStyle =
-         isValidEmail === "" ? {} : isValidEmail ? goodStyle : badStyle;
+      switch (input.name) {
+         case "emailLogin":
+            label = "Email";
+            break;
+         case "passLogin":
+            label = "Password";
+            break;
+         case "emailForgot":
+            label = "Email";
+            break;
+         case "nameReg":
+            label = "Name";
+            guideline = "only letters";
+            break;
+         case "emailReg":
+            label = "Email";
+            guideline = "valid e-mail";
+            break;
+         case "passReg1":
+            label = "Password";
+            guideline = (
+               <React.Fragment>
+                  <span style={_registerGuidelineStyle("limit")}>
+                     min 8 characters
+                  </span>{" "}
+                  -{" "}
+                  <span style={_registerGuidelineStyle("letter")}>
+                     one letter
+                  </span>{" "}
+                  -{" "}
+                  <span style={_registerGuidelineStyle("number")}>
+                     one number
+                  </span>
+               </React.Fragment>
+            );
+            break;
+         case "passReg2":
+            label = "Confirm Password";
+            guideline = "both passwords match";
+            break;
+         default:
+      }
 
-      // password
-      const is8Style = is8 === "" ? {} : is8 ? goodStyle : badStyle;
-      const hasLetterStyle =
-         hasLetter === "" ? {} : hasLetter ? goodStyle : badStyle;
-      const hasNumberStyle =
-         hasNumber === "" ? {} : hasNumber ? goodStyle : badStyle;
-
-      // password confirm
-      const arePassSameStyle =
-         arePassSame === "" ? {} : arePassSame ? goodStyle : badStyle;
+      if (input.value.length > 0 && input.name !== "passReg1") {
+         guidelineStyle = error ? { color: "red" } : { color: "green" };
+      }
 
       return (
-         <div id="login" onKeyPress={this.handleKeyPress}>
-            <ToggleDisplay show={showLogin}>
-               <div className="inputs-container">
-                  <div className="inputs-header">
-                     <h3 className="st">Log in</h3>
-                  </div>
+         <div>
+            <span className="input-label">{label}</span>
+            <Input
+               {...input}
+               type={type}
+               className="mb"
+               id={input.name}
+               onFocus={this.resetAsync}
+            />
+            <span className="login-guidelines" style={guidelineStyle}>
+               {guideline}
+            </span>
+         </div>
+      );
+   }
 
-                  <div className="inputs">
-                     <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Email"
-                        onChange={this.handleInputChange.bind(null, "email")}
-                        onFocus={this.handleFocus}
-                        ref={input => {
-                           this.nameInput = input;
-                        }}
-                        onClick={this.hardFocus.bind(null, "nameInput")}
-                     />
+   renderFields(fields, asyncError) {
+      return fields.map(field => {
+         let type = field.type || "text";
+         return (
+            <div key={field.input}>
+               <Field
+                  name={field.input}
+                  component={this.renderField}
+                  type={type}
+               />
 
-                     <div className="userPass">
-                        <input
-                           type={passInputType}
-                           className="form-control"
-                           placeholder="Password"
-                           onChange={this.handleInputChange.bind(
-                              null,
-                              "password"
-                           )}
-                           onFocus={this.handleFocus}
-                           ref={input => {
-                              this.passInput = input;
-                           }}
-                           onClick={this.hardFocus.bind(null, "passInput")}
-                        />
-                        <FontAwesomeIcon
-                           icon={faEye}
-                           onMouseEnter={this.togglePassInputType}
-                           onMouseLeave={this.togglePassInputType}
-                           className="password-eye"
-                        />
-                     </div>
-                  </div>
+               {field.icon}
 
-                  <div className="login-btn cc">
-                     {asyncLoading && loadingIcon}
-                     {asyncError && <p>Error: {asyncError}</p>}
-                     {!asyncLoading &&
-                        !asyncError && (
-                           <button
-                              className="btn btn-dark"
-                              onClick={this.handleLogin}
-                           >
-                              Log in
-                           </button>
-                        )}
-                  </div>
+               {this.isError({
+                  input: field.input,
+                  asyncError
+               }) && (
+                  <span
+                     role="img"
+                     aria-label="thumb"
+                     className="login-feedback-thumb"
+                  >
+                     👍
+                  </span>
+               )}
+            </div>
+         );
+      });
+   }
 
-                  <div id="lost-pass-text">
-                     <a onClick={this.toggleView.bind(null, "forgotPass")}>
-                        Lost password?
-                     </a>
-                  </div>
+   render() {
+      let { asyncError, asyncData, asyncLoading, handleSubmit } = this.props;
+      const { show, passInputType } = this.state;
 
-                  <div className="separator-container">
-                     <div className="separator" />
-                  </div>
+      const registerBtnEnabled = this.enableRegisterBtn();
+      const registerBtnStyle = registerBtnEnabled ? {} : { opacity: 0.5 };
+      const registerBtnClass = registerBtnEnabled ? "" : "forbidden-cursor";
 
-                  <div className="register">
-                     <a onClick={this.toggleView.bind(null, "register")}>
-                        No account yet? Register
-                     </a>
-                  </div>
+      const loginFields = [
+         {
+            input: "emailLogin"
+         },
+         {
+            input: "passLogin",
+            icon: this.eye(),
+            type: passInputType
+         }
+      ];
+
+      const forgotFields = [
+         {
+            input: "emailForgot"
+         }
+      ];
+
+      const registerFields = [
+         {
+            input: "nameReg",
+            guideline: "only letters"
+         },
+         {
+            input: "emailReg",
+            guideline: "valid e-mail"
+         },
+         {
+            input: "passReg1",
+            icon: this.eye(),
+            type: passInputType,
+            guideline: "only letters"
+         },
+         {
+            input: "passReg2",
+            icon: this.eye(),
+            type: passInputType
+         }
+      ];
+
+      return (
+         <div id="login">
+            <div>
+               <div>
+                  <img src={admixLogo} alt="admix" />
                </div>
-            </ToggleDisplay>
 
-            <ToggleDisplay show={showLostPast}>
-               <div className="inputs-container">
-                  <div className="inputs-header">
-                     <h3 className="st">Lost Password</h3>
-                  </div>
-
-                  <div className="inputs">
-                     <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Email"
-                        onChange={this.handleInputChange.bind(null, "email")}
-                        ref={input => {
-                           this.emailInput = input;
-                        }}
-                        onClick={this.hardFocus.bind(null, "emailInput")}
-                        onFocus={this.handleFocus}
-                     />
-                  </div>
-
-                  <div className="login-btn cc">
-                     {asyncLoading && loadingIcon}
-                     {asyncError && <p>Error: {asyncError}</p>}
-                     {asyncData !== null && <p>{asyncData.mssg}</p>}
-                     {!asyncLoading &&
-                        !asyncError &&
-                        !asyncData && (
-                           <button
-                              className="btn btn-dark"
-                              onClick={this.handleforgotPass}
-                           >
-                              Reset Password
+               <ToggleDisplay show={show === "login"} id="login-login">
+                  <form onSubmit={e => this.handleLogin(e)}>
+                     <div className="st">Login</div>
+                     <div>
+                        {this.renderFields(loginFields, asyncError)}
+                        <div className="login-btn-container">
+                           {asyncError && (
+                              <span className="asyncMssg asyncError">
+                                 {asyncError}
+                              </span>
+                           )}
+                           <button type="submit" className="gradient-btn">
+                              Login
                            </button>
-                        )}
-                  </div>
-
-                  <div id="lost-pass-text">
-                     <a onClick={this.toggleView.bind(null, "login")}>Back</a>
-                  </div>
-
-                  <div className="separator-container">
-                     <div className="separator" />
-                  </div>
-
-                  <div className="register">
-                     <a onClick={this.toggleView.bind(null, "register")}>
-                        No account yet? Register
-                     </a>
-                  </div>
-               </div>
-            </ToggleDisplay>
-
-            <ToggleDisplay show={showRegister}>
-               <div className="inputs-container">
-                  <div className="inputs-header">
-                     <h3 className="st">Register</h3>
-                  </div>
-
-                  <div className="inputs">
-                     {/* NAME */}
+                        </div>
+                     </div>
                      <div>
-                        <input
-                           type="text"
-                           className="form-control"
-                           placeholder="Name"
-                           onChange={this.handleInputChange.bind(
-                              null,
-                              "nameReg"
-                           )}
-                           onFocus={this.handleFocus}
-                           ref={input => {
-                              this.registerNameInput = input;
-                           }}
-                           onClick={this.hardFocus.bind(
-                              null,
-                              "registerNameInput"
-                           )}
-                        />
-                     </div>
-                     <div className="registerRules">
-                        <span style={isValidNameStyle}>only letters</span>
-                     </div>
-                     {/* EMAIL */}
-                     <div>
-                        <input
-                           type="text"
-                           className="form-control"
-                           placeholder="Email"
-                           onChange={this.handleInputChange.bind(
-                              null,
-                              "emailReg"
-                           )}
-                           onFocus={this.handleFocus}
-                           ref={input => {
-                              this.registerEmailInput = input;
-                           }}
-                           onClick={this.hardFocus.bind(
-                              null,
-                              "registerEmailInput"
-                           )}
-                        />
-                     </div>
-                     <div className="registerRules">
-                        <span style={isValidEmailStyle}>valid e-mail</span>
-                     </div>
-                     {/* PASSWORD */}
-                     <div>
-                        <input
-                           type={passInputType}
-                           className="form-control"
-                           placeholder="Password"
-                           onChange={this.handleInputChange.bind(
-                              null,
-                              "passwordReg"
-                           )}
-                           onFocus={this.handleFocus}
-                           ref={input => {
-                              this.registerPassInput = input;
-                           }}
-                           onClick={this.hardFocus.bind(
-                              null,
-                              "registerPassInput"
-                           )}
-                        />
-                        <FontAwesomeIcon
-                           icon={faEye}
-                           onMouseEnter={this.togglePassInputType}
-                           onMouseLeave={this.togglePassInputType}
-                           className="password-eye"
-                        />
-                     </div>
-                     <div className="registerRules">
-                        <span style={is8Style}>min 8 characters - </span>
-                        <span style={hasLetterStyle}>one letter - </span>
-                        <span style={hasNumberStyle}>one number</span>
-                     </div>
-                     {/* PASSWORD CONFIRM */}
-                     <div>
-                        <input
-                           type={passInputType}
-                           className="form-control"
-                           placeholder="Confirm Password"
-                           onChange={this.handleInputChange.bind(
-                              null,
-                              "confirmPasswordReg"
-                           )}
-                           onFocus={this.handleFocus}
-                           ref={input => {
-                              this.registerConfirmPassInput = input;
-                           }}
-                           onClick={this.hardFocus.bind(
-                              null,
-                              "registerConfirmPassInput"
-                           )}
-                        />
-                        <FontAwesomeIcon
-                           icon={faEye}
-                           onMouseEnter={this.togglePassInputType}
-                           onMouseLeave={this.togglePassInputType}
-                           className="password-eye"
-                        />
-                     </div>
-                     <div className="registerRules">
-                        <span style={arePassSameStyle}>
-                           both passwords match
-                        </span>
-                     </div>
-                     {/* TERMS AND CONDITIONS */}
-                     <div className="registerCheckbox">
                         <div>
-                           <div className="checkbox">
-                              <input
-                                 type="checkbox"
-                                 id="policy"
-                                 onChange={this.handleInputChange.bind(
-                                    null,
-                                    "policy"
-                                 )}
-                              />
-                              <label htmlFor="policy" />
-                           </div>
+                           <a
+                              onClick={this.toggleView.bind(null, "forgotPass")}
+                           >
+                              Lost password?
+                           </a>
                         </div>
                         <div>
-                           I have read to Admix’s &nbsp;
-                           <a
-                              href="https://admix.in/wp-content/uploads/2018/08/terms-1.pdf"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                           >
-                              T&Cs
-                           </a>
-                           &nbsp; and &nbsp;
-                           <a
-                              href="https://admix.in/wp-content/uploads/2018/08/privacy-1.pdf"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                           >
-                              privacy policy
+                           No account yet?{" "}
+                           <a onClick={this.toggleView.bind(null, "register")}>
+                              Register
                            </a>
                         </div>
                      </div>
+                  </form>
+               </ToggleDisplay>
 
-                     {/* USERS CONSENT */}
-                     <div className="registerCheckbox">
-                        <div>
-                           <div className="checkbox">
-                              <input
-                                 type="checkbox"
-                                 id="consent"
-                                 onChange={this.handleInputChange.bind(
-                                    null,
-                                    "consent"
-                                 )}
-                              />
-                              <label htmlFor="consent" />
-                           </div>
-                        </div>
-                        <div>
-                           I confirm that I have consent from my users to
-                           process some of their data, such as device ID or
-                           location, to serve more relevant ads.
+               <ToggleDisplay show={show === "forgotPass"} id="login-forgot">
+                  <form onSubmit={e => this.handleforgotPass(e)}>
+                     <div className="st">Forgot Password</div>
+                     <div>
+                        {this.renderFields(forgotFields, asyncError)}
+                        <div className="login-btn-container">
+                           {asyncError && (
+                              <span className="asyncMssg asyncError">
+                                 {asyncError}
+                              </span>
+                           )}
+                           {asyncData && (
+                              <span className="asyncMssg asyncData">
+                                 {asyncData.mssg}
+                              </span>
+                           )}
+                           {asyncLoading && (
+                              <span className="asyncMssg asyncData">
+                                 Loading...
+                              </span>
+                           )}
+                           <button type="submit" className="gradient-btn">
+                              Help me!
+                           </button>
                         </div>
                      </div>
-                  </div>
+                     <div>
+                        <div>
+                           <a onClick={this.toggleView.bind(null, "login")}>
+                              Login
+                           </a>
+                        </div>
+                        <div>
+                           No account yet?{" "}
+                           <a onClick={this.toggleView.bind(null, "register")}>
+                              Register
+                           </a>
+                        </div>
+                     </div>
+                  </form>
+               </ToggleDisplay>
 
-                  {/* BUTTON */}
-                  <div className="login-btn">
-                     {/* loading */}
-                     {asyncLoading && loadingIcon}
+               <ToggleDisplay show={show === "register"} id="login-register">
+                  <form onSubmit={handleSubmit(this.handleSignup)}>
+                     <div className="st">Register</div>
 
-                     {/* error */}
-                     {asyncError && <p>Error: {asyncError}</p>}
+                     <div>
+                        {this.renderFields(registerFields, asyncError)}
 
-                     {/* success message */}
-                     {asyncData !== null &&
-                        !asyncError && !asyncLoading && (
-                           <React.Fragment>
-                              <p>{asyncData.mssg}</p>
-                              <p>
-                                 Didn't get the email?{" "}
-                                 <a onClick={this.resendSignUpEmail}><u>Resend.</u></a>
-                              </p>
-                           </React.Fragment>
-                        )}
+                        {/* TERMS AND CONDITIONS */}
+                        <div className="registerCheckbox">
+                           <div>
+                              <div className="checkbox">
+                                 <input
+                                    type="checkbox"
+                                    id="policy"
+                                    onChange={this.toggleCheckbox.bind(
+                                       null,
+                                       "policy"
+                                    )}
+                                 />
+                                 <label htmlFor="policy" />
+                              </div>
+                           </div>
+                           <div>
+                              I have read to Admix’s &nbsp;
+                              <a
+                                 href="https://admix.in/wp-content/uploads/2018/08/terms-1.pdf"
+                                 target="_blank"
+                                 rel="noopener noreferrer"
+                              >
+                                 T&Cs
+                              </a>
+                              &nbsp; and &nbsp;
+                              <a
+                                 href="https://admix.in/wp-content/uploads/2018/08/privacy-1.pdf"
+                                 target="_blank"
+                                 rel="noopener noreferrer"
+                              >
+                                 privacy policy
+                              </a>
+                           </div>
+                        </div>
 
-                     {/* button */}
-                     {!asyncLoading &&
-                        !asyncError &&
-                        !asyncData && (
+                        {/* USERS CONSENT */}
+                        <div className="registerCheckbox">
+                           <div>
+                              <div className="checkbox">
+                                 <input
+                                    type="checkbox"
+                                    id="consent"
+                                    onChange={this.toggleCheckbox.bind(
+                                       null,
+                                       "consent"
+                                    )}
+                                 />
+                                 <label htmlFor="consent" />
+                              </div>
+                           </div>
+                           <div>
+                              I confirm that I have consent from my users to
+                              process some of their data, such as device ID or
+                              location, to serve more relevant ads.
+                           </div>
+                        </div>
+                        <div className="login-btn-container">
+                           {asyncError && (
+                              <span className="asyncMssg asyncError">
+                                 {asyncError}
+                              </span>
+                           )}
+                           {asyncData &&
+                              !asyncError && (
+                                 <span className="asyncMssg asyncData">
+                                    {asyncData.mssg}
+                                 </span>
+                              )}
+                           {asyncLoading && (
+                              <span className="asyncMssg asyncData">
+                                 Loading...
+                              </span>
+                           )}
                            <button
-                              className="btn btn-dark"
-                              onClick={this.handleSignup}
-                              disabled={registerBtnDisabled}
+                              type="submit"
+                              className={`gradient-btn ${registerBtnClass}`}
+                              style={registerBtnStyle}
+                              disabled={!registerBtnEnabled}
                            >
                               Register
                            </button>
-                        )}
-                  </div>
+                        </div>
+                     </div>
 
-                  <div id="lost-pass-text">
-                     <a onClick={this.toggleView.bind(null, "login")}>
-                        Go back
-                     </a>
-                  </div>
+                     <div>
+                        <div>
+                           <a onClick={this.toggleView.bind(null, "login")}>
+                              Login
+                           </a>
+                        </div>
+                     </div>
+                  </form>
+               </ToggleDisplay>
+            </div>
 
-                  <div className="separator-container">
-                     <div className="separator" />
-                  </div>
-               </div>
-            </ToggleDisplay>
+            <div />
          </div>
       );
    }
 }
 
-const mapStateToProps = state => ({
-   asyncData: state.app.get("asyncData"),
-   asyncError: state.app.get("asyncError"),
-   asyncLoading: state.app.get("asyncLoading"),
-   signupInfo: state.app.get("signupInfo"),
-   isLoggedIn: state.app.get("isLoggedIn")
-});
+const mapStateToProps = state => {
+   const initialValues = {
+      emailLogin: "",
+      passLogin: ""
+   };
 
-export default connect(mapStateToProps)(Login);
+   return {
+      asyncData: state.app.get("asyncData"),
+      asyncError: state.app.get("asyncError"),
+      asyncLoading: state.app.get("asyncLoading"),
+      signupInfo: state.app.get("signupInfo"),
+      isLoggedIn: state.app.get("isLoggedIn"),
+      reduxForm: state.form,
+      initialValues
+   };
+};
+
+const validate = values => {
+   const errors = {};
+   const { nameReg, emailReg, passReg1, passReg2 } = values;
+
+   if (!nameReg || !STR.hasOnlyLetters(nameReg)) {
+      errors.nameReg = true;
+   }
+
+   if (!emailReg || !STR.isValidEmail(emailReg)) {
+      errors.emailReg = true;
+   }
+
+   if (!passReg1 || !STR.isAtleast(passReg1, 8)) {
+      errors.passReg1 = errors.passReg1 || "";
+      errors.passReg1 += "limit";
+   }
+
+   if (!passReg1 || !STR.hasLetter(passReg1)) {
+      errors.passReg1 = errors.passReg1 || "";
+      errors.passReg1 += "letter";
+   }
+
+   if (!passReg1 || !STR.hasNumber(passReg1)) {
+      errors.passReg1 = errors.passReg1 || "";
+      errors.passReg1 += "number";
+   }
+
+   if (passReg1 !== passReg2) {
+      errors.passReg2 = true;
+   }
+
+   return errors;
+};
+
+const formConfig = {
+   form: "loginForm",
+   validate
+};
+
+Login = reduxForm(formConfig)(Login);
+Login = connect(mapStateToProps)(Login);
+
+export default Login;
