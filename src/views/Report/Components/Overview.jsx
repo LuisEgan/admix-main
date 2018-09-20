@@ -66,7 +66,7 @@ export default class Overview extends Component {
    };
 
    calcGrowth(oldest, newest) {
-      return (((newest - oldest) * 100) / oldest).toFixed(2);
+      return (((newest - oldest) * 100) / oldest).toFixed(4);
    }
 
    calcSumOf(attr) {
@@ -90,14 +90,14 @@ export default class Overview extends Component {
          }
       }
       sum = sum ? sum : 0;
-      return Number.isInteger(sum) ? Math.round(sum) : sum.toFixed(2);
+      return Number.isInteger(sum) ? Math.round(sum) : sum.toFixed(4);
    }
 
    calcFillRate() {
       const { calcSumOf } = this;
       let fillRate = (
          calcSumOf("impression") / calcSumOf("bidRequest")
-      ).toFixed(2);
+      ).toFixed(4);
       fillRate = isNaN(fillRate) || fillRate === Infinity ? 0 : fillRate;
       return fillRate;
    }
@@ -107,7 +107,7 @@ export default class Overview extends Component {
       let ERPM = (
          ((calcSumOf("revenue")/1000) / calcSumOf("impression")) *
          1000
-      ).toFixed(2);
+      ).toFixed(4);
 
       ERPM = isNaN(ERPM) ? 0 : ERPM;
       return ERPM;
@@ -166,7 +166,7 @@ export default class Overview extends Component {
                growth: 0
             },
             revenue: {
-               value: Number(rDateSum).toFixed(2),
+               value: Number(rDateSum).toFixed(4),
                growth: 0
             }
          };
@@ -381,8 +381,8 @@ export default class Overview extends Component {
             }
          }
 
-         revenueData.push(rDateSum.toFixed(2));
-         impressionsData.push(iDateSum.toFixed(2));
+         revenueData.push(rDateSum.toFixed(4));
+         impressionsData.push(iDateSum.toFixed(4));
       }
 
       const data = {
@@ -471,7 +471,7 @@ export default class Overview extends Component {
                            {this.renderQicon("impressions")}
                         </div>
                         <div>
-                           <h3 className="st">{calcSumOf("revenue")/1000} €</h3>
+                           <h3 className="st">{(calcSumOf("revenue")/1000).toFixed(4)} €</h3>
                            <h6 className="mb">net revenue</h6>
                            {this.renderQicon("revenue")}
                         </div>
