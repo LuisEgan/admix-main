@@ -1,7 +1,13 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import { Field, reduxForm, reset } from "redux-form";
+import { NavLink } from "react-router-dom";
 import { setNewPass, resetAsync } from "../../actions";
+
+import Input from "../../components/Input";
+
 import STR from "../../utils/strFuncs";
+import admixLogo from "../../assets/img/logo.png";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faEye from "@fortawesome/fontawesome-free-solid/faEye";
 
@@ -9,56 +15,22 @@ class ForgotPass extends Component {
    constructor(props) {
       super(props);
       this.state = {
-         password: "",
          passInputType: "password",
-         confirmPassword: "",
-         regValidation: {
-            is8: "",
-            hasLetter: "",
-            hasNumber: "",
-            arePassSame: ""
-         },
          registerBtnDisabled: true
       };
 
-      this.handleKeyPress = this.handleKeyPress.bind(this);
-      this.handleInputChange = this.handleInputChange.bind(this);
       this.handleFocus = this.handleFocus.bind(this);
-      this.hardFocus = this.hardFocus.bind(this);
+      this.resetAsync = this.resetAsync.bind(this);
+      this.enableRegisterBtn = this.enableRegisterBtn.bind(this);
       this.togglePassInputType = this.togglePassInputType.bind(this);
       this.handleChangePass = this.handleChangePass.bind(this);
+      this.renderField = this.renderField.bind(this);
    }
 
-   handleKeyPress(e) {
-      if (e.key === "Enter") {
-         this.handleChangePass();
-      }
-   }
-
-   handleInputChange(input, e) {
-      const state = this.state;
-      const inputValue = e.target.value;
-
-      const inputParsed = input.replace("Reg", "");
-      state[inputParsed] = inputValue;
-      state.registerBtnDisabled = false;
-
-      if (input === "passwordReg") {
-         state.regValidation.is8 = STR.isAtleast(inputValue, 8);
-         state.regValidation.hasLetter = STR.hasLetter(inputValue);
-         state.regValidation.hasNumber = STR.hasNumber(inputValue);
-         state.regValidation.arePassSame = state.confirmPassword === inputValue;
-      } else if (input === "confirmPasswordReg") {
-         state.regValidation.arePassSame = state.password === inputValue;
-      }
-
-      for (let validation in state.regValidation) {
-         if (!state.regValidation[validation]) {
-            state.registerBtnDisabled = true;
-         }
-      }
-
-      this.setState(state);
+   componentDidMount() {
+         const { dispatch } = this.props;
+      dispatch(resetAsync());
+      dispatch(reset("forgotPassForm"));
    }
 
    handleFocus(e) {
@@ -69,8 +41,9 @@ class ForgotPass extends Component {
       }
    }
 
-   hardFocus(input) {
-      this[input].focus();
+   resetAsync() {
+      const { dispatch } = this.props;
+      dispatch(resetAsync());
    }
 
    togglePassInputType() {
@@ -79,13 +52,12 @@ class ForgotPass extends Component {
       this.setState({ passInputType });
    }
 
-   handleChangePass() {
+   handleChangePass(values) {
       let {
          dispatch,
          location: { search }
       } = this.props;
-
-      const { password } = this.state;
+      const { passReg1 } = values;
 
       search = search.split("?")[1];
       const token = search
@@ -93,142 +65,348 @@ class ForgotPass extends Component {
          .slice(0, search.indexOf("&uid") - 6);
       const userId = search.split("uid=")[1];
 
-      dispatch(setNewPass({ token, userId, newPass: password }));
+      dispatch(setNewPass({ token, userId, newPass: passReg1 }));
    }
 
-   render() {
-      const { asyncData, asyncError, asyncLoading } = this.props;
+   // ERROS HANDLING ---------------------------------------------------------
 
+   enableRegisterBtn() {
       const {
-         passInputType,
-         regValidation: { is8, hasLetter, hasNumber, arePassSame },
-         registerBtnDisabled
-      } = this.state;
+         reduxForm
+      } = this.props;
+      
+      if(reduxForm.forgotPassForm) {
+            const { syncErrors, values } = reduxForm.forgotPassForm;
+            const { passReg1, passReg2 } = values;
+            if (passReg1 && passReg2) {
+               return !syncErrors;
+            }
+      }
 
-      const loadingIcon = <p>Loading...</p>;
+      return false;
+   }
 
-      // for register validation
+   // ICONS ---------------------------------------------------------
+
+   eye() {
+      return (
+         <FontAwesomeIcon
+            icon={faEye}
+            onMouseEnter={this.togglePassInputType}
+            onMouseLeave={this.togglePassInputType}
+            className="password-eye"
+         />
+      );
+   }
+
+   // RENDER ---------------------------------------------------------
+
+   renderField(field) {
+      const {
+         input,
+         type,
+         meta: { error }
+      } = field;
+      let label, guideline;
+      let guidelineStyle = {};
+
       const goodStyle = { color: "green" };
       const badStyle = { color: "red" };
 
-      // password
-      const is8Style = is8 === "" ? {} : is8 ? goodStyle : badStyle;
-      const hasLetterStyle =
-         hasLetter === "" ? {} : hasLetter ? goodStyle : badStyle;
-      const hasNumberStyle =
-         hasNumber === "" ? {} : hasNumber ? goodStyle : badStyle;
+      const _registerGuidelineStyle = guideline => {
+         if (error && input.value.length > 0) {
+            return error.indexOf(guideline) > -1 ? badStyle : goodStyle;
+         } else {
+            return input.value.length > 0 ? goodStyle : {};
+         }
+      };
 
-      // password confirm
-      const arePassSameStyle =
-         arePassSame === "" ? {} : arePassSame ? goodStyle : badStyle;
+      switch (input.name) {
+         case "emailLogin":
+            label = "Email";
+            break;
+         case "passLogin":
+            label = "Password";
+            break;
+         case "emailForgot":
+            label = "Email";
+            break;
+         case "nameReg":
+            label = "Name";
+            guideline = "only letters";
+            break;
+         case "emailReg":
+            label = "Email";
+            guideline = "valid e-mail";
+            break;
+         case "passReg1":
+            label = "Password";
+            guideline = (
+               <React.Fragment>
+                  <span style={_registerGuidelineStyle("limit")}>
+                     min 8 characters
+                  </span>{" "}
+                  -{" "}
+                  <span style={_registerGuidelineStyle("letter")}>
+                     one letter
+                  </span>{" "}
+                  -{" "}
+                  <span style={_registerGuidelineStyle("number")}>
+                     one number
+                  </span>
+               </React.Fragment>
+            );
+            break;
+         case "passReg2":
+            label = "Confirm Password";
+            guideline = "both passwords match";
+            break;
+         default:
+      }
+
+      if (input.value.length > 0 && input.name !== "passReg1") {
+         guidelineStyle = error ? { color: "red" } : { color: "green" };
+      }
+
+      return (
+         <div>
+            <span className="input-label">{label}</span>
+            <Input
+               {...input}
+               type={type}
+               className="mb"
+               id={input.name}
+               onFocus={this.resetAsync}
+            />
+            <span className="login-guidelines" style={guidelineStyle}>
+               {guideline}
+            </span>
+         </div>
+      );
+   }
+
+   renderFields(fields) {
+      return fields.map(field => {
+         let type = field.type || "text";
+         return (
+            <div key={field.input}>
+               <Field
+                  name={field.input}
+                  component={this.renderField}
+                  type={type}
+               />
+
+               {field.icon}
+            </div>
+         );
+      });
+   }
+
+   render() {
+      const { asyncData, asyncError, asyncLoading, handleSubmit } = this.props;
+
+      const { passInputType } = this.state;
+
+      const registerBtnEnabled = this.enableRegisterBtn();
+      const registerBtnStyle = registerBtnEnabled ? {} : { opacity: 0.5 };
+      const registerBtnClass = registerBtnEnabled ? "" : "forbidden-cursor";
+
+      const fields = [
+         {
+            input: "passReg1",
+            icon: this.eye(),
+            type: passInputType,
+            guideline: "only letters"
+         },
+         {
+            input: "passReg2",
+            icon: this.eye(),
+            type: passInputType
+         }
+      ];
 
       return (
          <div id="login" onKeyPress={this.handleKeyPress}>
-            <span>
-               <div className="inputs-container">
-                  <div className="inputs-header">
-                     <h3 className="st">Change your password</h3>
-                  </div>
-
-                  <div className="inputs">
-                     {/* PASSWORD */}
+            <div>
+               <div>
+                  <img src={admixLogo} alt="admix" />
+               </div>
+               <span id="forgotPass">
+                  <form onSubmit={handleSubmit(this.handleChangePass)}>
+                     <div className="st">Change your password</div>
                      <div>
-                        <input
-                           type={passInputType}
-                           className="form-control"
-                           placeholder="Password"
-                           onChange={this.handleInputChange.bind(
-                              null,
-                              "passwordReg"
+                        {this.renderFields(fields)}
+                        <div className="login-btn-container">
+                           {asyncError && (
+                              <span className="asyncMssg asyncError">
+                                 {asyncError}
+                              </span>
                            )}
-                           onFocus={this.handleFocus}
-                           ref={input => {
-                              this.registerPassInput = input;
-                           }}
-                           onClick={this.hardFocus.bind(
-                              null,
-                              "registerPassInput"
+                           {asyncData &&
+                              !asyncError && (
+                                 <span className="asyncMssg asyncData">
+                                    {asyncData.mssg}
+                                 </span>
+                              )}
+                           {asyncLoading && (
+                              <span className="asyncMssg asyncData">
+                                 Loading...
+                              </span>
                            )}
-                        />
-                        <FontAwesomeIcon
-                           icon={faEye}
-                           onMouseEnter={this.togglePassInputType}
-                           onMouseLeave={this.togglePassInputType}
-                           className="password-eye"
-                        />
-                     </div>
-                     <div className="registerRules">
-                        <span style={is8Style}>min 8 characters - </span>
-                        <span style={hasLetterStyle}>one letter - </span>
-                        <span style={hasNumberStyle}>one number</span>
-                     </div>
-                     {/* PASSWORD CONFIRM */}
-                     <div>
-                        <input
-                           type={passInputType}
-                           className="form-control"
-                           placeholder="Confirm Password"
-                           onChange={this.handleInputChange.bind(
-                              null,
-                              "confirmPasswordReg"
-                           )}
-                           onFocus={this.handleFocus}
-                           ref={input => {
-                              this.registerConfirmPassInput = input;
-                           }}
-                           onClick={this.hardFocus.bind(
-                              null,
-                              "registerConfirmPassInput"
-                           )}
-                        />
-                        <FontAwesomeIcon
-                           icon={faEye}
-                           onMouseEnter={this.togglePassInputType}
-                           onMouseLeave={this.togglePassInputType}
-                           className="password-eye"
-                        />
-                     </div>
-                     <div className="registerRules">
-                        <span style={arePassSameStyle}>
-                           both passwords match
-                        </span>
-                     </div>
-                  </div>
-
-                  {/* BUTTON */}
-                  <div className="login-btn cc">
-                     {asyncLoading && loadingIcon}
-                     {asyncError && <p>Error: {asyncError}</p>}
-                     {asyncData !== null && <p>{asyncData.mssg}</p>}
-                     {!asyncLoading &&
-                        !asyncError &&
-                        !asyncData && (
                            <button
-                              className="btn btn-dark"
-                              onClick={this.handleChangePass}
-                              disabled={registerBtnDisabled}
+                              type="submit"
+                              className={`gradient-btn ${registerBtnClass}`}
+                              style={registerBtnStyle}
+                              disabled={!registerBtnEnabled}
                            >
                               Set new password
                            </button>
-                        )}
-                  </div>
+                        </div>
+                     </div>
 
-                  <div className="separator-container">
-                     <div className="separator" />
-                  </div>
-               </div>
-            </span>
+                     <div>
+                        <div>
+                           <NavLink to="/login">
+                              Login
+                           </NavLink>
+                        </div>
+                     </div>
+                  </form>
+               </span>
+            </div>
+            <div />
          </div>
       );
    }
 }
 
-const mapStateToProps = state => ({
-   asyncData: state.app.get("asyncData"),
-   asyncError: state.app.get("asyncError"),
-   asyncLoading: state.app.get("asyncLoading"),
-   counter: state.app.get("counter"),
-   isLoggedIn: state.app.get("isLoggedIn")
-});
+const mapStateToProps = state => {
+   const initialValues = {
+      passReg1: "",
+      passReg2: ""
+   };
 
-export default connect(mapStateToProps)(ForgotPass);
+   return {
+      asyncData: state.app.get("asyncData"),
+      asyncError: state.app.get("asyncError"),
+      asyncLoading: state.app.get("asyncLoading"),
+      counter: state.app.get("counter"),
+      isLoggedIn: state.app.get("isLoggedIn"),
+      reduxForm: state.form,
+      initialValues
+   };
+};
+
+const validate = values => {
+   const errors = {};
+   const { passReg1, passReg2 } = values;
+
+   if (!passReg1 || !STR.isAtleast(passReg1, 8)) {
+      errors.passReg1 = errors.passReg1 || "";
+      errors.passReg1 += "limit";
+   }
+
+   if (!passReg1 || !STR.hasLetter(passReg1)) {
+      errors.passReg1 = errors.passReg1 || "";
+      errors.passReg1 += "letter";
+   }
+
+   if (!passReg1 || !STR.hasNumber(passReg1)) {
+      errors.passReg1 = errors.passReg1 || "";
+      errors.passReg1 += "number";
+   }
+
+   if (passReg1 !== passReg2) {
+      errors.passReg2 = true;
+   }
+
+   return errors;
+};
+
+const formConfig = {
+   form: "forgotPassForm",
+   validate
+};
+
+ForgotPass = reduxForm(formConfig)(ForgotPass);
+ForgotPass = connect(mapStateToProps)(ForgotPass);
+
+export default ForgotPass;
+
+{
+   /* <div className="inputs-container">
+   <div className="inputs-header">
+      <h3 className="st">Change your password</h3>
+   </div>
+
+   <div className="inputs">
+      <div>
+         <input
+            type={passInputType}
+            className="form-control"
+            placeholder="Password"
+            onChange={this.handleInputChange.bind(null, "passwordReg")}
+            onFocus={this.handleFocus}
+            ref={input => {
+               this.registerPassInput = input;
+            }}
+            onClick={this.hardFocus.bind(null, "registerPassInput")}
+         />
+         <FontAwesomeIcon
+            icon={faEye}
+            onMouseEnter={this.togglePassInputType}
+            onMouseLeave={this.togglePassInputType}
+            className="password-eye"
+         />
+      </div>
+      <div className="registerRules">
+         <span style={is8Style}>min 8 characters - </span>
+         <span style={hasLetterStyle}>one letter - </span>
+         <span style={hasNumberStyle}>one number</span>
+      </div>
+      <div>
+         <input
+            type={passInputType}
+            className="form-control"
+            placeholder="Confirm Password"
+            onChange={this.handleInputChange.bind(null, "confirmPasswordReg")}
+            onFocus={this.handleFocus}
+            ref={input => {
+               this.registerConfirmPassInput = input;
+            }}
+            onClick={this.hardFocus.bind(null, "registerConfirmPassInput")}
+         />
+         <FontAwesomeIcon
+            icon={faEye}
+            onMouseEnter={this.togglePassInputType}
+            onMouseLeave={this.togglePassInputType}
+            className="password-eye"
+         />
+      </div>
+      <div className="registerRules">
+         <span style={arePassSameStyle}>both passwords match</span>
+      </div>
+   </div>
+
+   <div className="login-btn cc">
+      {asyncLoading && loadingIcon}
+      {asyncError && <p>Error: {asyncError}</p>}
+      {asyncData !== null && <p>{asyncData.mssg}</p>}
+      {!asyncLoading &&
+         !asyncError &&
+         !asyncData && (
+            <button
+               className="btn btn-dark"
+               onClick={this.handleChangePass}
+               disabled={registerBtnDisabled}
+            >
+               Set new password
+            </button>
+         )}
+   </div>
+
+   <div className="separator-container">
+      <div className="separator" />
+   </div>
+</div>; */
+}

@@ -1,24 +1,29 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Field, reduxForm } from "redux-form";
+import { routeCodes } from "../../config/routes";
 import { updateApp } from "../../actions";
 import PropTypes from "prop-types";
+import Breadcrumbs from "../../components/Breadcrumbs";
+import Input from "../../components/Input";
+import ReactSVG from "react-svg";
 
 // Material UI
-import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 
-import STR from "../../utils/strFuncs";
 import C from "../../utils/constants";
+
+import SVG_content from "../../assets/svg/content-detail.svg";
+import SVG_audience from "../../assets/svg/audience-insights.svg";
 
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faAngleUp from "@fortawesome/fontawesome-free-solid/faAngleUp";
 import faLink from "@fortawesome/fontawesome-free-solid/faLink";
 import faUsers from "@fortawesome/fontawesome-free-solid/faUsers";
 import faFileAlt from "@fortawesome/fontawesome-free-solid/faFileAlt";
+// import SVG from "../../components/SVG";
 
 class Profile extends Component {
    static propTypes = {
@@ -71,36 +76,58 @@ class Profile extends Component {
    renderField(field) {
       const { input } = field;
 
-      let label;
-
-      if (input.name === "storeurl") {
-         label = "App store URL";
-      }
-
       return (
          <div className="redux-form-inputs-container">
-            <TextField
-               {...input}
-               id={input.name}
-               label={STR.capitalizeFirstLetter(label)}
-               margin="normal"
-            />
+            {/* <Input {...input} id={input.name} icon={SVG.checkmark}/> */}
+            <Input {...input} id={input.name} placeholder="App store URL" />
          </div>
       );
    }
 
    render() {
+      const { selectedApp } = this.props;
+
+      const breadcrumbs = [
+         {
+            title: "My apps",
+            route: routeCodes.MYAPPS
+         },
+         {
+            title: selectedApp.name,
+            route: routeCodes.SCENE
+         },
+         {
+            title: "App info",
+            route: routeCodes.INFO
+         }
+      ];
+
       return (
          <div className="step-container" id="info">
-            <div className="container simple-container">
-               <h3 className="st">App Info</h3>
-               <div>
-                  <form onSubmit={this.handleSubmit}>
+            <div className="container simple-container mb">
+               <form onSubmit={this.handleSubmit}>
+                  <Breadcrumbs breadcrumbs={breadcrumbs} />
+                  <div id="info-header">
+                     <div>
+                        <div className="engine-logo">
+                           {C.LOGOS[selectedApp.appEngine]}
+                        </div>
+                        <h3 className="st">{selectedApp.name}</h3>
+                     </div>
+                     <button
+                        className="gradient-btn"
+                        onClick={this.handleSubmit}
+                     >
+                        {" "}
+                        Save
+                     </button>
+                  </div>
+                  <div>
                      <div className="container">
                         {/* APP STORE URL */}
 
                         <ExpansionPanel
-                           className="ExpansionPanel"
+                           classes={{ root: "mui-expansionPanel-root" }}
                            defaultExpanded={true}
                         >
                            <ExpansionPanelSummary
@@ -111,11 +138,14 @@ class Profile extends Component {
                                     icon={faLink}
                                     className="sectionIcon"
                                  />
-                                 <h2 className="sst">App store URL</h2>
+                                 <span>App store URL</span>
                               </div>
                            </ExpansionPanelSummary>
                            <ExpansionPanelDetails className="mb">
                               <div className="expansionPanelDetails-container">
+                                 <span className="mb">
+                                    Change app store URL
+                                 </span>
                                  <Field
                                     name="storeurl"
                                     component={this.renderField}
@@ -129,18 +159,18 @@ class Profile extends Component {
                         {/* CONTENT DETAIL */}
 
                         <ExpansionPanel
-                           className="ExpansionPanel"
+                           classes={{ root: "mui-expansionPanel-root" }}
                            defaultExpanded={false}
                         >
                            <ExpansionPanelSummary
                               expandIcon={<FontAwesomeIcon icon={faAngleUp} />}
                            >
                               <div className="cc">
-                                 <FontAwesomeIcon
-                                    icon={faFileAlt}
+                                 <ReactSVG
+                                    src={SVG_content}
                                     className="sectionIcon"
                                  />
-                                 <h2 className="sst">Content Detail</h2>
+                                 <span>Content Detail</span>
                               </div>
                            </ExpansionPanelSummary>
                            <ExpansionPanelDetails className="mb">
@@ -153,18 +183,18 @@ class Profile extends Component {
                         {/* AUDIENCE INSIGHTS */}
 
                         <ExpansionPanel
-                           className="ExpansionPanel"
+                           classes={{ root: "mui-expansionPanel-root" }}
                            defaultExpanded={false}
                         >
                            <ExpansionPanelSummary
                               expandIcon={<FontAwesomeIcon icon={faAngleUp} />}
                            >
                               <div className="cc">
-                                 <FontAwesomeIcon
-                                    icon={faUsers}
+                                 <ReactSVG
+                                    src={SVG_audience}
                                     className="sectionIcon"
                                  />
-                                 <h2 className="sst">Audience Insights</h2>
+                                 <span>Audience Insights</span>
                               </div>
                            </ExpansionPanelSummary>
                            <ExpansionPanelDetails className="mb">
@@ -174,17 +204,8 @@ class Profile extends Component {
 
                         <br />
                      </div>
-
-                     <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={this.handleSubmit}
-                        className="mb"
-                     >
-                        Save
-                     </Button>
-                  </form>
-               </div>
+                  </div>
+               </form>
             </div>
          </div>
       );

@@ -2,24 +2,23 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { saveInputs } from "../../../actions/";
 
-import FormControl from "@material-ui/core/FormControl";
 import Input from "@material-ui/core/Input";
-import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
+import { KeyboardArrowDown } from "@material-ui/icons";
 
-import thumbsUp from "../../../assets/img/Thumbs_Up_Hand_Sign_Emoji.png";
+import SVG from "../../../components/SVG";
+import ToggleButton from "../../../components/ToggleButton";
+import CSS from "../../../utils/InLineCSS";
 
 import dbCategories from "./categories.json";
 import dbSubCategories from "./subCategories.json";
 
 export default class FormPanel extends Component {
    static propTypes = {
-      slidesManager: PropTypes.func,
       onSave: PropTypes.func,
       dispatch: PropTypes.func,
       updateClickedPlacement: PropTypes.func,
-      activeClickedElem: PropTypes.func,
 
       selectedApp: PropTypes.object,
       selectedScene: PropTypes.object,
@@ -63,7 +62,7 @@ export default class FormPanel extends Component {
       this.renderActiveToggle = this.renderActiveToggle.bind(this);
       this.renderInputs = this.renderInputs.bind(this);
       this.toggleInfoBox = this.toggleInfoBox.bind(this);
-      this.handleActiveChange = this.handleActiveChange.bind(this);
+      this.toggleActive = this.toggleActive.bind(this);
       this.onSave = this.onSave.bind(this);
       this.resetInputs = this.resetInputs.bind(this);
    }
@@ -148,51 +147,28 @@ export default class FormPanel extends Component {
       }
    }
 
-   handleActiveChange(input, e) {
+   toggleActive({ save }) {
       const { rawDataChangeActive } = this.props;
       const { savedInputs } = this.state;
-      let {
-         target: { value }
-      } = e;
 
-      const isFromParent = input === "isActiveFromParent";
-
-      if (input === "isActive" || input === "isActiveFromParent") {
-         value = e.target.checked;
-      }
-
-      input = input === "isActiveFromParent" ? "isActive" : input;
-
-      // if this function is called from the parent, then the changes there are already done
-      !isFromParent &&
-         rawDataChangeActive(savedInputs.placementId + "FromChild", e);
-
-      savedInputs[input] = value;
-      this.setState({ savedInputs, animating: true });
-      !isFromParent && this.onSave();
-
-      setTimeout(() => {
-         this.setState({ animating: false });
-      }, 1000);
+      savedInputs.isActive = !savedInputs.isActive;
+      this.setState({ savedInputs }, () => {
+         if (save) {
+            this.onSave();
+            rawDataChangeActive({
+               placementId: savedInputs.placementId,
+               save: false
+            });
+         }
+      });
    }
 
    onSave() {
       const { savedInputs } = this.state;
-      const {
-         dispatch,
-         updateClickedPlacement,
-         activeClickedElem
-      } = this.props;
+      const { dispatch, updateClickedPlacement } = this.props;
 
       updateClickedPlacement(savedInputs);
       dispatch(saveInputs(savedInputs));
-
-      this.setState({ feedbackClass: "feedback" });
-      setTimeout(() => {
-         this.setState({ feedbackClass: "" });
-      }, 2300);
-
-      activeClickedElem("saveClicked");
    }
 
    resetInputs() {
@@ -213,29 +189,30 @@ export default class FormPanel extends Component {
       this.setState({ savedInputs });
    }
 
-   changeDropdownValue(dropdown, e) {
+   changeDropdownValue({ dropdown, save, newValue }, e) {
       const { rawDataChangeDropdownValue } = this.props;
       const { savedInputs } = this.state;
-      const { value } = e.target;
+      const value = newValue ? newValue : e.target.value;
       const newState = { savedInputs };
 
-      const isFromParent =
-         dropdown === "categoryFromParent" ||
-         dropdown === "subCategoryFromParent";
-
-      if (dropdown === "category" || dropdown === "categoryFromParent") {
+      if (dropdown === "category") {
          newState.savedInputs.category = value;
          newState.subCategories = dbSubCategories[value];
       } else {
          newState.savedInputs.subCategory = value;
       }
 
-      // if this function is called from the parent, then the changes there are already done
-      !isFromParent &&
-         rawDataChangeDropdownValue(dropdown, savedInputs.placementId, e);
-
-      this.setState(newState);
-      !isFromParent && this.onSave();
+      this.setState(newState, () => {
+         if (save) {
+            this.onSave();
+            rawDataChangeDropdownValue({
+               dropdown,
+               save: false,
+               placementId: savedInputs.placementId,
+               newValue: value
+            });
+         }
+      });
    }
 
    renderDropdown(input) {
@@ -245,66 +222,49 @@ export default class FormPanel extends Component {
 
       const dropdown = toMap.map(item => {
          return (
-            <MenuItem value={item} key={item} className="mb">
+            <MenuItem value={item} key={item} style={CSS.mb}>
                {item}
             </MenuItem>
          );
       });
 
+      const value = !Array.isArray(savedInputs[input])
+         ? savedInputs[input]
+         : savedInputs[input][0];
+
       return (
-         <FormControl className="fw">
-            <InputLabel htmlFor={`${input}-helper`} className="mb">
-               {input === "category" ? "Category" : "Sub-Category"}
-            </InputLabel>
-            <Select
-               value={
-                  !Array.isArray(savedInputs[input])
-                     ? savedInputs[input]
-                     : savedInputs[input][0]
-               }
-               onChange={this.changeDropdownValue.bind(null, input)}
-               input={<Input name={input} id={`${input}-helper`} />}
-               className="mb"
-            >
-               <MenuItem value="" className="mb">
-                  <em>
-                     Please select a{" "}
-                     {input === "category" ? "Category" : "Sub-Category"}
-                  </em>
-               </MenuItem>
-               {dropdown}
-            </Select>
-         </FormControl>
+         <Select
+            value={value}
+            onChange={this.changeDropdownValue.bind(null, {
+               dropdown: input,
+               save: true
+            })}
+            input={<Input name={input} id={`${input}-helper`} />}
+            classes={{ root: "mui-select-root" }}
+            disableUnderline={true}
+            IconComponent={KeyboardArrowDown}
+            style={CSS.mb}
+         >
+            <MenuItem value="" style={CSS.mb}>
+               <em>
+                  Please select a{" "}
+                  {input === "category" ? "Category" : "Sub-Category"}
+               </em>
+            </MenuItem>
+            {dropdown}
+         </Select>
       );
    }
 
    renderActiveToggle() {
-      const { savedInputs, animating } = this.state;
-      const labelStyle = animating ? { opacity: 0.7 } : { opacity: 1 };
+      const { savedInputs } = this.state;
 
       return (
-         <div id="form-panel-active-switch">
-            <div className="active-switch clearfix toggleBtn">
-               <div className="toggles">
-                  <input
-                     type="checkbox"
-                     name="formPanelToggle"
-                     id="formPanelToggle"
-                     className="ios-toggle"
-                     checked={savedInputs.isActive}
-                     onChange={this.handleActiveChange.bind(null, "isActive")}
-                     disabled={animating}
-                  />
-                  <label
-                     htmlFor="formPanelToggle"
-                     className="checkbox-label"
-                     data-on=""
-                     data-off=""
-                     style={labelStyle}
-                  />
-               </div>
-            </div>
-         </div>
+         <ToggleButton
+            inputName={"app-form"}
+            isChecked={savedInputs.isActive}
+            onChange={this.toggleActive.bind(null, { save: true })}
+         />
       );
    }
 
@@ -313,8 +273,7 @@ export default class FormPanel extends Component {
          placementTypeInfoBox,
          activeInfoBox,
          categoryInfoBox,
-         savedInputs,
-         feedbackClass
+         savedInputs
       } = this.state;
 
       const _q_icon = input => {
@@ -357,37 +316,31 @@ export default class FormPanel extends Component {
       };
 
       return (
-         <div id="inputs-container">
-            <div className="input-container">
-               <div className="input-title mb">Name</div>
-               <div id="input-placement-name" className="mb">
-                  {savedInputs.placementName}
-               </div>
+         <div id="form-panel-inputs">
+            <div>
+               <div className="mb">Name</div>
+               <div className="mb">{savedInputs.placementName}</div>
             </div>
-            <div className="input-container">
-               {_q_icon("placementType")}
+            <div>
                <div className="input-title mb">Format</div>
                <div className="text-truncate mb">
                   {savedInputs.placementType}
                </div>
+               {_q_icon("placementType")}
             </div>
-            <div className="input-container">
-               {_q_icon("isActive")}
+            <div>
                <div className="input-title mb active-prop">Active</div>
                {this.renderActiveToggle()}
+               {_q_icon("isActive")}
             </div>
-            <div className="input-container column">
-               {_q_icon("Category")}
+            <div className="form-input-dropdown">
+               <div className="input-title mb">Category</div>
                <div>{this.renderDropdown("category")}</div>
+               {_q_icon("Category")}
             </div>
-            <div className="input-container column">
+            <div className="form-input-dropdown">
+               <div className="input-title mb">Sub-Category</div>
                <div>{this.renderDropdown("subCategory")}</div>
-            </div>
-            <div className="input-container cc">
-               <div id="input-save-feedback" className={feedbackClass}>
-                  Saved!
-                  <img src={thumbsUp} alt="Thumbs Up!" />
-               </div>
             </div>
          </div>
       );
@@ -404,8 +357,7 @@ export default class FormPanel extends Component {
                ? "slidePanelOutRight"
                : "slidePanelInRight"
          : "closed";
-      const arrow = slidedIn ? "left" : "right";
-      const arrowVisible = displayMode === "raw" ? "hidden" : "";
+      const rotateAnim = slidedIn ? "rotate90" : "rotate270";
 
       if (!sceneMounted) {
          return <div />;
@@ -413,23 +365,35 @@ export default class FormPanel extends Component {
 
       return (
          <div
-            className={`container panel ${slideAnim}`}
-            id="form-panel"
+            className={`panel ${slideAnim}`}
+            id="scene-form-panel"
             onMouseEnter={mouseOnPanel}
             onMouseLeave={mouseOnPanel}
          >
-            <div
-               className={`panel-toggle-btn cc ${arrow} ${arrowVisible}`}
-               onClick={this.toggleSlide}
-            />
+            {displayMode === "3D" && (
+               <div
+                  className={`panel-toggle-btn cc`}
+                  onClick={this.toggleSlide}
+               >
+                  <div className={`${rotateAnim}`}>{SVG.caretDown}</div>
+               </div>
+            )}
 
-            <h3 className="st">Edit placement</h3>
+            <div id="form-title">
+               <div>
+                  <span className="mb" style={{ color: "#14B9BE" }}>
+                     Editing placement
+                  </span>
+               </div>
+            </div>
 
-            <div id="form-panel-inputs">{this.renderInputs()}</div>
+            {this.renderInputs()}
 
             <div id="form-footer">
-               <div id="form-footer-separator" />
                <div id="form-footer-text" className="mb">
+                  <span role="img" aria-label="bulb">
+                     💡
+                  </span>{" "}
                   Click on other placements in the scene to edit!
                </div>
             </div>

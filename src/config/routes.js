@@ -39,7 +39,16 @@ const PrivateRoute = ({ component: Component, isLoggedIn, ...rest }) => (
       {...rest}
       render={props => {
          return isLoggedIn ? (
-            <Component {...props} {...rest.customFuncs} />
+            props.match.path !== "*" ? (
+               <Component {...props} {...rest.customFuncs} />
+            ) : (
+               <Redirect
+                  to={{
+                     pathname: "/myapps",
+                     state: { from: props.location }
+                  }}
+               />
+            )
          ) : (
             <Redirect
                to={{
@@ -81,12 +90,12 @@ export default props => {
             component={Login}
             isLoggedIn={isLoggedIn}
          />
-         <PrivateRoute
+         {/* <PrivateRoute
             exact
             path={publicPath}
             component={MyApps}
             isLoggedIn={isLoggedIn}
-         />
+         /> */}
          <PrivateRoute
             path={routeCodes.MYAPPS}
             component={MyApps}
@@ -140,7 +149,12 @@ export default props => {
             component={EmailFailure}
             exact
          />
-         <Route path="*" component={NotFound} />
+         <PrivateRoute
+            path="*"
+            component={MyApps}
+            isLoggedIn={isLoggedIn}
+            location={location}
+         />
       </Switch>
    );
 };

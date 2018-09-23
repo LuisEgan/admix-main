@@ -461,6 +461,7 @@ export const getUserData = accessToken => dispatch => {
 };
 
 export const toggleAppStatus = (appDetails, accessToken) => dispatch => {
+      console.log('appDetails: ', appDetails);
       dispatch(asyncStart());
 
       api
@@ -578,7 +579,6 @@ export const updatePlacements = ({
       dispatch(asyncStart());
 
       if (!adminToken) {
-            console.log('data: ', data);
             api
                   .updatePlacements(accessToken, data)
                   .then(res => dispatch(pushPlacements(res)))
@@ -625,7 +625,6 @@ export const getReportData = ({
                   dispatch(sendReportData(res))
             })
             .catch(error => {
-                  console.log('error: ', error);
                   dispatch(asyncError(error))
             });
 

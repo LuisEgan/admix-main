@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 
 import Routes from "../../config/routes";
 import Menu from "../.Global/Menu";
+import SideMenu from "../.Global/SideMenu";
 import Snackbar from "../.Global/SnackBar";
 
 // @withRouter()
@@ -24,6 +25,8 @@ class App extends Component {
    render() {
       const { isLoggedIn, location, history } = this.props;
 
+      const contentStyle = !isLoggedIn ? {width: "100%"} : {};
+
       return (
          <div className="App">
             <Menu
@@ -33,7 +36,8 @@ class App extends Component {
                onRef={ref => (this.menu = ref)}
             />
             <div id="Page">
-               <div id="content">
+               <SideMenu location={location} history={history} />
+               <div id="content" style={contentStyle}>
                   <Routes
                      isLoggedIn={isLoggedIn}
                      location={location}

@@ -11,6 +11,8 @@ import IconButton from "@material-ui/core/IconButton";
 import MenuItem from "@material-ui/core/MenuItem";
 import MUIMenu from "@material-ui/core/Menu";
 
+import SVG from "../../components/SVG";
+
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faUser from "@fortawesome/fontawesome-free-solid/faUser";
 import faCaretDown from "@fortawesome/fontawesome-free-solid/faCaretDown";
@@ -108,12 +110,11 @@ class Menu extends Component {
       const { anchorEl } = this.state;
       const open = Boolean(anchorEl);
 
-      const {
-         isLoggedIn,
-         userData,
-      } = this.props;
+      const { isLoggedIn, userData } = this.props;
 
       showDropdown = showDropdown ? "show" : "";
+
+      if (!isLoggedIn) return null;
 
       return (
          <div id="headerMenu">
@@ -126,60 +127,10 @@ class Menu extends Component {
                   </div>
                </div>
 
-               <div className="cc mb" id="pages-container">
-                  {isLoggedIn && (
-                     <React.Fragment>
-                        <div className={`${this.isSub("myapps")}`}>
-                           <NavLink
-                              exact
-                              to={routeCodes.MYAPPS}
-                              onClick={this.handleClose}
-                              className="mb mui-dropdown-item"
-                           >
-                              My Apps
-                           </NavLink>
-                        </div>
-                        <div className={`${this.isSub("profile")}`}>
-                           <NavLink
-                              exact
-                              to={routeCodes.PROFILE}
-                              onClick={this.handleClose}
-                              className="mb mui-dropdown-item"
-                           >
-                              My Profile
-                           </NavLink>
-                        </div>
-                        <div className={`${this.isSub("download")}`}>
-                           <NavLink
-                              exact
-                              to={routeCodes.DOWNLOAD}
-                              onClick={this.handleClose}
-                              className="mb mui-dropdown-item"
-                           >
-                              Download
-                           </NavLink>
-                        </div>
-                     </React.Fragment>
-                  )}
-               </div>
+               <div className="cc mb" id="pages-container" />
 
-               <div id="dropdown-container">
-                  <IconButton
-                     aria-owns={open ? "menu-appbar" : null}
-                     aria-haspopup="true"
-                     color="inherit"
-                  >
-                     {!isLoggedIn && <FontAwesomeIcon icon={faUser} />}
-
-                     {isLoggedIn &&
-                        userData._id && (
-                           <img
-                              src={userData.cloudinaryImgURL}
-                              onError={e => (e.target.src = defaultImg)}
-                              alt="Login"
-                           />
-                        )}
-                  </IconButton>
+               <div id="dropdown-container" className="mb">
+                  
                   <MUIMenu
                      id="menu-appbar"
                      anchorEl={anchorEl}
@@ -194,59 +145,37 @@ class Menu extends Component {
                      open={open}
                      onClose={this.handleClose}
                   >
-                     {!isLoggedIn && (
-                        <React.Fragment>
-                           <MenuItem onClick={this.handleClose}>
-                              <NavLink
-                                 exact
-                                 to={routeCodes.DOWNLOAD}
-                                 onClick={this.handleClose.bind(null, true)}
-                                 className="mb mui-dropdown-item"
-                              >
-                                 Download
-                              </NavLink>
-                           </MenuItem>
-                           <MenuItem onClick={this.handleClose}>
-                              {/* <NavLink
-                                 exact
-                                 to={routeCodes.LOGIN}
-                                 onClick={this.handleClose.bind(null, true)}
-                                 className="mb mui-dropdown-item"
-                                 >
-                                 Login
-                              </NavLink> */}
-                              <a
-                                 onClick={this.handleClose.bind(null, true)}
-                                 className="mb mui-dropdown-item"
-                                 href="/login"
-                              >
-                                 Login
-                              </a>
-                           </MenuItem>
-                        </React.Fragment>
-                     )}
-
-                     {isLoggedIn && (
-                        <React.Fragment>
-                           <MenuItem onClick={this.handleClose}>
-                              <a
-                                 onClick={this.handleLogout}
-                                 className="mb mui-dropdown-item"
-                                 href="/login"
-                              >
-                                 Logout
-                              </a>
-                           </MenuItem>
-                        </React.Fragment>
-                     )}
+                     <MenuItem onClick={this.handleClose}>
+                        <a
+                           onClick={this.handleLogout}
+                           className="mb mui-dropdown-item"
+                           href="/login"
+                        >
+                           Logout
+                        </a>
+                     </MenuItem>
                   </MUIMenu>
-                  <span className="sst" onClick={this.handleDropdown}>
+                  
+                  <IconButton
+                     aria-owns={open ? "menu-appbar" : null}
+                     aria-haspopup="true"
+                     color="inherit"
+                  >
+                     {userData._id && (
+                        <img
+                           src={userData.cloudinaryImgURL}
+                           onError={e => (e.target.src = defaultImg)}
+                           alt="Login"
+                        />
+                     )}
+                  </IconButton>
+                  <span onClick={this.handleDropdown}>
                      {userData.name === undefined ||
                      userData.name === "" ||
                      !userData.name
                         ? "Hello!"
                         : "Hi, " + userData.name}{" "}
-                     <FontAwesomeIcon icon={faCaretDown} />
+                     {SVG.caretDown}
                   </span>
                </div>
             </div>
