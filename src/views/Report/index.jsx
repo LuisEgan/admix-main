@@ -12,9 +12,11 @@ import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
+import { KeyboardArrowDown } from "@material-ui/icons";
 
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faTrash from "@fortawesome/fontawesome-free-solid/faTrash";
+import CSS from "../../utils/InLineCSS";
 
 import Overview from "./Components/Overview";
 import Performance from "./Components/Performance";
@@ -337,7 +339,8 @@ class Report extends Component {
 
    changeAppSelection(appId, e) {
       let { userApps, selectedApps, allAppsSelected } = this.state;
-      appId = e.target.value ? e.target.value : appId;
+      appId = e.target.value || appId;
+      console.log('appId: ', appId);
 
       if (appId !== "add") {
          if (appId !== "all") {
@@ -364,6 +367,7 @@ class Report extends Component {
             allAppsSelected = true;
          }
 
+         console.log('selectedApps: ', selectedApps);
          this.setState({ selectedApps, allAppsSelected });
       }
    }
@@ -397,7 +401,7 @@ class Report extends Component {
             >
                <div>{selectedApps[appId]}</div>
                <div onClick={this.changeAppSelection.bind(null, appId)}>
-                  <FontAwesomeIcon icon={faTrash} />
+                  {/* <FontAwesomeIcon icon={faTrash} /> */}X
                </div>
             </div>
          );
@@ -407,19 +411,20 @@ class Report extends Component {
       return (
          <div className="mb">
             <FormControl className="fw">
-               <InputLabel htmlFor="apps-helper" className="mb">
-                  Apps selection
-               </InputLabel>
+            <span>Apps selection</span>
                <Select
                   value="add"
                   onChange={this.changeAppSelection.bind(null, "")}
                   input={<Input name="apps" id="apps-helper" />}
-                  className="mb"
+                  style={CSS.mb}
+                  classes={{ root: "mui-select-root" }}
+                  disableUnderline={true}
+                  IconComponent={KeyboardArrowDown}
                >
-                  <MenuItem value="add" className="mb">
+                  <MenuItem value="add" style={CSS.mb}>
                      Add app
                   </MenuItem>
-                  <MenuItem value="all" className="mb">
+                  <MenuItem value="all" style={CSS.mb}>
                      {allAppsSelected ? "Unselect all" : "Select all"}
                   </MenuItem>
                   {dropdown}
@@ -478,9 +483,9 @@ class Report extends Component {
                />
             </div>
 
-            <div className={`panel menu-panel`}>
-               <div id="app-selection" className="container">
-                  <h3 className="st">Reporting</h3>
+            <div className={`panel menu-panel mb`}>
+               <div id="app-selection">
+                  <span style={{ color: "#14B9BE" }}>Reporting</span>
                   {this.renderAppsDropdown()}
                </div>
 
@@ -539,7 +544,7 @@ class Report extends Component {
 
                <hr />
 
-               <div className="list-group sst">
+               <div className="list-group">
                   <a
                      className={`list-group-item list-group-item-action ${owAct}`}
                      onClick={this.changeView.bind(null, "ov")}
@@ -565,6 +570,7 @@ class Report extends Component {
                /> */}
             </div>
 
+            <div>
             <ToggleDisplay show={show("ov")}>
                <Overview
                   filteredReportData={filteredReportData}
@@ -598,6 +604,9 @@ class Report extends Component {
             <ToggleDisplay show={show("an")}>
                <Analytics />
             </ToggleDisplay>
+
+            </div>
+
          </div>
       );
    }

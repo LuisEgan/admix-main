@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import { routeCodes } from "../../config/routes";
 import _ from "lodash";
 import { saveInputs } from "../../actions/";
 import C from "../../utils/constants";
@@ -1046,7 +1047,16 @@ class Scene extends Component {
          activeByPlacementId
       } = this.state;
 
-      const breadcrumbs = ["My apps", selectedApp.name];
+      const breadcrumbs = [
+         {
+            title: "My apps",
+            route: routeCodes.MYAPPS
+         },
+         {
+            title: selectedApp.name,
+            route: routeCodes.SCENE
+         }
+      ];
 
       const isActiveToggle = (placementId, savedInputsActive = null) => {
          const label = savedInputsActive

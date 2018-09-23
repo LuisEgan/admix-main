@@ -190,7 +190,7 @@ p {
       //header text
       // font-family: "Roboto", sans-serif;
       color: #000000;
-      font-size: 30px !important;
+      font-size: 28px !important;
 }
 
 .pt {
@@ -198,14 +198,14 @@ p {
       // font-family: "Roboto Slab", sans-serif;
       font-weight: bold;
       color: #4b44c5;
-      font-size: 45px !important;
+      font-size: 43px !important;
 }
 
 .st {
       //section title
-      font-size: 32px;
+      font-size: 30px;
       font-weight: 600;
-      line-height: 38px;
+      line-height: 36px;
       color: #0a1f44;
       // font-family: "Roboto Slab", sans-serif;
       // font-weight: bold;
@@ -219,7 +219,7 @@ p {
       // color: #000000;
       // font-size: 17px !important;
       color: #0a1f44;
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 600;
       line-height: 29px;
 }
@@ -227,7 +227,7 @@ p {
 .mb {
       //main body
       color: #0a1f44;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 600;
       line-height: 17px;
       // font-family: "Roboto", sans-serif;
@@ -239,7 +239,7 @@ p {
 
 .mbs {
       //main body small
-      font-size: 12px;
+      font-size: 10px;
       font-weight: 600;
       line-height: 14px;
 }
@@ -249,7 +249,7 @@ p {
       // font-family: "Roboto", sans-serif;
       font-weight: lighter;
       color: #a8afb9;
-      font-size: 20px !important;
+      font-size: 18px !important;
 }
 
 .lt {
@@ -257,7 +257,7 @@ p {
       // font-family: "Roboto", sans-serif;
       font-weight: lighter;
       color: #4b44c5;
-      font-size: 20px !important;
+      font-size: 18px !important;
 }
 
 // ----------------------------------------------------------------------------------------------------------
@@ -554,6 +554,7 @@ p {
             fill: #14b9be;
             margin-right: 5px;
       }
+
 }
 
 .mui-expansionPanel-root {
@@ -563,6 +564,23 @@ p {
       &::before {
             background-color: transparent !important;
       }
+
+      [aria-expanded="true"] {
+            &:first-child {
+                  border-bottom: solid #F5F7FA;
+            }
+      }
+
+}
+
+.mui-radio-btn {
+      svg {
+            color: #14B9BE;
+      }
+}
+
+.mui-menuItem-root {
+      @extend .mb;
 }
 
 // ----------------------------------------------------------------------------------------------------------
@@ -820,6 +838,14 @@ $inputsFontSize: calc(0.45em+0.3vw);
                   transform: rotate(-90deg);
                   padding: 0 10px;
             }
+      }
+      
+      a {
+            color: #53627C
+      }
+
+      a.last {
+            color: #0A1F44;
       }
 }
 
@@ -1096,6 +1122,10 @@ $inputsFontSize: calc(0.45em+0.3vw);
       border-radius: 5px;
       box-shadow: 0 3px 4px 0 rgba(10, 31, 68, 0.1);
 
+      .mui-select-root {
+            margin-top: 5px;
+      }
+
       .filter {
             position: relative;
             display: flex;
@@ -1105,7 +1135,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
             padding: 0 3%;
 
             span {
-                  margin-bottom: 6px;
+                  // margin-bottom: 6px;
             }
 
             >div {
@@ -1558,7 +1588,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
       flex-flow: column;
       padding-bottom: 0;
       z-index: 2;
-      opacity: 0.8;
+      // opacity: 0.8;
       position: absolute;
       height: 100%;
       background-color: #fff;
@@ -2278,88 +2308,32 @@ $inputsFontSize: calc(0.45em+0.3vw);
 }
 
 #report {
-      >span {
-            position: absolute;
-            width: 76%;
-            right: 0; // padding: 3%;
-            background: transparent;
+      display: flex;
+      height: 100%;
+
+      >div {
+            &:last-child {
+                  width: 75%;
+            }
       }
 
       .panel {
-            position: fixed;
-            height: 100vh;
-            padding-top: 8%;
-            top: 0;
-            z-index: 1;
-            width: 25% !important;
+            position: relative;
+            width: 25%;
             min-width: 180px;
-      }
 
-      .dropdown-menu.show {
-            transform: translate3d(0, 18.5%, 0px) !important;
-            max-height: 200px;
-            overflow-y: scroll;
-
-            >a {
-                  color: #5eb4ed;
+            >div {
+                  padding: 20px 35px;
             }
-      }
 
-      .WebGLScene {
-            canvas {
-                  top: 10%;
-            }
-      }
-
-      #report-selectedAppsDisplay {
-            max-height: 17vh;
-            overflow-y: scroll;
-            overflow-y: auto;
-            margin-top: 5%;
-
-            .report-selectedApp {
-                  padding: 2% 0;
-                  display: flex;
-                  color: #5eb4ed;
-
-                  >div {
-                        &:first-child {
-                              width: 95%;
-                        }
-
-                        &:last-child {
-                              color: red;
-
-                              &:hover {
-                                    cursor: pointer;
-                              }
-                        }
-                  }
-            }
-      }
-
-      .menu-panel {
             .list-group {
-                  margin: 0 -16%;
-                  border-radius: 0;
+                  padding: 20px 15px;
 
                   >a {
-                        border-radius: 0;
-                        padding: 5% 12%;
+                        background-color: #F5F7FA;
+                        border-radius: 10px;
                         border: none;
-
-                        &:visited {
-                              color: black !important;
-                        }
-
-                        &::after {
-                              content: "";
-                              position: absolute;
-                              border-top: 7px solid transparent;
-                              border-bottom: 7px solid transparent;
-                              border-left: 7px solid black;
-                              right: 15%;
-                        }
+                        padding: 8% 5%;
                   }
 
                   >a.active {
@@ -2421,6 +2395,48 @@ $inputsFontSize: calc(0.45em+0.3vw);
 
                               &:hover {
                                     color: black !important;
+                              }
+                        }
+                  }
+            }
+      }
+
+      .WebGLScene {
+            canvas {
+                  top: 10%;
+            }
+      }
+
+      #report-selectedAppsDisplay {
+            max-height: 17vh;
+            overflow-y: scroll;
+            overflow-y: auto;
+            margin-top: 5%;
+
+            .report-selectedApp {
+                  display: flex;
+                  color: #53627C;
+                  background-color: #F5F7FA;
+                  border-radius: 10px;
+                  padding: 5px 15px;
+
+                  >div {
+                        &:first-child {
+                              min-width: 45%;
+                              max-width: 95%;
+                        }
+
+                        &:last-child {
+                              color: red;
+
+                              &::after {
+                                    content: "";
+                                    border-width: 20px;
+                                    border-left-color: #e2e0e0;
+                              }
+
+                              &:hover {
+                                    cursor: pointer;
                               }
                         }
                   }
@@ -2533,8 +2549,16 @@ $inputsFontSize: calc(0.45em+0.3vw);
                         padding-left: 1%;
 
                         #graph {
+                              background: white;
+                              background-color: #FFFFFF;
+                              border-radius: 10px;
+                              box-shadow: 0 3px 4px 0 rgba(10, 31, 68, 0.1);
                               padding-top: 1%;
                               margin-top: 1%;
+
+                              canvas {
+                                    padding: 2%;
+                              }
                         }
                   }
             }
@@ -2689,6 +2713,84 @@ $inputsFontSize: calc(0.45em+0.3vw);
 
       .profile-helper-text {
             padding: 5%;
+
+            a {
+                  color: #14B9BE;
+            }
+      }
+
+      .input {
+            input {
+                  background: white;
+
+                  &:disabled {
+                        color: #d9d9d9;
+                  }
+            }
+      }
+
+      .image-drop-container {
+            @extend .cc;
+            width: 100%;
+            background-color: #FFFFFF;
+            border-radius: 10px;
+            box-shadow: 0 3px 4px 0 rgba(10, 31, 68, 0.1);
+
+            svg {
+                  bottom: -20px;
+            }
+
+            .dropzone {
+                  height: 30vh;
+                  max-height: 250px;
+            }
+      }
+
+      .password-eye {
+            font-size: 2em;
+            bottom: 30%;
+            color: #14B9BE;
+            padding: 2%;
+
+            &:hover {
+                  padding: 0.5%;
+            }
+      }
+
+      .paymentOpts {
+            flex-flow: row;
+
+            label {
+                  margin: 0;
+            }
+
+            .MuiSvgIcon-root-103 {
+                  color: $blueAdmix;
+            }
+      }
+
+      #profile-pay-banks-details {
+            h2 {
+                  padding: 0;
+            }
+
+            >div {
+                  padding: 5px 0;
+            }
+
+            .or-separator {
+                  display: flex;
+                  align-items: center;
+                  min-height: 7vh;
+            }
+      }
+
+      #expansionPanelDetails-container-payment {
+            flex-flow: column;
+
+            >div {
+                  width: 100%;
+            }
       }
 
       form {
@@ -2730,7 +2832,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
                                                             display: flex;
                                                             position: relative;
                                                             flex-flow: column;
-                                                            height: 20vh;
+                                                            min-height: 15vh;
                                                             justify-content: center;
                                                       }
                                                 }
@@ -2743,6 +2845,11 @@ $inputsFontSize: calc(0.45em+0.3vw);
                                                       margin-right: 2vw;
                                                       max-width: 2vw;
                                                 }
+
+                                                img {
+                                                      width: 5vw;
+                                                      max-width: 80px;
+                                                }
                                           }
                                     }
                               }
@@ -2751,50 +2858,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
             }
       }
 
-      .image-drop-container {
-            @extend .cc;
-            width: 100%;
-            background-color: #FFFFFF;
-            border-radius: 10px;
-            box-shadow: 0 3px 4px 0 rgba(10, 31, 68, 0.1);
 
-            svg {
-                  bottom: -20px;
-            }
-
-            .dropzone {
-                  height: 30vh;
-                  max-height: 250px;
-            }
-      }
-
-      .password-eye {
-            bottom: 43%;
-      }
-
-      .paymentOpts {
-            flex-flow: row;
-
-            label {
-                  margin: 0;
-            }
-
-            .MuiSvgIcon-root-103 {
-                  color: $blueAdmix;
-            }
-      }
-
-      #profile-pay-banks-details {
-            h2 {
-                  padding: 0;
-            }
-
-            .or-separator {
-                  display: flex;
-                  align-items: flex-end;
-                  min-height: 7vh;
-            }
-      }
 }
 
 // ----------------------------------------------------------------------------------------------------------
@@ -3201,6 +3265,7 @@ $ballSize: 20px;
       align-items: center;
       min-height: 50px;
       transition: 0.5s ease-in-out;
+      margin-top: 5px;
 
       >div {
             width: 100%;

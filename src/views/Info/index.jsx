@@ -1,10 +1,12 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Field, reduxForm } from "redux-form";
+import { routeCodes } from "../../config/routes";
 import { updateApp } from "../../actions";
 import PropTypes from "prop-types";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import Input from "../../components/Input";
+import ReactSVG from "react-svg";
 
 // Material UI
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
@@ -12,6 +14,9 @@ import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 
 import C from "../../utils/constants";
+
+import SVG_content from "../../assets/svg/content-detail.svg";
+import SVG_audience from "../../assets/svg/audience-insights.svg";
 
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faAngleUp from "@fortawesome/fontawesome-free-solid/faAngleUp";
@@ -82,11 +87,24 @@ class Profile extends Component {
    render() {
       const { selectedApp } = this.props;
 
-      const breadcrumbs = ["My apps", selectedApp.name, "App info"];
+      const breadcrumbs = [
+         {
+            title: "My apps",
+            route: routeCodes.MYAPPS
+         },
+         {
+            title: selectedApp.name,
+            route: routeCodes.SCENE
+         },
+         {
+            title: "App info",
+            route: routeCodes.INFO
+         }
+      ];
 
       return (
          <div className="step-container" id="info">
-            <div className="container simple-container">
+            <div className="container simple-container mb">
                <form onSubmit={this.handleSubmit}>
                   <Breadcrumbs breadcrumbs={breadcrumbs} />
                   <div id="info-header">
@@ -109,7 +127,7 @@ class Profile extends Component {
                         {/* APP STORE URL */}
 
                         <ExpansionPanel
-                           className="ExpansionPanel"
+                           classes={{ root: "mui-expansionPanel-root" }}
                            defaultExpanded={true}
                         >
                            <ExpansionPanelSummary
@@ -120,7 +138,7 @@ class Profile extends Component {
                                     icon={faLink}
                                     className="sectionIcon"
                                  />
-                                 <h2 className="sst">App store URL</h2>
+                                 <span>App store URL</span>
                               </div>
                            </ExpansionPanelSummary>
                            <ExpansionPanelDetails className="mb">
@@ -141,18 +159,18 @@ class Profile extends Component {
                         {/* CONTENT DETAIL */}
 
                         <ExpansionPanel
-                           className="ExpansionPanel"
+                           classes={{ root: "mui-expansionPanel-root" }}
                            defaultExpanded={false}
                         >
                            <ExpansionPanelSummary
                               expandIcon={<FontAwesomeIcon icon={faAngleUp} />}
                            >
                               <div className="cc">
-                                 <FontAwesomeIcon
-                                    icon={faFileAlt}
+                                 <ReactSVG
+                                    src={SVG_content}
                                     className="sectionIcon"
                                  />
-                                 <h2 className="sst">Content Detail</h2>
+                                 <span>Content Detail</span>
                               </div>
                            </ExpansionPanelSummary>
                            <ExpansionPanelDetails className="mb">
@@ -165,18 +183,18 @@ class Profile extends Component {
                         {/* AUDIENCE INSIGHTS */}
 
                         <ExpansionPanel
-                           className="ExpansionPanel"
+                           classes={{ root: "mui-expansionPanel-root" }}
                            defaultExpanded={false}
                         >
                            <ExpansionPanelSummary
                               expandIcon={<FontAwesomeIcon icon={faAngleUp} />}
                            >
                               <div className="cc">
-                                 <FontAwesomeIcon
-                                    icon={faUsers}
+                                 <ReactSVG
+                                    src={SVG_audience}
                                     className="sectionIcon"
                                  />
-                                 <h2 className="sst">Audience Insights</h2>
+                                 <span>Audience Insights</span>
                               </div>
                            </ExpansionPanelSummary>
                            <ExpansionPanelDetails className="mb">

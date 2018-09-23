@@ -461,6 +461,7 @@ export const getUserData = accessToken => dispatch => {
 };
 
 export const toggleAppStatus = (appDetails, accessToken) => dispatch => {
+      console.log('appDetails: ', appDetails);
       dispatch(asyncStart());
 
       api

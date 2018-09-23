@@ -26,6 +26,7 @@ import { KeyboardArrowDown } from "@material-ui/icons";
 import ToggleButton from "../../components/ToggleButton";
 import Input from "../../components/Input";
 import SVG from "../../components/SVG";
+import CSS from "../../utils/InLineCSS";
 
 class MyApps extends Component {
    static propTypes = {
@@ -346,7 +347,7 @@ class MyApps extends Component {
 
       const appEnginesOpts = Object.keys(C.APP_ENGINES_IMGS).map(engine => {
          return (
-            <MenuItem value={engine} key={engine} className="mb">
+            <MenuItem value={engine} key={engine} style={CSS.mb}>
                {engine}
             </MenuItem>
          );
@@ -356,21 +357,21 @@ class MyApps extends Component {
          <MenuItem
             value={C.APP_STATES.live}
             key={C.APP_STATES.live}
-            className="mb"
+            style={CSS.mb}
          >
             Live
          </MenuItem>,
          <MenuItem
             value={C.APP_STATES.inactive}
             key={C.APP_STATES.inactive}
-            className="mb"
+            style={CSS.mb}
          >
             Inactive
          </MenuItem>
       ];
 
       const platformOpts = [
-         <MenuItem value="Android" key="android" className="mb">
+         <MenuItem value="Android" key="android" style={CSS.mb}>
             Android
          </MenuItem>
       ];
@@ -419,8 +420,9 @@ class MyApps extends Component {
                                  classes={{ root: "mui-select-root" }}
                                  disableUnderline={true}
                                  IconComponent={KeyboardArrowDown}
+                                 style={CSS.mb}
                               >
-                                 <MenuItem value="" className="mb" />
+                                 <MenuItem value="" style={CSS.mb} />
                                  {opts.map(opt => opt)}
                               </Select>
                            </div>

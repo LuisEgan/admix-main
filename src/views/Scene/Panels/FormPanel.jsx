@@ -9,6 +9,7 @@ import { KeyboardArrowDown } from "@material-ui/icons";
 
 import SVG from "../../../components/SVG";
 import ToggleButton from "../../../components/ToggleButton";
+import CSS from "../../../utils/InLineCSS";
 
 import dbCategories from "./categories.json";
 import dbSubCategories from "./subCategories.json";
@@ -221,7 +222,7 @@ export default class FormPanel extends Component {
 
       const dropdown = toMap.map(item => {
          return (
-            <MenuItem value={item} key={item} className="mb">
+            <MenuItem value={item} key={item} style={CSS.mb}>
                {item}
             </MenuItem>
          );
@@ -242,8 +243,9 @@ export default class FormPanel extends Component {
             classes={{ root: "mui-select-root" }}
             disableUnderline={true}
             IconComponent={KeyboardArrowDown}
+            style={CSS.mb}
          >
-            <MenuItem value="" className="mb">
+            <MenuItem value="" style={CSS.mb}>
                <em>
                   Please select a{" "}
                   {input === "category" ? "Category" : "Sub-Category"}

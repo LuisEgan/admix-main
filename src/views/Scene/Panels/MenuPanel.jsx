@@ -10,6 +10,7 @@ import {
    updatePlacements
 } from "../../../actions/";
 import C from "../../../utils/constants";
+import CSS from "../../../utils/InLineCSS";
 
 import FormControl from "@material-ui/core/FormControl";
 import Input from "@material-ui/core/Input";
@@ -264,7 +265,7 @@ export default class MenuPanel extends Component {
             <MenuItem
                value={name}
                key={`${name}-${Math.random()}`}
-               className="mb"
+               style={CSS.mb}
             >
                {name}
             </MenuItem>
@@ -282,8 +283,9 @@ export default class MenuPanel extends Component {
                   classes={{ root: "mui-select-root" }}
                   disableUnderline={true}
                   IconComponent={KeyboardArrowDown}
+                  style={CSS.mb}
                >
-                  <MenuItem value="" className="mb">
+                  <MenuItem value="" style={CSS.mb}>
                      <em>Please select a scene</em>
                   </MenuItem>
                   {allScenes}
