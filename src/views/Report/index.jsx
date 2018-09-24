@@ -12,7 +12,11 @@ import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
-import { KeyboardArrowDown } from "@material-ui/icons";
+import {
+   KeyboardArrowDown,
+   KeyboardArrowRight,
+   KeyboardArrowUp
+} from "@material-ui/icons";
 
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faTrash from "@fortawesome/fontawesome-free-solid/faTrash";
@@ -119,13 +123,23 @@ class Report extends Component {
    }
 
    shouldComponentUpdate(nextProps, nextState, nextContext) {
-      const { from, to, selectedApps, show, selectedAppsLength } = this.state;
+      const {
+         from,
+         to,
+         selectedApps,
+         show,
+         selectedAppsLength,
+         quickFilter
+      } = this.state;
+      console.log("quickFilter: ", quickFilter);
+      console.log("nextState.quickFilter: ", nextState.quickFilter);
       if (
          from !== nextState.from ||
          to !== nextState.to ||
          Object.keys(selectedApps).length === 0 ||
          selectedAppsLength !== nextState.selectedAppsLength ||
-         show !== nextState.show
+         show !== nextState.show ||
+         quickFilter !== nextState.quickFilter
       ) {
          return true;
       }
@@ -309,48 +323,48 @@ class Report extends Component {
    }
 
    quickFilter(filter) {
-      const { reportData } = this.props;
+      let { reportData } = this.props;
+      reportData = reportData || {};
 
-      if (!_.isEmpty(reportData)) {
-         let newState;
+      let newState;
 
-         const today = new Date();
-         const yesterday = new Date();
-         const lastWeek = new Date();
-         yesterday.setDate(yesterday.getDate() - 1);
-         lastWeek.setDate(lastWeek.getDate() - 6);
+      const today = new Date();
+      const yesterday = new Date();
+      const lastWeek = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      lastWeek.setDate(lastWeek.getDate() - 6);
 
-         switch (filter) {
-            case "t":
-               newState = { from: today, to: today };
-               break;
-            case "y":
-               newState = { from: yesterday, to: yesterday };
-               break;
-            case "l":
-               newState = { from: lastWeek, to: today };
-               break;
-            case "a":
-               const keys = Object.keys(reportData).sort();
-               const first = keys[0];
-               newState = { from: new Date(first), to: new Date() };
-               //    const last = keys[keys.length - 1];
-               //    newState = { from: new Date(first), to: new Date(last) };
-               break;
-            default:
-               return;
-         }
-
-         newState.quickFilter = filter;
-
-         this.setState(newState);
+      switch (filter) {
+         case "t":
+            newState = { from: today, to: today };
+            break;
+         case "y":
+            newState = { from: yesterday, to: yesterday };
+            break;
+         case "l":
+            newState = { from: lastWeek, to: today };
+            break;
+         case "a":
+            const keys = Object.keys(reportData).sort();
+            const first = keys[0];
+            const from = first ? new Date(first) : new Date();
+            newState = { from, to: new Date() };
+            //    const last = keys[keys.length - 1];
+            //    newState = { from: new Date(first), to: new Date(last) };
+            break;
+         default:
+            return;
       }
+
+      newState.quickFilter = filter;
+
+      this.setState(newState);
    }
 
    changeAppSelection(appId, e) {
       let { userApps, selectedApps, allAppsSelected } = this.state;
       appId = e.target.value || appId;
-      console.log('appId: ', appId);
+      console.log("appId: ", appId);
 
       if (appId !== "add") {
          if (appId !== "all") {
@@ -412,9 +426,9 @@ class Report extends Component {
                className="report-selectedApp"
                key={`${selectedApps[appId]}-${Math.random()}`}
             >
-               <div>{selectedApps[appId]}</div>
+               <div>{selectedApps[appId]}</div> &nbsp;
                <div onClick={this.changeAppSelection.bind(null, appId)}>
-                  {/* <FontAwesomeIcon icon={faTrash} /> */}X
+                  {/* <FontAwesomeIcon icon={faTrash} /> */} X
                </div>
             </div>
          );
@@ -424,7 +438,7 @@ class Report extends Component {
       return (
          <div className="mb">
             <FormControl className="fw">
-            <span>Apps selection</span>
+               <span className="input-label">Apps selection</span>
                <Select
                   value="add"
                   onChange={this.changeAppSelection.bind(null, "")}
@@ -503,7 +517,7 @@ class Report extends Component {
                </div>
 
                <div id="dates">
-                  <h6 className="sst">Display</h6>
+                  <span className="input-label">Display</span>
                   <div id="range">
                      <div id="from">
                         <DayPickerInput
@@ -515,7 +529,6 @@ class Report extends Component {
                            }}
                         />
                      </div>
-                     <div>to</div>
                      <div id="to">
                         <DayPickerInput
                            value={to}
@@ -527,49 +540,37 @@ class Report extends Component {
                         />
                      </div>
                   </div>
-                  <div id="quickFilters">
-                     <a
-                        onClick={this.quickFilter.bind(null, "t")}
-                        className="mb"
-                     >
-                        today
-                     </a>
-                     <a
-                        onClick={this.quickFilter.bind(null, "y")}
-                        className="mb"
-                     >
-                        yesterday
-                     </a>
-                     <a
-                        onClick={this.quickFilter.bind(null, "l")}
-                        className="mb"
-                     >
-                        last week
-                     </a>
-                     <a
-                        onClick={this.quickFilter.bind(null, "a")}
-                        className="mb"
-                     >
-                        all
-                     </a>
+                  <div id="quickFilters" className="mbs">
+                     <a onClick={this.quickFilter.bind(null, "t")}>Today</a>
+                     <a onClick={this.quickFilter.bind(null, "y")}>Yesterday</a>
+                     <a onClick={this.quickFilter.bind(null, "l")}>Last week</a>
+                     <a onClick={this.quickFilter.bind(null, "a")}>All</a>
                   </div>
                </div>
 
-               <hr />
-
                <div className="list-group">
-                  <a
-                     className={`list-group-item list-group-item-action ${owAct}`}
+                  <div
+                     className={`${owAct}`}
                      onClick={this.changeView.bind(null, "ov")}
                   >
-                     Overview
-                  </a>
-                  <a
-                     className={`list-group-item list-group-item-action ${perAct}`}
+                     <span>Overview</span>
+                     {show("ov") ? (
+                        <KeyboardArrowRight className="rotate90" />
+                     ) : (
+                        <KeyboardArrowDown className="rotate270" />
+                     )}
+                  </div>
+                  <div
+                     className={`${perAct}`}
                      onClick={this.changeView.bind(null, "pe")}
                   >
-                     Performance
-                  </a>
+                     <span>Performance</span>
+                     {show("pe") ? (
+                        <KeyboardArrowRight className="rotate90" />
+                     ) : (
+                        <KeyboardArrowDown className="rotate270" />
+                     )}
+                  </div>
                   {/* <a
                      className={`list-group-item list-group-item-action ${anAct}`}
                      onClick={this.changeView.bind(null, "an")}
@@ -584,42 +585,40 @@ class Report extends Component {
             </div>
 
             <div>
-            <ToggleDisplay show={show("ov")}>
-               <Overview
-                  filteredReportData={filteredReportData}
-                  previousPeriods={previousPeriods(7)}
-                  quickFilter={quickFilter}
-               />
-            </ToggleDisplay>
+               <ToggleDisplay show={show("ov")}>
+                  <Overview
+                     filteredReportData={filteredReportData}
+                     previousPeriods={previousPeriods(7)}
+                     quickFilter={quickFilter}
+                  />
+               </ToggleDisplay>
 
-            <ToggleDisplay show={show("pe")}>
-               <Performance
-                  reportData={reportData}
-                  dispatch={dispatch}
-                  accessToken={accessToken}
-                  TJSclear={this.TJSclear}
-                  selectedApp={selectedApp}
-                  selectedApps={selectedApps}
-                  placementsByApp={placementsByApp}
-                  filteredReportData={filteredReportData}
-                  fromDate={from}
-                  toDate={to}
-                  doLoadScene={this.doLoadScene}
-                  moveCamera={this.moveCamera}
-                  addEventListeners={this.addEventListeners}
-                  disposeEventListeners={this.disposeEventListeners}
-                  isSceneLoaded={isSceneLoaded}
-                  isLoadingScene={isLoadingScene}
-                  progressLoadingScene={progressLoadingScene}
-               />
-            </ToggleDisplay>
+               <ToggleDisplay show={show("pe")}>
+                  <Performance
+                     reportData={reportData}
+                     dispatch={dispatch}
+                     accessToken={accessToken}
+                     TJSclear={this.TJSclear}
+                     selectedApp={selectedApp}
+                     selectedApps={selectedApps}
+                     placementsByApp={placementsByApp}
+                     filteredReportData={filteredReportData}
+                     fromDate={from}
+                     toDate={to}
+                     doLoadScene={this.doLoadScene}
+                     moveCamera={this.moveCamera}
+                     addEventListeners={this.addEventListeners}
+                     disposeEventListeners={this.disposeEventListeners}
+                     isSceneLoaded={isSceneLoaded}
+                     isLoadingScene={isLoadingScene}
+                     progressLoadingScene={progressLoadingScene}
+                  />
+               </ToggleDisplay>
 
-            <ToggleDisplay show={show("an")}>
-               <Analytics />
-            </ToggleDisplay>
-
+               <ToggleDisplay show={show("an")}>
+                  <Analytics />
+               </ToggleDisplay>
             </div>
-
          </div>
       );
    }
