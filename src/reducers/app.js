@@ -113,7 +113,7 @@ const actionsMap = {
       [ACTION_ERROR]: (state, action) => {
             const {
                   message,
-                  statusMessage
+                  statusMessage,
             } = action.data;
             let asyncError = Array.isArray(message) ? message[0].msg : message;
 
@@ -121,7 +121,7 @@ const actionsMap = {
             asyncError === "" && (asyncError = statusMessage);
 
             const asyncData = {
-                  mssg: "Oops.. Something went wrong"
+                  mssg: message || "Oops.. Something went wrong"
             };
             const isSnackBarOpen = true;
 

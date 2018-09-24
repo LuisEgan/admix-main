@@ -131,8 +131,6 @@ class Report extends Component {
          selectedAppsLength,
          quickFilter
       } = this.state;
-      console.log("quickFilter: ", quickFilter);
-      console.log("nextState.quickFilter: ", nextState.quickFilter);
       if (
          from !== nextState.from ||
          to !== nextState.to ||
@@ -364,7 +362,6 @@ class Report extends Component {
    changeAppSelection(appId, e) {
       let { userApps, selectedApps, allAppsSelected } = this.state;
       appId = e.target.value || appId;
-      console.log("appId: ", appId);
 
       if (appId !== "add") {
          if (appId !== "all") {

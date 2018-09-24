@@ -72,7 +72,7 @@ function asyncSuccess(data) {
       };
 }
 
-const asyncError = data => ({
+export const asyncError = data => ({
       type: ACTION_ERROR,
       data
 });

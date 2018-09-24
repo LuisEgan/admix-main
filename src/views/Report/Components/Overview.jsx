@@ -1,7 +1,10 @@
 import React, { Component } from "react";
+import { routeCodes } from "../../../config/routes";
 import PropTypes from "prop-types";
 import { Line } from "react-chartjs-2";
 import ReactTable from "react-table";
+import Breadcrumbs from "../../../components/Breadcrumbs";
+import SVG from "../../../components/SVG";
 
 export default class Overview extends Component {
    static propTypes = {
@@ -105,7 +108,7 @@ export default class Overview extends Component {
    calcERPM() {
       const { calcSumOf } = this;
       let ERPM = (
-         ((calcSumOf("revenue")/1000) / calcSumOf("impression")) *
+         (calcSumOf("revenue") / 1000 / calcSumOf("impression")) *
          1000
       ).toFixed(4);
 
@@ -115,7 +118,6 @@ export default class Overview extends Component {
 
    previousPeriodsTableData() {
       const { previousPeriods } = this.props;
-      // console.log("previousPeriods: ", previousPeriods);
       let tableData = [];
 
       let tableDataItemCounter = 0;
@@ -197,7 +199,7 @@ export default class Overview extends Component {
    }
 
    renderPreviousPeriodsTable() {
-      const { asyncLoading } = this.props;
+      const { asyncLoading, quickFilter } = this.props;
       let reportData = this.previousPeriodsTableData();
 
       if (reportData[0].previousPeriods === "") return null;
@@ -220,58 +222,90 @@ export default class Overview extends Component {
          return "neut";
       };
 
-      reportData = reportData.map(item => {
-         const impressions = (
-            <div className="perc">
-               {item.impressions.value}
-               <span className={`${gc(item.impressions.growth)}`}>
-                  {parseGrowth(item.impressions.growth)}
-               </span>
-            </div>
+      reportData =
+         quickFilter === "a"
+            ? []
+            : reportData.map(item => {
+                 const impressions = (
+                    <div className="perc">
+                       {item.impressions.value}
+                       <span className={`${gc(item.impressions.growth)}`}>
+                          {parseGrowth(item.impressions.growth)}
+                       </span>
+                    </div>
+                 );
+
+                 const newItem = {
+                    ...item,
+                    impressions
+                 };
+
+                 return newItem;
+              });
+
+      const paginationPrevious = props => {
+         const { disabled } = props;
+
+         return disabled ? (
+            <button {...props}>{SVG.paginationDisabled}</button>
+         ) : (
+            <button {...props} className="hundred80">
+               {SVG.paginationEnabled}
+            </button>
          );
+      };
 
-         const newItem = {
-            ...item,
-            impressions
-         };
+      const paginationNext = props => {
+         const { disabled } = props;
 
-         return newItem;
-      });
+         return disabled ? (
+            <button {...props} className="hundred80">
+               {SVG.paginationDisabled}
+            </button>
+         ) : (
+            <button {...props}>{SVG.paginationEnabled}</button>
+         );
+      };
 
       return (
-         <ReactTable
-            data={reportData}
-            noDataText={asyncLoading ? "Loading..." : "No data here"}
-            columns={[
-               {
-                  Header: "Previous Periods",
-                  columns: [
-                     {
-                        Header: "Periods",
-                        accessor: "previousPeriods",
-                        minWidth: 50,
-                        sortable: false
-                     },
-                     {
-                        Header: "Impressions",
-                        accessor: "impressions",
-                        sortMethod: (a, b) => {
-                           return a > b ? -1 : 1;
+         <div className="rawDataTable">
+            <ReactTable
+               data={reportData}
+               noDataText={asyncLoading ? "Loading..." : "No previous periods"}
+               columns={[
+                  {
+                     Header: "Previous Periods",
+                     columns: [
+                        {
+                           Header: "Periods",
+                           accessor: "previousPeriods",
+                           minWidth: 50,
+                           sortable: false
+                        },
+                        {
+                           Header: "Impressions",
+                           accessor: "impressions",
+                           sortMethod: (a, b) => {
+                              return a > b ? -1 : 1;
+                           }
+                        },
+                        {
+                           Header: "Revenue",
+                           accessor: "revenue.value",
+                           sortMethod: (a, b) => {
+                              return a > b ? -1 : 1;
+                           }
                         }
-                     },
-                     {
-                        Header: "Revenue",
-                        accessor: "revenue.value",
-                        sortMethod: (a, b) => {
-                           return a > b ? -1 : 1;
-                        }
-                     }
-                  ]
-               }
-            ]}
-            defaultPageSize={7}
-            className="-striped -highlight"
-         />
+                     ]
+                  }
+               ]}
+               defaultPageSize={3}
+               className="-striped -highlight"
+               PreviousComponent={paginationPrevious}
+               NextComponent={paginationNext}
+               pageSizeOptions={[3, 4, 5, 6, 7]}
+            />
+         </div>
       );
 
       // return (
@@ -452,69 +486,108 @@ export default class Overview extends Component {
 
    render() {
       const { calcSumOf } = this;
-      const { quickFilter } = this.props;
+
+      const breadcrumbs = [
+         {
+            title: "My apps",
+            route: routeCodes.MYAPPS
+         },
+         {
+            title: "Reporting",
+            route: routeCodes.REPORT
+         },
+         {
+            title: "Overview",
+            route: "#"
+         }
+      ];
 
       return (
          <div id="overview">
-            <div id="overview-top">
-               {/* TOP LINE */}
-               <div id="overview-topLine">
-                  <div className="report-title">
-                     <h5 className="sst">Top line</h5>
-                  </div>
-                  <div>
-                     {/* BOXES */}
-                     <div>
-                        <div>
-                           <h3 className="st">{calcSumOf("impression")}</h3>
-                           <h6 className="mb">impressions</h6>
-                           {this.renderQicon("impressions")}
-                        </div>
-                        <div>
-                           <h3 className="st">{(calcSumOf("revenue")/1000).toFixed(4)} €</h3>
-                           <h6 className="mb">net revenue</h6>
-                           {this.renderQicon("revenue")}
-                        </div>
-                     </div>
+            <Breadcrumbs breadcrumbs={breadcrumbs} />
+            <div id="performance-title" className="step-title">
+               <span className="st">Overview</span>
+            </div>
 
-                     {/* STATISTICS */}
-                     <div>
-                        <div>
-                           <h3 className="st">{this.calcFillRate()}%</h3>
-                           <h6 className="mb">fill rate</h6>
-                           {this.renderQicon("rate")}
-                        </div>
-                        <div>
-                           <h3 className="st">
-                              {calcSumOf("impressionUnique")}
-                           </h3>
-                           <h6 className="mb">uniques</h6>
-                           {this.renderQicon("uniques")}
-                        </div>
-                        <div>
-                           <h3 className="st">{this.calcERPM()}</h3>
-                           <h6 className="mb">RPM</h6>
-                           {this.renderQicon("rpm")}
-                        </div>
-                     </div>
-                  </div>
+            <div id="overview-data">
+               <div>
+                  <div>{calcSumOf("impression")}</div>
+                  <span>Impressions</span>
                </div>
-
-               {/* PLOT */}
-               <div id="overview-plot">
-                  <div className="report-title">
-                     <h5 className="sst">Plot</h5>
-                  </div>
-
-                  {/* GRAPH */}
-                  <div id="graph">{this.renderGraph()}</div>
+               <div>
+                  <div>€ {(calcSumOf("revenue") / 1000).toFixed(4)}</div>
+                  <span>Net Revenue</span>
+               </div>
+               <div>
+                  <div>{calcSumOf("impressionUnique")}</div>
+                  <span>Uniques</span>
+               </div>
+               <div>
+                  <div>{this.calcFillRate()}%</div>
+                  <span>Fill rate</span>
+               </div>
+               <div>
+                  <div>{this.calcERPM()}</div>
+                  <span>RPM</span>
                </div>
             </div>
 
-            <div id="overview-bot">
-               {quickFilter !== "a" && this.renderPreviousPeriodsTable()}
+            <div id="overview-graph">
+               <div className="graph">{this.renderGraph()}</div>
             </div>
+
+            <div id="overview-table">{this.renderPreviousPeriodsTable()}</div>
          </div>
       );
    }
+}
+
+{
+   /* <div id="overview-top">
+   <div id="overview-topLine">
+      <div className="report-title">
+         <h5 className="sst">Top line</h5>
+      </div>
+      <div>
+         <div>
+            <div>
+               <h3 className="st">{calcSumOf("impression")}</h3>
+               <h6 className="mb">impressions</h6>
+               {this.renderQicon("impressions")}
+            </div>
+            <div>
+               <h3 className="st">
+                  {(calcSumOf("revenue") / 1000).toFixed(4)}
+               </h3>
+               <h6 className="mb">net revenue</h6>
+               {this.renderQicon("revenue")}
+            </div>
+         </div>
+
+         <div>
+            <div>
+               <h3 className="st">{this.calcFillRate()}%</h3>
+               <h6 className="mb">fill rate</h6>
+               {this.renderQicon("rate")}
+            </div>
+            <div>
+               <h3 className="st">{calcSumOf("impressionUnique")}</h3>
+               <h6 className="mb">uniques</h6>
+               {this.renderQicon("uniques")}
+            </div>
+            <div>
+               <h3 className="st">{this.calcERPM()}</h3>
+               <h6 className="mb">RPM</h6>
+               {this.renderQicon("rpm")}
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <div id="overview-plot">
+      <div className="report-title">
+         <h5 className="sst">Plot</h5>
+      </div>
+   </div>
+</div>; */
 }

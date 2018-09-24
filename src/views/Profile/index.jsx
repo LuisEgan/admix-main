@@ -302,9 +302,9 @@ class Profile extends Component {
       const payBanksDetailsStyle =
          payment.region !== "" ? { display: "block" } : { display: "none" };
 
-      const warningStyle = isWarningVisible
-         ? { color: "red", opacity: 1 }
-         : { color: "red", opacity: 0 };
+      // const warningStyle = isWarningVisible
+      //    ? { color: "red", opacity: 1 }
+      //    : { color: "red", opacity: 0 };
 
       return (
          <div className="step-container" id="profile">
@@ -540,7 +540,7 @@ class Profile extends Component {
                                              United States of America
                                           </MenuItem>
                                           <MenuItem style={CSS.mb} value="uk">
-                                             Uniter Kingdom
+                                             United Kingdom
                                           </MenuItem>
                                           <MenuItem style={CSS.mb} value="eu">
                                              Europe

@@ -1257,9 +1257,9 @@ class Scene extends Component {
       };
 
       return (
-         <div id="rawDataTable-cont">
+         <div className="rawDataTable-cont">
             <Breadcrumbs breadcrumbs={breadcrumbs} />
-            <div id="rawDataTable">
+            <div className="rawDataTable">
                <ReactTable
                   data={data}
                   noDataText={
