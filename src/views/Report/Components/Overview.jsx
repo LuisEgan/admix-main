@@ -22,6 +22,21 @@ export default class Overview extends Component {
          rpmInfoBox: false
       };
 
+      this.breadcrumbs = [
+         {
+            title: "My apps",
+            route: routeCodes.MYAPPS
+         },
+         {
+            title: "Reporting",
+            route: routeCodes.REPORT
+         },
+         {
+            title: "Overview",
+            route: "#"
+         }
+      ];
+
       this.calcSumOf = this.calcSumOf.bind(this);
       this.calcFillRate = this.calcFillRate.bind(this);
       this.calcERPM = this.calcERPM.bind(this);
@@ -69,7 +84,7 @@ export default class Overview extends Component {
    };
 
    calcGrowth(oldest, newest) {
-      return (((newest - oldest) * 100) / oldest).toFixed(4);
+      return (((newest - oldest) * 100) / oldest).toFixed(2);
    }
 
    calcSumOf(attr) {
@@ -93,14 +108,14 @@ export default class Overview extends Component {
          }
       }
       sum = sum ? sum : 0;
-      return Number.isInteger(sum) ? Math.round(sum) : sum.toFixed(4);
+      return Number.isInteger(sum) ? Math.round(sum) : sum.toFixed(2);
    }
 
    calcFillRate() {
       const { calcSumOf } = this;
       let fillRate = (
          calcSumOf("impression") / calcSumOf("bidRequest")
-      ).toFixed(4);
+      ).toFixed(2);
       fillRate = isNaN(fillRate) || fillRate === Infinity ? 0 : fillRate;
       return fillRate;
    }
@@ -110,7 +125,7 @@ export default class Overview extends Component {
       let ERPM = (
          (calcSumOf("revenue") / 1000 / calcSumOf("impression")) *
          1000
-      ).toFixed(4);
+      ).toFixed(2);
 
       ERPM = isNaN(ERPM) ? 0 : ERPM;
       return ERPM;
@@ -168,7 +183,7 @@ export default class Overview extends Component {
                growth: 0
             },
             revenue: {
-               value: Number(rDateSum).toFixed(4),
+               value: (Number(rDateSum) / 1000).toFixed(2),
                growth: 0
             }
          };
@@ -299,11 +314,10 @@ export default class Overview extends Component {
                      ]
                   }
                ]}
-               defaultPageSize={3}
+               defaultPageSize={5}
                className="-striped -highlight"
                PreviousComponent={paginationPrevious}
                NextComponent={paginationNext}
-               pageSizeOptions={[3, 4, 5, 6, 7]}
             />
          </div>
       );
@@ -415,8 +429,8 @@ export default class Overview extends Component {
             }
          }
 
-         revenueData.push(rDateSum.toFixed(4));
-         impressionsData.push(iDateSum.toFixed(4));
+         revenueData.push((rDateSum / 1000).toFixed(2));
+         impressionsData.push(iDateSum.toFixed(2));
       }
 
       const data = {
@@ -461,7 +475,7 @@ export default class Overview extends Component {
                   scaleLabel: {
                      display: true,
                      fontColor: "rgba(0, 0, 0, .5)",
-                     labelString: "$ revenue"
+                     labelString: "€ Revenue"
                   },
                   ticks: { fontColor: "rgba(15, 15, 15, 1)" }
                },
@@ -473,7 +487,7 @@ export default class Overview extends Component {
                   scaleLabel: {
                      display: true,
                      fontColor: "rgba(0, 0, 0, .5)",
-                     labelString: "impressions"
+                     labelString: "Impressions"
                   },
                   ticks: { fontColor: "rgba(15, 15, 15, 1)" }
                }
@@ -487,25 +501,10 @@ export default class Overview extends Component {
    render() {
       const { calcSumOf } = this;
 
-      const breadcrumbs = [
-         {
-            title: "My apps",
-            route: routeCodes.MYAPPS
-         },
-         {
-            title: "Reporting",
-            route: routeCodes.REPORT
-         },
-         {
-            title: "Overview",
-            route: "#"
-         }
-      ];
-
       return (
-         <div id="overview">
-            <Breadcrumbs breadcrumbs={breadcrumbs} />
-            <div id="performance-title" className="step-title">
+         <div id="overview" className="mb">
+            <Breadcrumbs breadcrumbs={this.breadcrumbs} />
+            <div className="step-title">
                <span className="st">Overview</span>
             </div>
 
@@ -515,7 +514,7 @@ export default class Overview extends Component {
                   <span>Impressions</span>
                </div>
                <div>
-                  <div>€ {(calcSumOf("revenue") / 1000).toFixed(4)}</div>
+                  <div>€ {(calcSumOf("revenue") / 1000).toFixed(2)}</div>
                   <span>Net Revenue</span>
                </div>
                <div>
@@ -557,7 +556,7 @@ export default class Overview extends Component {
             </div>
             <div>
                <h3 className="st">
-                  {(calcSumOf("revenue") / 1000).toFixed(4)}
+                  {(calcSumOf("revenue") / 1000).toFixed(2)}
                </h3>
                <h6 className="mb">net revenue</h6>
                {this.renderQicon("revenue")}

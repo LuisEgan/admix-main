@@ -56,7 +56,7 @@ class Report extends Component {
       super(props);
 
       this.state = {
-         show: "ov",
+         show: "pe",
          from: new Date(),
          to: new Date(),
          initialDateSetup: false,
@@ -239,6 +239,7 @@ class Report extends Component {
 
    changeDate(type, date, modifiers) {
       let newState = type === "from" ? { from: date } : { to: date };
+      newState.quickFilter = null;
       this.setState(newState);
    }
 

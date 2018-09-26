@@ -1,12 +1,32 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import { routeCodes } from "../../../config/routes";
 import { Pie } from "react-chartjs-2";
 import { selectApp, getPlacementsByApp } from "../../../actions";
 import ReactTable from "react-table";
+import Breadcrumbs from "../../../components/Breadcrumbs";
+import SVG from "../../../components/SVG";
 
 import AdmixLoading from "../../../components/SVG/AdmixLoading";
 
 import { colors } from "../../../assets/data/colorsArr";
+
+import { Bar } from "react-chartjs-2";
+
+const data = {
+   labels: ["January", "February", "March", "April", "May", "June", "July"],
+   datasets: [
+      {
+         label: "My First dataset",
+         backgroundColor: "rgba(255,99,132,0.2)",
+         borderColor: "rgba(255,99,132,1)",
+         borderWidth: 1,
+         hoverBackgroundColor: "rgba(255,99,132,0.4)",
+         hoverBorderColor: "rgba(255,99,132,1)",
+         data: [65, 59, 80, 81, 56, 55, 40]
+      }
+   ]
+};
 
 const initialGeneralState = {
    selectedAppsLength: 0,
@@ -41,7 +61,8 @@ const initialState = {
    ...initialGeneralState,
    ...initialAppsState,
    ...initialScenesState,
-   ...initialPlacementsState
+   ...initialPlacementsState,
+   dataToShow: "Revenue"
 };
 
 export default class Performance extends Component {
@@ -55,6 +76,25 @@ export default class Performance extends Component {
       this.state = initialState;
 
       this.pieColorsAssigned = false;
+
+      this.breadcrumbs = [
+         {
+            title: "My apps",
+            route: routeCodes.MYAPPS
+         },
+         {
+            title: "Reporting",
+            route: routeCodes.REPORT
+         },
+         {
+            title: "Performance",
+            route: "#"
+         }
+      ];
+
+      this.dataToggles = ["Revenue", "Impressions", "RPM", "Fill rate"];
+
+      this.toggleData = this.toggleData.bind(this);
 
       this.onAppElementsClick = this.onAppElementsClick.bind(this);
       this.onSceneElementsClick = this.onSceneElementsClick.bind(this);
@@ -496,6 +536,10 @@ export default class Performance extends Component {
       // this.setState({ placementsPieData, placementsPieOpts });
    }
 
+   toggleData(dataToShow) {
+      this.setState({ dataToShow });
+   }
+
    // ON CHART CLICK ---------------------------------------------
 
    onAppElementsClick(e) {
@@ -769,6 +813,8 @@ export default class Performance extends Component {
       } = this.props;
 
       let {
+         dataToShow,
+
          clickedAppId,
          appsPieData,
          appsPieOpts,
@@ -790,100 +836,153 @@ export default class Performance extends Component {
       const sceneTxt = clickedAppId.length > 0 ? "Select a scene below" : "";
       const placementTxt = sceneClicked ? "Select a placement below" : "";
 
+      let dataToggleStyle;
+
       return (
-         <div id="performance" className="unselectable">
+         <div id="performance" className="unselectable mb">
+            <Breadcrumbs breadcrumbs={this.breadcrumbs} />
+            <div className="step-title">
+               <span className="st">Performance</span>
+               <div id="performance-toggles">
+                  {this.dataToggles.map(dt => {
+                     dataToggleStyle =
+                        dt === dataToShow
+                           ? {
+                                backgroundColor: "rgba(20, 185, 190, 0.05)",
+                                border: "2px solid #14B9BE"
+                             }
+                           : {};
+                     return (
+                        <div
+                           key={dt}
+                           style={dataToggleStyle}
+                           onClick={this.toggleData.bind(null, dt)}
+                        >
+                           {dt}
+                        </div>
+                     );
+                  })}
+               </div>
+            </div>
+
             <div id="performance-graphs">
-               <div>
-                  {/* {this.renderDropdown()} */}
-                  <div className="report-title">
-                     <h5 className="sst">Apps revenue</h5>
-                  </div>
-                  <span className="mb">Select an app below</span>
-                  <Pie
-                     data={appsPieData}
-                     options={appsPieOpts}
-                     onElementsClick={this.onAppElementsClick}
+               <div className="graph">
+                  <div className="sst graph-title">Apps selected</div>
+                  <Bar
+                     data={data}
+                     width={100}
+                     height={60}
                   />
                </div>
-
-               <div className="cc">
-                  <div className="arrowRight" />
+               <div className="graph">
+                  <Bar
+                     data={data}
+                     width={150}
+                     height={50}
+                  />
                </div>
-
-               <div>
-                  {/* {this.renderDropdown()} */}
-                  <div className="report-title">
-                     <h5 className="sst">Scenes revenue</h5>
-                  </div>
-                  <span className="mb">{sceneTxt}</span>
-                  {clickedAppId.length > 0 && (
-                     <Pie
-                        data={scenesPieData}
-                        options={scenesPieOpts}
-                        onElementsClick={this.onSceneElementsClick}
-                     />
-                  )}
+               <div className="graph">
+                  <Bar
+                     data={data}
+                     width={50}
+                     height={50}
+                  />
                </div>
-
-               <div className="cc">
-                  <div className="arrowRight" />
-               </div>
-
-               <div>
-                  {/* {this.renderDropdown()} */}
-                  <div className="report-title">
-                     <h5 className="sst">Placements revenue</h5>
-                  </div>
-                  <span className="mb">{placementTxt}</span>
-                  {sceneClicked && (
-                     <Pie
-                        data={placementsPieData}
-                        options={placementsPieOpts}
-                        onElementsClick={this.onPlacementElementsClick}
-                     />
-                  )}
-               </div>
-            </div>
-
-            <div
-               id="performance-webgl"
-               onMouseLeave={this.disposeEventListeners}
-               onMouseEnter={this.addEventListeners}
-               style={webglStyle}
-            >
-               <div id="performance-webgl-left-bar" />
-               <div id="performance-webgl-right-bar" />
-               <div id="performance-webgl-choose">
-                  {!isSceneLoaded && (
-                     <div id="report-webgl-idle" className="cc mb">
-                        {!isLoadingScene && (
-                           <React.Fragment>
-                              <span id="tv" role="img" aria-label="tv">
-                                 📺
-                              </span>
-                              <br />
-                              <span>Your scene will load here</span>
-                           </React.Fragment>
-                        )}
-                        {isLoadingScene && (
-                           <div id="report-webgl-loading">
-                              {<AdmixLoading loadingText="Loading" />}
-                              <h3 className="st">{progressLoadingScene}%</h3>
-                           </div>
-                        )}
-                     </div>
-                  )}
-                  {isSceneLoaded && (
-                     <div id="report-webgl-display" className="st" />
-                  )}
-               </div>
-            </div>
-
-            <div id="performance-tables">
-               {this.renderScenesTable()}
-               {this.renderPlacementsTable()}
             </div>
          </div>
       );
    }
+}
+
+{
+   /* <div id="performance-graphs">
+   <div>
+      <div className="report-title">
+         <h5 className="sst">Apps revenue</h5>
+      </div>
+      <span className="mb">Select an app below</span>
+      <Pie
+         data={appsPieData}
+         options={appsPieOpts}
+         onElementsClick={this.onAppElementsClick}
+      />
+   </div>
+
+   <div className="cc">
+      <div className="arrowRight" />
+   </div>
+
+   <div>
+      <div className="report-title">
+         <h5 className="sst">Scenes revenue</h5>
+      </div>
+      <span className="mb">{sceneTxt}</span>
+      {clickedAppId.length > 0 && (
+         <Pie
+            data={scenesPieData}
+            options={scenesPieOpts}
+            onElementsClick={this.onSceneElementsClick}
+         />
+      )}
+   </div>
+
+   <div className="cc">
+      <div className="arrowRight" />
+   </div>
+
+   <div>
+      <div className="report-title">
+         <h5 className="sst">Placements revenue</h5>
+      </div>
+      <span className="mb">{placementTxt}</span>
+      {sceneClicked && (
+         <Pie
+            data={placementsPieData}
+            options={placementsPieOpts}
+            onElementsClick={this.onPlacementElementsClick}
+         />
+      )}
+   </div>
+</div> */
+}
+
+{
+   /* <div
+   id="performance-webgl"
+   onMouseLeave={this.disposeEventListeners}
+   onMouseEnter={this.addEventListeners}
+   style={webglStyle}
+>
+   <div id="performance-webgl-left-bar" />
+   <div id="performance-webgl-right-bar" />
+   <div id="performance-webgl-choose">
+      {!isSceneLoaded && (
+         <div id="report-webgl-idle" className="cc mb">
+            {!isLoadingScene && (
+               <React.Fragment>
+                  <span id="tv" role="img" aria-label="tv">
+                     📺
+                  </span>
+                  <br />
+                  <span>Your scene will load here</span>
+               </React.Fragment>
+            )}
+            {isLoadingScene && (
+               <div id="report-webgl-loading">
+                  {<AdmixLoading loadingText="Loading" />}
+                  <h3 className="st">{progressLoadingScene}%</h3>
+               </div>
+            )}
+         </div>
+      )}
+      {isSceneLoaded && (
+         <div id="report-webgl-display" className="st" />
+      )}
+   </div>
+</div>
+
+<div id="performance-tables">
+   {this.renderScenesTable()}
+   {this.renderPlacementsTable()}
+</div> */
 }
