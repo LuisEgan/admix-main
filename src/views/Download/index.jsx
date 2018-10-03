@@ -17,7 +17,7 @@ export default class Congratulations extends Component {
                        <div>
                            <a
                            className="btn-dark mb"
-                           href="https://admix.in/wp-content/uploads/2018/09/Admix.Unity_Rev1.4_Release.zip"
+                           href="https://admix.in/wp-content/uploads/2018/10/Admix.Unity_Rev1.4_Release_testUpload.unitypackage"
                            target="_blank"
                            rel="noopener noreferrer"
                            >
