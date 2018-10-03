@@ -4,7 +4,6 @@
 // const dns = "http://ec2-52-15-223-69.us-east-2.compute.amazonaws.com:3005";
 const dns = "http://ec2-52-15-223-69.us-east-2.compute.amazonaws.com:3006";
 // const dns = "https://api.admix.in";
-// const dns = "https://api.admix.in:3005";
 
 function async () {
     return fetch("http://date.jsontest.com/").then(response => response.json());
