@@ -1981,7 +1981,12 @@ $inputsFontSize: calc(0.45em+0.3vw);
                   text-align: center;
 
                   >div {
-                        padding: 5px 0;
+                        padding: 5px;
+                        max-width: 100%;
+
+                        a {
+                              max-width: 100%;
+                        }
                   }
             }
       }

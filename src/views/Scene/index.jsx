@@ -219,7 +219,6 @@ class Scene extends Component {
       }
 
       if (!isEqual(selectedApp, prevSate.selectedApp)) {
-            console.log("UPDATE SA");
          return { selectedApp: { ...selectedApp } };
       }
 

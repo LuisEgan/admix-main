@@ -195,7 +195,6 @@ class MyApps extends Component {
       do {
          appId = Array.isArray(appsIds) ? appsIds[c] : appsIds;
          //    dispatch(selectApp(appId, accessToken));
-         console.log('appId: ', appId);
          dispatch(getPlacementsByAppId(appId, accessToken));
          c++;
       } while (Array.isArray(appsIds) && c < appsIds.length);

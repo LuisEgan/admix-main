@@ -327,7 +327,6 @@ const actionsMap = {
             });
             selectedApp.scenes = cloneDeep(scenes);
 
-            console.warn('REDUX selectedApp.appState: ', selectedApp.appState);
             const asyncLoading = false;
             return state.merge(
                   Map({
