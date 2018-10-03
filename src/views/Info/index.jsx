@@ -17,8 +17,6 @@ import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 
 import C from "../../utils/constants";
 
-import SVG_content from "../../assets/svg/content-detail.svg";
-import SVG_audience from "../../assets/svg/audience-insights.svg";
 import SVG_tickGreen from "../../assets/svg/tick-green.svg";
 import SVG_checkFail from "../../assets/svg/check-fail.svg";
 import SVG_delete from "../../assets/svg/delete.svg";
@@ -26,8 +24,6 @@ import SVG_delete from "../../assets/svg/delete.svg";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faAngleUp from "@fortawesome/fontawesome-free-solid/faAngleUp";
 import faLink from "@fortawesome/fontawesome-free-solid/faLink";
-import faUsers from "@fortawesome/fontawesome-free-solid/faUsers";
-import faFileAlt from "@fortawesome/fontawesome-free-solid/faFileAlt";
 // import SVG from "../../components/SVG";
 
 class Profile extends Component {
@@ -53,7 +49,7 @@ class Profile extends Component {
    }
 
    handleUpdateInfo(values) {
-      const { accessToken, dispatch, selectedApp } = this.props;
+      const { accessToken, admintoken, dispatch, selectedApp } = this.props;
       let { isActive } = selectedApp;
 
       let appState;
@@ -67,17 +63,18 @@ class Profile extends Component {
          platformName: selectedApp.platformName,
          name: selectedApp.name,
          appState,
+         appId: selectedApp._id,
          ...values
       };
 
-      dispatch(updateApp(appData, accessToken));
+      dispatch(updateApp({appData, accessToken, admintoken}));
    }
 
    renderField(field) {
       const {
          input,
          meta: { error }
-      } = field;
+        } = field;
 
       return (
          <div className="redux-form-inputs-container">
@@ -90,7 +87,7 @@ class Profile extends Component {
                rootstyle={error ? { borderColor: "red" } : null}
                icon={
                   <ReactSVG
-                     src={error ? SVG_checkFail : SVG_tickGreen}
+                     src={input.value === "" ? "" : error ? SVG_checkFail : SVG_tickGreen}
                      className="input-icon"
                   />
                }
@@ -136,7 +133,7 @@ class Profile extends Component {
                   </button>
                </div>
                <div>
-                  <div className="container">
+                  <div>
                      {/* APP STORE URL */}
 
                      <ExpansionPanel

@@ -5,6 +5,7 @@ import { Line } from "react-chartjs-2";
 import ReactTable from "react-table";
 import Breadcrumbs from "../../../components/Breadcrumbs";
 import SVG from "../../../components/SVG";
+import { isEqual, cloneDeep } from "lodash";
 
 export default class Overview extends Component {
    static propTypes = {
@@ -15,11 +16,18 @@ export default class Overview extends Component {
       super(props);
 
       this.state = {
-         impressionsInfoBox: false,
-         revenueInfoBox: false,
-         rateInfoBox: false,
-         uniquesInfoBox: false,
-         rpmInfoBox: false
+         selectedApps: {},
+         overviewData: {
+            revenue: 0,
+            impression: 0,
+            bidRequest: 0,
+            bidResponse: 0,
+            gaze: 0,
+            gazeUnique: 0,
+            impressionUnique: 0,
+            RPM: 0,
+            fillRate: 0
+         }
       };
 
       this.breadcrumbs = [
@@ -37,46 +45,63 @@ export default class Overview extends Component {
          }
       ];
 
-      this.calcSumOf = this.calcSumOf.bind(this);
-      this.calcFillRate = this.calcFillRate.bind(this);
-      this.calcERPM = this.calcERPM.bind(this);
       this.previousPeriodsTableData = this.previousPeriodsTableData.bind(this);
       this.renderPreviousPeriodsTable = this.renderPreviousPeriodsTable.bind(
          this
       );
-      this.toggleInfoBox = this.toggleInfoBox.bind(this);
-      this.renderQicon = this.renderQicon.bind(this);
       this.renderGraph = this.renderGraph.bind(this);
    }
 
-   toggleInfoBox(input) {
-      switch (input) {
-         case "impressions":
-            const impressionsInfoBox = !this.state.impressionsInfoBox;
-            this.setState({ impressionsInfoBox });
-            break;
-         case "revenue":
-            const revenueInfoBox = !this.state.revenueInfoBox;
-            this.setState({ revenueInfoBox });
-            break;
-         case "rate":
-            const rateInfoBox = !this.state.rateInfoBox;
-            this.setState({ rateInfoBox });
-            break;
-         case "uniques":
-            const uniquesInfoBox = !this.state.uniquesInfoBox;
-            this.setState({ uniquesInfoBox });
-            break;
-         case "rpm":
-            const rpmInfoBox = !this.state.rpmInfoBox;
-            this.setState({ rpmInfoBox });
-            break;
-         default:
+   static getDerivedStateFromProps(nextProps, prevState) {
+      const { selectedApps } = nextProps;
+
+      if (!isEqual(selectedApps, prevState.selectedApps)) {
+         const overviewData = {
+            revenue: Overview.calcSumOf({ selectedApps, attr: "revenue" }),
+            impression: Overview.calcSumOf({
+               selectedApps,
+               attr: "impression"
+            }),
+            bidRequest: Overview.calcSumOf({
+               selectedApps,
+               attr: "bidRequest"
+            }),
+            bidResponse: Overview.calcSumOf({
+               selectedApps,
+               attr: "bidResponse"
+            }),
+            gaze: Overview.calcSumOf({ selectedApps, attr: "gaze" }),
+            gazeUnique: Overview.calcSumOf({
+               selectedApps,
+               attr: "gazeUnique"
+            }),
+            impressionUnique: Overview.calcSumOf({
+               selectedApps,
+               attr: "impressionUnique"
+            }),
+            RPM: Overview.calcSumOf({ selectedApps, attr: "RPM" }),
+            fillRate: Overview.calcSumOf({ selectedApps, attr: "fillRate" })
+         };
+         return { selectedApps: cloneDeep(selectedApps), overviewData };
       }
+
+      return null;
+   }
+
+   static calcSumOf({ selectedApps, attr }) {
+      let sum = 0;
+
+      for (let appId in selectedApps) {
+         if (selectedApps[appId].reportData[attr]) {
+            sum = selectedApps[appId].reportData[attr] + sum;
+         }
+      }
+
+      return Number.isInteger(sum) ? Math.round(sum) : +sum.toFixed(2);
    }
 
    formatDate(date) {
-      return date.slice(date.indexOf("-") + 1);
+      return date.split("/")[0] + "/" + date.split("/")[1];
    }
 
    numberWithCommas = x => {
@@ -87,124 +112,53 @@ export default class Overview extends Component {
       return (((newest - oldest) * 100) / oldest).toFixed(2);
    }
 
-   calcSumOf(attr) {
-      const { filteredReportData } = this.props;
-      let sum = 0;
-      for (let date in filteredReportData) {
-         if (filteredReportData[date]) {
-            for (let appId in filteredReportData[date]) {
-               if (filteredReportData[date][appId]) {
-                  for (
-                     let i = 0;
-                     i < filteredReportData[date][appId].length;
-                     i++
-                  ) {
-                     sum = filteredReportData[date][appId][i][attr]
-                        ? filteredReportData[date][appId][i][attr] + sum
-                        : sum;
-                  }
-               }
-            }
-         }
-      }
-      sum = sum ? sum : 0;
-      return Number.isInteger(sum) ? Math.round(sum) : sum.toFixed(2);
-   }
-
-   calcFillRate() {
-      const { calcSumOf } = this;
-      let fillRate = (
-         calcSumOf("impression") / calcSumOf("bidRequest")
-      ).toFixed(2);
-      fillRate = isNaN(fillRate) || fillRate === Infinity ? 0 : fillRate;
-      return fillRate;
-   }
-
-   calcERPM() {
-      const { calcSumOf } = this;
-      let ERPM = (
-         (calcSumOf("revenue") / 1000 / calcSumOf("impression")) *
-         1000
-      ).toFixed(2);
-
-      ERPM = isNaN(ERPM) ? 0 : ERPM;
-      return ERPM;
-   }
-
    previousPeriodsTableData() {
       const { previousPeriods } = this.props;
       let tableData = [];
 
       let tableDataItemCounter = 0;
+      let from, to, pperiod;
+      let appReportItem;
       previousPeriods.forEach(period => {
-         const periodLength = Object.keys(period).length;
-         let tableDataItem = {};
+         from = `${period.from.getMonth() + 1}-${period.from.getDate()}`;
+         to = `${period.to.getMonth() + 1}-${period.to.getDate()}`;
+         pperiod = `${from} to ${to}`;
 
-         let previousPeriods = "";
-         let datesCounter = 0;
-         let fromPeriod = "";
-         let toPeriod = "";
-         let rDateSum = 0;
-         let iDateSum = 0;
-         for (let date in period) {
-            if (datesCounter === 0) {
-               fromPeriod = this.formatDate(date);
-               toPeriod = this.formatDate(date);
-               previousPeriods = fromPeriod + " to " + toPeriod;
-            } else if (datesCounter === periodLength - 1) {
-               toPeriod = this.formatDate(date);
-               previousPeriods = fromPeriod + " to " + toPeriod;
+         const totals = {
+            revenue: 0,
+            impression: 0
+         };
+         const tableDataItem = {};
+
+         for (let appId in period.data) {
+            for (let total in totals) {
+               appReportItem = period.data[appId][total];
+               totals[total] = appReportItem
+                  ? totals[total] + appReportItem
+                  : totals[total];
             }
-
-            // if there's data of that date
-            if (period[date]) {
-               for (let appId in period[date]) {
-                  for (let i = 0; i < period[date][appId].length; i++) {
-                     // get the sum of all revenues of that date
-                     rDateSum = period[date][appId][i]["revenue"]
-                        ? period[date][appId][i]["revenue"] + rDateSum
-                        : rDateSum;
-
-                     // get the sum of all impressions of that date
-                     iDateSum = period[date][appId][i]["impression"]
-                        ? period[date][appId][i]["impression"] + iDateSum
-                        : iDateSum;
-                  }
-               }
-            }
-
-            datesCounter++;
          }
 
-         tableDataItem = {
-            previousPeriods,
-            impressions: {
-               value: iDateSum,
+         for (let total in totals) {
+            tableDataItem.previousPeriods = pperiod;
+
+            tableDataItem[total] = {
+               value: +totals[total],
                growth: 0
-            },
-            revenue: {
-               value: (Number(rDateSum) / 1000).toFixed(2),
-               growth: 0
-            }
-         };
+            };
+         }
 
          tableData.push(tableDataItem);
 
-         // set growths
          if (tableDataItemCounter > 0) {
-            tableData[
-               tableDataItemCounter - 1
-            ].impressions.growth = this.calcGrowth(
-               iDateSum,
-               tableData[tableDataItemCounter - 1].impressions.value
-            );
-
-            tableData[
-               tableDataItemCounter - 1
-            ].revenue.growth = this.calcGrowth(
-               rDateSum,
-               tableData[tableDataItemCounter - 1].revenue.value
-            );
+            for (let total in totals) {
+               tableData[tableDataItemCounter - 1][
+                  total
+               ].growth = this.calcGrowth(
+                  tableData[tableDataItemCounter][total].value,
+                  tableData[tableDataItemCounter - 1][total].value
+               );
+            }
          }
 
          tableDataItemCounter++;
@@ -216,6 +170,22 @@ export default class Overview extends Component {
    renderPreviousPeriodsTable() {
       const { asyncLoading, quickFilter } = this.props;
       let reportData = this.previousPeriodsTableData();
+
+      let previousPeriodsStr;
+      reportData = reportData.map(data => {
+         previousPeriodsStr = data.previousPeriods;
+         previousPeriodsStr = previousPeriodsStr.split("to");
+         data.previousPeriods = (
+            <React.Fragment>
+               {previousPeriodsStr[0]}
+               &nbsp;
+               <span style={{ color: "##0A1F44", opacity: 0.3 }}>to</span>
+               &nbsp;
+               {previousPeriodsStr[1]}
+            </React.Fragment>
+         );
+         return data;
+      });
 
       if (reportData[0].previousPeriods === "") return null;
 
@@ -241,21 +211,24 @@ export default class Overview extends Component {
          quickFilter === "a"
             ? []
             : reportData.map(item => {
-                 const impressions = (
+                 item.impression = (
                     <div className="perc">
-                       {item.impressions.value}
-                       <span className={`${gc(item.impressions.growth)}`}>
-                          {parseGrowth(item.impressions.growth)}
+                       {item.impression.value}
+                       <span className={`${gc(item.impression.growth)}`}>
+                          {parseGrowth(item.impression.growth)}
                        </span>
                     </div>
                  );
 
-                 const newItem = {
-                    ...item,
-                    impressions
-                 };
-
-                 return newItem;
+                 item.revenue = (
+                    <div className="perc">
+                       {item.revenue.value}
+                       <span className={`${gc(item.revenue.growth)}`}>
+                          {parseGrowth(item.revenue.growth)}
+                       </span>
+                    </div>
+                 );
+                 return item;
               });
 
       const paginationPrevious = props => {
@@ -299,14 +272,14 @@ export default class Overview extends Component {
                         },
                         {
                            Header: "Impressions",
-                           accessor: "impressions",
+                           accessor: "impression",
                            sortMethod: (a, b) => {
                               return a > b ? -1 : 1;
                            }
                         },
                         {
                            Header: "Revenue",
-                           accessor: "revenue.value",
+                           accessor: "revenue",
                            sortMethod: (a, b) => {
                               return a > b ? -1 : 1;
                            }
@@ -321,163 +294,120 @@ export default class Overview extends Component {
             />
          </div>
       );
-
-      // return (
-      //    <table className="table table-bordered reportTable">
-      //       <thead>
-      //          <tr className="sst">
-      //             <th scope="col">Previous periods</th>
-      //             <th scope="col">Impressions</th>
-      //             <th scope="col">Revenue</th>
-      //             <th scope="col">Impressions</th>
-      //          </tr>
-      //       </thead>
-      //       <tbody>
-      //          {reportData.map(data => {
-      //             const { previousPeriods, impressions, revenue } = data;
-      //             return (
-      //                <tr className="mb" key={previousPeriods}>
-      //                   <td>{previousPeriods}</td>
-      //                   <td>
-      //                      {impressions.value}
-      //                      <span className={`perc ${gc(impressions.growth)}`}>
-      //                         {parseGrowth(impressions.growth)}
-      //                      </span>
-      //                   </td>
-      //                   <td>
-      //                      $ {revenue.value}
-      //                      <span className={`perc ${gc(revenue.growth)}`}>
-      //                         {parseGrowth(revenue.growth)}
-      //                      </span>
-      //                   </td>
-      //                   <td>
-      //                      {impressions.value}
-      //                      <span className={`perc ${gc(impressions.growth)}`}>
-      //                         {parseGrowth(impressions.growth)}
-      //                      </span>
-      //                   </td>
-      //                </tr>
-      //             );
-      //          })}
-      //       </tbody>
-      //    </table>
-      // );
-   }
-
-   renderQicon(input) {
-      const style = !this.state[`${input}InfoBox`]
-         ? { display: "none" }
-         : { display: "block" };
-
-      const infoBoxesTexts = {
-         impressions: "impressions",
-         revenue: "revenue",
-         rate: "rate",
-         uniques: "uniques",
-         rpm: "rpm"
-      };
-
-      return (
-         <div className="question-icon">
-            <div className="info-box" style={style} id={`${input}-info-box`}>
-               {infoBoxesTexts[input]}
-            </div>
-            <i
-               className="fa fa-question-circle"
-               aria-hidden="true"
-               onMouseEnter={this.toggleInfoBox.bind(null, input)}
-               onMouseLeave={this.toggleInfoBox.bind(null, input)}
-            />
-         </div>
-      );
    }
 
    renderGraph() {
-      const { filteredReportData } = this.props;
-      let labels = [];
-      let revenueData = [];
-      let impressionsData = [];
+      const { selectedApps } = this.state;
 
-      for (let date in filteredReportData) {
-         labels.push(this.formatDate(date));
+      const totalByDate = {
+         revenue: {},
+         impression: {}
+      };
 
-         let rDateSum = 0;
-         let iDateSum = 0;
+      const uniqueDates = {};
 
-         // if there's data of that date
-         if (filteredReportData[date]) {
-            for (let appId in filteredReportData[date]) {
-               if (filteredReportData[date][appId]) {
-                  for (
-                     let i = 0;
-                     i < filteredReportData[date][appId].length;
-                     i++
-                  ) {
-                     // get the sum of all revenues of that date
-                     rDateSum = filteredReportData[date][appId][i]["revenue"]
-                        ? filteredReportData[date][appId][i]["revenue"] +
-                          rDateSum
-                        : rDateSum;
-
-                     // get the sum of all impressions of that date
-                     iDateSum = filteredReportData[date][appId][i]["impression"]
-                        ? filteredReportData[date][appId][i]["impression"] +
-                          iDateSum
-                        : iDateSum;
-                  }
-               }
+      let byDatedata;
+      for (let appId in selectedApps) {
+         for (let date in selectedApps[appId].reportData.byDate) {
+            uniqueDates[date] = date;
+            byDatedata = selectedApps[appId].reportData.byDate[date];
+            for (let totalKey in totalByDate) {
+               totalByDate[totalKey][date] = totalByDate[totalKey][date]
+                  ? totalByDate[totalKey][date] + byDatedata[totalKey]
+                  : byDatedata[totalKey];
             }
          }
-
-         revenueData.push((rDateSum / 1000).toFixed(2));
-         impressionsData.push(iDateSum.toFixed(2));
       }
 
+      const labels = [];
+      const revenueData = [];
+      const impressionData = [];
+
+      const uniqueDatesArr = [];
+      for (let date in uniqueDates) {
+         uniqueDatesArr.push(date);
+      }
+
+      uniqueDatesArr.sort().forEach(date => {
+         labels.push(this.formatDate(date));
+
+         if (totalByDate.revenue[date]) {
+            totalByDate.revenue[date] = (
+               totalByDate.revenue[date] / 1000
+            ).toFixed(2);
+            revenueData.push(totalByDate.revenue[date]);
+         }
+         impressionData.push(totalByDate.impression[date] || 0);
+      });
+
       const data = {
-         labels,
+         labels: labels,
          datasets: [
             {
                label: "Revenues",
                data: revenueData,
                yAxisID: "A",
-               backgroundColor: "rgba(255, 255, 255, 0)",
-               borderColor: "rgba(0, 0, 0, 1)",
+               backgroundColor: "rgb(51, 255, 255)",
+               fill: false,
                borderWidth: 1,
-               steppedLine: false
+               borderColor: ["rgb(51, 255, 255)"]
             },
             {
                label: "Impressions",
-               data: impressionsData,
+               data: impressionData,
                yAxisID: "B",
-               backgroundColor: "rgba(255, 255, 255, 0)",
-               borderColor: "rgb(21, 124, 193)",
+               backgroundColor: "rgb(0, 143, 204)",
+               fill: false,
                borderWidth: 1,
-               steppedLine: false
+               borderColor: ["rgb(0, 143, 204)"]
             }
          ]
       };
 
       const options = {
+         defaultFontFamily: "'Montserrat'",
+         layout: {
+            padding: {
+               left: 30,
+               right: 30,
+               top: 30,
+               bottom: 30
+            }
+         },
+         legend: {
+            labels: {
+               fontColor: "rgba(10, 31, 68, 1)",
+               fontStyle: "bold"
+            }
+         },
          scales: {
             xAxes: [
                {
+                  offset: true,
                   gridLines: {
-                     display: false
+                     //  display: false
+                     //  offsetGridLines: true
+                  },
+                  ticks: {
+                     fontColor: "rgba(10, 31, 68, 1)",
+                     fontStyle: "bold",
+                     autoSkip: false
                   }
                }
             ],
             yAxes: [
                {
                   borderColor: "rgba(15, 15, 15, 0)",
-                  gridLines: { display: false },
+                  // gridLines: { display: false },
                   id: "A",
                   position: "left",
                   scaleLabel: {
                      display: true,
-                     fontColor: "rgba(0, 0, 0, .5)",
-                     labelString: "€ Revenue"
+                     fontColor: "rgb(51, 255, 255)",
+                     labelString: "€ Revenue",
+                     fontStyle: "bold"
                   },
-                  ticks: { fontColor: "rgba(15, 15, 15, 1)" }
+                  ticks: { fontColor: "rgba(10, 31, 68, 1)", fontStyle: "bold" }
                },
                {
                   borderColor: "rgba(15, 15, 15, 0)",
@@ -486,20 +416,21 @@ export default class Overview extends Component {
                   position: "right",
                   scaleLabel: {
                      display: true,
-                     fontColor: "rgba(0, 0, 0, .5)",
-                     labelString: "Impressions"
+                     fontColor: "rgb(0, 143, 204)",
+                     labelString: "Impressions",
+                     fontStyle: "bold"
                   },
-                  ticks: { fontColor: "rgba(15, 15, 15, 1)" }
+                  ticks: { fontColor: "rgba(10, 31, 68, 1)", fontStyle: "bold" }
                }
             ]
          }
       };
 
-      return <Line data={data} options={options} />;
+      return <Line ref="chart" data={data} options={options} />;
    }
 
    render() {
-      const { calcSumOf } = this;
+      const { overviewData } = this.state;
 
       return (
          <div id="overview" className="mb">
@@ -510,23 +441,23 @@ export default class Overview extends Component {
 
             <div id="overview-data">
                <div>
-                  <div>{calcSumOf("impression")}</div>
+                  <div>{overviewData.impression}</div>
                   <span>Impressions</span>
                </div>
                <div>
-                  <div>€ {(calcSumOf("revenue") / 1000).toFixed(2)}</div>
+                  <div>€ {overviewData.revenue}</div>
                   <span>Net Revenue</span>
                </div>
                <div>
-                  <div>{calcSumOf("impressionUnique")}</div>
+                  <div>{overviewData.impressionUnique}</div>
                   <span>Uniques</span>
                </div>
                <div>
-                  <div>{this.calcFillRate()}%</div>
+                  <div>{overviewData.fillRate}%</div>
                   <span>Fill rate</span>
                </div>
                <div>
-                  <div>{this.calcERPM()}</div>
+                  <div>€ {overviewData.RPM}</div>
                   <span>RPM</span>
                </div>
             </div>
@@ -539,54 +470,4 @@ export default class Overview extends Component {
          </div>
       );
    }
-}
-
-{
-   /* <div id="overview-top">
-   <div id="overview-topLine">
-      <div className="report-title">
-         <h5 className="sst">Top line</h5>
-      </div>
-      <div>
-         <div>
-            <div>
-               <h3 className="st">{calcSumOf("impression")}</h3>
-               <h6 className="mb">impressions</h6>
-               {this.renderQicon("impressions")}
-            </div>
-            <div>
-               <h3 className="st">
-                  {(calcSumOf("revenue") / 1000).toFixed(2)}
-               </h3>
-               <h6 className="mb">net revenue</h6>
-               {this.renderQicon("revenue")}
-            </div>
-         </div>
-
-         <div>
-            <div>
-               <h3 className="st">{this.calcFillRate()}%</h3>
-               <h6 className="mb">fill rate</h6>
-               {this.renderQicon("rate")}
-            </div>
-            <div>
-               <h3 className="st">{calcSumOf("impressionUnique")}</h3>
-               <h6 className="mb">uniques</h6>
-               {this.renderQicon("uniques")}
-            </div>
-            <div>
-               <h3 className="st">{this.calcERPM()}</h3>
-               <h6 className="mb">RPM</h6>
-               {this.renderQicon("rpm")}
-            </div>
-         </div>
-      </div>
-   </div>
-
-   <div id="overview-plot">
-      <div className="report-title">
-         <h5 className="sst">Plot</h5>
-      </div>
-   </div>
-</div>; */
 }

@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import _ from "lodash";
+import { isEmpty, cloneDeep, isEqual } from "lodash";
+import { getPlacementsByAppId } from "../../actions";
 
 import ToggleDisplay from "react-toggle-display";
 import DayPickerInput from "react-day-picker/DayPickerInput";
@@ -9,17 +10,10 @@ import "../../../node_modules/react-day-picker/lib/style.css";
 
 import FormControl from "@material-ui/core/FormControl";
 import Input from "@material-ui/core/Input";
-import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
-import {
-   KeyboardArrowDown,
-   KeyboardArrowRight,
-   KeyboardArrowUp
-} from "@material-ui/icons";
+import { KeyboardArrowDown, KeyboardArrowRight } from "@material-ui/icons";
 
-import FontAwesomeIcon from "@fortawesome/react-fontawesome";
-import faTrash from "@fortawesome/fontawesome-free-solid/faTrash";
 import CSS from "../../utils/InLineCSS";
 
 import Overview from "./Components/Overview";
@@ -40,13 +34,35 @@ const takeDays = function(date, days) {
    return dat;
 };
 
-// @connect(state => ({
-//   apps: state.app.get("apps"),
-//   userData: state.app.get("userData"),
-//   reportData: state.app.get("reportData"),
-//   initialReportAppId: state.app.get("initialReportAppId"),
-//   isLoad_webgl: state.app.get("load_webgl")
-// }))
+const isDateBetween = ({
+   from,
+   to,
+   date,
+   inclusiveFrom,
+   inclusiveTo,
+   inclusiveBoth
+}) => {
+   inclusiveFrom = inclusiveFrom || true;
+   inclusiveTo = inclusiveTo || true;
+   inclusiveBoth = inclusiveBoth || (inclusiveFrom && inclusiveTo);
+
+   from.setHours(0, 0, 0, 0);
+   to.setHours(0, 0, 0, 0);
+   date.setHours(0, 0, 0, 0);
+
+   const betweenFrom = inclusiveBoth
+      ? from <= date
+      : inclusiveFrom
+         ? from <= date
+         : from < date;
+   const betweenTo = inclusiveBoth
+      ? to >= date
+      : inclusiveTo
+         ? to >= date
+         : to > date;
+   return betweenFrom && betweenTo;
+};
+
 class Report extends Component {
    static propTypes = {
       dispatch: PropTypes.func
@@ -56,11 +72,11 @@ class Report extends Component {
       super(props);
 
       this.state = {
-         show: "pe",
+         show: "ov",
          from: new Date(),
          to: new Date(),
          initialDateSetup: false,
-         quickFilter: "a",
+         quickFilter: "l",
          doLoadScene: false,
          isSceneLoaded: false,
          isLoadingScene: false,
@@ -69,7 +85,8 @@ class Report extends Component {
          oldSelectedApps: {},
          selectedApps: {},
          selectedAppsLength: 0,
-         allAppsSelected: false
+         allAppsSelected: false,
+         placementsByAppId: {}
       };
 
       this.filteredData = this.filteredData.bind(this);
@@ -92,34 +109,12 @@ class Report extends Component {
       this.changeAppSelection = this.changeAppSelection.bind(this);
    }
 
-   componentDidMount() {
-      const { apps, initialReportAppId } = this.props;
-      let selectedApps = {};
-      let allAppsSelected = false;
-
-      const userApps = {};
-      apps.forEach(app => {
-         userApps[app._id] = app.name;
-      });
-
-      initialReportAppId.forEach(appId => {
-         selectedApps[appId] = userApps[appId];
-      });
-
-      if (Object.keys(selectedApps).length === Object.keys(userApps).length) {
-         allAppsSelected = true;
-      }
-
-      this.setState({
-         userApps,
-         selectedApps,
-         allAppsSelected,
-         selectedAppsLength: Object.keys(selectedApps).length
-      });
-   }
-
    componentWillUnmount() {
       this.disposeEventListeners();
+   }
+
+   componentDidMount() {
+      this.quickFilter("l");
    }
 
    shouldComponentUpdate(nextProps, nextState, nextContext) {
@@ -129,7 +124,8 @@ class Report extends Component {
          selectedApps,
          show,
          selectedAppsLength,
-         quickFilter
+         quickFilter,
+         placementsByAppId
       } = this.state;
       if (
          from !== nextState.from ||
@@ -137,7 +133,8 @@ class Report extends Component {
          Object.keys(selectedApps).length === 0 ||
          selectedAppsLength !== nextState.selectedAppsLength ||
          show !== nextState.show ||
-         quickFilter !== nextState.quickFilter
+         quickFilter !== nextState.quickFilter ||
+         !isEqual(placementsByAppId, nextProps.placementsByAppId)
       ) {
          return true;
       }
@@ -145,22 +142,159 @@ class Report extends Component {
    }
 
    static getDerivedStateFromProps(nextProps, prevState) {
-      const { reportData } = nextProps;
+      const {
+         apps,
+         reportData,
+         initialReportAppId,
+         placementsByAppId
+      } = nextProps;
       const { initialDateSetup } = prevState;
 
       if (Object.keys(reportData).length > 0 && !initialDateSetup) {
          const keys = Object.keys(reportData).sort();
          const first = keys[0];
+         const from = new Date(first);
+         const to = new Date();
+         const selectedApps = {};
+         let allAppsSelected = false;
+
+         const userApps = {};
+         apps.forEach(app => {
+            userApps[app._id] = app.name;
+         });
+
+         initialReportAppId.forEach(appId => {
+            selectedApps[appId] = {};
+            selectedApps[appId].name = userApps[appId];
+            selectedApps[appId].reportData = Report.aggReportDataByDate({
+               reportData,
+               from,
+               to,
+               appId
+            });
+         });
+
+         allAppsSelected =
+            Object.keys(selectedApps).length === Object.keys(userApps).length;
+
          //    const last = keys[keys.length - 1];
          return {
+            userApps,
+            selectedApps,
+            allAppsSelected,
+            selectedAppsLength: Object.keys(selectedApps).length,
+            placementsByAppId: cloneDeep(placementsByAppId),
+
             initialDateSetup: true,
-            from: new Date(first),
-            to: new Date()
+            from,
+            to
             // to: new Date(last)
          };
       }
 
+      if (!isEqual(placementsByAppId, prevState.placementsByAppId)) {
+         return {
+            placementsByAppId: cloneDeep(placementsByAppId)
+         };
+      }
+
       return null;
+   }
+
+   static aggReportDataByDate({ reportData, from, to, appId }) {
+      let aggregatedData = {
+         revenue: 0,
+         impression: 0,
+         bidRequest: 0,
+         bidResponse: 0,
+         gaze: 0,
+         gazeUnique: 0,
+         impressionUnique: 0,
+         RPM: 0,
+         fillRate: 0,
+         byDate: {},
+         bySceneId: {},
+         byPlacementId: {},
+         byPublisherId: {}
+      };
+      from = new Date(from);
+      to = new Date(to);
+
+      let keyLabel, reportItem;
+
+      for (let date in reportData) {
+         if (isDateBetween({ from, to, date: new Date(date) })) {
+            // is there report data of that app in that date?
+            if (reportData[date][appId]) {
+               for (let i = 0; i < reportData[date][appId].length; i++) {
+                  reportItem = reportData[date][appId][i];
+                  for (let dataKey in aggregatedData) {
+                     if (reportItem[dataKey]) {
+                        aggregatedData[dataKey] =
+                           reportItem[dataKey] + aggregatedData[dataKey];
+
+                        aggregatedData.byDate[date] =
+                           aggregatedData.byDate[date] || {};
+                        aggregatedData.byDate[date][dataKey] =
+                           reportItem[dataKey] +
+                           (aggregatedData.byDate[date][dataKey] || 0);
+
+                        for (let idKey in reportItem.keys) {
+                           switch (idKey) {
+                              case "sceid":
+                                 keyLabel = "bySceneId";
+                                 break;
+                              case "plaid":
+                                 keyLabel = "byPlacementId";
+                                 break;
+                              case "pubid":
+                                 keyLabel = "byPublisherId";
+                                 break;
+                              default:
+                           }
+
+                           aggregatedData[keyLabel][reportItem.keys[idKey]] =
+                              aggregatedData[keyLabel][
+                                 reportItem.keys[idKey]
+                              ] || {};
+                           aggregatedData[keyLabel][reportItem.keys[idKey]][
+                              dataKey
+                           ] =
+                              reportItem[dataKey] +
+                              (aggregatedData[keyLabel][reportItem.keys[idKey]][
+                                 dataKey
+                              ] || 0);
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      aggregatedData.RPM =
+         aggregatedData.revenue && aggregatedData.impression
+            ? (aggregatedData.revenue / 1000 / aggregatedData.impression) * 1000
+            : 0;
+
+      aggregatedData.fillRate =
+         aggregatedData.impression && aggregatedData.bidRequest
+            ? (aggregatedData.impression / aggregatedData.bidRequest) * 100
+            : 0;
+
+      for (let dataKey in aggregatedData) {
+         if (dataKey.indexOf("by") < 0) {
+            aggregatedData[dataKey] =
+               dataKey === "revenue"
+                  ? aggregatedData[dataKey] / 1000
+                  : aggregatedData[dataKey];
+            aggregatedData[dataKey] = Number.isInteger(aggregatedData[dataKey])
+               ? Math.round(aggregatedData[dataKey])
+               : +aggregatedData[dataKey].toFixed(2);
+         }
+      }
+
+      return aggregatedData;
    }
 
    // WebGL Methods -----------------------------------------
@@ -217,29 +351,63 @@ class Report extends Component {
    }
 
    getDates = (startDate, stopDate) => {
-      startDate.setHours(0, 0, 0, 0);
-      stopDate.setHours(0, 0, 0, 0);
       const dateArray = [];
       let currentDate = startDate;
       let daysInterval = 0;
 
-      while (currentDate <= stopDate) {
-         dateArray.push(currentDate);
-         currentDate = addDays(currentDate, 1);
-         daysInterval++;
+      if (startDate && stopDate) {
+         startDate.setHours(0, 0, 0, 0);
+         stopDate.setHours(0, 0, 0, 0);
+
+         while (currentDate <= stopDate) {
+            dateArray.push(currentDate);
+            currentDate = addDays(currentDate, 1);
+            daysInterval++;
+         }
+
+         const sameDate =
+            startDate.toString().slice(0, 15) ===
+            stopDate.toString().slice(0, 15);
+         if (daysInterval === 0 && sameDate) {
+            dateArray.push(currentDate);
+         }
       }
 
-      const sameDate =
-         startDate.toString().slice(0, 15) === stopDate.toString().slice(0, 15);
-      if (daysInterval === 0 && sameDate) {
-         dateArray.push(currentDate);
-      }
       return { dates: dateArray, daysInterval };
    };
 
-   changeDate(type, date, modifiers) {
-      let newState = type === "from" ? { from: date } : { to: date };
-      newState.quickFilter = null;
+   changeDate({ newFrom, newTo, quickFilter }, DayPickerInputDate) {
+      const { reportData } = this.props;
+      let { from, to, selectedApps } = this.state;
+
+      let newState = {
+         from: newFrom
+            ? newFrom === "DayPickerInput"
+               ? DayPickerInputDate
+               : newFrom
+            : from,
+         to: newTo
+            ? newTo === "DayPickerInput"
+               ? DayPickerInputDate
+               : newTo
+            : to
+      };
+
+      newState.selectedApps = cloneDeep(selectedApps);
+
+      for (let appId in newState.selectedApps) {
+         newState.selectedApps[appId].reportData = Report.aggReportDataByDate({
+            reportData,
+            from: newState.from,
+            to: newState.to,
+            appId
+         });
+      }
+
+      if (!quickFilter) {
+         newState.quickFilter = null;
+      }
+
       this.setState(newState);
    }
 
@@ -256,7 +424,7 @@ class Report extends Component {
 
       let filteredDataObj = {};
 
-      if (!_.isEmpty(reportData) && !_.isEmpty(selectedApps)) {
+      if (!isEmpty(reportData) && !isEmpty(selectedApps)) {
          filteredDates.forEach(date => {
             const parsedDate = this.parseDate(date);
 
@@ -269,15 +437,13 @@ class Report extends Component {
                      if (!filteredDataObj[parsedDate]) {
                         filteredDataObj[parsedDate] = {};
                      }
-                     filteredDataObj[parsedDate][appId] = _.cloneDeep(
+                     filteredDataObj[parsedDate][appId] = cloneDeep(
                         reportData[parsedDate][appId]
                      );
                   } else {
                      filteredDataObj[parsedDate] = null;
                   }
                }
-            } else {
-               filteredDataObj[parsedDate] = null;
             }
          });
       }
@@ -286,20 +452,37 @@ class Report extends Component {
    }
 
    previousPeriods(max) {
-      const { from, to } = this.state;
-      let previousPeriods = [];
+      const { reportData } = this.props;
+      const { from, to, selectedApps } = this.state;
+      const previousPeriods = [{}];
 
       // Get the interval from the filtered dates
       let daysInterval = this.getDates(from, to).daysInterval;
       daysInterval = daysInterval === 0 ? 1 : daysInterval;
 
+      let pp = {};
+      let ppFrom, ppTo;
+      let ppData = {};
       for (let i = 1; i <= max; i++) {
-         previousPeriods.push(
-            this.filteredData(
-               takeDays(from, daysInterval * i),
-               takeDays(to, daysInterval * i)
-            )
-         );
+         ppFrom = takeDays(from, daysInterval * i);
+         ppTo = takeDays(to, daysInterval * i);
+
+         for (let appId in selectedApps) {
+            ppData[appId] = Report.aggReportDataByDate({
+               reportData,
+               from: takeDays(from, daysInterval * i),
+               to: takeDays(to, daysInterval * i),
+               appId
+            });
+         }
+
+         pp = {
+            from: ppFrom,
+            to: ppTo,
+            data: cloneDeep(ppData)
+         };
+
+         previousPeriods[i - 1] = pp;
       }
 
       return previousPeriods;
@@ -321,11 +504,11 @@ class Report extends Component {
       return show === view;
    }
 
-   quickFilter(filter) {
+   quickFilter(quickFilter) {
       let { reportData } = this.props;
       reportData = reportData || {};
 
-      let newState;
+      let from, to;
 
       const today = new Date();
       const yesterday = new Date();
@@ -333,67 +516,88 @@ class Report extends Component {
       yesterday.setDate(yesterday.getDate() - 1);
       lastWeek.setDate(lastWeek.getDate() - 6);
 
-      switch (filter) {
+      switch (quickFilter) {
          case "t":
-            newState = { from: today, to: today };
+            from = today;
+            to = today;
             break;
          case "y":
-            newState = { from: yesterday, to: yesterday };
+            from = yesterday;
+            to = yesterday;
             break;
          case "l":
-            newState = { from: lastWeek, to: today };
+            from = lastWeek;
+            to = today;
             break;
          case "a":
             const keys = Object.keys(reportData).sort();
             const first = keys[0];
-            const from = first ? new Date(first) : new Date();
-            newState = { from, to: new Date() };
+            from = first ? new Date(first) : new Date();
+            to = today;
             //    const last = keys[keys.length - 1];
             //    newState = { from: new Date(first), to: new Date(last) };
             break;
          default:
-            return;
       }
 
-      newState.quickFilter = filter;
-
-      this.setState(newState);
+      this.setState({ quickFilter }, () => {
+         this.changeDate({ newFrom: from, newTo: to, quickFilter }, null);
+      });
    }
 
    changeAppSelection(appId, e) {
-      let { userApps, selectedApps, allAppsSelected } = this.state;
+      const { accessToken, dispatch, reportData } = this.props;
+      let { userApps, selectedApps, allAppsSelected, from, to } = this.state;
       appId = e.target.value || appId;
+
+      let getNewPcs = false;
 
       if (appId !== "add") {
          if (appId !== "all") {
             if (selectedApps[appId]) {
                delete selectedApps[appId];
             } else {
-               selectedApps[appId] = _.cloneDeep(userApps[appId]);
+               getNewPcs = true;
+               selectedApps[appId] = {};
+               selectedApps[appId].name = userApps[appId];
+               selectedApps[appId].reportData = Report.aggReportDataByDate({
+                  reportData,
+                  from,
+                  to,
+                  appId
+               });
             }
          } else {
             if (allAppsSelected) {
                selectedApps = {};
             } else {
                for (let appId in userApps) {
-                  selectedApps[appId] = userApps[appId];
+                  getNewPcs = true;
+                  selectedApps[appId] = {};
+                  selectedApps[appId].name = userApps[appId];
+                  selectedApps[appId].reportData = Report.aggReportDataByDate({
+                     reportData,
+                     from,
+                     to,
+                     appId
+                  });
                }
             }
          }
 
-         allAppsSelected = false;
+         allAppsSelected =
+            Object.keys(selectedApps).length === Object.keys(userApps).length;
 
-         if (
-            Object.keys(selectedApps).length === Object.keys(userApps).length
-         ) {
-            allAppsSelected = true;
-         }
-
-         this.setState({
-            selectedApps,
-            allAppsSelected,
-            selectedAppsLength: Object.keys(selectedApps).length
-         });
+         this.setState(
+            {
+               selectedApps,
+               allAppsSelected,
+               selectedAppsLength: Object.keys(selectedApps).length
+            },
+            () => {
+               getNewPcs && dispatch(getPlacementsByAppId(appId, accessToken));
+            }
+         );
       }
    }
 
@@ -422,9 +626,9 @@ class Report extends Component {
          const selectedAppDisplay = (
             <div
                className="report-selectedApp"
-               key={`${selectedApps[appId]}-${Math.random()}`}
+               key={`${selectedApps[appId].name}-${Math.random()}`}
             >
-               <div>{selectedApps[appId]}</div> &nbsp;
+               <div>{selectedApps[appId].name}</div> &nbsp;
                <div onClick={this.changeAppSelection.bind(null, appId)}>
                   {/* <FontAwesomeIcon icon={faTrash} /> */} X
                </div>
@@ -462,6 +666,7 @@ class Report extends Component {
 
    render() {
       const { show, filteredData, previousPeriods } = this;
+
       const {
          from,
          to,
@@ -469,7 +674,8 @@ class Report extends Component {
          isLoadingScene,
          progressLoadingScene,
          selectedApps,
-         quickFilter
+         quickFilter,
+         placementsByAppId
       } = this.state;
 
       const {
@@ -478,8 +684,8 @@ class Report extends Component {
          isLoad_webgl,
          reportData,
          userData,
-         selectedApp,
-         placementsByApp
+         selectedApp
+         //    placementsByAppId
       } = this.props;
 
       const owAct = show("ov") ? "active" : "";
@@ -520,7 +726,9 @@ class Report extends Component {
                      <div id="from">
                         <DayPickerInput
                            value={from}
-                           onDayChange={this.changeDate.bind(null, "from")}
+                           onDayChange={this.changeDate.bind(null, {
+                              newFrom: "DayPickerInput"
+                           })}
                            dayPickerProps={{
                               selectedDays: from,
                               disabledDays: { after: to }
@@ -530,7 +738,9 @@ class Report extends Component {
                      <div id="to">
                         <DayPickerInput
                            value={to}
-                           onDayChange={this.changeDate.bind(null, "to")}
+                           onDayChange={this.changeDate.bind(null, {
+                              newTo: "DayPickerInput"
+                           })}
                            dayPickerProps={{
                               selectedDays: to,
                               disabledDays: { before: from }
@@ -588,6 +798,7 @@ class Report extends Component {
                      filteredReportData={filteredReportData}
                      previousPeriods={previousPeriods(7)}
                      quickFilter={quickFilter}
+                     selectedApps={selectedApps}
                   />
                </ToggleDisplay>
 
@@ -599,7 +810,7 @@ class Report extends Component {
                      TJSclear={this.TJSclear}
                      selectedApp={selectedApp}
                      selectedApps={selectedApps}
-                     placementsByApp={placementsByApp}
+                     placementsByAppId={placementsByAppId}
                      filteredReportData={filteredReportData}
                      fromDate={from}
                      toDate={to}
@@ -627,9 +838,9 @@ const mapStateToProps = state => ({
    accessToken: state.app.get("accessToken"),
    userData: state.app.get("userData"),
    selectedApp: state.app.get("selectedApp"),
-   placementsByApp: state.app.get("placementsByApp"),
    reportData: state.app.get("reportData"),
    initialReportAppId: state.app.get("initialReportAppId"),
+   placementsByAppId: state.app.get("placementsByAppId"),
    isLoad_webgl: state.app.get("load_webgl")
 });
 

@@ -47,6 +47,10 @@ const getFirstUpper = str => {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
  };
 
+ const formatDate = date => {
+     return `${date.getDate()} / ${date.getMonth()+1} / ${date.getFullYear()}`
+ }
+
 export default {
     isAtleast,
     hasLetter,
@@ -56,5 +60,6 @@ export default {
     capitalizeFirstLetter,
     withoutPrefix,
     getFirstUpper,
-    numberWithCommas
+    numberWithCommas,
+    formatDate
 };

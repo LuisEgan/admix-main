@@ -217,7 +217,9 @@ const updatePlacements = (accessToken, data) =>
 const getReportData = (accessToken, data) =>
     fetch(
         //   `http://ec2-52-200-109-193.compute-1.amazonaws.com:3020/report/placement/daily`,
-        `http://report.admix.in/report/placement/daily`, {
+        // PROD - HTTPS
+        // `https://report.admix.in/report/placement/daily`, {
+        `https://report.admix.in/report/placement/daily`, {
             method: "POST",
             headers: new Headers({
                 "Content-Type": "application/json"

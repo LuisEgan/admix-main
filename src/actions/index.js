@@ -27,7 +27,7 @@ export const REGISTER_REQUEST = "USERS_REGISTER_REQUEST",
       SAVE_APP = "SAVE_APP",
       SET_PLACEMENT = "SET_PLACEMENT",
       SET_PLACEMENTS = "SET_PLACEMENTS",
-      SET_PLACEMENTS_BY_APP = "SET_PLACEMENTS_BY_APP",
+      SET_PLACEMENTS_BY_ID = "SET_PLACEMENTS_BY_ID",
       SAVE_INPUTS = "SAVE_INPUTS",
       RESET_SAVED_INPUTS = "RESET_SAVED_INPUTS",
       TOGGLE_APP_STATUS = "TOGGLE_APP_STATUS",
@@ -214,10 +214,10 @@ const setPlacements = data => {
       }
 };
 
-const setPlacementsByApp = data => {
+const setplacementsByAppId = data => {
       if (data.status) {
             return {
-                  type: SET_PLACEMENTS_BY_APP,
+                  type: SET_PLACEMENTS_BY_ID,
                   data
             };
       } else {
@@ -328,7 +328,9 @@ export function login(email, password) {
             };
             api
                   .login(data)
-                  .then(data => dispatch(doLogin(data)))
+                  .then(data => {
+                        dispatch(doLogin(data))
+                  })
                   .catch(error => dispatch(asyncError(error)));
       };
 }
@@ -461,7 +463,6 @@ export const getUserData = accessToken => dispatch => {
 };
 
 export const toggleAppStatus = (appDetails, accessToken) => dispatch => {
-      console.log('appDetails: ', appDetails);
       dispatch(asyncStart());
 
       api
@@ -537,12 +538,21 @@ export const selectApp = (appId, accessToken) => dispatch => {
             .catch(error => dispatch(asyncError(error)));
 };
 
-export const updateApp = (appData, accessToken) => dispatch => {
+export const updateApp = ({appData, accessToken, adminToken}) => dispatch => {
       dispatch(asyncStart());
 
       api
             .updateApp(accessToken, appData)
-            .then(res => dispatch(doUpdateApp(res)))
+            .then( () => {
+                  return adminToken ? api.getAppsAdmin(accessToken, adminToken) : api.getApps(accessToken);
+            })
+            .then(res => {
+                  dispatch(getApps({
+                        accessToken
+                  }))
+                  dispatch(selectApp(appData.appId, accessToken))
+                  dispatch(doUpdateApp(res))
+            })
             .catch(error => dispatch(asyncError(error)));
 };
 
@@ -559,7 +569,7 @@ export const getPlacements = (appId, sceneId, accessToken) => dispatch => {
             .catch(error => dispatch(asyncError(error)));
 };
 
-export const getPlacementsByApp = (appId, accessToken) => dispatch => {
+export const getPlacementsByAppId = (appId, accessToken) => dispatch => {
       dispatch(asyncStart());
       const data = {
             appId
@@ -567,7 +577,7 @@ export const getPlacementsByApp = (appId, accessToken) => dispatch => {
 
       api
             .getPlacements(accessToken, data)
-            .then(res => dispatch(setPlacementsByApp(res)))
+            .then(res => dispatch(setplacementsByAppId(res)))
             .catch(error => dispatch(asyncError(error)));
 };
 
@@ -595,7 +605,6 @@ export const updatePlacements = ({
 // REPORT =============================================
 
 export const getReportData = ({
-      isAdmin,
       appsIds,
       accessToken,
       publisherId
@@ -618,7 +627,6 @@ export const getReportData = ({
             publisherId
       }
 
-      console.log('data: ', data);
       api
             .getReportData(accessToken, data)
             .then(res => {

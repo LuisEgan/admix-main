@@ -1,7 +1,9 @@
 import {
       Map
 } from "immutable";
-import _ from "lodash";
+import {
+      cloneDeep
+} from "lodash";
 import C from "../utils/constants";
 
 import {
@@ -24,7 +26,7 @@ import {
       SAVE_APP,
       SET_PLACEMENT,
       SET_PLACEMENTS,
-      SET_PLACEMENTS_BY_APP,
+      SET_PLACEMENTS_BY_ID,
       SAVE_INPUTS,
       RESET_SAVED_INPUTS,
       TOGGLE_APP_STATUS,
@@ -40,7 +42,8 @@ import {
       SET_APPS_FILTER_BY
 } from "../actions";
 
-export const initialState = Map({
+const initialStateValues = {
+      logoutCount: 0,
       counter: 0,
       isSnackBarOpen: false,
       asyncLoading: false,
@@ -53,14 +56,17 @@ export const initialState = Map({
       userData: {},
       apps: [],
       selectedApp: {},
-      placementsByApp: {},
+      placementsByAppId: {},
       savedApps: [],
       savedInputs: [],
       load_webgl: false,
       reportData: {},
       initialReportAppId: [],
       userImgURL: "",
-      appsFilterBy: []
+      appsFilterBy: [],
+}
+
+export const initialState = Map({ ...initialStateValues
 });
 
 const actionsMap = {
@@ -121,7 +127,7 @@ const actionsMap = {
             asyncError === "" && (asyncError = statusMessage);
 
             const asyncData = {
-                  mssg: message || "Oops.. Something went wrong"
+                  mssg: asyncError || "Oops.. Something went wrong"
             };
             const isSnackBarOpen = true;
 
@@ -137,10 +143,14 @@ const actionsMap = {
       },
       [ACTION_SUCCESS]: (state, action) => {
             const asyncLoading = false;
+            const asyncData = {};
+            let mssg = Array.isArray(action.data) ? action.data[0].msg : action.data;
+            asyncData.mssg = mssg;
+
             return state.merge(
                   Map({
                         asyncLoading,
-                        asyncData: action.data
+                        asyncData
                   })
             );
       },
@@ -151,7 +161,6 @@ const actionsMap = {
                   userName: to.name,
                   userEmail: to.email
             }
-            console.log('signupInfo: ', signupInfo);
 
             const asyncLoading = false;
             const asyncData = {
@@ -228,7 +237,7 @@ const actionsMap = {
             const asyncLoading = false;
 
             const asyncData = {
-                  mssg: data.data.message
+                  mssg: Array.isArray(data.data.message) ? data.data.message[0].msg : data.data.message
             };
             return state.merge(
                   Map({
@@ -242,7 +251,7 @@ const actionsMap = {
             const asyncLoading = false;
 
             const asyncData = {
-                  mssg: data.data.message
+                  mssg: Array.isArray(data.data.message) ? data.data.message[0].msg : data.data.message
             };
             return state.merge(
                   Map({
@@ -273,9 +282,10 @@ const actionsMap = {
       },
       [LOGOUT_SUCCESS]: (state, action) => {
 
-            return state.merge(Map(
-                  initialState
-            ));
+            return state.merge(Map({
+                  ...initialStateValues,
+                  logoutCount: 1
+            }));
       },
       [APPS_SUCCESS]: (state, action) => {
             const asyncLoading = false;
@@ -305,17 +315,19 @@ const actionsMap = {
             const {
                   appId
             } = data.data;
-            const scenes = data.data.data;
+            const scenes = [...data.data.data];
 
             apps.some(app => {
                   if (app._id === appId) {
-                        selectedApp = app;
+                        selectedApp = { ...app
+                        };
                         return true;
                   }
                   return false;
             });
-            selectedApp.scenes = scenes;
+            selectedApp.scenes = cloneDeep(scenes);
 
+            console.warn('REDUX selectedApp.appState: ', selectedApp.appState);
             const asyncLoading = false;
             return state.merge(
                   Map({
@@ -342,9 +354,11 @@ const actionsMap = {
 
       [RESET_SELECTED_APP]: state => {
             const selectedApp = {};
+            const placementsByAppId = {};
             return state.merge(
                   Map({
-                        selectedApp
+                        selectedApp,
+                        placementsByAppId
                   })
             );
       },
@@ -424,14 +438,38 @@ const actionsMap = {
       },
       [SET_PLACEMENTS]: (state, data) => {
             const selectedApp = state.get("selectedApp");
+            const apps = state.get("apps");
             const placements = data.data.data;
 
-            selectedApp.scenes.forEach(scene => {
+            apps.forEach(app => {
+                  app.scenes && app.scenes.forEach(scene => {
+                        scene.placements = [];
+                        Array.isArray(placements) &&
+                              placements.forEach((placement, i) => {
+                                    if (scene._id === placement.sceneId._id) {
+                                          const placementToPush = cloneDeep(placements[i]);
+                                          placementToPush.addedPrefix = false;
+
+                                          if (
+                                                placementToPush.placementName &&
+                                                !placementToPush.placementName.includes(C.ADMIX_OBJ_PREFIX)
+                                          ) {
+                                                placementToPush.addedPrefix = true;
+                                                placementToPush.placementName =
+                                                      C.ADMIX_OBJ_PREFIX + placementToPush.placementName;
+                                          }
+                                          scene.placements.push(placementToPush);
+                                    }
+                              });
+                  });
+            })
+
+            selectedApp.scenes && selectedApp.scenes.forEach(scene => {
                   scene.placements = [];
                   Array.isArray(placements) &&
                         placements.forEach((placement, i) => {
                               if (scene._id === placement.sceneId._id) {
-                                    const placementToPush = _.cloneDeep(placements[i]);
+                                    const placementToPush = cloneDeep(placements[i]);
                                     placementToPush.addedPrefix = false;
 
                                     if (
@@ -455,14 +493,21 @@ const actionsMap = {
                   })
             );
       },
-      [SET_PLACEMENTS_BY_APP]: (state, data) => {
-            const placementsByApp = data.data.data;
+      [SET_PLACEMENTS_BY_ID]: (state, data) => {
+            let placementsByAppId = state.get("placementsByAppId");
+            const placements = Array.isArray(data.data.data) ? [...data.data.data] : [];
+            let newPcsById = placements.length > 0 ? cloneDeep(placementsByAppId) : {};
+
+            placements && placements.forEach(placement => {
+                  newPcsById[placement._id] = cloneDeep(placement);
+                  delete newPcsById[placement._id]._id;
+            });
 
             const asyncLoading = false;
             return state.merge(
                   Map({
                         asyncLoading,
-                        placementsByApp
+                        placementsByAppId: newPcsById
                   })
             );
       },
@@ -471,7 +516,7 @@ const actionsMap = {
             toSaveInputs
       }) => {
             let savedInputs = state.get("savedInputs");
-            const newInput = _.cloneDeep(toSaveInputs);
+            const newInput = cloneDeep(toSaveInputs);
             savedInputs = !!savedInputs ? savedInputs : [];
 
             // Slice out the savedInput if it was already saved
@@ -554,9 +599,8 @@ const actionsMap = {
             const asyncLoading = false;
             const reportData = {};
 
-            console.log('data.data.data: ', data.data.data);
             data.data.data.forEach(elem => {
-                  const elemClone = _.cloneDeep(elem);
+                  const elemClone = cloneDeep(elem);
                   const {
                         date,
                         keys: {
@@ -566,10 +610,9 @@ const actionsMap = {
                   delete elemClone.date;
                   delete elemClone.keys.appid;
 
-                  const reportDate = date.split("T")[0];
+                  let reportDate = date.split("T")[0];
+                  reportDate = reportDate.split("-")[1] + "/" + reportDate.split("-")[2] + "/" + reportDate.split("-")[0];
 
-                  // before adding sub-attributes, the parent atrribute must exist, it won't create whilst creating the child
-                  // obj.a.b = value will only work if obj.a already exists
                   if (reportData[reportDate]) {
                         if (reportData[reportDate][appid]) {
                               reportData[reportDate][appid] = [

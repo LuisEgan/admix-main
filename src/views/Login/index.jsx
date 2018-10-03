@@ -127,12 +127,16 @@ class Login extends Component {
    }
 
    enableRegisterBtn() {
-      const {
-         reduxForm: {
-            loginForm: { syncErrors, values }
-         }
-      } = this.props;
+      const { reduxForm } = this.props;
       const { policy, consent } = this.state;
+
+      let syncErrors = {};
+      let values = {};
+
+      if (reduxForm && reduxForm.loginForm) {
+         syncErrors = reduxForm.loginForm.syncErrors;
+         values = reduxForm.loginForm.values;
+      }
       const { nameReg, emailReg, passReg1, passReg2 } = values;
 
       if (nameReg && emailReg && passReg1 && passReg2) {

@@ -6,8 +6,7 @@ import {
    setUserImgURL,
    forgotPass,
    updateUser,
-   changeEmail,
-   logout
+   changeEmail
 } from "../../actions";
 import PropTypes from "prop-types";
 import Dropzone from "react-dropzone";
@@ -35,14 +34,10 @@ import SVG_payment from "../../assets/svg/payments-configuration.svg";
 import CSS from "../../utils/InLineCSS";
 
 import CustomInput from "../../components/Input";
-import STR from "../../utils/strFuncs";
 
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
 import faAngleUp from "@fortawesome/fontawesome-free-solid/faAngleUp";
-import faUser from "@fortawesome/fontawesome-free-solid/faUser";
-import faEye from "@fortawesome/fontawesome-free-solid/faEye";
-import faMoneyCheckAlt from "@fortawesome/fontawesome-free-solid/faMoneyCheckAlt";
 import faUniversity from "@fortawesome/fontawesome-free-solid/faUniversity";
 
 import BankDetails from "./BankDetails";
@@ -160,6 +155,8 @@ class Profile extends Component {
 
             update.payment.details.bankDetails = paymentDetail;
             update.payment.details.region = payment.region;
+         } else {
+            update.payment.paypalEmail = values.paypalEmail;
          }
       }
 
@@ -276,6 +273,9 @@ class Profile extends Component {
          input.value = initialValues.password;
          disabled = true;
          type = "password";
+      } else if (input.name === "paypalEmail") {
+         input.value = initialValues.paypalEmail;
+         label = "Paypal email";
       }
 
       return (
@@ -293,8 +293,11 @@ class Profile extends Component {
    }
 
    render() {
-      const { initialValues, asyncLoading, userData } = this.props;
-      const { passInputType, clicked, isWarningVisible, payment } = this.state;
+      const { asyncLoading, userData } = this.props;
+      const { clicked, payment } = this.state;
+
+      const paypalEmailStyle =
+         payment.option !== "bank" ? { display: "block" } : { display: "none" };
 
       const payBanksStyle =
          payment.option === "bank" ? { display: "block" } : { display: "none" };
@@ -364,7 +367,7 @@ class Profile extends Component {
                                     src={SVG_personalInfo}
                                     className="sectionIcon"
                                  />
-                                 <span>Personal Information</span>
+                                 <span>Personal information</span>
                               </div>
                            </ExpansionPanelSummary>
                            <ExpansionPanelDetails>
@@ -464,7 +467,7 @@ class Profile extends Component {
                                     src={SVG_payment}
                                     className="sectionIcon"
                                  />
-                                 <span>Payments Configuration</span>
+                                 <span>Payments configuration</span>
                               </div>
                            </ExpansionPanelSummary>
                            <ExpansionPanelDetails>
@@ -508,6 +511,13 @@ class Profile extends Component {
                                        />
                                     </RadioGroup>
                                  </FormControl>
+
+                                 <div style={paypalEmailStyle}>
+                                    <Field
+                                       name="paypalEmail"
+                                       component={this.renderField}
+                                    />
+                                 </div>
 
                                  <div
                                     id="profile-pay-banks"
@@ -590,6 +600,7 @@ const mapStateToProps = state => {
    const userData = state.app.get("userData");
    const {
       payment: {
+         paypalEmail,
          details: { bankDetails, region }
       }
    } = userData;
@@ -600,6 +611,7 @@ const mapStateToProps = state => {
       userName: userData.name,
       email: userData.email.value,
       password: "Click -> to change it!",
+      paypalEmail: paypalEmail || "",
       initialPaymentRegion
    };
 

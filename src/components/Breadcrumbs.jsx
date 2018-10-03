@@ -2,7 +2,6 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import ReactSVG from "react-svg";
 import caret from "../assets/svg/caret-down.svg";
-import SVG from "./SVG";
 
 class Breadcrumbs extends React.Component {
    render() {

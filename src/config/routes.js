@@ -13,7 +13,7 @@ import Download from "../views/Download";
 import ForgotPass from "../views/ForgotPass";
 import EmailSuccess from "../views/EmailVerification/emailSuccess";
 import EmailFailure from "../views/EmailVerification/emailFailure";
-import NotFound from "../views/NotFound";
+// import NotFound from "../views/NotFound";
 import ChangeEmail from "../views/ChangeEmail";
 
 const publicPath = "/";

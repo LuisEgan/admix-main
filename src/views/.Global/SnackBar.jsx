@@ -61,7 +61,7 @@ class SnackBar extends Component {
             }}
             message={
                <span id="message-id">
-                  {smiley} {asyncData ? asyncData.mssg : ""}
+                  {smiley} {asyncData ? asyncData.mssg[0].msg || asyncData.mssg : ""}
                </span>
             }
             action={

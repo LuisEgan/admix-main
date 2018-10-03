@@ -18,7 +18,8 @@ const middleware = isProduction
 const config = {
    transforms: [immutableTransform()],
    key: "root",
-   storage
+   storage,
+//    whitelist: ["app"]
 };
 
 const reducer = combineReducers(rootReducer);

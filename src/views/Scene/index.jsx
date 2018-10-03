@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { routeCodes } from "../../config/routes";
-import _ from "lodash";
+import { cloneDeep, isEqual } from "lodash";
 import { saveInputs } from "../../actions/";
 import C from "../../utils/constants";
 import STR from "../../utils/strFuncs";
@@ -18,9 +18,6 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import { KeyboardArrowDown } from "@material-ui/icons";
 
-// import Panels from "./Panels";
-// import Progress from "react-progressbar";
-
 import monkey from "../../assets/img/See_No_Evil_Monkey_Emoji.png";
 import monkeyArrow from "../../assets/img/monkeyArrow.png";
 import exportObj from "../../assets/img/exportOBJ.png";
@@ -31,20 +28,6 @@ import SVG from "../../components/SVG";
 import dbCategories from "./Panels/categories.json";
 import dbSubCategories from "./Panels/subCategories.json";
 
-// let TrackballControls;
-// let PointerLockControls;
-// let mtl;
-
-// @connect(state => ({
-//   asyncData: state.app.get("asyncData"),
-//   asyncError: state.app.get("asyncError"),
-//   asyncLoading: state.app.get("asyncLoading"),
-//   userData: state.app.get("userData"),
-//   selectedApp: state.app.get("selectedApp"),
-//   savedApps: state.app.get("savedApps"),
-//   savedInputs: state.app.get("savedInputs"),
-//   isLoad_webgl: state.app.get("load_webgl")
-// }))
 class Scene extends Component {
    static propTypes = {
       asyncData: PropTypes.object,
@@ -225,6 +208,7 @@ class Scene extends Component {
 
          return {
             initialSet: !emptyPlacements,
+            selectedApp,
             selectedScene,
             placementsByName,
             subCatsDropdownByPlacementId,
@@ -233,6 +217,12 @@ class Scene extends Component {
             activeByPlacementId
          };
       }
+
+      if (!isEqual(selectedApp, prevSate.selectedApp)) {
+            console.log("UPDATE SA");
+         return { selectedApp: { ...selectedApp } };
+      }
+
       return null;
    }
 
@@ -409,16 +399,13 @@ class Scene extends Component {
    }
 
    onObjectClick(e) {
-      console.log("e: ", e);
       const { THREE } = window;
       e.stopImmediatePropagation();
       const { isMouseOnPanel } = this.state;
 
       // Check if mouse is on one of the side panels and avoid clicking on an object if so
-      console.log("isMouseOnPanel: ", isMouseOnPanel);
       if (!isMouseOnPanel) {
          const intersects = this.checkIntersection();
-         console.log("intersects: ", intersects);
 
          if (intersects.length > 0 && !!intersects[0].object.material.color) {
             const intersected = intersects[0].object;
@@ -447,7 +434,7 @@ class Scene extends Component {
                savedInputs.some(input => {
                   if (input.placementName === intersected.name) {
                      //    clickedPlacement = JSON.parse(JSON.stringify(input));
-                     clickedPlacement = _.cloneDeep(input);
+                     clickedPlacement = cloneDeep(input);
                      isSaved = true;
                      return true;
                   }
@@ -460,7 +447,7 @@ class Scene extends Component {
                      // This should be placement.placementName === intersected.name
                      // With === not !== ; otherwise is for test
                      if (placement.placementName === intersected.name) {
-                        clickedPlacement = _.cloneDeep(placement);
+                        clickedPlacement = cloneDeep(placement);
                         return true;
                      }
                      return false;
@@ -932,7 +919,7 @@ class Scene extends Component {
    changeActive({ placementId, save }) {
       const { activeByPlacementId } = this.state;
 
-      const newActives = _.cloneDeep(activeByPlacementId);
+      const newActives = cloneDeep(activeByPlacementId);
       newActives[placementId] = !activeByPlacementId[placementId];
 
       this.setState({ activeByPlacementId: newActives }, () => {
@@ -1037,7 +1024,8 @@ class Scene extends Component {
    }
 
    renderRawDataTable() {
-      const { asyncLoading, savedInputs, selectedApp } = this.props;
+      const { asyncLoading, savedInputs } = this.props;
+      const { selectedApp } = this.state;
       const {
          selectedScene,
          noPlacementsDataMssg,
@@ -1256,6 +1244,13 @@ class Scene extends Component {
          );
       };
 
+      let lastUpdatedApp = selectedApp.updatedAt
+         ? STR.formatDate(new Date(selectedApp.updatedAt))
+         : "";
+      let lastUpdatedScene = selectedScene.updatedAt
+         ? STR.formatDate(new Date(selectedScene.updatedAt))
+         : "";
+
       return (
          <div className="rawDataTable-cont">
             <Breadcrumbs breadcrumbs={breadcrumbs} />
@@ -1321,6 +1316,11 @@ class Scene extends Component {
             </div>
             <br />
             <span className="mb">
+               Last update - App: {lastUpdatedApp} - Scene: {lastUpdatedScene}
+            </span>
+            <br />
+            <br />
+            <span className="mb">
                Tip: for a better user experience, check the 'Export OBJ' option
                in the Unity plugin{" "}
                <span role="img" aria-label="wink">
@@ -1364,7 +1364,6 @@ class Scene extends Component {
    render() {
       const {
          asyncLoading,
-         selectedApp,
          savedApps,
          dispatch,
          accessToken,
@@ -1372,6 +1371,7 @@ class Scene extends Component {
       } = this.props;
 
       let {
+         selectedApp,
          loadingProgress,
          selectedScene,
          isSceneLoading,
@@ -1401,6 +1401,7 @@ class Scene extends Component {
             onKeyDown={this.handleKeyDown}
             onKeyUp={this.handleKeyUp}
             tabIndex="0"
+            className="mb"
          >
             <MenuPanel
                // functions
@@ -1483,23 +1484,3 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps)(Scene);
-
-// {
-//    <Panels
-//                ref={i => (this.Panels = i)}
-//                onSave={this.onSave}
-//                loadScene={this.loadScene}
-//                selectScene={this.selectScene}
-//                mouseOnPanel={this.mouseOnPanel}
-//                setDisplayMode={this.setDisplayMode}
-//                rawDataChangeActive={this.changeActive}
-//                updateClickedPlacement={this.updateClickedPlacement}
-//                rawDataChangeDropdownValue={this.changeDropdownValue}
-//                sceneLoadingError={sceneLoadingError}
-//                isSceneLoading={isSceneLoading}
-//                selectedScene={selectedScene}
-//                clickedPlacement={clickedPlacement}
-//                sceneMounted={sceneMounted}
-//                displayMode={displayMode}
-//             />
-// }

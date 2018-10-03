@@ -13,7 +13,9 @@ import {
    resetSavedInputs,
    resetSelectedApp,
    setUserImgURL,
-   setAppsFilterBy
+   setAppsFilterBy,
+   getPlacementsByAppId,
+   logout
 } from "../../actions";
 import C from "../../utils/constants";
 import STR from "../../utils/strFuncs";
@@ -54,6 +56,7 @@ class MyApps extends Component {
          userUsedFilter: false
       };
 
+      this.forceLogout = this.forceLogout.bind(this);
       this.showContent = this.showContent.bind(this);
       this.selectApp = this.selectApp.bind(this);
       this.getReportData = this.getReportData.bind(this);
@@ -109,6 +112,11 @@ class MyApps extends Component {
 
       const allAppsIds = apps.map(app => app._id);
       return { allAppsIds, activeApps };
+   }
+
+   forceLogout() {
+      const { dispatch } = this.props;
+      dispatch(logout());
    }
 
    showContent() {
@@ -178,18 +186,22 @@ class MyApps extends Component {
    }
 
    getReportData({ appsIds, userId }) {
-      const {
-         dispatch,
-         accessToken,
-         location: { search },
-         userData
-      } = this.props;
+      const { dispatch, accessToken, userData } = this.props;
 
-      const isAdmin = search === "?iamanadmin";
+      // to assing scenes to the apps for the scenes names for the graphs
+      let c = 0;
+      let appId;
+
+      do {
+         appId = Array.isArray(appsIds) ? appsIds[c] : appsIds;
+         //    dispatch(selectApp(appId, accessToken));
+         console.log('appId: ', appId);
+         dispatch(getPlacementsByAppId(appId, accessToken));
+         c++;
+      } while (Array.isArray(appsIds) && c < appsIds.length);
 
       dispatch(
          getReportData({
-            isAdmin,
             appsIds,
             accessToken,
             publisherId: userId || userData._id
@@ -487,13 +499,12 @@ class MyApps extends Component {
                appState = "Off";
                break;
             case "pending":
-               appState = "Need Info";
+               appState = "Sandbox";
                break;
             default:
                appState = "Live";
          }
 
-         console.log("app.appEngine: ", app.appEngine);
          const appEngineLogo = app.appEngine
             ? C.LOGOS[app.appEngine]
             : C.LOGOS.Admix;
@@ -597,7 +608,21 @@ class MyApps extends Component {
    }
 
    render() {
-      const { location, apps, adminToken, asyncLoading, userData } = this.props;
+      const {
+         location,
+         apps,
+         adminToken,
+         asyncLoading,
+         userData,
+         logoutCount
+      } = this.props;
+
+      // replace with cookie
+      if (!logoutCount) {
+         this.forceLogout();
+         return null;
+      }
+
       const {
          showContent,
          appSelected,
@@ -672,7 +697,8 @@ const mapStateToProps = state => ({
    accessToken: state.app.get("accessToken"),
    adminToken: state.app.get("adminToken"),
    asyncLoading: state.app.get("asyncLoading"),
-   userData: state.app.get("userData")
+   userData: state.app.get("userData"),
+   logoutCount: state.app.get("logoutCount")
 });
 
 export default connect(mapStateToProps)(MyApps);

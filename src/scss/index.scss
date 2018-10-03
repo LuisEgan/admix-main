@@ -637,6 +637,7 @@ p {
                         div {
                               @extend .st;
                               text-align: left;
+                              padding: 0;
                         }
                   }
 
@@ -659,6 +660,10 @@ p {
                                     }
                               }
                         }
+                  }
+
+                  .rt-th {
+                        padding: 2%;
                   }
 
                   .rt-td {
@@ -933,8 +938,8 @@ $inputsFontSize: calc(0.45em+0.3vw);
                   width: 25%;
 
                   img {
-                        width: 4vw;
-                        height: 4vw;
+                        width: 3vw;
+                        height: 3vw;
                         border-radius: 100%;
                         max-width: 50px;
                         max-height: 50px;
@@ -1095,7 +1100,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
       padding: 2% $sidesPadding calc(2% + 64px);
 
       .step-title {
-            margin: 64px 0 40px 0;
+            margin: 35px 0 40px 0;
       }
 }
 
@@ -1287,8 +1292,8 @@ $inputsFontSize: calc(0.45em+0.3vw);
                         width: 10vw;
                         height: 10vw;
                         border-radius: 100%;
-                        max-width: 100px;
-                        max-height: 100px;
+                        max-width: 120px;
+                        max-height: 120px;
                         // padding: 10%;
                         box-shadow: 0 3px 4px 0 rgba(10, 31, 68, 0.1);
                         margin: auto
@@ -1412,12 +1417,16 @@ $inputsFontSize: calc(0.45em+0.3vw);
       margin-top: 1%;
 
       canvas {
-            padding: 4%;
-            padding-top: 0;
+            // padding: 4%;
       }
 
       .graph-title {
-            padding: 2% 4.5%;
+            padding: 2% 7%;
+      }
+
+      .graph-title-cont {
+            display: flex;
+            align-items: center
       }
 }
 
@@ -1791,7 +1800,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
       height: 100%;
       background-color: #fff;
       width: 20%;
-      box-shadow: 0 3px 4px 0 rgba(10, 31, 68, 0.1);  
+      box-shadow: 0 3px 4px 0 rgba(10, 31, 68, 0.1);
 }
 
 #webgl {
@@ -1910,10 +1919,15 @@ $inputsFontSize: calc(0.45em+0.3vw);
                                     }
 
                                     &:last-child {
-                                          border-top-right-radius: 5px;
-                                          border-bottom-right-radius: 5px;
+                                          border-top-right-radius: 10px;
+                                          border-bottom-right-radius: 10px;
                                     }
                               }
+                        }
+
+                        #sceneLoadErrorMssg {
+                              color: #53627C;
+                              margin: 5px 0;
                         }
                   }
             }
@@ -2663,6 +2677,26 @@ $inputsFontSize: calc(0.45em+0.3vw);
 
                   .graph {
                         min-height: 200px;
+                        margin-bottom: 5vh;
+
+                        .graph-title-cont {
+                              >div {
+                                    &:first-child {
+                                          width: 35%;
+                                          padding-right: 0;
+                                    }
+
+                                    &:last-child {
+                                          min-width: 20%;
+
+                                          >div {
+                                                &:last-child {
+                                                      width: 100%;
+                                                }
+                                          }
+                                    }
+                              }
+                        }
                   }
             }
 
@@ -2774,13 +2808,20 @@ $inputsFontSize: calc(0.45em+0.3vw);
             box-shadow: 0 3px 4px 0 rgba(10, 31, 68, 0.1);
 
             svg {
+                  padding: 10px;
                   bottom: -20px;
             }
 
-            .dropzone {
-                  height: 30vh;
-                  max-height: 250px;
+            .image-drop {
+                  width: 100%;
+
+                  .dropzone {
+                        width: 100%;
+                        height: 30vh;
+                        max-height: 250px;
+                  }
             }
+
       }
 
       .password-eye {
@@ -2912,12 +2953,82 @@ $inputsFontSize: calc(0.45em+0.3vw);
       }
 
       >form {
-            min-height: 90vh;
+            // min-height: 90vh;
 
             >div {
                   background-color: transparent;
                   padding-top: 3vh;
                   margin-top: 0;
+
+                  &:last-child {
+                        padding-top: 32px;
+                        width: 100%;
+                        position: relative;
+
+                        h5 {
+                              text-align: left; // padding: 4vh 0 0vh;
+                        }
+
+                        .expansionPanelDetails-container {
+                              width: 100%;
+                              text-align: left;
+                              margin-top: 15px;
+
+                              >div {
+                                    position: relative;
+                                    width: 100%;
+                                    display: flex;
+                                    margin-top: 15px;
+                              }
+
+                              >span {
+                                    margin: 5px 0;
+                              }
+
+                              .input {
+                                    input {
+                                          width: 100%;
+                                    }
+
+
+                                    >div {
+                                          width: 100%;
+                                    }
+                              }
+
+                              .input-icon {
+                                    svg {
+                                          margin-top: 5px;
+                                    }
+                              }
+
+                              .input-delete {
+                                    position: absolute;
+                                    right: 40px;
+                                    width: 0;
+                                    top: 40%;
+
+                                    &:hover {
+                                          cursor: pointer;
+                                    }
+                              }
+                        }
+
+                        .mui-expansionPanel-root {
+                              border-radius: 10px;
+
+                              >div {
+                                    &:first-child {
+                                          border-bottom: solid #ededed;
+                                    }
+                              }
+
+                              .sectionIcon {
+                                    margin-right: 2vw;
+                                    max-width: 2vw;
+                              }
+                        }
+                  }
             }
 
             #info-header {
@@ -2946,76 +3057,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
 
             .breadcrumbs {
                   padding-bottom: 22px;
-            }
-
-            .container {
-                  padding-top: 32px;
-                  width: 100%;
-                  position: relative;
-
-                  h5 {
-                        text-align: left; // padding: 4vh 0 0vh;
-                  }
-
-                  .expansionPanelDetails-container {
-                        width: 100%;
-                        text-align: left;
-                        margin-top: 15px;
-
-                        >div {
-                              position: relative;
-                              width: 100%;
-                              display: flex;
-                              margin-top: 15px;
-                        }
-
-                        >span {
-                              margin: 5px 0;
-                        }
-
-                        .input {
-                              input {
-                                    width: 100%;
-                              }
-
-
-                              >div {
-                                    width: 100%;
-                              }
-                        }
-
-                        .input-icon {
-                              svg {
-                                    margin-top: 5px;
-                              }
-                        }
-
-                        .input-delete {
-                              position: absolute;
-                              right: 40px;
-                              width: 0;
-                              top: 40%;
-
-                              &:hover {
-                                    cursor: pointer;
-                              }
-                        }
-                  }
-
-                  .mui-expansionPanel-root {
-                        border-radius: 10px;
-
-                        >div {
-                              &:first-child {
-                                    border-bottom: solid #ededed;
-                              }
-                        }
-
-                        .sectionIcon {
-                              margin-right: 2vw;
-                              max-width: 2vw;
-                        }
-                  }
             }
       }
 }

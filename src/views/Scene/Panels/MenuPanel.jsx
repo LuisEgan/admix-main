@@ -168,22 +168,24 @@ export default class MenuPanel extends Component {
             return false;
          });
 
-         // Get scene's placements
-         dispatch(getPlacements(_id, scene._id, accessToken));
+         if (scene) {
+            // Get scene's placements
+            dispatch(getPlacements(_id, scene._id, accessToken));
 
-         // Hide Menu panel
-         // this.toggleSlide();
+            // Hide Menu panel
+            // this.toggleSlide();
 
-         // Change dropdown scene display
-         this.setState({ selectedScene: sceneName });
+            // Change dropdown scene display
+            this.setState({ selectedScene: sceneName });
 
-         // Set Scene (parent parent component /Scene index) selectedScene state
-         selectScene(scene);
+            // Set Scene (parent parent component /Scene index) selectedScene state
+            selectScene(scene);
 
-         // Load webgl
-         setTimeout(() => {
-            loadScene();
-         }, 1500);
+            // Load webgl
+            setTimeout(() => {
+               loadScene();
+            }, 1500);
+         }
       }
    }
 
@@ -348,7 +350,7 @@ export default class MenuPanel extends Component {
                      />
                   </RadioGroup>
                   {sceneLoadingError && (
-                     <div id="sceneLoadErrorMssg" className="mb">
+                     <div id="sceneLoadErrorMssg" className="mbs">
                         Tick Export OBJ to enable 3D view.
                      </div>
                   )}
@@ -409,8 +411,8 @@ export default class MenuPanel extends Component {
          appState === C.APP_STATES.pending ||
          appState === C.APP_STATES.inactive ||
          !isActive
-            ? "Your app isn’t generating revenue yet"
-            : "Your app is starting to generate revenue";
+            ? (<span>Your app isn’t generating <br/> revenue yet</span>)
+            : (<span>Your app is starting to <br/> generate revenue</span>);
 
       let footerActiveMssg =
          appState !== undefined
@@ -456,7 +458,7 @@ export default class MenuPanel extends Component {
 
                {footerActiveMssg !== C.APP_STATES.pending && (
                   <NavLink exact to={routeCodes.MYAPPS} className="white-btn">
-                     Back to dashboard
+                     Back to my apps
                   </NavLink>
                )}
             </div>

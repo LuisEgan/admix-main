@@ -16,8 +16,8 @@ export default class Congratulations extends Component {
                        <div><span className="sst">Admix for Unity</span></div>
                        <div>
                            <a
-                           className="btn btn-dark"
-                           href="https://admix.in/wp-content/uploads/2018/08/Admix_Unity.rar"
+                           className="btn-dark mb"
+                           href="https://admix.in/wp-content/uploads/2018/09/Admix.Unity_Rev1.4_Release.zip"
                            target="_blank"
                            rel="noopener noreferrer"
                            >
@@ -27,7 +27,7 @@ export default class Congratulations extends Component {
                    <div id="download-ue">
                        <div>{SVG.logoUnreal}</div>
                        <div><span className="sst">Admix for Unreal</span></div>
-                       <div><a>Download</a></div>
+                       <div><a className="mb">Download</a></div>
                    </div>
                    <div id="download-help">
                        <div><span className="st">Need help?</span></div>
@@ -46,9 +46,9 @@ export default class Congratulations extends Component {
                <div className="mb download-bottom-section">
                    <div>
                        <span className="subtitle">VERSION</span>
-                       <span>Admix.Unity_Rev1.3-Release_videoFix</span>
+                       <span>Admix.Unity_Rev1.4_Release</span>
                        <span className="subtitle">SIZE</span>
-                       <span>8MB</span>
+                       <span>4MB</span>
                        <span className="subtitle">REQUIREMENTS</span>
                        <span>Unity 2017.f.1.10 and above</span>
                    </div>
