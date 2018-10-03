@@ -81,10 +81,14 @@ const actionsMap = {
       },
 
       [SNACKBAR_TOGGLE]: state => {
-            const isSnackBarOpen = state.get("isSnackBarOpen");
+            let isSnackBarOpen = state.get("isSnackBarOpen");
+            const isLoggedIn = state.get("isLoggedIn");
+
+            isSnackBarOpen = isLoggedIn ? !isSnackBarOpen : false;
+
             return state.merge(
                   Map({
-                        isSnackBarOpen: !isSnackBarOpen
+                        isSnackBarOpen
                   })
             );
       },
@@ -117,6 +121,8 @@ const actionsMap = {
             );
       },
       [ACTION_ERROR]: (state, action) => {
+            const isLoggedIn = state.get("isLoggedIn");
+
             const {
                   message,
                   statusMessage,
@@ -129,7 +135,7 @@ const actionsMap = {
             const asyncData = {
                   mssg: asyncError || "Oops.. Something went wrong"
             };
-            const isSnackBarOpen = true;
+            const isSnackBarOpen = isLoggedIn;
 
             const asyncLoading = false;
             return state.merge(
@@ -271,7 +277,8 @@ const actionsMap = {
             const newState = {
                   isLoggedIn,
                   accessToken: data.loginToken,
-                  asyncLoading
+                  asyncLoading,
+                  asyncData: null
             };
 
             if (data.adminToken) {
