@@ -595,7 +595,11 @@ class Report extends Component {
                selectedAppsLength: Object.keys(selectedApps).length
             },
             () => {
-               getNewPcs && dispatch(getPlacementsByAppId(appId, accessToken));
+               if (getNewPcs) {
+                  for (let appId in userApps) {
+                     dispatch(getPlacementsByAppId(appId, accessToken));
+                  }
+               }
             }
          );
       }

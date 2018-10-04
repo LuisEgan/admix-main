@@ -21,9 +21,6 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { KeyboardArrowDown } from "@material-ui/icons";
 
-import FontAwesomeIcon from "@fortawesome/react-fontawesome";
-import faMousePointer from "@fortawesome/fontawesome-free-solid/faMousePointer";
-
 import SVG from "../../../components/SVG";
 import ToggleButton from "../../../components/ToggleButton";
 
@@ -359,49 +356,7 @@ export default class MenuPanel extends Component {
          </div>
       );
    }
-
-   renderControls() {
-      const { sceneMounted, displayMode } = this.props;
-      let renderDisplayModeToggle;
-      let fadeIn;
-      if (sceneMounted && displayMode === "3D") {
-         renderDisplayModeToggle = { opacity: 1 };
-         fadeIn = "fadeIn";
-      } else {
-         renderDisplayModeToggle = { opacity: 0 };
-         fadeIn = "";
-      }
-
-      return (
-         <div
-            id="scene-controls"
-            className={`${fadeIn}`}
-            style={renderDisplayModeToggle}
-         >
-            <div className="cc">
-               <span className="mb">Controls</span>
-            </div>
-            <div>
-               <div className="mb">
-                  <div>{SVG.MouseScroll}</div>
-                  <div>
-                     <FontAwesomeIcon icon={faMousePointer} />
-                  </div>
-                  <div>{SVG.RighClick}</div>
-                  {/* <div>
-                     <img src={controlsE} alt="E" />
-                  </div> */}
-               </div>
-               <div className="mb">
-                  <div>Dolly</div>
-                  <div>Orbit</div>
-                  <div>Pan</div>
-                  {/* <div>Down</div> */}
-               </div>
-            </div>
-         </div>
-      );
-   }
+  
 
    renderMenuFooter() {
       const { selectedApp } = this.props;
@@ -497,8 +452,6 @@ export default class MenuPanel extends Component {
             {this.renderScenesSelect()}
 
             {this.renderDisplayModeToggle()}
-
-            {this.renderControls()}
 
             {this.renderMenuFooter()}
          </div>

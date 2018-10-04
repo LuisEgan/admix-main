@@ -501,6 +501,23 @@ p {
       animation: rotate-x-180 1s forwards;
 }
 
+@keyframes scale-down-left {
+      0% {
+            transform: scale(1);
+            transform-origin: 0% 50%;
+      }
+
+      100% {
+            transform: scale(0);
+            transform-origin: 0% 50%;
+      }
+}
+
+.scale-down-left {
+      animation: scale-down-left 0.8s ease-in-out both;
+}
+
+
 // ----------------------------------------------------------------------------------------------------------
 // MATERIAL UI ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------------
@@ -1809,14 +1826,94 @@ $inputsFontSize: calc(0.45em+0.3vw);
       overflow: hidden;
       position: relative;
 
+      #scene-controls {
+            display: flex;
+            flex-flow: column;
+            z-index: 1;
+            position: absolute;
+            height: 70px;
+            width: 300px;
+            left: 0;
+            right: 0;
+            margin: auto;
+            bottom: 5%;
+            padding: 0;
+            background: rgba(217, 217, 217, .3);
+            justify-content: space-evenly;
+            border-radius: 10px;
+
+            div {
+                  display: flex;
+            }
+
+            svg {
+                  height: 33px;
+                  width: 40px;
+                  max-width: 50px;
+                  max-height: 50px;
+                  color: #9a9a9a;
+                  fill: #9a9a9a;
+                  padding: 1vh 0;
+            }
+
+            >div {
+                  flex-flow: column;
+
+                  &:first-child() {
+                        position: absolute;
+                        right: -5%;
+                        top: -20%;
+
+                        &:hover {
+                              cursor: pointer;
+                        }
+                  }
+
+                  &:nth-child(3) {
+                        flex-flow: column;
+
+                        >div {
+                              justify-content: space-between;
+
+                              >div {
+                                    @extend .cc;
+                                    width: 25%;
+                                    padding: 0 2%;
+                                    font-size: 0.7em;
+                                    font-weight: bold;
+                              }
+                        }
+                  }
+
+            }
+      }
+
+      #toggle-controls-on {
+            position: absolute;
+            bottom: 5vh;
+            left: 20vw;
+            z-index: 1;
+
+            &:hover {
+                  cursor: pointer;
+            }
+
+            svg {
+                  width: 50px;
+                  height: 50px;
+                  color: #9a9a9a;
+                  fill: #9a9a9a;
+                  padding: 1vh 0;
+            }
+      }
+
       #scene-menu-panel {
-            justify-content: space-between;
 
             >div {
                   display: flex;
 
                   &:not(:first-child) {
-                        padding: 3% 0;
+                        padding: 5% 0;
                   }
 
                   >div {
@@ -1932,49 +2029,12 @@ $inputsFontSize: calc(0.45em+0.3vw);
                   }
             }
 
-            #scene-controls {
-                  padding: 7%;
-                  display: flex;
-                  flex-flow: column;
 
-                  div {
-                        display: flex;
-                  }
-
-                  svg {
-                        height: 40px;
-                        width: 40px;
-                        max-width: 50px;
-                        max-height: 50px;
-                        color: #9a9a9a;
-                        fill: #9a9a9a;
-                        padding: 1vh 0;
-                  }
-
-                  >div {
-                        flex-flow: column;
-
-                        &:nth-child(2) {
-                              flex-flow: column;
-
-                              >div {
-                                    justify-content: space-between;
-
-                                    >div {
-                                          @extend .cc;
-                                          width: 25%;
-                                          padding: 0 2%;
-                                          font-size: 0.7em;
-                                          font-weight: bold;
-                                    }
-                              }
-                        }
-                  }
-            }
 
             #menu-panel-footer {
                   color: #53627c;
-                  align-self: flex-end;
+                  position: absolute;
+                  bottom: 0;
                   width: 100%;
                   flex-flow: column;
                   align-items: center;

@@ -274,7 +274,6 @@ class Profile extends Component {
          disabled = true;
          type = "password";
       } else if (input.name === "paypalEmail") {
-         input.value = initialValues.paypalEmail;
          label = "Paypal email";
       }
 

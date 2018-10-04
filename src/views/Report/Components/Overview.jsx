@@ -79,8 +79,11 @@ export default class Overview extends Component {
                selectedApps,
                attr: "impressionUnique"
             }),
-            RPM: Overview.calcSumOf({ selectedApps, attr: "RPM" }),
-            fillRate: Overview.calcSumOf({ selectedApps, attr: "fillRate" })
+            RPM: Overview.calcAvgSumOfApps({ selectedApps, attr: "RPM" }),
+            fillRate: Overview.calcAvgSumOfApps({
+               selectedApps,
+               attr: "fillRate"
+            })
          };
          return { selectedApps: cloneDeep(selectedApps), overviewData };
       }
@@ -96,6 +99,22 @@ export default class Overview extends Component {
             sum = selectedApps[appId].reportData[attr] + sum;
          }
       }
+
+      return Number.isInteger(sum) ? Math.round(sum) : +sum.toFixed(2);
+   }
+
+   static calcAvgSumOfApps({ selectedApps, attr }) {
+      let sum = 0;
+      let appsCounter = 0;
+
+      for (let appId in selectedApps) {
+         appsCounter++;
+         if (selectedApps[appId].reportData[attr]) {
+            sum = selectedApps[appId].reportData[attr] + sum;
+         }
+      }
+
+      sum = appsCounter ? sum / appsCounter : sum;
 
       return Number.isInteger(sum) ? Math.round(sum) : +sum.toFixed(2);
    }

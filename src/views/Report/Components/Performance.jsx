@@ -15,7 +15,7 @@ import { KeyboardArrowDown } from "@material-ui/icons";
 
 import { colors } from "../../../utils/colorsArr";
 
-import { Bar } from "react-chartjs-2";
+import BarGraph from "../../../components/BarGraph";
 
 const generateColor = () => {
    //    return "#" + (((1 << 24) * Math.random()) | 0).toString(16);
@@ -151,7 +151,7 @@ export default class Performance extends Component {
          let pcData;
 
          for (let placementId in placementsByAppId) {
-            pcData = {...placementsByAppId[placementId]};
+            pcData = { ...placementsByAppId[placementId] };
 
             scenesById[pcData.sceneId._id] = cloneDeep(pcData.sceneId);
 
@@ -243,8 +243,10 @@ export default class Performance extends Component {
       };
 
       let reportDataByKey, byItemValue, reportKey;
+      let appsCounter = 0;
 
       for (let appId in selectedApps) {
+         appsCounter++;
          for (let i = 0; i < reportKeys.length; i++) {
             reportKey = reportKeys[i];
             reportDataByKey = selectedApps[appId].reportData[reportKey];
@@ -266,7 +268,9 @@ export default class Performance extends Component {
       }
 
       let valueToPush, bgColor, pcLabel;
-      const virginLabels = [];
+      const appsVirginLabels = [];
+      const scenesVirginLabels = [];
+      const pcsVirginLabels = [];
 
       for (let byId in totals) {
          for (let id in totals[byId]) {
@@ -289,15 +293,17 @@ export default class Performance extends Component {
             switch (dataToShow) {
                case "RPM":
                   valueToPush = (
-                     (totals[byId][id].revenue / totals[byId][id].impression) *
-                     1000
+                     ((totals[byId][id].revenue / totals[byId][id].impression) *
+                        1000) /
+                     appsCounter
                   ).toFixed(2);
                   break;
                case "fillRate":
                   valueToPush = (
-                     (totals[byId][id].impression /
+                     ((totals[byId][id].impression /
                         totals[byId][id].bidRequest) *
-                     100
+                        100) /
+                     appsCounter
                   ).toFixed(2);
                   break;
                default:
@@ -306,10 +312,11 @@ export default class Performance extends Component {
             switch (byId) {
                case "bySceneId":
                   scenesData.push(valueToPush);
-                  if(scenesById[id]) {
-                        scenesLabels.push(scenesById[id].name);
+                  if (scenesById[id]) {
+                     scenesLabels.push(scenesById[id].name);
+                     scenesVirginLabels.push(scenesById[id].name);
                   } else {
-                        scenesLabels.push("loading..");
+                     scenesLabels.push("loading..");
                   }
                   scenesBgColors.push(bgColor);
                   break;
@@ -317,7 +324,8 @@ export default class Performance extends Component {
                case "byPlacementId":
                   if (
                      placementsByAppId[id] &&
-                     selectedScenes.indexOf(placementsByAppId[id].sceneName) > -1
+                     selectedScenes.indexOf(placementsByAppId[id].sceneName) >
+                        -1
                   ) {
                      pcsData.push(valueToPush);
                      pcsBgColors.push(bgColor);
@@ -325,7 +333,7 @@ export default class Performance extends Component {
                      pcLabel = STR.withoutPrefix(
                         placementsByAppId[id].placementName
                      );
-                     virginLabels.push(pcLabel);
+                     pcsVirginLabels.push(pcLabel);
 
                      pcLabel =
                         pcLabel.split("_-_")[0] +
@@ -346,9 +354,11 @@ export default class Performance extends Component {
             {
                data: scenesData,
                backgroundColor: scenesBgColors,
-               hoverBackgroundColor: scenesBgColors
+               hoverBackgroundColor: scenesBgColors,
+               label: "Scenes"
             }
-         ]
+         ],
+         virginLabels: scenesVirginLabels
       };
 
       const pcsGraphData = {
@@ -357,16 +367,18 @@ export default class Performance extends Component {
             {
                data: pcsData,
                backgroundColor: pcsBgColors,
-               hoverBackgroundColor: pcsBgColors
+               hoverBackgroundColor: pcsBgColors,
+               label: "Placements"
             }
          ],
-         virginLabels
+         virginLabels: pcsVirginLabels
       };
 
       // APPS --------------
 
       for (let appId in selectedApps) {
          appsLabels.push(selectedApps[appId].name);
+         appsVirginLabels.push(selectedApps[appId].name);
          appsData.push(selectedApps[appId].reportData[dataToShow]);
 
          if (bgColorsById[appId]) {
@@ -385,9 +397,11 @@ export default class Performance extends Component {
             {
                data: appsData,
                backgroundColor: appsBgColors,
-               hoverBackgroundColor: appsBgColors
+               hoverBackgroundColor: appsBgColors,
+               label: "Apps"
             }
-         ]
+         ],
+         virginLabels: appsVirginLabels
       };
 
       this.setState({
@@ -399,7 +413,7 @@ export default class Performance extends Component {
       });
    }
 
-   renderGraph(graphData, GraphTitleComponent) {
+   renderGraph(graphData, graphTitle) {
       let { dataToShow } = this.state;
 
       this.graphOptions.scales.yAxes[0].scaleLabel.labelString =
@@ -421,16 +435,17 @@ export default class Performance extends Component {
          default:
       }
 
+      const options = { ...this.graphOptions };
       return (
-         <div className="graph">
-            {GraphTitleComponent}
-            <Bar
-               data={graphData}
-               options={this.graphOptions}
-               width={100}
-               height={50}
-            />
-         </div>
+         <BarGraph
+            data={graphData}
+            graphTitle={graphTitle}
+            graphProps={{
+               width: 100,
+               height: 50,
+               options
+            }}
+         />
       );
    }
 
@@ -515,8 +530,8 @@ export default class Performance extends Component {
             </div>
 
             <div id="performance-graphs">
-               {this.renderGraph(scenesGraphData, scenesComp)}
                {this.renderGraph(appsGraphData, appsComp)}
+               {this.renderGraph(scenesGraphData, scenesComp)}
                {this.renderGraph(pcsGraphData, pcsComp)}
             </div>
          </div>

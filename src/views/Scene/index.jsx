@@ -18,6 +18,11 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import { KeyboardArrowDown } from "@material-ui/icons";
 
+import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import faMousePointer from "@fortawesome/fontawesome-free-solid/faMousePointer";
+import faMinusSquare from "@fortawesome/fontawesome-free-solid/faMinusSquare";
+import faGamepad from "@fortawesome/fontawesome-free-solid/faGamepad";
+
 import monkey from "../../assets/img/See_No_Evil_Monkey_Emoji.png";
 import monkeyArrow from "../../assets/img/monkeyArrow.png";
 import exportObj from "../../assets/img/exportOBJ.png";
@@ -45,6 +50,7 @@ class Scene extends Component {
       super(props);
 
       this.state = {
+         showControls: true,
          displayMode: "raw",
          initialSet: false,
          TJSsetup: false,
@@ -104,6 +110,9 @@ class Scene extends Component {
       this.enableTrackBallControls = this.enableTrackBallControls.bind(this);
       this.handleKeyDown = this.handleKeyDown.bind(this);
       this.handleKeyUp = this.handleKeyUp.bind(this);
+      this.handleKeyUp = this.handleKeyUp.bind(this);
+      this.renderControls = this.renderControls.bind(this);
+      this.toggleControlStatus = this.toggleControlStatus.bind(this);
 
       // FOR CHILDREN --------------
       this.mouseOnPanel = this.mouseOnPanel.bind(this);
@@ -591,6 +600,12 @@ class Scene extends Component {
       }
    }
 
+   toggleControlStatus() {
+      let { showControls } = this.state;
+      showControls = !showControls;
+      this.setState({ showControls });
+   }
+
    // FOR CHILDREN ---------------------------------------------
 
    mouseOnPanel() {
@@ -1005,6 +1020,63 @@ class Scene extends Component {
    }
 
    // RENDER ---------------------------------------------
+
+   renderControls() {
+      const { sceneMounted, displayMode, showControls } = this.state;
+
+      let style;
+      let className;
+      if (sceneMounted && displayMode === "3D") {
+         style = { opacity: 1 };
+         className = "className";
+      } else {
+         style = { opacity: 0 };
+         className = "";
+      }
+
+      if (!showControls) {
+         className = "scale-down-left";
+      }
+
+      return (
+         <div>
+            <div id="scene-controls" className={`${className}`} style={style}>
+               <div onClick={this.toggleControlStatus}>
+                  <FontAwesomeIcon icon={faMinusSquare} />
+               </div>
+
+               <div className="cc">
+                  <span className="mb">Controls</span>
+               </div>
+               <div>
+                  <div className="mb">
+                     <div>{SVG.MouseScroll}</div>
+                     <div>
+                        <FontAwesomeIcon icon={faMousePointer} />
+                     </div>
+                     <div>{SVG.RighClick}</div>
+                  </div>
+                  <div className="mb">
+                     <div>Dolly</div>
+                     <div>Orbit</div>
+                     <div>Pan</div>
+                     {/* <div>Down</div> */}
+                  </div>
+               </div>
+            </div>
+
+            {!showControls &&
+               displayMode === "3D" && (
+                  <div
+                     id="toggle-controls-on"
+                     onClick={this.toggleControlStatus}
+                  >
+                     <FontAwesomeIcon icon={faGamepad} />
+                  </div>
+               )}
+         </div>
+      );
+   }
 
    renderNothingToSee() {
       return (
@@ -1439,6 +1511,8 @@ class Scene extends Component {
             {renderNothingToSee && this.renderNothingToSee()}
 
             {renderRawDataTable && this.renderRawDataTable()}
+
+            {sceneMounted && this.renderControls()}
 
             <div
                id="scene-webglMount"
