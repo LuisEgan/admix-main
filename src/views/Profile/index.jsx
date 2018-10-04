@@ -422,7 +422,7 @@ class Profile extends Component {
                                              {asyncLoading &&
                                              clicked === "email"
                                                 ? " ...Loading"
-                                                : " Change."}
+                                                : " Update email"}
                                           </a>
                                           {/* <span style={warningStyle}>
                                              &nbsp;Warning! Your account will
@@ -444,7 +444,7 @@ class Profile extends Component {
                                              {asyncLoading &&
                                              clicked === "password"
                                                 ? " ...Loading"
-                                                : " Change."}
+                                                : " Send a \"reset password\" email"}
                                           </a>
                                        </span>
                                     </div>
