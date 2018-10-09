@@ -1269,7 +1269,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
             border-radius: 100%;
             color: white;
             background: #14B9BE;
-            margin: auto;
+            margin: 0 auto;
             bottom: -20px;
 
             &:hover {
@@ -1313,7 +1313,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
                         max-height: 120px;
                         // padding: 10%;
                         box-shadow: 0 3px 4px 0 rgba(10, 31, 68, 0.1);
-                        margin: auto
+                        margin: auto 0;
                   }
 
                   .loadingSVG {
