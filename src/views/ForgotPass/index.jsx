@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import _a from "../../utils/analytics";
 import { connect } from "react-redux";
 import { Field, reduxForm, reset } from "redux-form";
 import { NavLink } from "react-router-dom";
@@ -9,7 +10,8 @@ import Input from "../../components/Input";
 import STR from "../../utils/strFuncs";
 import admixLogo from "../../assets/img/logo.png";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
-import faEye from "@fortawesome/fontawesome-free-solid/faEye";
+
+const { ga } = _a;
 
 class ForgotPass extends Component {
    constructor(props) {
@@ -28,7 +30,7 @@ class ForgotPass extends Component {
    }
 
    componentDidMount() {
-         const { dispatch } = this.props;
+      const { dispatch } = this.props;
       dispatch(resetAsync());
       dispatch(reset("forgotPassForm"));
    }
@@ -53,17 +55,19 @@ class ForgotPass extends Component {
    }
 
    handleChangePass(values) {
+      _a.track(ga.actions.account.passwordChange, {
+         category: ga.categories.account
+      });
+
       let {
          dispatch,
          location: { search }
       } = this.props;
       const { passReg1 } = values;
+      const urlParams = new URLSearchParams(search);
 
-      search = search.split("?")[1];
-      const token = search
-         .split("token=")[1]
-         .slice(0, search.indexOf("&uid") - 6);
-      const userId = search.split("uid=")[1];
+      const token = urlParams.get("token");
+      const userId = urlParams.get("uid");
 
       dispatch(setNewPass({ token, userId, newPass: passReg1 }));
    }
@@ -71,16 +75,14 @@ class ForgotPass extends Component {
    // ERROS HANDLING ---------------------------------------------------------
 
    enableRegisterBtn() {
-      const {
-         reduxForm
-      } = this.props;
-      
-      if(reduxForm.forgotPassForm) {
-            const { syncErrors, values } = reduxForm.forgotPassForm;
-            const { passReg1, passReg2 } = values;
-            if (passReg1 && passReg2) {
-               return !syncErrors;
-            }
+      const { reduxForm } = this.props;
+
+      if (reduxForm.forgotPassForm) {
+         const { syncErrors, values } = reduxForm.forgotPassForm;
+         const { passReg1, passReg2 } = values;
+         if (passReg1 && passReg2) {
+            return !syncErrors;
+         }
       }
 
       return false;
@@ -91,7 +93,7 @@ class ForgotPass extends Component {
    eye() {
       return (
          <FontAwesomeIcon
-            icon={faEye}
+            icon="eye"
             onMouseEnter={this.togglePassInputType}
             onMouseLeave={this.togglePassInputType}
             className="password-eye"
@@ -203,9 +205,20 @@ class ForgotPass extends Component {
    }
 
    render() {
-      const { asyncData, asyncError, asyncLoading, handleSubmit } = this.props;
-
+      const {
+         asyncData,
+         asyncError,
+         asyncLoading,
+         handleSubmit,
+         location: { search }
+      } = this.props;
       const { passInputType } = this.state;
+
+      const urlParams = new URLSearchParams(search);
+      const timestamp = urlParams.get("t");
+      const ONE_HOUR = 60 * 60 * 1000; /* ms */
+      const moreThanHourChecker = new Date().getTime();
+      const isTokeValid = moreThanHourChecker - timestamp <= ONE_HOUR;
 
       const registerBtnEnabled = this.enableRegisterBtn();
       const registerBtnStyle = registerBtnEnabled ? {} : { opacity: 0.5 };
@@ -253,22 +266,30 @@ class ForgotPass extends Component {
                                  Loading...
                               </span>
                            )}
-                           <button
-                              type="submit"
-                              className={`gradient-btn ${registerBtnClass}`}
-                              style={registerBtnStyle}
-                              disabled={!registerBtnEnabled}
-                           >
-                              Set new password
-                           </button>
+
+                           {isTokeValid && (
+                              <button
+                                 type="submit"
+                                 className={`gradient-btn ${registerBtnClass}`}
+                                 style={registerBtnStyle}
+                                 disabled={!registerBtnEnabled}
+                              >
+                                 Set new password
+                              </button>
+                           )}
+
+                           {!isTokeValid && (
+                              <span className="asyncMssg asyncData">
+                                 Password reset link has been outdated. Please
+                                 request a new one
+                              </span>
+                           )}
                         </div>
                      </div>
 
                      <div>
                         <div>
-                           <NavLink to="/login">
-                              Login
-                           </NavLink>
+                           <NavLink to="/login">Login</NavLink>
                         </div>
                      </div>
                   </form>

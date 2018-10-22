@@ -36,19 +36,27 @@ const withoutPrefix = str => {
 
 const getFirstUpper = str => {
     for (let i = 0; i < str.length; i++) {
-       if (str.charAt(i) === str.charAt(i).toUpperCase()) {
-          return i;
-       }
+        if (str.charAt(i) === str.charAt(i).toUpperCase()) {
+            return i;
+        }
     }
     return -1;
- };
+};
 
- const numberWithCommas = x => {
+const numberWithCommas = x => {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
- };
+};
 
- const formatDate = date => {
-     return `${date.getDate()} / ${date.getMonth()+1} / ${date.getFullYear()}`
+const formatDate = date => {
+    return `${date.getDate()} / ${date.getMonth()+1} / ${date.getFullYear()}`
+}
+
+const parsePathName = path => {
+    return capitalizeFirstLetter(path.split("/")[1]);
+}
+
+const appStateToNumber = appState => {
+    return appState === "inactive" ? 0 : appState === "live" ? 1 : 2;
  }
 
 export default {
@@ -61,5 +69,7 @@ export default {
     withoutPrefix,
     getFirstUpper,
     numberWithCommas,
-    formatDate
+    formatDate,
+    parsePathName,
+    appStateToNumber
 };

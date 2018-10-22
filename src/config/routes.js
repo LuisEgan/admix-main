@@ -1,5 +1,6 @@
 import React from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
+import routeCodes from "./routeCodes";
 
 import Login from "../views/Login";
 import MyApps from "../views/MyApps";
@@ -15,24 +16,6 @@ import EmailSuccess from "../views/EmailVerification/emailSuccess";
 import EmailFailure from "../views/EmailVerification/emailFailure";
 // import NotFound from "../views/NotFound";
 import ChangeEmail from "../views/ChangeEmail";
-
-const publicPath = "/";
-
-export const routeCodes = {
-   LOGIN: `${publicPath}login`,
-   MYAPPS: `${publicPath}myapps`,
-   INFO: `${publicPath}info`,
-   SCENE: `${publicPath}scene`,
-   VALIDATION: `${publicPath}validation`,
-   CONGRATULATIONS: `${publicPath}congratulations`,
-   REPORT: `${publicPath}report`,
-   PROFILE: `${publicPath}profile`,
-   DOWNLOAD: `${publicPath}download`,
-   FORGOT_PASS: `${publicPath}forgotPass`,
-   CHANGE_EMAIL: `${publicPath}changeEmail`,
-   EMAIL_SUCCESS: `${publicPath}emailSuccess`,
-   EMAIL_FAILURE: `${publicPath}emailFailure`
-};
 
 const PrivateRoute = ({ component: Component, isLoggedIn, ...rest }) => (
    <Route
@@ -92,7 +75,7 @@ export default props => {
          />
          {/* <PrivateRoute
             exact
-            path={publicPath}
+            path={routeCodes.publicPath}
             component={MyApps}
             isLoggedIn={isLoggedIn}
          /> */}

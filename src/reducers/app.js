@@ -39,7 +39,8 @@ import {
       USER_IMG_UPLOAD,
       SET_USER_IMG_URL,
       SNACKBAR_TOGGLE,
-      SET_APPS_FILTER_BY
+      SET_APPS_FILTER_BY,
+      SET_LOADED_SCENE
 } from "../actions";
 
 const initialStateValues = {
@@ -64,6 +65,7 @@ const initialStateValues = {
       initialReportAppId: [],
       userImgURL: "",
       appsFilterBy: [],
+      loadedScenesByAppId: null
 }
 
 export const initialState = Map({ ...initialStateValues
@@ -291,7 +293,7 @@ const actionsMap = {
 
             return state.merge(Map({
                   ...initialStateValues,
-                  logoutCount: 1
+                  logoutCount: 2
             }));
       },
       [APPS_SUCCESS]: (state, action) => {
@@ -678,6 +680,19 @@ const actionsMap = {
                   Map({
                         asyncLoading,
                         userImgURL
+                  })
+            );
+      },
+
+      [SET_LOADED_SCENE]: (state, data) => {
+            let loadedScenesByAppId = state.get("loadedScenesByAppId") || {};
+
+            loadedScenesByAppId[data.loadedScene.appId] = { ...data.loadedScene
+            };
+
+            return state.merge(
+                  Map({
+                        loadedScenesByAppId
                   })
             );
       }

@@ -1,13 +1,15 @@
 import React, { Component } from "react";
+import _a from "../../../utils/analytics";
 import { NavLink } from "react-router-dom";
 import _ from "lodash";
-import { routeCodes } from "../../../config/routes";
+import routeCodes from "../../../config/routeCodes";
 import PropTypes from "prop-types";
 import {
    getPlacements,
    resetSelectedApp,
    toggleAppStatus,
    updatePlacements
+   //    setLoadedScene
 } from "../../../actions/";
 import C from "../../../utils/constants";
 import CSS from "../../../utils/InLineCSS";
@@ -21,8 +23,11 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { KeyboardArrowDown } from "@material-ui/icons";
 
+import STR from "../../../utils/strFuncs";
 import SVG from "../../../components/SVG";
 import ToggleButton from "../../../components/ToggleButton";
+
+const { ga } = _a;
 
 let oldSavedInputs = {};
 
@@ -144,7 +149,7 @@ export default class MenuPanel extends Component {
    };
 
    sceneChange(e) {
-      const sceneName = e.target.value;
+      const sceneName = e.target ? e.target.value : e;
       let scene;
       const {
          loadScene,
@@ -169,6 +174,9 @@ export default class MenuPanel extends Component {
             // Get scene's placements
             dispatch(getPlacements(_id, scene._id, accessToken));
 
+            // Set loaded scene
+            // dispatch(setLoadedScene(scene));
+
             // Hide Menu panel
             // this.toggleSlide();
 
@@ -187,6 +195,14 @@ export default class MenuPanel extends Component {
    }
 
    displayChange(e) {
+      _a.track(ga.actions.scenes.toggleSceneDisplayMode, {
+         category: ga.categories.scenes,
+         label:
+            e.target.value === "raw"
+               ? ga.labels.toggleSceneDisplayMode.raw
+               : ga.labels.toggleSceneDisplayMode.d3
+      });
+
       const { setDisplayMode, forceCloseFormPanel } = this.props;
       forceCloseFormPanel();
 
@@ -242,6 +258,12 @@ export default class MenuPanel extends Component {
             appState = C.APP_STATES.pending;
          }
       }
+
+      _a.track(ga.actions.apps.toggleAppState, {
+         category: ga.categories.apps,
+         label: ga.labels.toggleAppState.onScene,
+         value: STR.appStateToNumber(appState)
+      });
 
       const appDetails = {
          _id,
@@ -301,8 +323,10 @@ export default class MenuPanel extends Component {
       const isSceneSelected = Object.keys(selectedScene).length > 0;
 
       const class3D = displayMode === "3D" ? "dm-selected" : "dm-not-selected";
+      const style3D = displayMode === "3D" ? {} : { borderLeft: 0 };
       const classRaw =
          displayMode === "raw" ? "dm-selected" : "dm-not-selected";
+      const styleRaw = displayMode === "3D" ? { borderRight: 0 } : {};
 
       const renderDisplayModeToggle = isSceneSelected
          ? { opacity: 1 }
@@ -322,7 +346,7 @@ export default class MenuPanel extends Component {
                   >
                      <FormControlLabel
                         classes={{ root: classRaw }}
-                        style={isSceneSelected ? {} : { cursor: "unset" }}
+                        style={isSceneSelected ? styleRaw : { cursor: "unset" }}
                         value="raw"
                         control={<Radio className="hidden" />}
                         label={
@@ -334,7 +358,7 @@ export default class MenuPanel extends Component {
                      />
                      <FormControlLabel
                         classes={{ root: class3D }}
-                        style={isSceneSelected ? {} : { cursor: "unset" }}
+                        style={isSceneSelected ? style3D : { cursor: "unset" }}
                         value="3D"
                         control={<Radio className="hidden" />}
                         disabled={sceneLoadingError !== ""}
@@ -356,7 +380,6 @@ export default class MenuPanel extends Component {
          </div>
       );
    }
-  
 
    renderMenuFooter() {
       const { selectedApp } = this.props;
@@ -365,9 +388,15 @@ export default class MenuPanel extends Component {
       let footerMssg =
          appState === C.APP_STATES.pending ||
          appState === C.APP_STATES.inactive ||
-         !isActive
-            ? (<span>Your app isn’t generating <br/> revenue yet</span>)
-            : (<span>Your app is starting to <br/> generate revenue</span>);
+         !isActive ? (
+            <span>
+               Your app isn’t generating <br /> revenue yet
+            </span>
+         ) : (
+            <span>
+               Your app is starting to <br /> generate revenue
+            </span>
+         );
 
       let footerActiveMssg =
          appState !== undefined

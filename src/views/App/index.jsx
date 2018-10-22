@@ -1,11 +1,16 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
+import { withLastLocation } from "react-router-last-location";
 import { connect } from "react-redux";
+import { logout } from "../../actions";
 
 import Routes from "../../config/routes";
 import Menu from "../.Global/Menu";
 import SideMenu from "../.Global/SideMenu";
 import Snackbar from "../.Global/SnackBar";
+
+import _a from "../../utils/analytics";
+import STR from "../../utils/strFuncs";
 
 // @withRouter()
 // @connect(state => ({
@@ -18,14 +23,52 @@ class App extends Component {
       this.updateMenuImg = this.updateMenuImg.bind(this);
    }
 
+   componentDidMount() {
+      const {
+         history: {
+            location: { pathname }
+         }
+      } = this.props;
+
+      _a.load();
+
+      const pageName = STR.parsePathName(pathname);
+      _a.page(pageName, {
+         referrer: document.referrer
+      });
+   }
+
    updateMenuImg() {
       this.menu.updateMenuImg();
    }
 
-   render() {
-      const { isLoggedIn, location, history } = this.props;
+   forceLogout() {
+      const { dispatch } = this.props;
+      dispatch(logout());
+   }
 
-      const contentStyle = !isLoggedIn ? {width: "100%"} : {};
+   render() {
+      const {
+         isLoggedIn,
+         location,
+         history,
+         lastLocation,
+         logoutCount
+      } = this.props;
+
+      if (logoutCount !== 2) {
+         this.forceLogout();
+         return null;
+      }
+
+      if (history.action === "PUSH" || history.action === "REPLACE") {
+         const pageName = STR.parsePathName(history.location.pathname);
+         _a.page(pageName, {
+            referrer: lastLocation.pathname
+         });
+      }
+
+      const contentStyle = !isLoggedIn ? { width: "100%" } : {};
 
       return (
          <div className="App">
@@ -52,7 +95,8 @@ class App extends Component {
 }
 
 const mapStateToProps = state => ({
-   isLoggedIn: state.app.get("isLoggedIn")
+   isLoggedIn: state.app.get("isLoggedIn"),
+   logoutCount: state.app.get("logoutCount")
 });
 
-export default withRouter(connect(mapStateToProps)(App));
+export default withLastLocation(withRouter(connect(mapStateToProps)(App)));

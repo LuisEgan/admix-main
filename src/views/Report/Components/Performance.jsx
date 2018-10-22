@@ -1,6 +1,7 @@
 import React, { Component } from "react";
+import _a from "../../../utils/analytics";
 import PropTypes from "prop-types";
-import { routeCodes } from "../../../config/routes";
+import routeCodes from "../../../config/routeCodes";
 import Breadcrumbs from "../../../components/Breadcrumbs";
 import { isEqual, cloneDeep } from "lodash";
 import STR from "../../../utils/strFuncs";
@@ -16,6 +17,8 @@ import { KeyboardArrowDown } from "@material-ui/icons";
 import { colors } from "../../../utils/colorsArr";
 
 import BarGraph from "../../../components/BarGraph";
+
+const { ga } = _a;
 
 const generateColor = () => {
    //    return "#" + (((1 << 24) * Math.random()) | 0).toString(16);
@@ -194,6 +197,11 @@ export default class Performance extends Component {
    // SET DATA ---------------------------------------------
 
    toggleData(dataToShow) {
+      _a.track(ga.actions.report.changePerformanceGraphData, {
+            category: ga.categories.report,
+            label: ga.labels.changePerformanceGraphData[dataToShow]
+      })
+
       this.setState({ dataToShow });
    }
 
@@ -500,7 +508,9 @@ export default class Performance extends Component {
 
       return (
          <div id="performance" className="unselectable mb">
-            <Breadcrumbs breadcrumbs={this.breadcrumbs} />
+            <Breadcrumbs
+               breadcrumbs={this.breadcrumbs}
+            />
             <div className="step-title">
                <span className="st">Performance</span>
                <div id="performance-toggles">

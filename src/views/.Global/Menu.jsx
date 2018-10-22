@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { NavLink, Redirect, Link } from "react-router-dom";
-import { routeCodes } from "../../config/routes";
+import routeCodes from "../../config/routeCodes";
 import PropTypes from "prop-types";
 import { logout, async, fetchUserImgURL } from "../../actions";
 import logoImg20 from "../../assets/img/logo_20.png";
@@ -149,7 +149,7 @@ class Menu extends Component {
                         <a
                            onClick={this.handleLogout}
                            className="mb mui-dropdown-item"
-                           href="/login"
+                        //    href="/login"
                         >
                            Logout
                         </a>

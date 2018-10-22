@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import _a from "../../utils/analytics";
 import PropTypes from "prop-types";
-import { routeCodes } from "../../config/routes";
+import routeCodes from "../../config/routeCodes";
 import { cloneDeep, isEqual } from "lodash";
 import { saveInputs } from "../../actions/";
 import C from "../../utils/constants";
@@ -19,9 +20,6 @@ import Select from "@material-ui/core/Select";
 import { KeyboardArrowDown } from "@material-ui/icons";
 
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
-import faMousePointer from "@fortawesome/fontawesome-free-solid/faMousePointer";
-import faMinusSquare from "@fortawesome/fontawesome-free-solid/faMinusSquare";
-import faGamepad from "@fortawesome/fontawesome-free-solid/faGamepad";
 
 import monkey from "../../assets/img/See_No_Evil_Monkey_Emoji.png";
 import monkeyArrow from "../../assets/img/monkeyArrow.png";
@@ -32,6 +30,8 @@ import SVG from "../../components/SVG";
 
 import dbCategories from "./Panels/categories.json";
 import dbSubCategories from "./Panels/subCategories.json";
+
+const { ga } = _a;
 
 class Scene extends Component {
    static propTypes = {
@@ -50,6 +50,7 @@ class Scene extends Component {
       super(props);
 
       this.state = {
+         appDidUpdate: false,
          showControls: true,
          displayMode: "raw",
          initialSet: false,
@@ -142,6 +143,29 @@ class Scene extends Component {
 
    componentDidMount() {
       // this.Panels = this.Panels.getWrappedInstance();
+      const { selectedApp } = this.props;
+      selectedApp.scenes = selectedApp.scenes || [];
+
+      let scene1Timestamp, scene2Timestamp, closestToToday;
+
+      const sceneToDisplay =
+         selectedApp.scenes.length > 0
+            ? selectedApp.scenes.reduce((scene1, scene2) => {
+                 scene1Timestamp = new Date(
+                    scene1.updatedAt || scene1.createdAt || 0
+                 );
+                 scene2Timestamp = new Date(
+                    scene2.updatedAt || scene2.createdAt || 0
+                 );
+
+                 closestToToday =
+                    scene1Timestamp > scene2Timestamp
+                       ? { ...scene1 }
+                       : { ...scene2 };
+
+                 return closestToToday;
+              }) || selectedApp.scenes[0]
+            : {};
 
       const { THREE } = window;
 
@@ -153,6 +177,11 @@ class Scene extends Component {
       this.selectedObjects = [];
 
       this.intersected = null;
+
+      this.MenuPanel.sceneChange(sceneToDisplay.name || {});
+      // if (loadedScenesByAppId && loadedScenesByAppId[selectedApp._id]) {
+      //    this.MenuPanel.sceneChange(loadedScenesByAppId[selectedApp._id].name);
+      // }
    }
 
    componentWillUnmount() {
@@ -603,6 +632,14 @@ class Scene extends Component {
    toggleControlStatus() {
       let { showControls } = this.state;
       showControls = !showControls;
+
+      _a.track(ga.actions.scenes.toggleControlsView, {
+         category: ga.categories.scenes,
+         label: showControls
+            ? ga.labels.toggleControlsView.show
+            : ga.labels.toggleControlsView.hide
+      });
+
       this.setState({ showControls });
    }
 
@@ -931,20 +968,46 @@ class Scene extends Component {
    // RAW DATA ---------------------------------------------
 
    changeActive({ placementId, save }) {
+      const { displayMode } = this.state;
+      _a.track(ga.actions.placements.togglePlacementState, {
+         category: ga.categories.placements,
+         label:
+            displayMode === "raw"
+               ? ga.labels.togglePlacementState.onRaw
+               : ga.labels.togglePlacementState.on3d
+      });
+
       const { activeByPlacementId } = this.state;
 
       const newActives = cloneDeep(activeByPlacementId);
       newActives[placementId] = !activeByPlacementId[placementId];
 
-      this.setState({ activeByPlacementId: newActives }, () => {
-         if (save) {
-            this.onSave(placementId);
-            this.toggleActiveFormPanel();
+      this.setState(
+         { activeByPlacementId: newActives, appDidUpdate: true },
+         () => {
+            if (save) {
+               this.onSave(placementId);
+               this.toggleActiveFormPanel();
+            }
          }
-      });
+      );
    }
 
    changeDropdownValue({ dropdown, save, placementId, newValue }, e) {
+      const { displayMode } = this.state;
+      const _aAction =
+         dropdown === "category"
+            ? ga.actions.placements.changeCategory
+            : ga.actions.placements.changeSubCategory;
+
+      _a.track(_aAction, {
+         category: ga.categories.placements,
+         label:
+            displayMode === "raw"
+               ? ga.labels[dropdown === "category" ? "changeCategory" : "changeSubCategory"].onRaw
+               : ga.labels[dropdown === "category" ? "changeCategory" : "changeSubCategory"].on3d
+      });
+
       const value = newValue ? newValue : e.target.value;
       let {
          catsSelectedByPlacementId,
@@ -964,7 +1027,8 @@ class Scene extends Component {
          {
             catsSelectedByPlacementId,
             subCatsSelectedByPlacementId,
-            subCatsDropdownByPlacementId
+            subCatsDropdownByPlacementId,
+            appDidUpdate: true
          },
          () => {
             if (save) {
@@ -1042,7 +1106,7 @@ class Scene extends Component {
          <div>
             <div id="scene-controls" className={`${className}`} style={style}>
                <div onClick={this.toggleControlStatus}>
-                  <FontAwesomeIcon icon={faMinusSquare} />
+                  <FontAwesomeIcon icon="minus-square" />
                </div>
 
                <div className="cc">
@@ -1052,7 +1116,7 @@ class Scene extends Component {
                   <div className="mb">
                      <div>{SVG.MouseScroll}</div>
                      <div>
-                        <FontAwesomeIcon icon={faMousePointer} />
+                        <FontAwesomeIcon icon="mouse-pointer" />
                      </div>
                      <div>{SVG.RighClick}</div>
                   </div>
@@ -1071,7 +1135,7 @@ class Scene extends Component {
                      id="toggle-controls-on"
                      onClick={this.toggleControlStatus}
                   >
-                     <FontAwesomeIcon icon={faGamepad} />
+                     <FontAwesomeIcon icon="gamepad" />
                   </div>
                )}
          </div>
@@ -1096,7 +1160,7 @@ class Scene extends Component {
 
    renderRawDataTable() {
       const { asyncLoading, savedInputs } = this.props;
-      const { selectedApp } = this.state;
+      const { selectedApp, appDidUpdate } = this.state;
       const {
          selectedScene,
          noPlacementsDataMssg,
@@ -1264,7 +1328,9 @@ class Scene extends Component {
                subCategory =
                   savedInputsByPlacementId[placement._id].subCategory;
             } else {
-               name = STR.withoutPrefix(placement.placementName);
+               name = placement.placementName
+                  ? STR.withoutPrefix(placement.placementName)
+                  : "";
                format = placement.placementType;
                isActive = null;
                category = null;
@@ -1315,12 +1381,16 @@ class Scene extends Component {
          );
       };
 
-      let lastUpdatedApp = selectedApp.updatedAt
-         ? STR.formatDate(new Date(selectedApp.updatedAt))
-         : "";
-      let lastUpdatedScene = selectedScene.updatedAt
-         ? STR.formatDate(new Date(selectedScene.updatedAt))
-         : "";
+      const actualDate = new Date().toISOString();
+
+      // let lastUpdatedApp = appDidUpdate ? actualDate : selectedApp.updatedAt
+      //    ? new Date(selectedApp.updatedAt).toISOString()
+      //    : "";
+      let lastUpdatedScene = appDidUpdate
+         ? actualDate
+         : selectedScene.updatedAt
+            ? new Date(selectedScene.updatedAt).toISOString()
+            : "";
 
       return (
          <div className="rawDataTable-cont">
@@ -1387,7 +1457,8 @@ class Scene extends Component {
             </div>
             <br />
             <span className="mb">
-               Last update - App: {lastUpdatedApp} - Scene: {lastUpdatedScene}
+               Last scene update : {lastUpdatedScene}
+               {/* Last update - App: {lastUpdatedApp} - Scene: {lastUpdatedScene} */}
             </span>
             <br />
             <br />
@@ -1438,7 +1509,8 @@ class Scene extends Component {
          savedApps,
          dispatch,
          accessToken,
-         savedInputs
+         savedInputs,
+         userData
       } = this.props;
 
       let {
@@ -1461,7 +1533,7 @@ class Scene extends Component {
       // const renderSceneLoadingError =
       //    sceneLoadingError !== "" && displayMode === "3D";
 
-      const renderNothingToSee = Object.keys(selectedScene).length <= 0;
+      // const renderNothingToSee = Object.keys(selectedScene).length <= 0;
 
       const renderRawDataTable =
          Object.keys(selectedScene).length > 0 && displayMode === "raw";
@@ -1475,6 +1547,7 @@ class Scene extends Component {
             className="mb"
          >
             <MenuPanel
+               ref={i => (this.MenuPanel = i)}
                // functions
                onSave={this.onSave}
                loadScene={this.loadScene}
@@ -1487,6 +1560,7 @@ class Scene extends Component {
                rawDataChangeDropdownValue={this.changeDropdownValue}
                // props
                asyncLoading={asyncLoading}
+               userData={userData}
                isSceneLoading={isSceneLoading}
                sceneLoadingError={sceneLoadingError}
                dispatch={dispatch}
@@ -1508,7 +1582,7 @@ class Scene extends Component {
 
             {/* {renderSceneLoadingError && this.renderSceneLoadingError()} */}
 
-            {renderNothingToSee && this.renderNothingToSee()}
+            {/* {renderNothingToSee && this.renderNothingToSee()} */}
 
             {renderRawDataTable && this.renderRawDataTable()}
 
@@ -1553,6 +1627,7 @@ const mapStateToProps = state => ({
    selectedApp: state.app.get("selectedApp"),
    savedApps: state.app.get("savedApps"),
    savedInputs: state.app.get("savedInputs"),
+   loadedScenesByAppId: state.app.get("loadedScenesByAppId"),
    isLoad_webgl: state.app.get("load_webgl")
 });
 

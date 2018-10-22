@@ -1,4 +1,5 @@
 import api from "../api";
+import _a from "../utils/analytics";
 
 export const ACTION = "ACTION";
 
@@ -41,6 +42,7 @@ export const REGISTER_REQUEST = "USERS_REGISTER_REQUEST",
       USER_IMG_UPLOAD = "USER_IMG_UPLOAD",
       SNACKBAR_TOGGLE = "SNACKBAR_TOGGLE",
       SET_APPS_FILTER_BY = "SET_APPS_FILTER_BY",
+      SET_LOADED_SCENE = "SET_LOADED_SCENE",
       PERSIST_REHYDRATE = "persist/REHYDRATE";
 
 // Test action
@@ -82,6 +84,7 @@ export const resetAsync = () => ({
 });
 
 const doLogin = data => {
+
       if (data.status) {
             return {
                   type: LOGIN_SUCCESS,
@@ -306,6 +309,11 @@ export const setAppsFilterBy = data => {
       };
 }
 
+export const setLoadedScene = loadedScene => ({
+      type: SET_LOADED_SCENE,
+      loadedScene
+})
+
 // FETCH =============================================
 
 export function async () {
@@ -326,12 +334,38 @@ export function login(email, password) {
                   username: email,
                   password: password
             };
+
+            let loginData;
             api
                   .login(data)
                   .then(data => {
-                        dispatch(doLogin(data))
+                        loginData = data;
+                        return api.getUserData(loginData.data.loginToken)
                   })
-                  .catch(error => dispatch(asyncError(error)));
+                  .then(data => {
+                        const userData = data.data;
+                        const userId = userData._id;
+
+                        if (userId && window.analytics) {
+                              const traits = {
+                                    name: userData.name,
+                                    email: userData.email.value,
+                                    companyName: userData.companyName
+                              }
+                              _a.identify(userId, traits, {}, () => {
+                                    _a.track(_a.events.account.loggedIn);
+                              });
+                              dispatch(doLogin(loginData));
+                        } else {
+                              window.analytics && _a.track(_a.events.account.failedLogin);
+                              dispatch(doLogin(loginData));
+                        }
+                  })
+                  .catch(error => {
+                        console.log('error: ', error);
+
+                        return dispatch(asyncError(error))
+                  });
       };
 }
 
@@ -345,7 +379,14 @@ export function signup(name, email, password) {
             };
             api
                   .signup(data)
-                  .then(data => dispatch(doSignup(data)))
+                  .then(data => {
+                        if (data.status) {
+                              _a.track(_a.events.account.created);
+                        } else {
+                              _a.track(_a.events.account.createdFailed);
+                        }
+                        return dispatch(doSignup(data))
+                  })
                   .catch(error => dispatch(asyncError(error)));
       };
 }
@@ -538,12 +579,16 @@ export const selectApp = (appId, accessToken) => dispatch => {
             .catch(error => dispatch(asyncError(error)));
 };
 
-export const updateApp = ({appData, accessToken, adminToken}) => dispatch => {
+export const updateApp = ({
+      appData,
+      accessToken,
+      adminToken
+}) => dispatch => {
       dispatch(asyncStart());
 
       api
             .updateApp(accessToken, appData)
-            .then( () => {
+            .then(() => {
                   return adminToken ? api.getAppsAdmin(accessToken, adminToken) : api.getApps(accessToken);
             })
             .then(res => {

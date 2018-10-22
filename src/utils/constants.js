@@ -1,9 +1,12 @@
 import React from "react";
+import ReactSVG from "react-svg";
+
 import Unity from "../assets/img/unity-logo_20.png";
 import Unreal from "../assets/img/Unreal-Engine-Logo_60x60.png";
 import HiFi from "../assets/svg/hifi.svg";
 import Desktop from "../assets/img/unity-logo_20.png";
 import admix from "../assets/img/isologo.png";
+import sbvrSVG from "../assets/svg/SBVR.svg";
 
 // import Android from "../assets/img/android.png";
 // import WindowsEditor from "../assets/img/Thinking_Face_Emoji.png";
@@ -29,10 +32,21 @@ const APP_ENGINES_IMGS = {
 }
 
 const LOGOS = {
-    Admix: (<img src={admix} alt="admix"/>),
+    Admix: ( < img src = {
+            admix
+        }
+        alt = "admix" / > ),
+    SBVR: ( < ReactSVG src = {
+            sbvrSVG
+        }
+        className = "logo-SVBR" /
+        > ),
     Unity: SVG.logoUnity,
     Unreal: SVG.logoUnreal,
-    "High Fidelity": (<img src={HiFi} alt="hifi"/>),
+    "High Fidelity": ( < img src = {
+            HiFi
+        }
+        alt = "hifi" / > ),
     Paypal: SVG.logoPaypal,
 }
 

@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Redirect, NavLink } from "react-router-dom";
-import { routeCodes } from "../../config/routes";
+import routeCodes from "../../config/routeCodes";
+import _a from "../../utils/analytics";
 import PropTypes from "prop-types";
 import {
    getApps,
@@ -30,6 +31,8 @@ import Input from "../../components/Input";
 import SVG from "../../components/SVG";
 import CSS from "../../utils/InLineCSS";
 
+const { ga } = _a;
+
 class MyApps extends Component {
    static propTypes = {
       apps: PropTypes.array,
@@ -56,7 +59,6 @@ class MyApps extends Component {
          userUsedFilter: false
       };
 
-      this.forceLogout = this.forceLogout.bind(this);
       this.showContent = this.showContent.bind(this);
       this.selectApp = this.selectApp.bind(this);
       this.getReportData = this.getReportData.bind(this);
@@ -67,7 +69,6 @@ class MyApps extends Component {
       this.renderNoApps = this.renderNoApps.bind(this);
 
       //filter
-      this.toggleFilter = this.toggleFilter.bind(this);
       this.addFilter = this.addFilter.bind(this);
       this.deleteFilter = this.deleteFilter.bind(this);
       this.setFilter = this.setFilter.bind(this);
@@ -112,12 +113,7 @@ class MyApps extends Component {
 
       const allAppsIds = apps.map(app => app._id);
       return { allAppsIds, activeApps };
-   }
-
-   forceLogout() {
-      const { dispatch } = this.props;
-      dispatch(logout());
-   }
+   }   
 
    showContent() {
       const { asyncLoading, userData } = this.props;
@@ -128,6 +124,10 @@ class MyApps extends Component {
             this.showContent();
          }
       }, 500);
+   }
+
+   appStateToNumber(appState) {
+      return appState === "inactive" ? 0 : appState === "live" ? 1 : 2;
    }
 
    handleOnSwitch(app, e) {
@@ -141,6 +141,12 @@ class MyApps extends Component {
             appState = C.APP_STATES.pending;
          }
       }
+
+      _a.track(ga.actions.apps.toggleAppState, {
+         category: ga.categories.apps,
+         label: ga.labels.toggleAppState.onMyapps,
+         value: STR.appStateToNumber(appState)
+      });
 
       const appDetails = {
          _id,
@@ -186,6 +192,14 @@ class MyApps extends Component {
    }
 
    getReportData({ appsIds, userId }) {
+      const isGlobal = Array.isArray(appsIds) ? "G" : "";
+      _a.track(
+         ga.actions.navigationLinks[isGlobal ? "toGlobalReport" : "toReport"],
+         {
+            category: ga.categories.navigationLinks
+         }
+      );
+
       const { dispatch, accessToken, userData } = this.props;
 
       // to assing scenes to the apps for the scenes names for the graphs
@@ -209,18 +223,20 @@ class MyApps extends Component {
 
       dispatch(setInitialReportApp(appsIds));
       // dispatch(getApps({accessToken}));
-      this.setState({ appSelected: true, redirect: "REPORT" });
+      this.setState({ appSelected: true, redirect: routeCodes.REPORT });
    }
 
    // FILTER ----------------------------------------------
 
-   toggleFilter() {
-      const { showFilter } = this.state;
+   addFilter(button) {
+      const _aAction =
+         button === "main"
+            ? ga.actions.apps.openFilter
+            : ga.actions.apps.addFilter;
+      _a.track(_aAction, {
+         category: ga.categories.apps
+      });
 
-      this.setState({ showFilter: !showFilter });
-   }
-
-   addFilter() {
       const { filterBy } = this.state;
 
       const newFilter = {
@@ -240,6 +256,10 @@ class MyApps extends Component {
    }
 
    deleteFilter(i) {
+      _a.track(ga.actions.apps.deleteFilter, {
+         category: ga.categories.apps
+      });
+
       const { accessToken, adminToken, dispatch } = this.props;
       const { filterBy } = this.state;
       filterBy.splice(i, 1);
@@ -457,7 +477,10 @@ class MyApps extends Component {
                   })}
                   <div>
                      <div>
-                        <button onClick={this.addFilter} className="SVGbtn">
+                        <button
+                           onClick={this.addFilter.bind(null, "plus")}
+                           className="SVGbtn"
+                        >
                            {SVG.plus}
                         </button>
                         <button
@@ -535,7 +558,7 @@ class MyApps extends Component {
                         <button
                            onClick={this.selectApp.bind(null, {
                               appId: _id,
-                              redirect: "SCENE"
+                              redirect: routeCodes.SCENE
                            })}
                         >
                            {SVG.setup}
@@ -543,7 +566,7 @@ class MyApps extends Component {
                         <button
                            onClick={this.selectApp.bind(null, {
                               appId: _id,
-                              redirect: "INFO"
+                              redirect: routeCodes.INFO
                            })}
                         >
                            {SVG.info}
@@ -588,7 +611,15 @@ class MyApps extends Component {
                      <br />
                      Don't have the plugin?
                   </h2>
-                  <NavLink to="/download" className="btn btn-dark">
+                  <NavLink
+                     to="/download"
+                     className="btn btn-dark"
+                     onClick={() => {
+                        _a.track(ga.actions.navigationLinks.toDownloadNoApps, {
+                           category: ga.categories.navigationLinks
+                        });
+                     }}
+                  >
                      Download Admix plugin
                   </NavLink>
                </React.Fragment>
@@ -607,20 +638,7 @@ class MyApps extends Component {
    }
 
    render() {
-      const {
-         location,
-         apps,
-         adminToken,
-         asyncLoading,
-         userData,
-         logoutCount
-      } = this.props;
-
-      // replace with cookie
-      if (!logoutCount) {
-         this.forceLogout();
-         return null;
-      }
+      const { location, apps, adminToken, asyncLoading, userData } = this.props;
 
       const {
          showContent,
@@ -635,7 +653,7 @@ class MyApps extends Component {
          return (
             <Redirect
                to={{
-                  pathname: routeCodes[redirect],
+                  pathname: redirect,
                   state: { from: location }
                }}
                push
@@ -656,7 +674,7 @@ class MyApps extends Component {
                <button
                   id="filter"
                   className="mb unselectable white-btn"
-                  onClick={this.addFilter}
+                  onClick={this.addFilter.bind(null, "main")}
                >
                   {SVG.filter} &nbsp;
                   <span>Filter selection</span>

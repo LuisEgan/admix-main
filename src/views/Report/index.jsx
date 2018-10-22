@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import _a from "../../utils/analytics";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { isEmpty, cloneDeep, isEqual } from "lodash";
@@ -21,6 +22,8 @@ import Performance from "./Components/Performance";
 import Analytics from "./Components/Analytics";
 
 import WebGLScene from "../WebGLScene";
+
+const { ga } = _a;
 
 const addDays = function(date, days) {
    var dat = new Date(date);
@@ -76,6 +79,7 @@ class Report extends Component {
          from: new Date(),
          to: new Date(),
          initialDateSetup: false,
+         quickFilterFirstClick: true,
          quickFilter: "l",
          doLoadScene: false,
          isSceneLoaded: false,
@@ -377,6 +381,15 @@ class Report extends Component {
    };
 
    changeDate({ newFrom, newTo, quickFilter }, DayPickerInputDate) {
+      const { quickFilterFirstClick } = this.state;
+
+      if (!quickFilterFirstClick) {
+         _a.track(ga.actions.report.changeReportDate, {
+            category: ga.categories.report,
+            label: ga.labels.changeReportDate[quickFilter ? quickFilter : "c"]
+         });
+      }
+
       const { reportData } = this.props;
       let { from, to, selectedApps } = this.state;
 
@@ -407,6 +420,8 @@ class Report extends Component {
       if (!quickFilter) {
          newState.quickFilter = null;
       }
+
+      newState.quickFilterFirstClick = false;
 
       this.setState(newState);
    }
@@ -490,6 +505,14 @@ class Report extends Component {
 
    changeView(view) {
       const { show } = this.state;
+
+      if (show !== view) {
+         _a.track(ga.actions.report.changeReportDisplay, {
+            category: ga.categories.report,
+            label: ga.labels.changeReportDisplay[view]
+         });
+      }
+
       if (view !== "pe" && show === "pe") {
          // this.webGL.unmountWebGL();
       } else if (view === "pe" && show !== "pe") {
@@ -546,9 +569,22 @@ class Report extends Component {
    }
 
    changeAppSelection(appId, e) {
-      const { accessToken, dispatch, reportData } = this.props;
       let { userApps, selectedApps, allAppsSelected, from, to } = this.state;
+      const { accessToken, dispatch, reportData } = this.props;
       appId = e.target.value || appId;
+
+      const _aAction =
+         appId === "all"
+            ? allAppsSelected
+               ? ga.actions.report.unselectAllApps
+               : ga.actions.report.selectAllApps
+            : selectedApps[appId]
+               ? ga.actions.report.unselectApp
+               : ga.actions.report.selectApp;
+
+      _a.track(_aAction, {
+         category: ga.categories.report
+      });
 
       let getNewPcs = false;
 

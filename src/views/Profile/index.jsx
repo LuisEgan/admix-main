@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import _a from "../../utils/analytics";
 import { Field, reduxForm, reset, change } from "redux-form";
 import {
    imgUpload,
@@ -36,9 +37,6 @@ import CSS from "../../utils/InLineCSS";
 import CustomInput from "../../components/Input";
 
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
-import faEdit from "@fortawesome/fontawesome-free-solid/faEdit";
-import faAngleUp from "@fortawesome/fontawesome-free-solid/faAngleUp";
-import faUniversity from "@fortawesome/fontawesome-free-solid/faUniversity";
 
 import BankDetails from "./BankDetails";
 
@@ -50,6 +48,8 @@ import {
 import defaultImg from "../../assets/img/default_pic.jpg";
 import paypal from "../../assets/img/paypal.png";
 import SVG from "../../components/SVG";
+
+const { ga } = _a;
 
 class Profile extends Component {
    static propTypes = {
@@ -68,6 +68,7 @@ class Profile extends Component {
          uploadedFile: "",
          passInputType: "password",
          clicked: "",
+         changePassClicked: false,
          isWarningVisible: false,
          payment: {
             option: payment.option ? payment.option : "",
@@ -102,6 +103,10 @@ class Profile extends Component {
    }
 
    handleSubmit = e => {
+      _a.track(ga.actions.account.accountUpdate, {
+         category: ga.categories.account
+      });
+
       e.preventDefault();
       const {
          reduxForm: {
@@ -164,6 +169,10 @@ class Profile extends Component {
    };
 
    onImageDrop(files) {
+      _a.track(ga.actions.account.imageChange, {
+         category: ga.categories.account
+      });
+
       const { userData } = this.props;
 
       this.setState({
@@ -213,8 +222,21 @@ class Profile extends Component {
    }
 
    handleUserUpdate(input) {
+      const _aAction =
+         input === "password"
+            ? ga.actions.account.passwordChangeRequest
+            : ga.actions.account.emailChangeRequest;
+      _a.track(_aAction, {
+         category: ga.categories.account
+      });
+
       const { dispatch, initialValues, accessToken } = this.props;
-      this.setState({ clicked: input }, () => {
+
+      const newState =
+         input === "password"
+            ? { clicked: input, changePassClicked: true }
+            : { clicked: input };
+      this.setState(newState, () => {
          if (input === "password") {
             dispatch(forgotPass(initialValues.email));
          } else if (input === "email") {
@@ -293,7 +315,7 @@ class Profile extends Component {
 
    render() {
       const { asyncLoading, userData } = this.props;
-      const { clicked, payment } = this.state;
+      const { clicked, payment, changePassClicked } = this.state;
 
       const paypalEmailStyle =
          payment.option !== "bank" ? { display: "block" } : { display: "none" };
@@ -338,10 +360,11 @@ class Profile extends Component {
                                        alt="+"
                                     />
                                     {/* {SVG.edit} */}
-                                    <FontAwesomeIcon
+                                    {/* <FontAwesomeIcon
                                        className="fa"
-                                       icon={faEdit}
-                                    />
+                                       icon={faPen}
+                                    /> */}
+                                    <FontAwesomeIcon icon="pen" />
                                  </React.Fragment>
                               )}
 
@@ -359,7 +382,7 @@ class Profile extends Component {
                            classes={{ root: "mui-expansionPanel-root" }}
                         >
                            <ExpansionPanelSummary
-                              expandIcon={<FontAwesomeIcon icon={faAngleUp} />}
+                              expandIcon={<FontAwesomeIcon icon="angle-up" />}
                            >
                               <div className="cc">
                                  <ReactSVG
@@ -434,17 +457,28 @@ class Profile extends Component {
                                     </div>
                                     <div>
                                        <span className="profile-helper-text">
-                                          <a
-                                             onClick={this.handleUserUpdate.bind(
-                                                null,
-                                                "password"
-                                             )}
-                                          >
-                                             {asyncLoading &&
-                                             clicked === "password"
-                                                ? " ...Loading"
-                                                : " Change."}
-                                          </a>
+                                          {!changePassClicked && (
+                                             <a
+                                                onClick={this.handleUserUpdate.bind(
+                                                   null,
+                                                   "password"
+                                                )}
+                                             >
+                                                {asyncLoading &&
+                                                clicked === "password"
+                                                   ? " ...Loading"
+                                                   : " Change password."}
+                                             </a>
+                                          )}
+
+                                          {changePassClicked && (
+                                             <span>
+                                                {asyncLoading &&
+                                                clicked === "password"
+                                                   ? " ...Loading"
+                                                   : " Check your inbox for the password reset link."}
+                                             </span>
+                                          )}
                                        </span>
                                     </div>
                                  </div>
@@ -459,7 +493,7 @@ class Profile extends Component {
                            classes={{ root: "mui-expansionPanel-root" }}
                         >
                            <ExpansionPanelSummary
-                              expandIcon={<FontAwesomeIcon icon={faAngleUp} />}
+                              expandIcon={<FontAwesomeIcon icon="angle-up" />}
                            >
                               <div className="cc">
                                  <ReactSVG
@@ -501,9 +535,7 @@ class Profile extends Component {
                                           }
                                           label={
                                              <React.Fragment>
-                                                <FontAwesomeIcon
-                                                   icon={faUniversity}
-                                                />{" "}
+                                                <FontAwesomeIcon icon="university" />{" "}
                                                 Bank
                                              </React.Fragment>
                                           }

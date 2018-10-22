@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { routeCodes } from "../../config/routes";
+import routeCodes from "../../config/routeCodes";
 
 import SVG from "../../components/SVG";
 

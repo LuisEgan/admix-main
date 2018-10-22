@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import _a from "../../utils/analytics";
 import PropTypes from "prop-types";
 import {
    login,
@@ -15,8 +16,9 @@ import Input from "../../components/Input";
 import ToggleDisplay from "react-toggle-display";
 import STR from "../../utils/strFuncs";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
-import faEye from "@fortawesome/fontawesome-free-solid/faEye";
 import admixLogo from "../../assets/img/logo.png";
+
+const { ga } = _a;
 
 class Login extends Component {
    static propTypes = {
@@ -150,7 +152,7 @@ class Login extends Component {
    eye() {
       return (
          <FontAwesomeIcon
-            icon={faEye}
+            icon="eye"
             onMouseEnter={this.togglePassInputType}
             onMouseLeave={this.togglePassInputType}
             className="password-eye"
@@ -175,6 +177,10 @@ class Login extends Component {
    }
 
    handleforgotPass(e) {
+      _a.track(ga.actions.account.passwordChangeRequest, {
+         category: ga.categories.account
+      });
+
       if (e) e.preventDefault();
       let {
          reduxForm: {

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
-import { routeCodes } from "../../config/routes";
+import routeCodes from "../../config/routeCodes";
 import PropTypes from "prop-types";
 import { updatePlacements, toggleAppStatus } from "../../actions";
 import C from "../../utils/constants";

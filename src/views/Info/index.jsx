@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import _a from "../../utils/analytics";
 import { Field, reduxForm, change } from "redux-form";
-import { routeCodes } from "../../config/routes";
+import routeCodes from "../../config/routeCodes";
 import { updateApp, asyncError } from "../../actions";
 import PropTypes from "prop-types";
 import validate from "validate.js";
@@ -26,6 +27,8 @@ import faAngleUp from "@fortawesome/fontawesome-free-solid/faAngleUp";
 import faLink from "@fortawesome/fontawesome-free-solid/faLink";
 // import SVG from "../../components/SVG";
 
+const { ga } = _a;
+
 class Profile extends Component {
    static propTypes = {
       dispatch: PropTypes.func
@@ -49,6 +52,10 @@ class Profile extends Component {
    }
 
    handleUpdateInfo(values) {
+        _a.track(ga.actions.apps.modifyStoreUrl, {
+            category: ga.categories.apps
+        })
+
       const { accessToken, admintoken, dispatch, selectedApp } = this.props;
       let { isActive } = selectedApp;
 

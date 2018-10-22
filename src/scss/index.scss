@@ -592,6 +592,12 @@ p {
             background-color: transparent !important;
       }
 
+      >div {
+            &:first-child {
+                  min-height: 64px;
+            }
+      }
+
       [aria-expanded="true"] {
             &:first-child {
                   border-bottom: solid #F5F7FA;
@@ -1712,7 +1718,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
                   }
 
                   #app-select-info {
-                        width: 50%;
+                        width: 70%;
 
                         .engine-logo {
                               width: 4vw;
@@ -2850,7 +2856,8 @@ $inputsFontSize: calc(0.45em+0.3vw);
       .profile-helper-text {
             padding: 5%;
 
-            a {
+            a,
+            span {
                   color: #14B9BE;
             }
       }
@@ -2873,7 +2880,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
             box-shadow: 0 3px 4px 0 rgba(10, 31, 68, 0.1);
 
             svg {
-                  padding: 10px;
+                  padding: 12px;
                   bottom: -20px;
             }
 
@@ -3539,5 +3546,15 @@ $ballSize: 20px;
       100% {
             -webkit-transform: translate(0, 0);
             transform: translate(0, 0);
+      }
+}
+
+.logo-SVBR {
+      .st0 {
+            fill: #EC4E36 !important;
+      }
+
+      .st1 {
+            fill: #5B5B5B !important;
       }
 }

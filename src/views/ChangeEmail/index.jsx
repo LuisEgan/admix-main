@@ -1,9 +1,12 @@
 import React, { Component } from "react";
+import _a from "../../utils/analytics";
 import { connect } from "react-redux";
 import { setNewEmail, resetAsync } from "../../actions";
 import STR from "../../utils/strFuncs";
 
-class ForgotPass extends Component {
+const { ga } = _a;
+
+class ChangeEmail extends Component {
    constructor(props) {
       super(props);
       this.state = {
@@ -52,6 +55,10 @@ class ForgotPass extends Component {
    }
 
    handleChangeEmail() {
+      _a.track(ga.actions.account.emailChange, {
+         category: ga.categories.account
+      });
+
       let {
          dispatch,
          location: { search }
@@ -147,4 +154,4 @@ const mapStateToProps = state => ({
    isLoggedIn: state.app.get("isLoggedIn")
 });
 
-export default connect(mapStateToProps)(ForgotPass);
+export default connect(mapStateToProps)(ChangeEmail);

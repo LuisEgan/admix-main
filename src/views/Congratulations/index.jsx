@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import { routeCodes } from "../../config/routes";
+import routeCodes from "../../config/routeCodes";
 import PropTypes from "prop-types";
 
 import party from "../../assets/img/party-popper_1f389_40.png";

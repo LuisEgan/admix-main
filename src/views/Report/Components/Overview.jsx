@@ -1,11 +1,13 @@
 import React, { Component } from "react";
-import { routeCodes } from "../../../config/routes";
+import routeCodes from "../../../config/routeCodes";
 import PropTypes from "prop-types";
 import { Line } from "react-chartjs-2";
 import ReactTable from "react-table";
 import Breadcrumbs from "../../../components/Breadcrumbs";
 import SVG from "../../../components/SVG";
 import { isEqual, cloneDeep } from "lodash";
+
+const _a_location = routeCodes.REPORT;
 
 export default class Overview extends Component {
    static propTypes = {
@@ -453,7 +455,7 @@ export default class Overview extends Component {
 
       return (
          <div id="overview" className="mb">
-            <Breadcrumbs breadcrumbs={this.breadcrumbs} />
+            <Breadcrumbs breadcrumbs={this.breadcrumbs} renderedOn={_a_location}/>
             <div className="step-title">
                <span className="st">Overview</span>
             </div>
