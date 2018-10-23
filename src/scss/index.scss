@@ -1009,11 +1009,17 @@ $inputsFontSize: calc(0.45em+0.3vw);
       z-index: 3;
       width: 7.5%;
       padding-top: 30px;
-      max-width: 130px;
+      min-width: 115px;
       background-image: linear-gradient(135.78deg,
             #002590 0%,
             #1388b7 50.87%,
             #56c4c6 100%);
+
+      svg {
+            g {
+                  fill: white;
+            }
+      }
 
       >div {
             @extend .mbs;
