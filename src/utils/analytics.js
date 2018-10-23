@@ -5,7 +5,12 @@ import routeCodes from "../config/routeCodes";
 // let applyAnalytics = window.analytics ? process.env.NODE_ENV === "production" ? window.origin.indexOf("3001") < 0 : true : false;
 
 // only on prod and on port 3001
-let applyAnalytics = window.analytics && (process.env.NODE_ENV === "production" || window.origin.indexOf("3001") >= 0);
+let applyAnalytics;
+if(window.origin) {
+    applyAnalytics = window.analytics && (process.env.NODE_ENV === "production" || window.origin.indexOf("3001") >= 0);
+} else {
+    applyAnalytics = window.analytics && (process.env.NODE_ENV === "production" || window.location.origin.indexOf("3001") >= 0);
+}
 
 const load = () => {
     if (applyAnalytics) {
