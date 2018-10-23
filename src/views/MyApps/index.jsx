@@ -16,7 +16,6 @@ import {
    setUserImgURL,
    setAppsFilterBy,
    getPlacementsByAppId,
-   logout
 } from "../../actions";
 import C from "../../utils/constants";
 import STR from "../../utils/strFuncs";
