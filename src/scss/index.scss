@@ -1829,6 +1829,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
       height: 100%;
       background-color: #fff;
       width: 20%;
+      min-width: 300px;
       box-shadow: 0 3px 4px 0 rgba(10, 31, 68, 0.1);
 }
 
@@ -2459,9 +2460,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
 
       .panel {
             position: relative;
-            width: 25%;
             height: unset;
-            min-width: 180px;
 
             >div {
                   padding: 10px 35px 0;
