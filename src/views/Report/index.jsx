@@ -739,7 +739,7 @@ class Report extends Component {
       const filteredReportData = filteredData();
 
       return (
-         <div id="report">
+         <div id="report" className="page-withPanel-container">
             <div style={performanceShow}>
                <WebGLScene
                   isLoad_webgl={isLoad_webgl}
@@ -832,7 +832,7 @@ class Report extends Component {
                /> */}
             </div>
 
-            <div>
+            <div className="page-content">
                <ToggleDisplay show={show("ov")}>
                   <Overview
                      filteredReportData={filteredReportData}

@@ -1004,8 +1004,16 @@ class Scene extends Component {
          category: ga.categories.placements,
          label:
             displayMode === "raw"
-               ? ga.labels[dropdown === "category" ? "changeCategory" : "changeSubCategory"].onRaw
-               : ga.labels[dropdown === "category" ? "changeCategory" : "changeSubCategory"].on3d
+               ? ga.labels[
+                    dropdown === "category"
+                       ? "changeCategory"
+                       : "changeSubCategory"
+                 ].onRaw
+               : ga.labels[
+                    dropdown === "category"
+                       ? "changeCategory"
+                       : "changeSubCategory"
+                 ].on3d
       });
 
       const value = newValue ? newValue : e.target.value;
@@ -1540,11 +1548,11 @@ class Scene extends Component {
 
       return (
          <div
-            id="webgl"
+            id="scene"
             onKeyDown={this.handleKeyDown}
             onKeyUp={this.handleKeyUp}
             tabIndex="0"
-            className="mb"
+            className="mb page-withPanel-container"
          >
             <MenuPanel
                ref={i => (this.MenuPanel = i)}
@@ -1572,47 +1580,49 @@ class Scene extends Component {
                displayMode={displayMode}
             />
 
-            {loadingProgress !== 0 &&
-               loadingProgress && (
-                  <div id="scene-loading" className="progressbar-container">
-                     <AdmixLoading />
-                     {`${loadingProgress}% loaded`}
-                  </div>
-               )}
+            <div className="page-content">
+               {loadingProgress !== 0 &&
+                  loadingProgress && (
+                     <div id="scene-loading" className="progressbar-container">
+                        <AdmixLoading />
+                        {`${loadingProgress}% loaded`}
+                     </div>
+                  )}
 
-            {/* {renderSceneLoadingError && this.renderSceneLoadingError()} */}
+               <div
+                  id="scene-webglMount"
+                  ref={mount => {
+                     this.mount = mount;
+                  }}
+               />
 
-            {/* {renderNothingToSee && this.renderNothingToSee()} */}
+               {/* {renderSceneLoadingError && this.renderSceneLoadingError()} */}
 
-            {renderRawDataTable && this.renderRawDataTable()}
+               {/* {renderNothingToSee && this.renderNothingToSee()} */}
 
-            {sceneMounted && this.renderControls()}
+               {renderRawDataTable && this.renderRawDataTable()}
 
-            <div
-               id="scene-webglMount"
-               ref={mount => {
-                  this.mount = mount;
-               }}
-            />
+               {sceneMounted && this.renderControls()}
 
-            <FormPanel
-               ref={i => (this.FormPanel = i)}
-               // functions
-               onSave={this.onSave}
-               mouseOnPanel={this.mouseOnPanel}
-               rawDataChangeActive={this.changeActive}
-               updateClickedPlacement={this.updateClickedPlacement}
-               rawDataChangeDropdownValue={this.changeDropdownValue}
-               // props
-               selectedApp={selectedApp}
-               dispatch={dispatch}
-               selectedScene={selectedScene}
-               savedApps={savedApps}
-               // state
-               clickedPlacement={clickedPlacement}
-               sceneMounted={sceneMounted}
-               displayMode={displayMode}
-            />
+               <FormPanel
+                  ref={i => (this.FormPanel = i)}
+                  // functions
+                  onSave={this.onSave}
+                  mouseOnPanel={this.mouseOnPanel}
+                  rawDataChangeActive={this.changeActive}
+                  updateClickedPlacement={this.updateClickedPlacement}
+                  rawDataChangeDropdownValue={this.changeDropdownValue}
+                  // props
+                  selectedApp={selectedApp}
+                  dispatch={dispatch}
+                  selectedScene={selectedScene}
+                  savedApps={savedApps}
+                  // state
+                  clickedPlacement={clickedPlacement}
+                  sceneMounted={sceneMounted}
+                  displayMode={displayMode}
+               />
+            </div>
          </div>
       );
    }

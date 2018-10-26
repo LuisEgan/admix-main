@@ -6,6 +6,7 @@ import routeCodes from "../../config/routeCodes";
 import { updateApp, asyncError } from "../../actions";
 import PropTypes from "prop-types";
 import validate from "validate.js";
+import ToggleDisplay from "react-toggle-display";
 
 import Breadcrumbs from "../../components/Breadcrumbs";
 import Input from "../../components/Input";
@@ -25,6 +26,7 @@ import SVG_delete from "../../assets/svg/delete.svg";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import faAngleUp from "@fortawesome/fontawesome-free-solid/faAngleUp";
 import faLink from "@fortawesome/fontawesome-free-solid/faLink";
+import { KeyboardArrowDown, KeyboardArrowRight } from "@material-ui/icons";
 // import SVG from "../../components/SVG";
 
 const { ga } = _a;
@@ -37,24 +39,31 @@ class Profile extends Component {
    constructor(props) {
       super(props);
 
-      this.state = {};
+      this.state = {
+         show: "url"
+      };
 
       this.breadcrumbs = [];
 
       this.deleteValue = this.deleteValue.bind(this);
       this.handleUpdateInfo = this.handleUpdateInfo.bind(this);
+      this.show = this.show.bind(this);
       this.renderField = this.renderField.bind(this);
    }
 
+   changeView(view) {
+      this.setState({ show: view });
+   }
+
    deleteValue(input) {
-       const { dispatch } = this.props;
-       dispatch(change('infoForm', input, ''));
+      const { dispatch } = this.props;
+      dispatch(change("infoForm", input, ""));
    }
 
    handleUpdateInfo(values) {
-        _a.track(ga.actions.apps.modifyStoreUrl, {
-            category: ga.categories.apps
-        })
+      _a.track(ga.actions.apps.modifyStoreUrl, {
+         category: ga.categories.apps
+      });
 
       const { accessToken, admintoken, dispatch, selectedApp } = this.props;
       let { isActive } = selectedApp;
@@ -74,14 +83,19 @@ class Profile extends Component {
          ...values
       };
 
-      dispatch(updateApp({appData, accessToken, admintoken}));
+      dispatch(updateApp({ appData, accessToken, admintoken }));
+   }
+
+   show(view) {
+      const { show } = this.state;
+      return show === view;
    }
 
    renderField(field) {
       const {
          input,
          meta: { error }
-        } = field;
+      } = field;
 
       return (
          <div className="redux-form-inputs-container">
@@ -94,18 +108,29 @@ class Profile extends Component {
                rootstyle={error ? { borderColor: "red" } : null}
                icon={
                   <ReactSVG
-                     src={input.value === "" ? "" : error ? SVG_checkFail : SVG_tickGreen}
+                     src={
+                        input.value === ""
+                           ? ""
+                           : error
+                              ? SVG_checkFail
+                              : SVG_tickGreen
+                     }
                      className="input-icon"
                   />
                }
             />
 
-            <ReactSVG src={SVG_delete} className="input-delete" onClick={this.deleteValue.bind(null, input.name)}/>
+            <ReactSVG
+               src={SVG_delete}
+               className="input-delete"
+               onClick={this.deleteValue.bind(null, input.name)}
+            />
          </div>
       );
    }
 
    render() {
+      const { show } = this;
       const { selectedApp, handleSubmit } = this.props;
 
       this.breadcrumbs = [
@@ -123,96 +148,68 @@ class Profile extends Component {
          }
       ];
 
+      const urlAct = show("ov") ? "active" : "";
+      const audAct = show("pe") ? "active" : "";
+
       return (
-         <div className="step-container mb" id="info">
-            <form onSubmit={handleSubmit(this.handleUpdateInfo)}>
-               <Breadcrumbs breadcrumbs={this.breadcrumbs} />
-               <div id="info-header">
-                  <div>
-                     <div className="engine-logo">
-                        {C.LOGOS[selectedApp.appEngine]}
+         <div className="mb page-withPanel-container" id="info">
+            <div className={`panel menu-panel`}>
+               <div className="list-group">
+                  <div
+                     className={`${urlAct}`}
+                     onClick={this.changeView.bind(null, "url")}
+                  >
+                     <span>App store URL</span>
+                     {show("url") ? (
+                        <KeyboardArrowRight className="rotate90" />
+                     ) : (
+                        <KeyboardArrowDown className="rotate270" />
+                     )}
+                  </div>
+                  <div
+                     className={`${audAct}`}
+                     onClick={this.changeView.bind(null, "aud")}
+                  >
+                     <span>Audience breakdown</span>
+                     {show("aud") ? (
+                        <KeyboardArrowRight className="rotate90" />
+                     ) : (
+                        <KeyboardArrowDown className="rotate270" />
+                     )}
+                  </div>
+               </div>
+            </div>
+
+            <div className="page-content">
+               <form onSubmit={handleSubmit(this.handleUpdateInfo)}>
+                  <Breadcrumbs breadcrumbs={this.breadcrumbs} />
+                  <div id="info-header">
+                     <div>
+                        <div className="engine-logo">
+                           {C.LOGOS[selectedApp.appEngine]}
+                        </div>
+                        <h3 className="st">{selectedApp.name}</h3>
                      </div>
-                     <h3 className="st">{selectedApp.name}</h3>
+                     <button type="submit" className="gradient-btn">
+                        {" "}
+                        Save
+                     </button>
                   </div>
-                  <button type="submit" className="gradient-btn">
-                     {" "}
-                     Save
-                  </button>
-               </div>
-               <div>
+
                   <div>
-                     {/* APP STORE URL */}
-
-                     <ExpansionPanel
-                        classes={{ root: "mui-expansionPanel-root" }}
-                        defaultExpanded={true}
-                     >
-                        <ExpansionPanelSummary
-                           expandIcon={<FontAwesomeIcon icon={faAngleUp} />}
-                        >
-                           <div className="cc">
-                              <FontAwesomeIcon
-                                 icon={faLink}
-                                 className="sectionIcon"
-                              />
-                              <span>App store URL</span>
-                           </div>
-                        </ExpansionPanelSummary>
-                        <ExpansionPanelDetails className="mb">
-                           <div className="expansionPanelDetails-container">
-                              <span className="mb">Change app store URL</span>
-                              <Field
-                                 name="storeurl"
-                                 component={this.renderField}
-                              />
-                           </div>
-                        </ExpansionPanelDetails>
-                     </ExpansionPanel>
-
-                     {/* <ExpansionPanel
-                        classes={{ root: "mui-expansionPanel-root" }}
-                        defaultExpanded={false}
-                     >
-                        <ExpansionPanelSummary
-                           expandIcon={<FontAwesomeIcon icon={faAngleUp} />}
-                        >
-                           <div className="cc">
-                              <ReactSVG
-                                 src={SVG_content}
-                                 className="sectionIcon"
-                              />
-                              <span>Content Detail</span>
-                           </div>
-                        </ExpansionPanelSummary>
-                        <ExpansionPanelDetails className="mb">
-                           <div className="expansionPanelDetails-container" />
-                        </ExpansionPanelDetails>
-                     </ExpansionPanel>
-
-                     <br />
-
-                     <ExpansionPanel
-                        classes={{ root: "mui-expansionPanel-root" }}
-                        defaultExpanded={false}
-                     >
-                        <ExpansionPanelSummary
-                           expandIcon={<FontAwesomeIcon icon={faAngleUp} />}
-                        >
-                           <div className="cc">
-                              <ReactSVG
-                                 src={SVG_audience}
-                                 className="sectionIcon"
-                              />
-                              <span>Audience Insights</span>
-                           </div>
-                        </ExpansionPanelSummary>
-                        <ExpansionPanelDetails className="mb">
-                           <div className="expansionPanelDetails-container" />
-                        </ExpansionPanelDetails>
-                     </ExpansionPanel> */}
+                     <div>
+                        <span>App store URL</span>
+                        <div className="expansionPanelDetails-container">
+                           <span>Change app store URL</span>
+                           <Field
+                              name="storeurl"
+                              component={this.renderField}
+                           />
+                        </div>
+                     </div>
                   </div>
-               </div>
-            </form>
+               </form>
+            </div>
          </div>
       );
    }
