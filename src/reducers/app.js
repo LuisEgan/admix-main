@@ -334,7 +334,7 @@ const actionsMap = {
                   }
                   return false;
             });
-            selectedApp.scenes = cloneDeep(scenes);
+            selectedApp.scenes = [...scenes];
 
             const asyncLoading = false;
             return state.merge(
@@ -450,7 +450,7 @@ const actionsMap = {
             const placements = data.data.data;
 
             apps.forEach(app => {
-                  app.scenes && app.scenes.forEach(scene => {
+                  app.scenes && Array.isArray(app.scenes) && app.scenes.forEach(scene => {
                         scene.placements = [];
                         Array.isArray(placements) &&
                               placements.forEach((placement, i) => {
