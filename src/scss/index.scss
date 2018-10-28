@@ -1079,12 +1079,60 @@ $inputsFontSize: calc(0.45em+0.3vw);
       width: 20%;
       min-width: 250px;
       box-shadow: 0 3px 4px 0 rgba(10, 31, 68, 0.1);
+
+      > div {
+            padding: 20px 25px;
+      }
+
+      .panel-title-container {
+
+            border-bottom: solid #f5f7fa;
+
+            span {
+                  word-break: break-all;
+            }
+
+            > div {
+                  display: flex;
+                  flex-flow: column;
+            }
+
+            .panel-title {
+                  margin-bottom: 5px;
+            }
+      }
+
+      .list-group {
+            padding: 20px 15px;
+
+            svg {
+                  color: #14B9BE;
+            }            
+
+            >div {
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  border-radius: 10px;
+                  padding: 15px 20px;
+                  transition: 1s;
+
+                  &:hover {
+                        cursor: pointer;
+                  }
+            }
+
+            .active {
+                  background-color: #F5F7FA;
+            }
+      }
 }
 
 .page-content {
       width: 80%;
       position: relative;
       overflow-x: hidden;
+      padding: 4%;
 }
 
 .breadcrumbs {
@@ -1845,6 +1893,10 @@ $inputsFontSize: calc(0.45em+0.3vw);
 #scene {
       overflow: hidden;
 
+      .page-content {
+            padding: unset;
+      }
+
       #scene-controls {
             display: flex;
             flex-flow: column;
@@ -1954,6 +2006,10 @@ $inputsFontSize: calc(0.45em+0.3vw);
             #scene-title {
                   padding: 10% 0;
                   border-bottom: solid #f5f7fa;
+
+                  span {
+                        word-break: break-all;
+                  }
             }
 
             #scene-select {
@@ -2449,38 +2505,13 @@ $inputsFontSize: calc(0.45em+0.3vw);
 
       .panel {
 
-            >div {
+            >div:not(.list-group) {
                   padding: 10px 35px 0;
 
                   &:first-child {
                         padding: 20px 35px;
                   }
-            }
-
-            .list-group {
-                  padding: 20px 15px;
-
-                  svg {
-                        color: #14B9BE;
-                  }
-
-                  >div {
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        border-radius: 10px;
-                        padding: 15px 20px;
-                        transition: 1s;
-
-                        &:hover {
-                              cursor: pointer;
-                        }
-                  }
-
-                  .active {
-                        background-color: #F5F7FA;
-                  }
-            }
+            }            
 
             .btn-group {
                   padding-top: 5%;
@@ -2625,7 +2656,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
       #overview {
             display: flex;
             flex-flow: column;
-            padding: 5%;
 
             >div {
                   width: 100%;
@@ -2704,7 +2734,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
       #performance {
             display: flex;
             flex-flow: column;
-            padding: 5%;
 
             .step-title {
                   display: flex;
@@ -3007,120 +3036,27 @@ $inputsFontSize: calc(0.45em+0.3vw);
 // INFO ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------------
 #info {
-      form {
-            width: 100%;
-      }
-
-      input,
-      label {
-            @extend .mb;
-      }
-
-      >form {
-            // min-height: 90vh;
+      #info-header {
+            display: flex;
+            padding: 5% 0;
 
             >div {
-                  background-color: transparent;
-                  padding-top: 3vh;
-                  margin-top: 0;
-
-                  &:last-child {
-                        padding-top: 32px;
-                        width: 100%;
-                        position: relative;
-
-                        h5 {
-                              text-align: left; // padding: 4vh 0 0vh;
-                        }
-
-                        .expansionPanelDetails-container {
-                              width: 100%;
-                              text-align: left;
-                              margin-top: 15px;
-
-                              >div {
-                                    position: relative;
-                                    width: 100%;
-                                    display: flex;
-                                    margin-top: 15px;
-                              }
-
-                              >span {
-                                    margin: 5px 0;
-                              }
-
-                              .input {
-                                    input {
-                                          width: 100%;
-                                    }
-
-
-                                    >div {
-                                          width: 100%;
-                                    }
-                              }
-
-                              .input-icon {
-                                    svg {
-                                          margin-top: 5px;
-                                    }
-                              }
-
-                              .input-delete {
-                                    position: absolute;
-                                    right: 40px;
-                                    width: 0;
-                                    top: 40%;
-
-                                    &:hover {
-                                          cursor: pointer;
-                                    }
-                              }
-                        }
-
-                        .mui-expansionPanel-root {
-                              border-radius: 10px;
-
-                              >div {
-                                    &:first-child {
-                                          border-bottom: solid #ededed;
-                                    }
-                              }
-
-                              .sectionIcon {
-                                    margin-right: 2vw;
-                                    max-width: 2vw;
-                              }
-                        }
-                  }
-            }
-
-            #info-header {
                   display: flex;
-                  justify-content: space-between;
+                  align-items: center;
 
-                  svg {
-                        padding: 15%;
-
-                        g {
-                              fill: #000;
-                        }
+                  &:nth-child(2) {
+                        padding: 0 20px;
                   }
-
-                  >div {
-                        &:first-child {
-                              display: flex;
-                              align-items: center;
-
-                              h3 {
-                                    padding-left: 15px;
-                              }
-                        }
-                  }
+                  
             }
 
-            .breadcrumbs {
-                  padding-bottom: 22px;
+            .engine-logo {
+                  width: 15%;
+
+                  .logo-SVBR {
+                        height: 100%;
+                        width: 100%;
+                  }
             }
       }
 }

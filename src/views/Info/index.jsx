@@ -45,6 +45,7 @@ class Profile extends Component {
 
       this.breadcrumbs = [];
 
+      this.changeView = this.changeView.bind(this);
       this.deleteValue = this.deleteValue.bind(this);
       this.handleUpdateInfo = this.handleUpdateInfo.bind(this);
       this.show = this.show.bind(this);
@@ -148,12 +149,23 @@ class Profile extends Component {
          }
       ];
 
-      const urlAct = show("ov") ? "active" : "";
-      const audAct = show("pe") ? "active" : "";
+      const urlAct = show("url") ? "active" : "";
+      const audAct = show("aud") ? "active" : "";
 
       return (
          <div className="mb page-withPanel-container" id="info">
             <div className={`panel menu-panel`}>
+               <div className="panel-title-container">
+                  <div>
+                     <span
+                        className="mb panel-title"
+                        style={{ color: "#14B9BE" }}
+                     >
+                        App info
+                     </span>
+                     <span className="sst">{selectedApp.name}</span>
+                  </div>
+               </div>
                <div className="list-group">
                   <div
                      className={`${urlAct}`}
@@ -184,30 +196,39 @@ class Profile extends Component {
                <form onSubmit={handleSubmit(this.handleUpdateInfo)}>
                   <Breadcrumbs breadcrumbs={this.breadcrumbs} />
                   <div id="info-header">
+                     <div className="engine-logo">
+                        {C.LOGOS[selectedApp.appEngine]}
+                     </div>
                      <div>
-                        <div className="engine-logo">
-                           {C.LOGOS[selectedApp.appEngine]}
-                        </div>
                         <h3 className="st">{selectedApp.name}</h3>
                      </div>
-                     <button type="submit" className="gradient-btn">
-                        {" "}
-                        Save
-                     </button>
-                  </div>
-
-                  <div>
                      <div>
-                        <span>App store URL</span>
-                        <div className="expansionPanelDetails-container">
-                           <span>Change app store URL</span>
-                           <Field
-                              name="storeurl"
-                              component={this.renderField}
-                           />
-                        </div>
+                        <button type="submit" className="gradient-btn">
+                           {" "}
+                           Save
+                        </button>
                      </div>
                   </div>
+
+                  {show("url") && (
+                     <div id="info-url">
+                        <div>
+                           <span>App store URL</span>
+                           <div className="expansionPanelDetails-container">
+                              <span>Change app store URL</span>
+                              <Field
+                                 name="storeurl"
+                                 component={this.renderField}
+                              />
+                           </div>
+                        </div>
+                     </div>
+                  )}
+
+                  {show("aud") && (
+                        <div id="info-aud">
+                        </div>
+                  )}
                </form>
             </div>
          </div>
