@@ -9,6 +9,7 @@ class Input extends React.Component {
       };
 
       this.onFocus = this.onFocus.bind(this);
+      this.forceFocus = this.forceFocus.bind(this);
    }
 
    onFocus() {
@@ -21,17 +22,24 @@ class Input extends React.Component {
       this.setState({ focused: !focused });
    }
 
+   forceFocus() {
+      this.input.focus();
+   }
+
    render() {
       const { icon, rootstyle } = this.props;
       const { focused } = this.state;
       const inputStyle = focused ? { borderColor: "#14B9BE" } : rootstyle;
 
       return (
-         <div className="input" style={inputStyle}>
+         <div className="input" style={inputStyle} onClick={this.forceFocus}>
             {icon && <div id="input-icon">{icon}</div>}
             <div>
                <input
                   {...this.props}
+                  ref={i => {
+                     this.input = i;
+                  }}
                   onFocus={this.onFocus}
                   onBlur={this.onFocus}
                />

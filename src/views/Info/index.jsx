@@ -6,7 +6,6 @@ import routeCodes from "../../config/routeCodes";
 import { updateApp, asyncError } from "../../actions";
 import PropTypes from "prop-types";
 import validate from "validate.js";
-import ToggleDisplay from "react-toggle-display";
 
 import Breadcrumbs from "../../components/Breadcrumbs";
 import Input from "../../components/Input";
@@ -24,9 +23,11 @@ import SVG_checkFail from "../../assets/svg/check-fail.svg";
 import SVG_delete from "../../assets/svg/delete.svg";
 
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
-import faAngleUp from "@fortawesome/fontawesome-free-solid/faAngleUp";
-import faLink from "@fortawesome/fontawesome-free-solid/faLink";
-import { KeyboardArrowDown, KeyboardArrowRight } from "@material-ui/icons";
+import {
+   KeyboardArrowDown,
+   KeyboardArrowRight,
+   Timeline
+} from "@material-ui/icons";
 // import SVG from "../../components/SVG";
 
 const { ga } = _a;
@@ -40,10 +41,59 @@ class Profile extends Component {
       super(props);
 
       this.state = {
-         show: "url"
+         show: "aud"
       };
 
       this.breadcrumbs = [];
+
+      this.expMetrics = {
+         panelIcon: <Timeline className="sectionIcon" />,
+         panelTitle: "Metrics",
+         fields: [
+            {
+               title: "DAU",
+               name: "dau"
+            },
+            {
+               title: "MAU",
+               name: "mau"
+            },
+            {
+               title: "Session per users/month",
+               name: "avgTimePerSession"
+            },
+            {
+               title: "Average time per session",
+               name: "sessions",
+               optional: ["%"]
+            }
+         ]
+      };
+
+      this.expGeos = {
+         panelIcon: (
+            <FontAwesomeIcon icon="globe-americas" className="sectionIcon" />
+         ),
+         panelTitle: "Geos",
+         fields: [
+            {
+               title: "US (%)",
+               name: "us"
+            },
+            {
+               title: "UK (%)",
+               name: "uk"
+            },
+            {
+               title: "EU (%)",
+               name: "eu"
+            },
+            {
+               title: "Rest of the world",
+               name: "world"
+            }
+         ]
+      };
 
       this.changeView = this.changeView.bind(this);
       this.deleteValue = this.deleteValue.bind(this);
@@ -81,6 +131,17 @@ class Profile extends Component {
          name: selectedApp.name,
          appState,
          appId: selectedApp._id,
+         metrics: {
+            dau: values.dau || null,
+            mau: values.mau || null,
+            avgTimePerSession: values.avgTimePerSession || null,
+            sessions: values.session || null
+         },
+         geos: {
+            us: +values.us || null,
+            uk: +values.uk || null,
+            eu: +values.eu || null
+         },
          ...values
       };
 
@@ -98,14 +159,38 @@ class Profile extends Component {
          meta: { error }
       } = field;
 
+      const {
+         reduxForm: { infoForm }
+      } = this.props;
+
+      let us, uk, eu;
+
+      console.warn("us: ", us);
+      console.warn("uk: ", uk);
+      console.warn("eu: ", eu);
+
+      if (infoForm) {
+         us = infoForm.values.us || us;
+         uk = infoForm.values.uk || uk;
+         eu = infoForm.values.eu || eu;
+      }
+      console.log("us: ", us);
+      console.log("uk: ", uk);
+      console.log("eu: ", eu);
+
+      let customValue = undefined;
+
+      if (input.name === "world") {
+         customValue = +us + +uk + +eu;
+         console.warn("customValue: ", customValue);
+      }
+
       return (
          <div className="redux-form-inputs-container">
-            {/* <Input {...input} id={input.name} icon={SVG.checkmark}/> */}
-
             <Input
                {...input}
                id={input.name}
-               placeholder="App store URL"
+               //    placeholder="App store URL"
                rootstyle={error ? { borderColor: "red" } : null}
                icon={
                   <ReactSVG
@@ -116,9 +201,10 @@ class Profile extends Component {
                               ? SVG_checkFail
                               : SVG_tickGreen
                      }
-                     className="input-icon"
+                     className="input-svg-icon"
                   />
                }
+               value={customValue || input.value}
             />
 
             <ReactSVG
@@ -127,6 +213,39 @@ class Profile extends Component {
                onClick={this.deleteValue.bind(null, input.name)}
             />
          </div>
+      );
+   }
+
+   renderExpansionPanel({ panelIcon, panelTitle, fields }) {
+      return (
+         <ExpansionPanel
+            defaultExpanded={panelTitle === "Geos"}
+            classes={{ root: "mui-expansionPanel-root" }}
+         >
+            <ExpansionPanelSummary
+               expandIcon={<FontAwesomeIcon icon="angle-up" />}
+            >
+               <div className="cc">
+                  {panelIcon}
+                  <span>{panelTitle}</span>
+               </div>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+               <div className="expansionPanelDetails-container">
+                  {fields.map(field => {
+                     return (
+                        <div key={field.name}>
+                           <span>{field.title}</span>
+                           <Field
+                              name={field.name}
+                              component={this.renderField}
+                           />
+                        </div>
+                     );
+                  })}
+               </div>
+            </ExpansionPanelDetails>
+         </ExpansionPanel>
       );
    }
 
@@ -212,22 +331,25 @@ class Profile extends Component {
 
                   {show("url") && (
                      <div id="info-url">
-                        <div>
-                           <span>App store URL</span>
-                           <div className="expansionPanelDetails-container">
-                              <span>Change app store URL</span>
-                              <Field
-                                 name="storeurl"
-                                 component={this.renderField}
-                              />
-                           </div>
-                        </div>
+                        <span>App store URL</span>
+                        <Field name="storeurl" component={this.renderField} />
                      </div>
                   )}
 
                   {show("aud") && (
-                        <div id="info-aud">
-                        </div>
+                     <div id="info-aud">
+                        {this.renderExpansionPanel({
+                           panelIcon: this.expMetrics.panelIcon,
+                           panelTitle: this.expMetrics.panelTitle,
+                           fields: this.expMetrics.fields
+                        })}
+
+                        {this.renderExpansionPanel({
+                           panelIcon: this.expGeos.panelIcon,
+                           panelTitle: this.expGeos.panelTitle,
+                           fields: this.expGeos.fields
+                        })}
+                     </div>
                   )}
                </form>
             </div>
@@ -239,7 +361,7 @@ class Profile extends Component {
 const mapStateToProps = state => {
    const userData = state.app.get("userData");
    const selectedApp = state.app.get("selectedApp");
-   const { storeurl } = selectedApp;
+   const { storeurl, metrics, geos, demographics } = selectedApp;
 
    return {
       accessToken: state.app.get("accessToken"),
@@ -250,14 +372,18 @@ const mapStateToProps = state => {
       userData,
       reduxForm: state.form,
       initialValues: {
-         storeurl
+         storeurl,
+         ...metrics,
+         ...geos,
+         ...demographics
       }
    };
 };
 
 const validateForm = values => {
    const errors = {};
-   let { storeurl } = values;
+   let { storeurl, us, uk, eu } = values;
+   const numericValues = { us, uk, eu };
 
    storeurl =
       storeurl && storeurl.indexOf("http") < 0
@@ -268,6 +394,15 @@ const validateForm = values => {
 
    if (notValid && storeurl !== "") {
       errors.storeurl = notValid.website[0];
+   }
+
+   let isNumber;
+
+   for (let numericInputName in numericValues) {
+      isNumber = /^\d+$/.test(numericValues[numericInputName]);
+      if (numericValues[numericInputName] && !isNumber) {
+         errors[numericInputName] = "Should be a number!";
+      }
    }
 
    return errors;

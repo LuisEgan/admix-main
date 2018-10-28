@@ -24,7 +24,8 @@ import {
    faMousePointer,
    faMinusSquare,
    faGamepad,
-   faEye
+   faEye,
+   faGlobeAmericas
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -35,7 +36,8 @@ library.add(
    faMousePointer,
    faMinusSquare,
    faGamepad,
-   faEye
+   faEye,
+   faGlobeAmericas
 );
 
 const { persistor, store } = configureStore();

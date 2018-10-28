@@ -256,7 +256,7 @@ const filter = (
 );
 
 const logoUnity = (
-   <svg width="54px" height="55px" viewBox="0 0 54 55">
+   <svg width="54px" className="logo-unity" height="55px" viewBox="0 0 54 55">
       <g
          id="Page-1"
          stroke="none"
@@ -280,7 +280,7 @@ const logoUnity = (
 );
 
 const logoUnreal = (
-   <svg width="61px" height="61px" viewBox="0 0 61 61">
+   <svg width="61px" className="logo-unreal" height="61px" viewBox="0 0 61 61">
       <g
          id="Page-1"
          stroke="none"
@@ -816,7 +816,7 @@ const logoSBVR = (
       x="0px"
       y="0px"
       viewBox="0 0 200 200"
-      className="logo-SVBR"
+      className="logo-SBVR"
    >
       <g>
          <path

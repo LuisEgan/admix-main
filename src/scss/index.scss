@@ -1080,7 +1080,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
       min-width: 250px;
       box-shadow: 0 3px 4px 0 rgba(10, 31, 68, 0.1);
 
-      > div {
+      >div {
             padding: 20px 25px;
       }
 
@@ -1092,7 +1092,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
                   word-break: break-all;
             }
 
-            > div {
+            >div {
                   display: flex;
                   flex-flow: column;
             }
@@ -1107,7 +1107,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
 
             svg {
                   color: #14B9BE;
-            }            
+            }
 
             >div {
                   display: flex;
@@ -2511,7 +2511,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
                   &:first-child {
                         padding: 20px 35px;
                   }
-            }            
+            }
 
             .btn-group {
                   padding-top: 5%;
@@ -3039,6 +3039,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
       #info-header {
             display: flex;
             padding: 5% 0;
+            justify-content: space-between;
 
             >div {
                   display: flex;
@@ -3047,17 +3048,49 @@ $inputsFontSize: calc(0.45em+0.3vw);
                   &:nth-child(2) {
                         padding: 0 20px;
                   }
-                  
+
             }
 
             .engine-logo {
                   width: 15%;
 
-                  .logo-SVBR {
+                  .logo-SBVR {
                         height: 100%;
                         width: 100%;
                   }
             }
+      }
+
+      .input-delete {
+            position: absolute;
+            width: unset;
+            right: 40px;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+            height: 30%;
+
+            &:hover {
+                  cursor: pointer;
+            }
+
+            >div {
+                  display: flex;
+                  align-items: center;
+            }
+      }
+
+      .expansionPanelDetails-container {
+            width: 100%;
+
+            >div {
+                  margin-bottom: 10px;
+            }
+
+      }
+
+      .sectionIcon {
+            margin-right: 15px;
       }
 }
 
@@ -3353,6 +3386,7 @@ $ballSize: 20px;
 }
 
 .input {
+      background-color: white;
       border: 2px solid #ededed;
       border-radius: 5px;
       padding: 10px;
@@ -3362,11 +3396,16 @@ $ballSize: 20px;
       transition: 0.5s ease-in-out;
       margin-top: 5px;
 
+      &:hover {
+            cursor: text;
+      }
+
       >div {
             width: 100%;
       }
 
       input {
+            @extend .mb;
             border: 0;
             margin: 0;
             white-space: nowrap;
@@ -3384,6 +3423,18 @@ $ballSize: 20px;
             align-items: center;
             max-width: 30px;
             margin: 0 15px;
+
+            >div {
+                  display: flex;
+                  align-items: center
+            }
+
+            .input-svg-icon {
+                  >div {
+                        display: flex;
+                        align-items: center
+                  }
+            }
       }
 }
 
@@ -3477,12 +3528,19 @@ $ballSize: 20px;
       }
 }
 
-.logo-SVBR {
+.logo-SBVR {
       .st0 {
             fill: #EC4E36 !important;
       }
 
       .st1 {
             fill: #5B5B5B !important;
+      }
+}
+
+.logo-unity,
+.logo-unreal {
+      g {
+            fill: black;
       }
 }

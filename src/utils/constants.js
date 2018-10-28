@@ -39,8 +39,9 @@ const LOGOS = {
     SBVR: ( < ReactSVG src = {
             sbvrSVG
         }
-        className = "logo-SVBR" /
-        > ),
+        className = "logo-SBVR" /
+        >
+    ),
     Unity: SVG.logoUnity,
     Unreal: SVG.logoUnreal,
     "High Fidelity": ( < img src = {
