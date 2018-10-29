@@ -41,7 +41,7 @@ class Profile extends Component {
       super(props);
 
       this.state = {
-         show: "aud"
+         show: "url"
       };
 
       this.expMetrics = {
@@ -252,7 +252,7 @@ class Profile extends Component {
 
       return (
          <ExpansionPanel
-            defaultExpanded={panelTitle === "Geos"}
+            defaultExpanded={panelTitle === "Metrics"}
             classes={{ root: "mui-expansionPanel-root" }}
          >
             <ExpansionPanelSummary

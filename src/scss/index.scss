@@ -1544,6 +1544,86 @@ $inputsFontSize: calc(0.45em+0.3vw);
       }
 }
 
+.appStateToggle {
+
+      display: flex;
+      justify-content: space-evenly;
+      height: 100%;
+      width: 100%;
+
+      >div {
+            @extend .cc;
+            border: solid 2px;
+            padding: 0 5px;
+            flex-grow: 1;
+            width: 30%;
+            position: relative;
+            transition: 1.2s;
+
+            &:hover {
+                  cursor: pointer;
+            }
+
+            &:first-child() {
+                  border-top-left-radius: 5px;
+                  border-bottom-left-radius: 5px;
+            }
+
+            &:nth-child(2) {
+                  border-left: none;
+                  width: 40%;
+            }
+
+            &:last-child() {
+                  border-left: none;
+                  border-top-right-radius: 5px;
+                  border-bottom-right-radius: 5px;
+            }
+      }
+
+      .admix-tooltip {
+            @extend .mbs;
+            display: none;
+            position: absolute;
+            background-color: rgba(0,0,0,.5);
+            color: white;
+            padding: 5px 7px;
+            width: 300%;
+            bottom: -200%;
+            z-index: 1;
+            border-radius: 5px;
+
+            &::after {
+                  content: '';
+                  position: absolute;
+                  top: -10px;
+                  width: 0;
+                  height: 0;
+                  border-left: 10px solid transparent;
+                  border-right: 10px solid transparent;
+                  border-bottom: 10px solid rgba(0,0,0,.5);
+                  margin: 0 auto;
+                  left: 0;
+                  right: 0;
+            }
+      }
+
+      .inactive {
+            border-color: #d9d9d9;
+            color: #d9d9d9;
+      }
+
+      .pending {
+            border-color: orange;
+            color: orange;
+      }
+
+      .live {
+            border-color: #0066ff;
+            color: #0066ff;
+      }
+}
+
 
 // ----------------------------------------------------------------------------------------------------------
 // LOGIN ----------------------------------------------------------------------------------------
@@ -1835,6 +1915,11 @@ $inputsFontSize: calc(0.45em+0.3vw);
                                     display: flex;
                                     align-items: center;
                               }
+                        }
+
+                        .app-status {
+                              height: 80%;
+                              min-width: 200px;
                         }
 
                         .app-buttons {

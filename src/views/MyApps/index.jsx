@@ -26,6 +26,7 @@ import Select from "@material-ui/core/Select";
 import { KeyboardArrowDown } from "@material-ui/icons";
 
 import ToggleButton from "../../components/ToggleButton";
+import AppsStateToggle from "../../components/AppStateToggle";
 import Input from "../../components/Input";
 import SVG from "../../components/SVG";
 import CSS from "../../utils/InLineCSS";
@@ -540,15 +541,16 @@ class MyApps extends Component {
                   <div className="app-name">{name}</div>
                </div>
                <div id="app-select-buttons">
-                  <div>{appState}</div>
+                  {/* <div>{appState}</div> */}
                   <div>
                      <div className="app-status mb">
-                        <ToggleButton
+                        {/* <ToggleButton
                            inputName={_id}
                            isChecked={isActive}
                            onChange={this.handleOnSwitch.bind(null, app)}
                            labelClass={isPendingStyle}
-                        />
+                        /> */}
+                        <AppsStateToggle app={app} {...this.props}/>
                      </div>
                   </div>
 
