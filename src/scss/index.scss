@@ -3080,14 +3080,19 @@ $inputsFontSize: calc(0.45em+0.3vw);
             }
       }
 
-      .expansionPanelDetails-container {
-            width: 100%;
+      .mui-expansionPanel-root {
+            margin: 10px 0;
 
-            >div {
-                  margin-bottom: 10px;
+            .expansionPanelDetails-container {
+                  width: 100%;
+
+                  >div {
+                        margin-bottom: 10px;
+                  }
+
             }
-
       }
+
 
       .sectionIcon {
             margin-right: 15px;

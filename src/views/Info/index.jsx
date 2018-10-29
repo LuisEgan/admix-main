@@ -44,8 +44,6 @@ class Profile extends Component {
          show: "aud"
       };
 
-      this.breadcrumbs = [];
-
       this.expMetrics = {
          panelIcon: <Timeline className="sectionIcon" />,
          panelTitle: "Metrics",
@@ -89,8 +87,43 @@ class Profile extends Component {
                name: "eu"
             },
             {
-               title: "Rest of the world",
+               title: "Rest of the world (%)",
                name: "world"
+            }
+         ]
+      };
+
+      this.expDemos = {
+         panelIcon: <FontAwesomeIcon icon="users" className="sectionIcon" />,
+         panelTitle: "Demographics",
+         fields: [
+            {
+               title: "Male (%)",
+               name: "male"
+            },
+            {
+               title: "Female (%)",
+               name: "female"
+            },
+            {
+               title: "15 - 24",
+               name: "young"
+            },
+            {
+               title: "24 - 34",
+               name: "youngMid"
+            },
+            {
+               title: "35 - 44",
+               name: "mid"
+            },
+            {
+               title: "45 - 54",
+               name: "senior"
+            },
+            {
+               title: "55 - older",
+               name: "old"
             }
          ]
       };
@@ -99,6 +132,7 @@ class Profile extends Component {
       this.deleteValue = this.deleteValue.bind(this);
       this.handleUpdateInfo = this.handleUpdateInfo.bind(this);
       this.show = this.show.bind(this);
+      this.renderExpansionPanel = this.renderExpansionPanel.bind(this);
       this.renderField = this.renderField.bind(this);
    }
 
@@ -142,6 +176,16 @@ class Profile extends Component {
             uk: +values.uk || null,
             eu: +values.eu || null
          },
+         demographics: {
+            male: values.male,
+            byAge: {
+               young: values.young,
+               youngMid: values.youngMid,
+               mid: values.mid,
+               senior: values.senior,
+               old: values.old
+            }
+         },
          ...values
       };
 
@@ -158,32 +202,6 @@ class Profile extends Component {
          input,
          meta: { error }
       } = field;
-
-      const {
-         reduxForm: { infoForm }
-      } = this.props;
-
-      let us, uk, eu;
-
-      console.warn("us: ", us);
-      console.warn("uk: ", uk);
-      console.warn("eu: ", eu);
-
-      if (infoForm) {
-         us = infoForm.values.us || us;
-         uk = infoForm.values.uk || uk;
-         eu = infoForm.values.eu || eu;
-      }
-      console.log("us: ", us);
-      console.log("uk: ", uk);
-      console.log("eu: ", eu);
-
-      let customValue = undefined;
-
-      if (input.name === "world") {
-         customValue = +us + +uk + +eu;
-         console.warn("customValue: ", customValue);
-      }
 
       return (
          <div className="redux-form-inputs-container">
@@ -204,7 +222,6 @@ class Profile extends Component {
                      className="input-svg-icon"
                   />
                }
-               value={customValue || input.value}
             />
 
             <ReactSVG
@@ -217,6 +234,22 @@ class Profile extends Component {
    }
 
    renderExpansionPanel({ panelIcon, panelTitle, fields }) {
+      let {
+         reduxForm: { infoForm }
+      } = this.props;
+
+      let us = 0,
+         uk = 0,
+         eu = 0;
+
+      if (infoForm) {
+         us = infoForm.values.us || us;
+         uk = infoForm.values.uk || uk;
+         eu = infoForm.values.eu || eu;
+      }
+
+      const restOfTheWorld = 100 - (+us + +uk + +eu);
+
       return (
          <ExpansionPanel
             defaultExpanded={panelTitle === "Geos"}
@@ -236,10 +269,17 @@ class Profile extends Component {
                      return (
                         <div key={field.name}>
                            <span>{field.title}</span>
-                           <Field
-                              name={field.name}
-                              component={this.renderField}
-                           />
+
+                           {field.name !== "world" && (
+                              <Field
+                                 name={field.name}
+                                 component={this.renderField}
+                              />
+                           )}
+
+                           {field.name === "world" && (
+                              <div>{restOfTheWorld}</div>
+                           )}
                         </div>
                      );
                   })}
@@ -349,6 +389,12 @@ class Profile extends Component {
                            panelTitle: this.expGeos.panelTitle,
                            fields: this.expGeos.fields
                         })}
+
+                        {this.renderExpansionPanel({
+                           panelIcon: this.expDemos.panelIcon,
+                           panelTitle: this.expDemos.panelTitle,
+                           fields: this.expDemos.fields
+                        })}
                      </div>
                   )}
                </form>
@@ -375,7 +421,8 @@ const mapStateToProps = state => {
          storeurl,
          ...metrics,
          ...geos,
-         ...demographics
+         male: demographics.male,
+         ...demographics.byAge
       }
    };
 };
