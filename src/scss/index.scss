@@ -3143,10 +3143,16 @@ $inputsFontSize: calc(0.45em+0.3vw);
 
             .engine-logo {
                   width: 15%;
+                  max-height: 50px;
 
                   .logo-SBVR {
                         height: 100%;
                         width: 100%;
+                  }
+
+                  img,
+                  svg {
+                        height: 100%;
                   }
             }
       }
