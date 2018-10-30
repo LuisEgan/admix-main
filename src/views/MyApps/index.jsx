@@ -25,7 +25,6 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import { KeyboardArrowDown } from "@material-ui/icons";
 
-import ToggleButton from "../../components/ToggleButton";
 import AppsStateToggle from "../../components/AppStateToggle";
 import Input from "../../components/Input";
 import SVG from "../../components/SVG";
@@ -504,17 +503,17 @@ class MyApps extends Component {
       const appsRe = apps.slice().reverse();
 
       return appsRe.map((app, i) => {
-         let { _id, userId, name, isActive, appState, storeurl } = app;
+         let { _id, userId, name, appState } = app;
 
          const selectedAppClass =
             selectedApp && selectedApp._id === _id ? "app-selected" : "";
 
-         let isPendingStyle = "";
+      //    let isPendingStyle = "";
 
-         if (storeurl !== undefined && appState !== undefined) {
-            isPendingStyle =
-               appState === C.APP_STATES.pending ? "pendingState" : "";
-         }
+      //    if (storeurl !== undefined && appState !== undefined) {
+      //       isPendingStyle =
+      //          appState === C.APP_STATES.pending ? "pendingState" : "";
+      //    }
 
          switch (appState) {
             case "inactive":

@@ -45,7 +45,6 @@ class AppStateToggle extends React.Component {
          isActive: appState === C.APP_STATES.live,
          appState
       };
-      console.log('appDetails: ', appDetails);
       dispatch(toggleAppStatus(appDetails, accessToken));
    }
 
@@ -57,8 +56,10 @@ class AppStateToggle extends React.Component {
    }
 
    render() {
-      const { app } = this.props;
+      let { app, displayTooltip } = this.props;
       const { appState } = app;
+
+      if(displayTooltip === undefined) displayTooltip = true;
 
       const { oninactive, onpending, onlive } = this.state;
 
@@ -95,9 +96,9 @@ class AppStateToggle extends React.Component {
                )}
             >
                <span>Off</span>
-               <div className="admix-tooltip" style={offTooltip}>
+               {displayTooltip && (<div className="admix-tooltip" style={offTooltip}>
                   In Off mode, ads are not delivering and appear transparent.
-               </div>
+               </div>)}
             </div>
             <div
                className={appState}
@@ -113,10 +114,10 @@ class AppStateToggle extends React.Component {
                )}
             >
                <span>Sandbox</span>
-               <div className="admix-tooltip" style={sandboxTooltip}>
+               {displayTooltip && (<div className="admix-tooltip" style={sandboxTooltip}>
                   In SANDBOX mode, placeholder ads are delivered for testing
                   purposes but not generating revenue.
-               </div>
+               </div>)}
             </div>
             <div
                className={appState}
@@ -132,9 +133,9 @@ class AppStateToggle extends React.Component {
                )}
             >
                <span>{this.liveText(appState).title}</span>
-               <div className="admix-tooltip" style={liveTooltip}>
+               {displayTooltip && (<div className="admix-tooltip" style={liveTooltip}>
                   {this.liveText(appState).tooltip}
-               </div>
+               </div>)}
             </div>
          </div>
       );

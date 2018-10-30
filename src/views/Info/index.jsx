@@ -8,6 +8,7 @@ import PropTypes from "prop-types";
 import validate from "validate.js";
 
 import Breadcrumbs from "../../components/Breadcrumbs";
+import PanelFooter from "../../components/PanelFooter";
 import Input from "../../components/Input";
 import ReactSVG from "react-svg";
 
@@ -349,6 +350,7 @@ class Profile extends Component {
                      )}
                   </div>
                </div>
+               <PanelFooter app={selectedApp} {...this.props}/>
             </div>
 
             <div className="page-content">
@@ -407,7 +409,11 @@ class Profile extends Component {
 const mapStateToProps = state => {
    const userData = state.app.get("userData");
    const selectedApp = state.app.get("selectedApp");
-   const { storeurl, metrics, geos, demographics } = selectedApp;
+   let { storeurl, metrics, geos, demographics } = selectedApp;
+
+   metrics = metrics || {};
+   geos = geos || {};
+   demographics = demographics || {};
 
    return {
       accessToken: state.app.get("accessToken"),

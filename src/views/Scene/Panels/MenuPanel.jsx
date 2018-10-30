@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import _a from "../../../utils/analytics";
-import { NavLink } from "react-router-dom";
 import _ from "lodash";
-import routeCodes from "../../../config/routeCodes";
 import PropTypes from "prop-types";
 import {
    getPlacements,
@@ -25,7 +23,7 @@ import { KeyboardArrowDown } from "@material-ui/icons";
 
 import STR from "../../../utils/strFuncs";
 import SVG from "../../../components/SVG";
-import ToggleButton from "../../../components/ToggleButton";
+import PanelFooter from "../../../components/PanelFooter";
 
 const { ga } = _a;
 
@@ -65,7 +63,6 @@ export default class MenuPanel extends Component {
       this.changeActive = this.changeActive.bind(this);
       this.toggleDropdowns = this.toggleDropdowns.bind(this);
       this.renderDisplayModeToggle = this.renderDisplayModeToggle.bind(this);
-      this.renderMenuFooter = this.renderMenuFooter.bind(this);
    }
 
    static getDerivedStateFromProps(nextProps, prevState) {
@@ -381,75 +378,6 @@ export default class MenuPanel extends Component {
       );
    }
 
-   renderMenuFooter() {
-      const { selectedApp } = this.props;
-      const { appState, isActive, storeurl } = selectedApp;
-
-      let footerMssg =
-         appState === C.APP_STATES.pending ||
-         appState === C.APP_STATES.inactive ||
-         !isActive ? (
-            <span>
-               Your app isn’t generating <br /> revenue yet
-            </span>
-         ) : (
-            <span>
-               Your app is starting to <br /> generate revenue
-            </span>
-         );
-
-      let footerActiveMssg =
-         appState !== undefined
-            ? appState
-            : storeurl !== undefined || storeurl !== ""
-               ? C.APP_STATES.inactive
-               : C.APP_STATES.pending;
-
-      let footerStyle, isPendingStyle;
-
-      switch (footerActiveMssg) {
-         case C.APP_STATES.inactive:
-            footerStyle = { background: "#F5F7FA" };
-            break;
-         case C.APP_STATES.pending:
-            footerStyle = { background: "#ffebcc" };
-            isPendingStyle = {
-               boxShadow: "inset 0 0 0 20px orange, 0 0 0 2px orange"
-            };
-            break;
-         default:
-            footerStyle = { background: "#ccffe4" };
-      }
-
-      return (
-         <div id="menu-panel-footer" className="mb" style={footerStyle}>
-            <div>
-               <ToggleButton
-                  inputName={"app"}
-                  isChecked={isActive}
-                  onChange={this.changeActive}
-                  labelStyle={isPendingStyle}
-               />
-               {/* <span>{footerActiveMssg}</span> */}
-            </div>
-            <div>{footerMssg}</div>
-            <div>
-               {footerActiveMssg === C.APP_STATES.pending && (
-                  <NavLink exact to={routeCodes.INFO} className="white-btn">
-                     Add URL
-                  </NavLink>
-               )}
-
-               {footerActiveMssg !== C.APP_STATES.pending && (
-                  <NavLink exact to={routeCodes.MYAPPS} className="white-btn">
-                     Back to my apps
-                  </NavLink>
-               )}
-            </div>
-         </div>
-      );
-   }
-
    render() {
       const { selectedApp, displayMode } = this.props;
 
@@ -482,7 +410,7 @@ export default class MenuPanel extends Component {
 
             {this.renderDisplayModeToggle()}
 
-            {this.renderMenuFooter()}
+            <PanelFooter app={selectedApp} {...this.props}/>
          </div>
       );
    }

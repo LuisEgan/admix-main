@@ -19,6 +19,7 @@ const ADMIX_OBJ_PREFIX = "__advirObj__";
 const APP_STATES = {
     live: "live",
     inactive: "inactive",
+    sandbox: "sandbox",
     pending: "pending"
 }
 
