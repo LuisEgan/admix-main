@@ -320,10 +320,10 @@ export default class MenuPanel extends Component {
       const isSceneSelected = Object.keys(selectedScene).length > 0;
 
       const class3D = displayMode === "3D" ? "dm-selected" : "dm-not-selected";
-      const style3D = displayMode === "3D" ? {} : { borderLeft: 0 };
+      const style3D = { borderLeft: 0 };
       const classRaw =
          displayMode === "raw" ? "dm-selected" : "dm-not-selected";
-      const styleRaw = displayMode === "3D" ? { borderRight: 0 } : {};
+      const styleRaw = { borderRightColor: "#14b9be" };
 
       const renderDisplayModeToggle = isSceneSelected
          ? { opacity: 1 }
@@ -410,7 +410,7 @@ export default class MenuPanel extends Component {
 
             {this.renderDisplayModeToggle()}
 
-            <PanelFooter app={selectedApp} {...this.props}/>
+            <PanelFooter app={selectedApp} {...this.props} />
          </div>
       );
    }

@@ -118,6 +118,7 @@ class Report extends Component {
    }
 
    componentDidMount() {
+      document.getElementById("report-content").scrollTop = 0;
       this.quickFilter("l");
    }
 
@@ -478,7 +479,8 @@ class Report extends Component {
       let pp = {};
       let ppFrom, ppTo;
       let ppData = {};
-      for (let i = 1; i <= max; i++) {
+
+      for (let i = 0; i <= max; i++) {
          ppFrom = takeDays(from, daysInterval * i);
          ppTo = takeDays(to, daysInterval * i);
 
@@ -497,7 +499,7 @@ class Report extends Component {
             data: cloneDeep(ppData)
          };
 
-         previousPeriods[i - 1] = pp;
+         previousPeriods[i] = pp;
       }
 
       return previousPeriods;
@@ -737,7 +739,6 @@ class Report extends Component {
          : { display: "none" };
 
       const filteredReportData = filteredData();
-
       return (
          <div id="report" className="page-withPanel-container">
             <div style={performanceShow}>
@@ -832,7 +833,7 @@ class Report extends Component {
                /> */}
             </div>
 
-            <div className="page-content">
+            <div className="page-content" id="report-content">
                <ToggleDisplay show={show("ov")}>
                   <Overview
                      filteredReportData={filteredReportData}

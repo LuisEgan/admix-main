@@ -51,13 +51,20 @@ const formatDate = date => {
     return `${date.getDate()} / ${date.getMonth()+1} / ${date.getFullYear()}`
 }
 
+const formatSceneDate = date => {
+    const zSplit = date.split("Z");
+    const tSplit = zSplit[0].split("T");
+    const colonSplit = tSplit[1].split(":");
+    return `${tSplit[0]} @${colonSplit[0]}:${colonSplit[1]}`
+}
+
 const parsePathName = path => {
     return capitalizeFirstLetter(path.split("/")[1]);
 }
 
 const appStateToNumber = appState => {
     return appState === "inactive" ? 0 : appState === "live" ? 1 : 2;
- }
+}
 
 export default {
     isAtleast,
@@ -70,6 +77,7 @@ export default {
     getFirstUpper,
     numberWithCommas,
     formatDate,
+    formatSceneDate,
     parsePathName,
     appStateToNumber
 };

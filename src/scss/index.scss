@@ -598,10 +598,8 @@ p {
             }
       }
 
-      [aria-expanded="true"] {
-            &:first-child {
-                  border-bottom: solid #F5F7FA;
-            }
+      [aria-expanded="true"]+div {
+            border-top: solid #F5F7FA;
       }
 
 }
@@ -1159,6 +1157,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
 
 .breadcrumbs {
       display: flex;
+      margin-bottom: 20px;
 
       >div {
             &:nth-child(2n) {
@@ -2146,6 +2145,8 @@ $inputsFontSize: calc(0.45em+0.3vw);
                               width: 50%;
                               justify-content: center;
                               padding: 5px;
+                              border-width: 2px;
+                              border-style: solid;
 
                               &:hover {
                                     background: #f2f2f2;
@@ -2159,6 +2160,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
                         span {
                               @extend .mb;
                               max-height: 35px;
+
                         }
 
                         .faIcon {
@@ -2177,12 +2179,12 @@ $inputsFontSize: calc(0.45em+0.3vw);
 
                         .dm-selected {
                               background-color: rgba(20, 185, 190, 0.05);
-                              border: 2px solid #14b9be;
+                              border-color: #14b9be;
                         }
 
                         .dm-not-selected {
                               background-color: #ffffff;
-                              border: 2px solid #ededed;
+                              border-color: #ededed;
 
                               svg {
                                     g {
@@ -2477,10 +2479,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
             background: #f2f2f2;
             overflow-y: auto;
             padding: 5%;
-
-            .breadcrumbs {
-                  padding: 0 5px;
-            }
 
             .table-toggles {
                   display: flex;
@@ -2817,7 +2815,11 @@ $inputsFontSize: calc(0.45em+0.3vw);
             }
 
             #overview-graph {
-                  margin-bottom: 30px;
+                  margin-bottom: 10px;
+            }
+
+            #overview-graph-table {
+                  margin-bottom: 50px;
             }
       }
 
@@ -3002,6 +3004,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
                         width: 100%;
                         height: 30vh;
                         max-height: 250px;
+                        border-radius: 10px;
                   }
             }
 
@@ -3128,7 +3131,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
 #info {
       #info-header {
             display: flex;
-            padding: 5% 0;
+            padding-bottom: 5%;
             justify-content: space-between;
 
             >div {
@@ -3148,6 +3151,10 @@ $inputsFontSize: calc(0.45em+0.3vw);
                   .logo-SBVR {
                         height: 100%;
                         width: 100%;
+
+                        >div { 
+                              height: 100%;
+                        }
                   }
 
                   img,

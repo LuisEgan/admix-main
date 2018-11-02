@@ -1391,13 +1391,10 @@ class Scene extends Component {
 
       const actualDate = new Date().toISOString();
 
-      // let lastUpdatedApp = appDidUpdate ? actualDate : selectedApp.updatedAt
-      //    ? new Date(selectedApp.updatedAt).toISOString()
-      //    : "";
       let lastUpdatedScene = appDidUpdate
          ? actualDate
          : selectedScene.updatedAt
-            ? new Date(selectedScene.updatedAt).toISOString()
+            ? STR.formatSceneDate(new Date(selectedScene.updatedAt).toISOString())
             : "";
 
       return (

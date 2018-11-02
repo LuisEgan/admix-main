@@ -198,9 +198,9 @@ export default class Performance extends Component {
 
    toggleData(dataToShow) {
       _a.track(ga.actions.report.changePerformanceGraphData, {
-            category: ga.categories.report,
-            label: ga.labels.changePerformanceGraphData[dataToShow]
-      })
+         category: ga.categories.report,
+         label: ga.labels.changePerformanceGraphData[dataToShow]
+      });
 
       this.setState({ dataToShow });
    }
@@ -508,20 +508,21 @@ export default class Performance extends Component {
 
       return (
          <div id="performance" className="unselectable mb">
-            <Breadcrumbs
-               breadcrumbs={this.breadcrumbs}
-            />
+            <Breadcrumbs breadcrumbs={this.breadcrumbs} />
             <div className="step-title">
                <span className="st">Performance</span>
                <div id="performance-toggles">
-                  {this.dataToggles.map(dt => {
+                  {this.dataToggles.map((dt, i) => {
                      dataToggleStyle =
                         dt === dataToShow
                            ? {
                                 backgroundColor: "rgba(20, 185, 190, 0.05)",
-                                border: "2px solid #14B9BE"
+                                border: "2px solid #14B9BE",
+                                borderLeft: dataToShow === "revenue" ? "2px solid #14B9BE" : "none"
                              }
-                           : {};
+                           : this.dataToggles[i + 1] === dataToShow
+                              ? { borderRight: "2px solid #14B9BE" }
+                              : {};
                      return (
                         <div
                            key={dt}

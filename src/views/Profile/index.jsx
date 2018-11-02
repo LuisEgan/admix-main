@@ -326,10 +326,6 @@ class Profile extends Component {
       const payBanksDetailsStyle =
          payment.region !== "" ? { display: "block" } : { display: "none" };
 
-      // const warningStyle = isWarningVisible
-      //    ? { color: "red", opacity: 1 }
-      //    : { color: "red", opacity: 0 };
-
       return (
          <div className="step-container" id="profile">
             <form onSubmit={this.handleSubmit}>

@@ -51,7 +51,9 @@ export default class Overview extends Component {
       this.renderPreviousPeriodsTable = this.renderPreviousPeriodsTable.bind(
          this
       );
+      
       this.renderGraph = this.renderGraph.bind(this);
+      this.renderGraphDataTable = this.renderGraphDataTable.bind(this);
    }
 
    static getDerivedStateFromProps(nextProps, prevState) {
@@ -188,6 +190,86 @@ export default class Overview extends Component {
       return tableData;
    }
 
+   renderGraphDataTable() {
+      const paginationPrevious = props => {
+            const { disabled } = props;
+
+            return disabled ? (
+            <button {...props}>{SVG.paginationDisabled}</button>
+            ) : (
+            <button {...props} className="hundred80">
+                  {SVG.paginationEnabled}
+            </button>
+            );
+      };
+
+      const paginationNext = props => {
+      const { disabled } = props;
+
+      return disabled ? (
+            <button {...props} className="hundred80">
+            {SVG.paginationDisabled}
+            </button>
+      ) : (
+            <button {...props}>{SVG.paginationEnabled}</button>
+      );
+      };
+
+      const { asyncLoading } = this.props;
+      const { selectedApps } = this.state;
+
+      const reportData = [];
+      
+      for (let appId in selectedApps) {
+         for (let date in selectedApps[appId].reportData.byDate) {
+            reportData.push({
+                  date,
+                  impression: selectedApps[appId].reportData.byDate[date].impression,
+                  revenue: (selectedApps[appId].reportData.byDate[date].revenue/1000).toFixed(2)
+            })
+         }
+      }
+
+      return (
+            <div className="rawDataTable">
+               <ReactTable
+                  data={reportData}
+                  noDataText={asyncLoading ? "Loading..." : "No data"}
+                  columns={[
+                     {
+                        columns: [
+                           {
+                              Header: "Days",
+                              accessor: "date",
+                              minWidth: 50,
+                              sortable: false
+                           },
+                           {
+                              Header: "Impressions",
+                              accessor: "impression",
+                              sortMethod: (a, b) => {
+                                 return a > b ? -1 : 1;
+                              }
+                           },
+                           {
+                              Header: "Revenue",
+                              accessor: "revenue",
+                              sortMethod: (a, b) => {
+                                 return a > b ? -1 : 1;
+                              }
+                           }
+                        ]
+                     }
+                  ]}
+                  defaultPageSize={5}
+                  className="-striped -highlight"
+                  PreviousComponent={paginationPrevious}
+                  NextComponent={paginationNext}
+               />
+            </div>
+         );
+   }
+
    renderPreviousPeriodsTable() {
       const { asyncLoading, quickFilter } = this.props;
       let reportData = this.previousPeriodsTableData();
@@ -283,7 +365,7 @@ export default class Overview extends Component {
                noDataText={asyncLoading ? "Loading..." : "No previous periods"}
                columns={[
                   {
-                     Header: "Previous Periods",
+                     Header: "All Periods",
                      columns: [
                         {
                            Header: "Periods",
@@ -328,6 +410,7 @@ export default class Overview extends Component {
       const uniqueDates = {};
 
       let byDatedata;
+      
       for (let appId in selectedApps) {
          for (let date in selectedApps[appId].reportData.byDate) {
             uniqueDates[date] = date;
@@ -455,7 +538,10 @@ export default class Overview extends Component {
 
       return (
          <div id="overview" className="mb">
-            <Breadcrumbs breadcrumbs={this.breadcrumbs} renderedOn={_a_location}/>
+            <Breadcrumbs
+               breadcrumbs={this.breadcrumbs}
+               renderedOn={_a_location}
+            />
             <div className="step-title">
                <span className="st">Overview</span>
             </div>
@@ -485,6 +571,10 @@ export default class Overview extends Component {
 
             <div id="overview-graph">
                <div className="graph">{this.renderGraph()}</div>
+            </div>
+
+            <div id="overview-graph-table">
+                  {this.renderGraphDataTable()}
             </div>
 
             <div id="overview-table">{this.renderPreviousPeriodsTable()}</div>
