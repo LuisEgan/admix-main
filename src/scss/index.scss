@@ -692,7 +692,6 @@ p {
 
                         >div {
                               @extend .mb;
-                              width: 100%;
                         }
                   }
             }
@@ -2480,6 +2479,17 @@ $inputsFontSize: calc(0.45em+0.3vw);
             overflow-y: auto;
             padding: 5%;
 
+            .rawDataTable {
+                  .ReactTable {
+                        .rt-td {
+                              >div {
+                                    width: 100%;
+                              }
+                        }
+                  }
+
+            }
+
             .table-toggles {
                   display: flex;
                   align-items: center;
@@ -2570,18 +2580,28 @@ $inputsFontSize: calc(0.45em+0.3vw);
 }
 
 .perc {
-      width: 100%;
+      width: unset;
 
       span {
-            float: right;
+            margin-left: 5px;
       }
 
       .pos {
             color: #0ccc06;
+
+            &:before {
+                  content: "🡅";
+                  margin-right: 5px;
+            }
       }
 
       .neg {
             color: red;
+
+            &:before {
+                  content: "🡇";
+                  margin-right: 5px;
+            }
       }
 
       .neut {
@@ -2815,7 +2835,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
             }
 
             #overview-graph {
-                  margin-bottom: 10px;
+                  margin-bottom: 50px;
             }
 
             #overview-graph-table {
@@ -3152,7 +3172,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
                         height: 100%;
                         width: 100%;
 
-                        >div { 
+                        >div {
                               height: 100%;
                         }
                   }
