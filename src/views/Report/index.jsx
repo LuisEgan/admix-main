@@ -707,38 +707,19 @@ class Report extends Component {
    }
 
    render() {
-      const { show, filteredData, previousPeriods } = this;
+      const { show, previousPeriods } = this;
 
-      const {
-         from,
-         to,
-         isSceneLoaded,
-         isLoadingScene,
-         progressLoadingScene,
-         selectedApps,
-         quickFilter,
-         placementsByAppId
-      } = this.state;
+      const { from, to } = this.state;
 
-      const {
-         dispatch,
-         accessToken,
-         isLoad_webgl,
-         reportData,
-         userData,
-         selectedApp
-         //    placementsByAppId
-      } = this.props;
+      const { dispatch, isLoad_webgl, userData } = this.props;
 
       const owAct = show("ov") ? "active" : "";
       const perAct = show("pe") ? "active" : "";
-      // const anAct = show("an") ? "active" : "";
 
       const performanceShow = show("pe")
          ? { display: "block" }
          : { display: "none" };
 
-      const filteredReportData = filteredData();
       return (
          <div id="report" className="page-withPanel-container">
             <div style={performanceShow}>
@@ -820,49 +801,20 @@ class Report extends Component {
                         <KeyboardArrowDown className="rotate270" />
                      )}
                   </div>
-                  {/* <a
-                     className={`list-group-item list-group-item-action ${anAct}`}
-                     onClick={this.changeView.bind(null, "an")}
-                  >
-                     Analytics
-                  </a> */}
                </div>
-               {/* <div
-                  className="menu-panel-vertical-cover"
-                  style={performanceShow}
-               /> */}
             </div>
 
             <div className="page-content" id="report-content">
                <ToggleDisplay show={show("ov")}>
                   <Overview
-                     filteredReportData={filteredReportData}
                      previousPeriods={previousPeriods(7)}
-                     quickFilter={quickFilter}
-                     selectedApps={selectedApps}
+                     {...this.state}
+                     {...this.props}
                   />
                </ToggleDisplay>
 
                <ToggleDisplay show={show("pe")}>
-                  <Performance
-                     reportData={reportData}
-                     dispatch={dispatch}
-                     accessToken={accessToken}
-                     TJSclear={this.TJSclear}
-                     selectedApp={selectedApp}
-                     selectedApps={selectedApps}
-                     placementsByAppId={placementsByAppId}
-                     filteredReportData={filteredReportData}
-                     fromDate={from}
-                     toDate={to}
-                     doLoadScene={this.doLoadScene}
-                     moveCamera={this.moveCamera}
-                     addEventListeners={this.addEventListeners}
-                     disposeEventListeners={this.disposeEventListeners}
-                     isSceneLoaded={isSceneLoaded}
-                     isLoadingScene={isLoadingScene}
-                     progressLoadingScene={progressLoadingScene}
-                  />
+                  <Performance {...this} {...this.state} {...this.props} />
                </ToggleDisplay>
 
                <ToggleDisplay show={show("an")}>

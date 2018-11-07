@@ -9,6 +9,24 @@ import { isEqual, cloneDeep } from "lodash";
 
 const _a_location = routeCodes.REPORT;
 
+const parseGrowth = val => {
+   val = val === "Infinity" ? 100 : val;
+   return val === Infinity || !val || val === "NaN" || isNaN(val)
+      ? "-"
+      : Math.round(val) + "%";
+};
+
+// growth class
+const gc = growth => {
+   if (growth > 0) {
+      return "pos";
+   } else if (growth < 0) {
+      return "neg";
+   }
+
+   return "neut";
+};
+
 export default class Overview extends Component {
    static propTypes = {
       dispatch: PropTypes.func
@@ -218,6 +236,7 @@ export default class Overview extends Component {
       const { asyncLoading } = this.props;
       const { selectedApps } = this.state;
 
+      // ! let reportData = this.previousPeriodsTableData();
       const reportData = [];
 
       for (let appId in selectedApps) {
@@ -295,24 +314,6 @@ export default class Overview extends Component {
       });
 
       if (reportData[0].previousPeriods === "") return null;
-
-      const parseGrowth = val => {
-         val = val === "Infinity" ? 100 : val;
-         return val === Infinity || !val || val === "NaN" || isNaN(val)
-            ? "-"
-            : val + "%";
-      };
-
-      // growth class
-      const gc = growth => {
-         if (growth > 0) {
-            return "pos";
-         } else if (growth < 0) {
-            return "neg";
-         }
-
-         return "neut";
-      };
 
       reportData =
          quickFilter === "a"
