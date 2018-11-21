@@ -148,7 +148,7 @@ export default class MenuPanel extends Component {
    sceneChange(e) {
       const sceneName = e.target ? e.target.value : e;
       let scene;
-      const {
+      let {
          loadScene,
          selectScene,
          dispatch,
@@ -156,6 +156,8 @@ export default class MenuPanel extends Component {
          selectedApp: { _id, scenes }
       } = this.props;
       const { selectedScene } = this.state;
+
+      scenes = scenes || [];
 
       if (selectedScene !== sceneName) {
          //Get scene's ID
@@ -275,7 +277,9 @@ export default class MenuPanel extends Component {
    renderScenesSelect() {
       const { selectedApp } = this.props;
       let { selectedScene } = this.state;
-      const { scenes } = selectedApp;
+      let { scenes } = selectedApp;
+
+      scenes = scenes || [];
 
       const allScenes = scenes.map(scene => {
          const { name } = scene;

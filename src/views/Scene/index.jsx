@@ -203,6 +203,8 @@ class Scene extends Component {
       const { selectedScene, initialSet } = prevSate;
       let emptyPlacements = false;
 
+      // console.warn("CHECK");
+
       if (
          selectedApp.scenes &&
          selectedApp.scenes[0] &&
@@ -214,6 +216,8 @@ class Scene extends Component {
          const subCatsSelectedByPlacementId = {};
          const activeByPlacementId = {};
          const placementsByName = {};
+
+         // console.log("HERE");
 
          // set the placements to the selectedScene
          selectedApp.scenes.some(scene => {
@@ -244,6 +248,8 @@ class Scene extends Component {
             return false;
          });
 
+         // console.log("UPDATE ALL");
+         // console.log('NEW selectedApp: ', selectedApp);
          return {
             initialSet: !emptyPlacements,
             selectedApp,
@@ -257,6 +263,7 @@ class Scene extends Component {
       }
 
       if (!isEqual(selectedApp, prevSate.selectedApp)) {
+         // console.log("JUST UPDATE SELECTEDAPP");
          return { selectedApp: { ...selectedApp } };
       }
 
@@ -1519,7 +1526,7 @@ class Scene extends Component {
       } = this.props;
 
       let {
-         selectedApp,
+         selectedApp,         
          loadingProgress,
          selectedScene,
          isSceneLoading,
@@ -1529,6 +1536,7 @@ class Scene extends Component {
          displayMode
       } = this.state;
       // const barColor = "#157cc1";
+      // console.log('R selectedApp: ', selectedApp);
 
       loadingProgress =
          !isFinite(loadingProgress) || isNaN(loadingProgress)
