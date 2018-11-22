@@ -6,6 +6,7 @@ import ReactTable from "react-table";
 import Breadcrumbs from "../../../components/Breadcrumbs";
 import SVG from "../../../components/SVG";
 import { isEqual, cloneDeep } from "lodash";
+import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 
 const _a_location = routeCodes.REPORT;
 
@@ -315,24 +316,39 @@ export default class Overview extends Component {
 
       if (reportData[0].previousPeriods === "") return null;
 
+      let impClass, impArrow, revClass, revArrow;
       reportData =
          quickFilter === "a"
             ? []
             : reportData.map(item => {
+                 impClass = gc(item.impression.growth);
+                 impArrow =
+                    impClass === "pos" ? (
+                       <FontAwesomeIcon icon="arrow-up" />
+                    ) : (
+                       <FontAwesomeIcon icon="arrow-down" />
+                    );
                  item.impression = (
                     <div className="perc">
                        {item.impression.value}
-                       <span className={`${gc(item.impression.growth)}`}>
-                          {parseGrowth(item.impression.growth)}
+                       <span className={impClass}>
+                          {impArrow} {parseGrowth(item.impression.growth)}
                        </span>
                     </div>
                  );
 
+                 revClass = gc(item.revenue.growth);
+                 revArrow =
+                    revClass === "pos" ? (
+                       <FontAwesomeIcon icon="arrow-up" />
+                    ) : (
+                       <FontAwesomeIcon icon="arrow-down" />
+                    );
                  item.revenue = (
                     <div className="perc">
                        {item.revenue.value}
-                       <span className={`${gc(item.revenue.growth)}`}>
-                          {parseGrowth(item.revenue.growth)}
+                       <span className={revClass}>
+                          {revArrow} {parseGrowth(item.revenue.growth)}
                        </span>
                     </div>
                  );

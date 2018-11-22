@@ -26,7 +26,9 @@ import {
    faGamepad,
    faEye,
    faGlobeAmericas,
-   faUsers
+   faUsers,
+   faArrowDown,
+   faArrowUp
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -39,7 +41,9 @@ library.add(
    faGamepad,
    faEye,
    faGlobeAmericas,
-   faUsers
+   faUsers,
+   faArrowDown,
+   faArrowUp
 );
 
 const { persistor, store } = configureStore();
