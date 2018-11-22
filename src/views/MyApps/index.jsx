@@ -15,7 +15,7 @@ import {
    resetSelectedApp,
    setUserImgURL,
    setAppsFilterBy,
-   getPlacementsByAppId,
+   getPlacementsByAppId
 } from "../../actions";
 import C from "../../utils/constants";
 import STR from "../../utils/strFuncs";
@@ -112,7 +112,7 @@ class MyApps extends Component {
 
       const allAppsIds = apps.map(app => app._id);
       return { allAppsIds, activeApps };
-   }   
+   }
 
    showContent() {
       const { asyncLoading, userData } = this.props;
@@ -428,8 +428,8 @@ class MyApps extends Component {
                                  filter[filterType] === ""
                                     ? ""
                                     : filter[filterType]
-                                       ? C.APP_STATES.live
-                                       : C.APP_STATES.inactive;
+                                    ? C.APP_STATES.live
+                                    : C.APP_STATES.inactive;
                               break;
                            case "platformName":
                               opts = platformOpts;
@@ -508,12 +508,12 @@ class MyApps extends Component {
          const selectedAppClass =
             selectedApp && selectedApp._id === _id ? "app-selected" : "";
 
-      //    let isPendingStyle = "";
+         //    let isPendingStyle = "";
 
-      //    if (storeurl !== undefined && appState !== undefined) {
-      //       isPendingStyle =
-      //          appState === C.APP_STATES.pending ? "pendingState" : "";
-      //    }
+         //    if (storeurl !== undefined && appState !== undefined) {
+         //       isPendingStyle =
+         //          appState === C.APP_STATES.pending ? "pendingState" : "";
+         //    }
 
          switch (appState) {
             case "inactive":
@@ -549,7 +549,7 @@ class MyApps extends Component {
                            onChange={this.handleOnSwitch.bind(null, app)}
                            labelClass={isPendingStyle}
                         /> */}
-                        <AppsStateToggle app={app} {...this.props}/>
+                        <AppsStateToggle app={app} {...this.props} />
                      </div>
                   </div>
 
@@ -698,8 +698,9 @@ class MyApps extends Component {
 
             {filterBy.length > 0 && this.renderFilter()}
 
-            {anyApps &&
-               showContent && <div id="apps-list">{this.renderApps()}</div>}
+            {anyApps && showContent && (
+               <div id="apps-list">{this.renderApps()}</div>
+            )}
 
             {!anyApps && userData._id && showContent && this.renderNoApps()}
          </div>
