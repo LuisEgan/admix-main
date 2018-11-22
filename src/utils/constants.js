@@ -28,6 +28,12 @@ const APP_ENGINES_IMGS = {
     Unreal,
     "High Fidelity": HiFi,
     Desktop,
+    SBVR: ( < ReactSVG src = {
+            sbvrSVG
+        }
+        className = "logo-SBVR" /
+        >
+    ),
     // WindowsEditor,
     // Android
 }
