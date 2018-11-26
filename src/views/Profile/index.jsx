@@ -13,11 +13,9 @@ import PropTypes from "prop-types";
 import Dropzone from "react-dropzone";
 import request from "superagent";
 import ReactSVG from "react-svg";
+import ExpansionPanel from "../../components/ExpansionPanel";
 
 // Material UI
-import ExpansionPanel from "@material-ui/core/ExpansionPanel";
-import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
-import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -313,7 +311,7 @@ class Profile extends Component {
 
   render() {
     const { asyncLoading, userData } = this.props;
-    const { clicked, payment, changePassClicked } = this.state;
+    const { payment } = this.state;
 
     const paypalEmailStyle =
       payment.option !== "bank" ? { display: "block" } : { display: "none" };
@@ -370,200 +368,40 @@ class Profile extends Component {
                 {/* PERSONAL INFORMATION */}
 
                 <ExpansionPanel
-                  defaultExpanded={true}
-                  classes={{ root: "mui-expansionPanel-root" }}
-                >
-                  <ExpansionPanelSummary
-                    expandIcon={<FontAwesomeIcon icon="angle-up" />}
-                  >
-                    <div className="cc">
-                      <ReactSVG
-                        src={SVG_personalInfo}
-                        className="sectionIcon"
-                      />
-                      <span>Personal information</span>
-                    </div>
-                  </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
-                    <div className="expansionPanelDetails-container">
-                      <div>
-                        <Field name="userName" component={this.renderField} />
-                        <Field name="email" component={this.renderField} />
-                        <Field
-                          name="Password"
-                          component={this.renderField}
-                          disabled={true}
-                        />
-                      </div>
-                      <div>
-                        <div />
-                        <div>
-                          <span className="profile-helper-text">
-                            <a
-                              onClick={this.handleUserUpdate.bind(
-                                null,
-                                "email"
-                              )}
-                              onMouseEnter={() => {
-                                this.setState({
-                                  isWarningVisible: true
-                                });
-                              }}
-                              onMouseLeave={() => {
-                                this.setState({
-                                  isWarningVisible: false
-                                });
-                              }}
-                            >
-                              {asyncLoading && clicked === "email"
-                                ? " ...Loading"
-                                : " Update email"}
-                            </a>
-                            {/* <span style={warningStyle}>
-                                             &nbsp;Warning! Your account will
-                                             become inactive and you will have
-                                             to verify your new email before
-                                             logging in again (this will log you
-                                             out).
-                                          </span> */}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="profile-helper-text">
-                            {!changePassClicked && (
-                              <a
-                                onClick={this.handleUserUpdate.bind(
-                                  null,
-                                  "password"
-                                )}
-                              >
-                                {asyncLoading && clicked === "password"
-                                  ? " ...Loading"
-                                  : " Change password."}
-                              </a>
-                            )}
-
-                            {changePassClicked && (
-                              <span>
-                                {asyncLoading && clicked === "password"
-                                  ? " ...Loading"
-                                  : " Check your inbox for the password reset link."}
-                              </span>
-                            )}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </ExpansionPanelDetails>
-                </ExpansionPanel>
+                  headerIcon={
+                    <ReactSVG src={SVG_personalInfo} className="sectionIcon" />
+                  }
+                  headerTitle={"Personal information"}
+                  Content={
+                    <PersonalInfo
+                      renderField={this.renderField}
+                      handleUserUpdate={this.handleUserUpdate}
+                      {...this.state}
+                      {...this.props}
+                    />
+                  }
+                />
 
                 {/* PAYMENT OPTIONS */}
 
                 <ExpansionPanel
-                  defaultExpanded={false}
-                  classes={{ root: "mui-expansionPanel-root" }}
-                >
-                  <ExpansionPanelSummary
-                    expandIcon={<FontAwesomeIcon icon="angle-up" />}
-                  >
-                    <div className="cc">
-                      <ReactSVG src={SVG_payment} className="sectionIcon" />
-                      <span>Payments configuration</span>
-                    </div>
-                  </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
-                    <div
-                      id="expansionPanelDetails-container-payment"
-                      className="expansionPanelDetails-container"
-                    >
-                      <FormControl component="fieldset" required>
-                        <RadioGroup
-                          aria-label="paymentOpts"
-                          name="paymentOpts"
-                          value={payment.option}
-                          onChange={this.paymentChange.bind(null, "option")}
-                          className="paymentOpts"
-                        >
-                          <FormControlLabel
-                            value="paypal"
-                            control={<Radio className="mui-radio-btn" />}
-                            label={<img src={paypal} alt="paypal" />}
-                          />
-                          <FormControlLabel
-                            value="bank"
-                            control={<Radio className="mui-radio-btn" />}
-                            label={
-                              <React.Fragment>
-                                <FontAwesomeIcon icon="university" /> Bank
-                              </React.Fragment>
-                            }
-                          />
-                        </RadioGroup>
-                      </FormControl>
-
-                      <div style={paypalEmailStyle}>
-                        <Field
-                          name="paypalEmail"
-                          component={this.renderField}
-                        />
-                      </div>
-
-                      <div
-                        id="profile-pay-banks"
-                        style={payBanksStyle}
-                        className="fadeIn mb"
-                      >
-                        <FormControl>
-                          <div className="input-label">Region</div>
-                          <Select
-                            value={payment.region}
-                            onChange={this.paymentChange.bind(null, "region")}
-                            input={<Input name="region" id="region-helper" />}
-                            classes={{ root: "mui-select-root" }}
-                            disableUnderline={true}
-                            IconComponent={KeyboardArrowDown}
-                            style={CSS.mb}
-                          >
-                            <MenuItem style={CSS.mb} value="">
-                              <em>Please select a region</em>
-                            </MenuItem>
-                            <MenuItem style={CSS.mb} value="usa">
-                              United States of America
-                            </MenuItem>
-                            <MenuItem style={CSS.mb} value="uk">
-                              United Kingdom
-                            </MenuItem>
-                            <MenuItem style={CSS.mb} value="eu">
-                              Europe
-                            </MenuItem>
-                          </Select>
-                          <FormHelperText>
-                            Don't see your country yet? You can always use
-                            PayPal in the meantime{" "}
-                            <span role="img" aria-label="thumbs-up">
-                              👍
-                            </span>
-                          </FormHelperText>
-                        </FormControl>
-
-                        {payment.region !== "" && (
-                          <div
-                            id="profile-pay-banks-details"
-                            style={payBanksDetailsStyle}
-                            className="fadeIn"
-                          >
-                            <BankDetails
-                              Field={Field}
-                              renderField={this.renderField}
-                              region={payment.region}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </ExpansionPanelDetails>
-                </ExpansionPanel>
-
+                  headerIcon={
+                    <ReactSVG src={SVG_payment} className="sectionIcon" />
+                  }
+                  headerTitle={"Payment configuration"}
+                  contentId={"expansionPanelDetails-container-payment"}
+                  Content={
+                    <PaymentConfig
+                      renderField={this.renderField}
+                      paymentChange={this.paymentChange}
+                      paypalEmailStyle={paypalEmailStyle}
+                      payBanksStyle={payBanksStyle}
+                      payBanksDetailsStyle={payBanksDetailsStyle}
+                      {...this.state}
+                      {...this.props}
+                    />
+                  }
+                />
                 <br />
               </div>
             </div>
@@ -573,6 +411,146 @@ class Profile extends Component {
     );
   }
 }
+
+const PersonalInfo = ({
+  renderField,
+  handleUserUpdate,
+  asyncLoading,
+  clicked,
+  changePassClicked
+}) => {
+  return (
+    <React.Fragment>
+      <div>
+        <Field name="userName" component={renderField} />
+        <Field name="email" component={renderField} />
+        <Field name="Password" component={renderField} disabled={true} />
+      </div>
+      <div>
+        <div />
+        <div>
+          <span className="profile-helper-text">
+            <a onClick={handleUserUpdate.bind(null, "email")}>
+              {asyncLoading && clicked === "email"
+                ? " ...Loading"
+                : " Update email"}
+            </a>
+          </span>
+        </div>
+        <div>
+          <span className="profile-helper-text">
+            {!changePassClicked && (
+              <a onClick={handleUserUpdate.bind(null, "password")}>
+                {asyncLoading && clicked === "password"
+                  ? " ...Loading"
+                  : " Change password."}
+              </a>
+            )}
+
+            {changePassClicked && (
+              <span>
+                {asyncLoading && clicked === "password"
+                  ? " ...Loading"
+                  : " Check your inbox for the password reset link."}
+              </span>
+            )}
+          </span>
+        </div>
+      </div>
+    </React.Fragment>
+  );
+};
+
+const PaymentConfig = ({
+  renderField,
+  paymentChange,
+  payment,
+  paypalEmailStyle,
+  payBanksStyle,
+  payBanksDetailsStyle
+}) => {
+  const regions = [
+    { title: <em>Please select a region</em>, value: "" },
+    { title: "United States of America", value: "usa" },
+    { title: "United Kingdom", value: "uk" },
+    { title: "Europe", value: "eu" }
+  ];
+
+  return (
+    <React.Fragment>
+      <Field name="compName" component={renderField} />
+
+      <RadioGroup
+        aria-label="paymentOpts"
+        name="paymentOpts"
+        value={payment.option}
+        onChange={paymentChange.bind(null, "option")}
+        className="paymentOpts"
+      >
+        <FormControlLabel
+          value="paypal"
+          control={<Radio className="mui-radio-btn" />}
+          label={<img src={paypal} alt="paypal" />}
+        />
+        <FormControlLabel
+          value="bank"
+          control={<Radio className="mui-radio-btn" />}
+          label={
+            <React.Fragment>
+              <FontAwesomeIcon icon="university" /> Bank
+            </React.Fragment>
+          }
+        />
+      </RadioGroup>
+
+      <div style={paypalEmailStyle}>
+        <Field name="paypalEmail" component={renderField} />
+      </div>
+
+      <div id="profile-pay-banks" style={payBanksStyle} className="fadeIn mb">
+        <FormControl>
+          <div className="input-label">Region</div>
+          <Select
+            value={payment.region}
+            onChange={paymentChange.bind(null, "region")}
+            input={<Input name="region" id="region-helper" />}
+            classes={{ root: "mui-select-root" }}
+            disableUnderline={true}
+            IconComponent={KeyboardArrowDown}
+            style={CSS.mb}
+          >
+            {regions.map(region => (
+              <MenuItem key={region.value} style={CSS.mb} value={region.value}>
+                {region.title}
+              </MenuItem>
+            ))}
+          </Select>
+          <FormHelperText>
+            Don't see your country yet? You can always use PayPal in the
+            meantime{" "}
+            <span role="img" aria-label="thumbs-up">
+              👍
+            </span>
+          </FormHelperText>
+        </FormControl>
+
+        {payment.region !== "" && (
+          <div
+            id="profile-pay-banks-details"
+            style={payBanksDetailsStyle}
+            className="fadeIn"
+          >
+            <BankDetails
+              Field={Field}
+              renderField={renderField}
+              region={payment.region}
+            />
+          </div>
+        )}
+      </div>
+    </React.Fragment>
+  );
+};
 
 const mapStateToProps = state => {
   const userData = state.app.get("userData");
