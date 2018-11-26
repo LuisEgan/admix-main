@@ -394,18 +394,6 @@ class Profile extends Component {
                           component={this.renderField}
                           disabled={true}
                         />
-                        {/* <div>
-                                       <FontAwesomeIcon
-                                          icon={faEye}
-                                          onMouseEnter={
-                                             this.togglePassInputType
-                                          }
-                                          onMouseLeave={
-                                             this.togglePassInputType
-                                          }
-                                          className="password-eye"
-                                       />
-                                    </div> */}
                       </div>
                       <div>
                         <div />
