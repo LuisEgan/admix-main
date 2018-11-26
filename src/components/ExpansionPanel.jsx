@@ -6,7 +6,7 @@ import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 
 export default class ExpPanel extends React.Component {
   render() {
-    const { headerIcon, headerTitle, contentId, Content } = this.props;
+    const { headerIcon, headerTitle, contentId, children } = this.props;
     return (
       <ExpansionPanel
         defaultExpanded={true}
@@ -20,7 +20,7 @@ export default class ExpPanel extends React.Component {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <div className="expansionPanelDetails-container" id={contentId}>
-            {Content}
+            {children}
           </div>
         </ExpansionPanelDetails>
       </ExpansionPanel>

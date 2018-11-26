@@ -372,15 +372,14 @@ class Profile extends Component {
                     <ReactSVG src={SVG_personalInfo} className="sectionIcon" />
                   }
                   headerTitle={"Personal information"}
-                  Content={
-                    <PersonalInfo
-                      renderField={this.renderField}
-                      handleUserUpdate={this.handleUserUpdate}
-                      {...this.state}
-                      {...this.props}
-                    />
-                  }
-                />
+                >
+                  <PersonalInfo
+                    renderField={this.renderField}
+                    handleUserUpdate={this.handleUserUpdate}
+                    {...this.state}
+                    {...this.props}
+                  />
+                </ExpansionPanel>
 
                 {/* PAYMENT OPTIONS */}
 
@@ -390,18 +389,18 @@ class Profile extends Component {
                   }
                   headerTitle={"Payment configuration"}
                   contentId={"expansionPanelDetails-container-payment"}
-                  Content={
-                    <PaymentConfig
-                      renderField={this.renderField}
-                      paymentChange={this.paymentChange}
-                      paypalEmailStyle={paypalEmailStyle}
-                      payBanksStyle={payBanksStyle}
-                      payBanksDetailsStyle={payBanksDetailsStyle}
-                      {...this.state}
-                      {...this.props}
-                    />
-                  }
-                />
+                >
+                  <PaymentConfig
+                    renderField={this.renderField}
+                    paymentChange={this.paymentChange}
+                    paypalEmailStyle={paypalEmailStyle}
+                    payBanksStyle={payBanksStyle}
+                    payBanksDetailsStyle={payBanksDetailsStyle}
+                    {...this.state}
+                    {...this.props}
+                  />
+                </ExpansionPanel>
+
                 <br />
               </div>
             </div>
@@ -478,7 +477,9 @@ const PaymentConfig = ({
 
   return (
     <React.Fragment>
-      <Field name="compName" component={renderField} />
+      <div>
+        <Field name="compName" component={renderField} />
+      </div>
 
       <RadioGroup
         aria-label="paymentOpts"
