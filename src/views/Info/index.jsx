@@ -42,7 +42,7 @@ class Profile extends Component {
       super(props);
 
       this.state = {
-         show: "del",
+         show: "url",
          deleteClicked: false
       };
 
