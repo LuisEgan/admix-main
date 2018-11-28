@@ -28,7 +28,8 @@ import {
    faGlobeAmericas,
    faUsers,
    faArrowDown,
-   faArrowUp
+   faArrowUp,
+   faBuilding
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -43,7 +44,8 @@ library.add(
    faGlobeAmericas,
    faUsers,
    faArrowDown,
-   faArrowUp
+   faArrowUp,
+   faBuilding
 );
 
 const { persistor, store } = configureStore();
