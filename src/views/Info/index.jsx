@@ -207,7 +207,7 @@ class Profile extends Component {
          isActive: false
       };
 
-      console.log('appData: ', appData);
+      console.log("appData: ", appData);
       this.setState({ deleteClicked: true }, () => {
          dispatch(updateApp({ appData, accessToken, admintoken }));
       });
@@ -442,9 +442,9 @@ class Profile extends Component {
                      </span>{" "}
                      <br />
                      <br />
-                     This will inactivate you app and you will not be able to
+                     This will inactivate your app and you will not be able to
                      activate it and it will dissappear from your "My apps"
-                     menu. Continue? <br />
+                     menu. <br />
                      <span className="mbs">
                         Note: you can re-activate it by contacting{" "}
                         <a href="mailto:support@admix.in">support@admix.in</a>
