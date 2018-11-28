@@ -42,7 +42,8 @@ class Profile extends Component {
       super(props);
 
       this.state = {
-         show: "url"
+         show: "del",
+         deleteClicked: false
       };
 
       this.expMetrics = {
@@ -132,6 +133,7 @@ class Profile extends Component {
       this.changeView = this.changeView.bind(this);
       this.deleteValue = this.deleteValue.bind(this);
       this.handleUpdateInfo = this.handleUpdateInfo.bind(this);
+      this.handleDelete = this.handleDelete.bind(this);
       this.show = this.show.bind(this);
       this.renderExpansionPanel = this.renderExpansionPanel.bind(this);
       this.renderField = this.renderField.bind(this);
@@ -193,6 +195,24 @@ class Profile extends Component {
       dispatch(updateApp({ appData, accessToken, admintoken }));
    }
 
+   handleDelete() {
+      const { accessToken, admintoken, dispatch, selectedApp } = this.props;
+      let { platformName, name } = selectedApp;
+
+      const appData = {
+         platformName,
+         name,
+         appId: selectedApp._id,
+         appState: "deleted",
+         isActive: false
+      };
+
+      console.log('appData: ', appData);
+      this.setState({ deleteClicked: true }, () => {
+         dispatch(updateApp({ appData, accessToken, admintoken }));
+      });
+   }
+
    show(view) {
       const { show } = this.state;
       return show === view;
@@ -217,8 +237,8 @@ class Profile extends Component {
                         input.value === ""
                            ? ""
                            : error
-                              ? SVG_checkFail
-                              : SVG_tickGreen
+                           ? SVG_checkFail
+                           : SVG_tickGreen
                      }
                      className="input-svg-icon"
                   />
@@ -292,7 +312,8 @@ class Profile extends Component {
 
    render() {
       const { show } = this;
-      const { selectedApp, handleSubmit } = this.props;
+      const { asyncData, selectedApp, handleSubmit } = this.props;
+      const { deleteClicked } = this.state;
 
       this.breadcrumbs = [
          {
@@ -311,6 +332,7 @@ class Profile extends Component {
 
       const urlAct = show("url") ? "active" : "";
       const audAct = show("aud") ? "active" : "";
+      const delAct = show("del") ? "active" : "";
 
       return (
          <div className="mb page-withPanel-container" id="info">
@@ -349,8 +371,19 @@ class Profile extends Component {
                         <KeyboardArrowDown className="rotate270" />
                      )}
                   </div>
+                  <div
+                     className={`${delAct} delete-arrow`}
+                     onClick={this.changeView.bind(null, "del")}
+                  >
+                     <span>Delete app</span>
+                     {show("del") ? (
+                        <KeyboardArrowRight className="rotate90" />
+                     ) : (
+                        <KeyboardArrowDown className="rotate270" />
+                     )}
+                  </div>
                </div>
-               <PanelFooter app={selectedApp} {...this.props}/>
+               <PanelFooter app={selectedApp} {...this.props} />
             </div>
 
             <div className="page-content">
@@ -363,12 +396,14 @@ class Profile extends Component {
                      <div>
                         <h3 className="st">{selectedApp.name}</h3>
                      </div>
-                     <div>
-                        <button type="submit" className="gradient-btn">
-                           {" "}
-                           Save
-                        </button>
-                     </div>
+                     {!show("del") && (
+                        <div>
+                           <button type="submit" className="gradient-btn">
+                              {" "}
+                              Save
+                           </button>
+                        </div>
+                     )}
                   </div>
 
                   {show("url") && (
@@ -400,6 +435,34 @@ class Profile extends Component {
                      </div>
                   )}
                </form>
+               {show("del") && (
+                  <div id="info-del">
+                     <span className="sst" style={{ color: "red" }}>
+                        Warning!
+                     </span>{" "}
+                     <br />
+                     <br />
+                     This will inactivate you app and you will not be able to
+                     activate it and it will dissappear from your "My apps"
+                     menu. Continue? <br />
+                     <span className="mbs">
+                        Note: you can re-activate it by contacting{" "}
+                        <a href="mailto:support@admix.in">support@admix.in</a>
+                     </span>{" "}
+                     <br />
+                     <br />
+                     {deleteClicked && <div>{asyncData.mssg}</div>}
+                     {!deleteClicked && (
+                        <button
+                           className="gradient-btn"
+                           type="button"
+                           onClick={this.handleDelete}
+                        >
+                           Confirm
+                        </button>
+                     )}
+                  </div>
+               )}
             </div>
          </div>
       );
@@ -409,6 +472,7 @@ class Profile extends Component {
 const mapStateToProps = state => {
    const userData = state.app.get("userData");
    const selectedApp = state.app.get("selectedApp");
+   const asyncData = state.app.get("asyncData");
    let { storeurl, metrics, geos, demographics } = selectedApp;
 
    metrics = metrics || {};
@@ -420,6 +484,7 @@ const mapStateToProps = state => {
       isLoggedIn: state.app.get("isLoggedIn"),
       userImgURL: state.app.get("userImgURL"),
       asyncLoading: state.app.get("asyncLoading"),
+      asyncData,
       selectedApp,
       userData,
       reduxForm: state.form,

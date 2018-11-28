@@ -1145,6 +1145,12 @@ $inputsFontSize: calc(0.45em+0.3vw);
                   }
             }
       }
+
+      .delete-arrow {
+            svg {
+                  color: red;
+            }
+      }
 }
 
 .page-content {
@@ -3151,7 +3157,9 @@ $inputsFontSize: calc(0.45em+0.3vw);
       #info-header {
             display: flex;
             padding-bottom: 5%;
-            justify-content: space-between;
+            min-height: 20vh;
+            align-items: center;
+            // justify-content: space-between;
 
             >div {
                   display: flex;
@@ -3159,6 +3167,12 @@ $inputsFontSize: calc(0.45em+0.3vw);
 
                   &:nth-child(2) {
                         padding: 0 20px;
+                        width: 65%;
+                  }
+
+                  &:nth-child(3) {
+                        width: 20%;
+                        justify-content: flex-end;
                   }
 
             }
@@ -3181,6 +3195,10 @@ $inputsFontSize: calc(0.45em+0.3vw);
                         height: 100%;
                   }
             }
+      }
+
+      #info-del {
+            text-align: center;
       }
 
       .input-delete {
@@ -3214,7 +3232,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
 
             }
       }
-
 
       .sectionIcon {
             margin-right: 15px;
