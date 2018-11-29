@@ -10,6 +10,7 @@ import validate from "validate.js";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import PanelFooter from "../../components/PanelFooter";
 import Input from "../../components/Input";
+import AdmixCalculator from "../../components/AdmixCalculator";
 import ReactSVG from "react-svg";
 
 // Material UI
@@ -42,7 +43,7 @@ class Profile extends Component {
       super(props);
 
       this.state = {
-         show: "url",
+         show: "cal",
          deleteClicked: false
       };
 
@@ -333,6 +334,7 @@ class Profile extends Component {
       const urlAct = show("url") ? "active" : "";
       const audAct = show("aud") ? "active" : "";
       const delAct = show("del") ? "active" : "";
+      const calAct = show("cal") ? "active" : "";
 
       return (
          <div className="mb page-withPanel-container" id="info">
@@ -366,6 +368,17 @@ class Profile extends Component {
                   >
                      <span>Audience breakdown</span>
                      {show("aud") ? (
+                        <KeyboardArrowRight className="rotate90" />
+                     ) : (
+                        <KeyboardArrowDown className="rotate270" />
+                     )}
+                  </div>
+                  <div
+                     className={`${calAct}`}
+                     onClick={this.changeView.bind(null, "cal")}
+                  >
+                     <span>Revenue calculator</span>
+                     {show("cal") ? (
                         <KeyboardArrowRight className="rotate90" />
                      ) : (
                         <KeyboardArrowDown className="rotate270" />
@@ -435,6 +448,14 @@ class Profile extends Component {
                      </div>
                   )}
                </form>
+
+               {show("cal") && (
+                  <div>
+                     <AdmixCalculator />
+                  </div>
+               )}
+
+
                {show("del") && (
                   <div id="info-del">
                      <span className="sst" style={{ color: "red" }}>
