@@ -11,7 +11,7 @@ export default class AdmixCalculator extends React.Component {
       this.expected = 0;
 
       this.state = {
-         cpm: 0,
+         cpm: 20,
          mau: 0,
          session: 0,
          avg: 0
