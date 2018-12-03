@@ -472,7 +472,7 @@ class Profile extends Component {
                      </span>{" "}
                      <br />
                      <br />
-                     {deleteClicked && <div>{asyncData.mssg}</div>}
+                     {deleteClicked && <div>{asyncData && asyncData.mssg}</div>}
                      {!deleteClicked && (
                         <button
                            className="gradient-btn"
