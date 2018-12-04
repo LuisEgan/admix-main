@@ -1,7 +1,9 @@
 import React from "react";
+import { connect } from "react-redux";
+import { Field, reduxForm } from "redux-form";
 import Input from "./Input";
 
-export default class AdmixCalculator extends React.Component {
+class AdmixCalculator extends React.Component {
    constructor(props) {
       super(props);
 
@@ -22,11 +24,14 @@ export default class AdmixCalculator extends React.Component {
 
    changeInput(e) {
       const { state } = this;
+      const { exportValuesOnChange } = this.props;
       const {
          target: { value, name }
       } = e;
-      state[name] = value;
-      this.setState(state);
+      state[name] = +value;
+      this.setState(state, () => {
+         exportValuesOnChange(state);
+      });
    }
 
    render() {
@@ -94,3 +99,22 @@ export default class AdmixCalculator extends React.Component {
       );
    }
 }
+
+const mapStateToProps = (state, props) => {
+   const { initialValues } = props;
+
+   return {
+      initialValues: {
+         ...initialValues
+      }
+   };
+};
+
+const formConfig = {
+   form: "admixCalculatorForm"
+};
+
+AdmixCalculator = reduxForm(formConfig)(AdmixCalculator);
+AdmixCalculator = connect(mapStateToProps)(AdmixCalculator);
+
+export default AdmixCalculator;
