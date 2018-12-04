@@ -34,7 +34,7 @@ import {
 
 const { ga } = _a;
 
-class Profile extends Component {
+class Info extends Component {
    static propTypes = {
       dispatch: PropTypes.func
    };
@@ -558,7 +558,7 @@ const formConfig = {
    onSubmitFail
 };
 
-Profile = reduxForm(formConfig)(Profile);
-Profile = connect(mapStateToProps)(Profile);
+Info = reduxForm(formConfig)(Info);
+Info = connect(mapStateToProps)(Info);
 
-export default Profile;
+export default Info;
