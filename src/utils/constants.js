@@ -20,7 +20,8 @@ const APP_STATES = {
     live: "live",
     inactive: "inactive",
     sandbox: "sandbox",
-    pending: "pending"
+    pending: "pending",
+    deleted: "deleted"
 }
 
 const APP_ENGINES_IMGS = {

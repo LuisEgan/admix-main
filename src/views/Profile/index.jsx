@@ -1,12 +1,11 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import _a from "../../utils/analytics";
-import { Field, reduxForm, reset, change } from "redux-form";
+import { reduxForm, reset, change } from "redux-form";
 import {
    imgUpload,
    setUserImgURL,
    forgotPass,
-   updateUser,
    changeEmail
 } from "../../actions";
 import PropTypes from "prop-types";
@@ -320,6 +319,8 @@ class Profile extends Component {
          case "postcode":
             label = "Postcode";
             break;
+
+         default:
       }
 
       return (
@@ -389,24 +390,6 @@ class Profile extends Component {
                   </div>
                   <div>
                      <div className="mb">
-                        {/* COMPANY INFORMATION */}
-                        <ExpansionPanel
-                           headerIcon={
-                              <FontAwesomeIcon
-                                 icon="building"
-                                 className="sectionIcon"
-                              />
-                           }
-                           headerTitle={"Company Information"}
-                        >
-                           <CompanyInfo
-                              renderField={this.renderField}
-                              handleUserUpdate={this.handleUserUpdate}
-                              {...this.state}
-                              {...this.props}
-                           />
-                        </ExpansionPanel>
-
                         {/* PERSONAL INFORMATION */}
                         <ExpansionPanel
                            headerIcon={
@@ -447,6 +430,24 @@ class Profile extends Component {
                            />
                         </ExpansionPanel>
 
+                        {/* COMPANY INFORMATION */}
+                        <ExpansionPanel
+                           headerIcon={
+                              <FontAwesomeIcon
+                                 icon="building"
+                                 className="sectionIcon"
+                              />
+                           }
+                           headerTitle={"Company Information"}
+                        >
+                           <CompanyInfo
+                              renderField={this.renderField}
+                              handleUserUpdate={this.handleUserUpdate}
+                              {...this.state}
+                              {...this.props}
+                           />
+                        </ExpansionPanel>
+
                         <br />
                      </div>
                   </div>
@@ -463,16 +464,20 @@ const mapStateToProps = state => {
       payment: {
          paypalEmail,
          details: { bankDetails, region }
-      }
+      },
+      name,
+      email: { value },
+      company
    } = userData;
 
    const initialPaymentRegion = region;
 
    const initialValues = {
-      userName: userData.name,
-      email: userData.email.value,
+      userName: name,
+      email: value,
       password: "Click -> to change it!",
       paypalEmail: paypalEmail || "",
+      ...company,
       initialPaymentRegion
    };
 
