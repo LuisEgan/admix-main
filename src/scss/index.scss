@@ -2586,22 +2586,17 @@ $inputsFontSize: calc(0.45em+0.3vw);
             margin-left: 5px;
       }
 
+      svg {
+            font-size: .6em;
+            margin-bottom: 3px;
+      }
+
       .pos {
             color: #0ccc06;
-
-            &:before {
-                  content: "🡅";
-                  margin-right: 5px;
-            }
       }
 
       .neg {
             color: red;
-
-            &:before {
-                  content: "🡇";
-                  margin-right: 5px;
-            }
       }
 
       .neut {
@@ -3075,6 +3070,10 @@ $inputsFontSize: calc(0.45em+0.3vw);
             >div {
                   width: 100%;
             }
+      }
+
+      #profile-company {
+            width: 100%;
       }
 
       form {

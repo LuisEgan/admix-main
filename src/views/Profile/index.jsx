@@ -13,32 +13,18 @@ import PropTypes from "prop-types";
 import Dropzone from "react-dropzone";
 import request from "superagent";
 import ReactSVG from "react-svg";
+import ExpansionPanel from "../../components/ExpansionPanel";
+import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 
-// Material UI
-import ExpansionPanel from "@material-ui/core/ExpansionPanel";
-import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
-import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
-import Radio from "@material-ui/core/Radio";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormControl from "@material-ui/core/FormControl";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import Select from "@material-ui/core/Select";
-import Input from "@material-ui/core/Input";
-import { KeyboardArrowDown } from "@material-ui/icons";
+import CompanyInfo from "./Panels/CompanyInfo";
+import PersonalInfo from "./Panels/PersonalInfo";
+import PaymentConfig from "./Panels/PaymentConfig";
 
 //SVGs
 import SVG_personalInfo from "../../assets/svg/personal-information.svg";
 import SVG_payment from "../../assets/svg/payments-configuration.svg";
 
-import CSS from "../../utils/InLineCSS";
-
 import CustomInput from "../../components/Input";
-
-import FontAwesomeIcon from "@fortawesome/react-fontawesome";
-
-import BankDetails from "./BankDetails";
 
 import {
    CLOUDINARY_UPLOAD_PRESET,
@@ -46,7 +32,6 @@ import {
 } from "../../config/cloudinary";
 
 import defaultImg from "../../assets/img/default_pic.jpg";
-import paypal from "../../assets/img/paypal.png";
 import SVG from "../../components/SVG";
 
 const { ga } = _a;
@@ -102,25 +87,25 @@ class Profile extends Component {
       this.setState({ passInputType });
    }
 
-   handleSubmit = e => {
+   handleSubmit = values => {
       _a.track(ga.actions.account.accountUpdate, {
          category: ga.categories.account
       });
 
-      e.preventDefault();
-      const {
-         reduxForm: {
-            profileForm: { values }
-         },
-         userData,
-         dispatch,
-         accessToken,
-         initialValues
-      } = this.props;
+      const { userData, dispatch, accessToken, initialValues } = this.props;
       const { payment } = this.state;
+      const {
+         userName,
+         paypalEmail,
+         initialPaymentRegion,
+         email,
+         password,
+         ...companyInfo
+      } = values;
 
       let update = {
-         name: values.userName
+         name: userName,
+         company: { ...companyInfo }
       };
 
       delete values.email;
@@ -161,11 +146,12 @@ class Profile extends Component {
             update.payment.details.bankDetails = paymentDetail;
             update.payment.details.region = payment.region;
          } else {
-            update.payment.paypalEmail = values.paypalEmail;
+            update.payment.paypalEmail = paypalEmail;
          }
       }
 
-      dispatch(updateUser(userData._id, update, accessToken));
+      console.log("update: ", update);
+      // dispatch(updateUser(userData._id, update, accessToken));
    };
 
    onImageDrop(files) {
@@ -282,21 +268,58 @@ class Profile extends Component {
       let disabled = false;
       let type = "text";
 
-      if (input.name === "userName") {
-         if (input.value.length === 0) {
-            input.value = initialValues[input.name];
-         }
-         label = "Name";
-      } else if (input.name === "email") {
-         input.value = initialValues.email;
-         label = "Email";
-         disabled = true;
-      } else if (input.name === "Password") {
-         input.value = initialValues.password;
-         disabled = true;
-         type = "password";
-      } else if (input.name === "paypalEmail") {
-         label = "Paypal email";
+      switch (input.name) {
+         case "userName":
+            input.value =
+               input.value.length === 0
+                  ? initialValues[input.name]
+                  : input.value;
+            label = "Name";
+            break;
+
+         case "email":
+            input.value = initialValues.email;
+            label = "Email";
+            disabled = true;
+            break;
+
+         case "Password":
+            input.value = initialValues.password;
+            disabled = true;
+            type = "password";
+            break;
+
+         case "paypalEmail":
+            label = "Paypal email";
+            break;
+
+         case "companyName":
+            label = "Company Name";
+            break;
+
+         case "registeredNumber":
+            label = "Registered number";
+            break;
+
+         case "address1":
+            label = "Address 1";
+            break;
+
+         case "address2":
+            label = "Address 2";
+            break;
+
+         case "city":
+            label = "City";
+            break;
+
+         case "country":
+            label = "Country";
+            break;
+
+         case "postcode":
+            label = "Postcode";
+            break;
       }
 
       return (
@@ -314,8 +337,8 @@ class Profile extends Component {
    }
 
    render() {
-      const { asyncLoading, userData } = this.props;
-      const { clicked, payment, changePassClicked } = this.state;
+      const { asyncLoading, userData, handleSubmit } = this.props;
+      const { payment } = this.state;
 
       const paypalEmailStyle =
          payment.option !== "bank" ? { display: "block" } : { display: "none" };
@@ -328,7 +351,7 @@ class Profile extends Component {
 
       return (
          <div className="step-container" id="profile">
-            <form onSubmit={this.handleSubmit}>
+            <form onSubmit={handleSubmit(this.handleSubmit)}>
                <div className="step-title">
                   <h3 className="st sc-h3">My profile</h3>
                   <button type="submit" className="mb gradient-btn">
@@ -355,11 +378,6 @@ class Profile extends Component {
                                        }
                                        alt="+"
                                     />
-                                    {/* {SVG.edit} */}
-                                    {/* <FontAwesomeIcon
-                                       className="fa"
-                                       icon={faPen}
-                                    /> */}
                                     <FontAwesomeIcon icon="pen" />
                                  </React.Fragment>
                               )}
@@ -371,246 +389,62 @@ class Profile extends Component {
                   </div>
                   <div>
                      <div className="mb">
-                        {/* PERSONAL INFORMATION */}
-
+                        {/* COMPANY INFORMATION */}
                         <ExpansionPanel
-                           defaultExpanded={true}
-                           classes={{ root: "mui-expansionPanel-root" }}
+                           headerIcon={
+                              <FontAwesomeIcon
+                                 icon="building"
+                                 className="sectionIcon"
+                              />
+                           }
+                           headerTitle={"Company Information"}
                         >
-                           <ExpansionPanelSummary
-                              expandIcon={<FontAwesomeIcon icon="angle-up" />}
-                           >
-                              <div className="cc">
-                                 <ReactSVG
-                                    src={SVG_personalInfo}
-                                    className="sectionIcon"
-                                 />
-                                 <span>Personal information</span>
-                              </div>
-                           </ExpansionPanelSummary>
-                           <ExpansionPanelDetails>
-                              <div className="expansionPanelDetails-container">
-                                 <div>
-                                    <Field
-                                       name="userName"
-                                       component={this.renderField}
-                                    />
-                                    <Field
-                                       name="email"
-                                       component={this.renderField}
-                                    />
-                                    <Field
-                                       name="Password"
-                                       component={this.renderField}
-                                       disabled={true}
-                                    />
-                                    {/* <div>
-                                       <FontAwesomeIcon
-                                          icon={faEye}
-                                          onMouseEnter={
-                                             this.togglePassInputType
-                                          }
-                                          onMouseLeave={
-                                             this.togglePassInputType
-                                          }
-                                          className="password-eye"
-                                       />
-                                    </div> */}
-                                 </div>
-                                 <div>
-                                    <div />
-                                    <div>
-                                       <span className="profile-helper-text">
-                                          <a
-                                             onClick={this.handleUserUpdate.bind(
-                                                null,
-                                                "email"
-                                             )}
-                                             onMouseEnter={() => {
-                                                this.setState({
-                                                   isWarningVisible: true
-                                                });
-                                             }}
-                                             onMouseLeave={() => {
-                                                this.setState({
-                                                   isWarningVisible: false
-                                                });
-                                             }}
-                                          >
-                                             {asyncLoading &&
-                                             clicked === "email"
-                                                ? " ...Loading"
-                                                : " Update email"}
-                                          </a>
-                                          {/* <span style={warningStyle}>
-                                             &nbsp;Warning! Your account will
-                                             become inactive and you will have
-                                             to verify your new email before
-                                             logging in again (this will log you
-                                             out).
-                                          </span> */}
-                                       </span>
-                                    </div>
-                                    <div>
-                                       <span className="profile-helper-text">
-                                          {!changePassClicked && (
-                                             <a
-                                                onClick={this.handleUserUpdate.bind(
-                                                   null,
-                                                   "password"
-                                                )}
-                                             >
-                                                {asyncLoading &&
-                                                clicked === "password"
-                                                   ? " ...Loading"
-                                                   : " Change password."}
-                                             </a>
-                                          )}
+                           <CompanyInfo
+                              renderField={this.renderField}
+                              handleUserUpdate={this.handleUserUpdate}
+                              {...this.state}
+                              {...this.props}
+                           />
+                        </ExpansionPanel>
 
-                                          {changePassClicked && (
-                                             <span>
-                                                {asyncLoading &&
-                                                clicked === "password"
-                                                   ? " ...Loading"
-                                                   : " Check your inbox for the password reset link."}
-                                             </span>
-                                          )}
-                                       </span>
-                                    </div>
-                                 </div>
-                              </div>
-                           </ExpansionPanelDetails>
+                        {/* PERSONAL INFORMATION */}
+                        <ExpansionPanel
+                           headerIcon={
+                              <ReactSVG
+                                 src={SVG_personalInfo}
+                                 className="sectionIcon"
+                              />
+                           }
+                           headerTitle={"Personal information"}
+                        >
+                           <PersonalInfo
+                              renderField={this.renderField}
+                              handleUserUpdate={this.handleUserUpdate}
+                              {...this.state}
+                              {...this.props}
+                           />
                         </ExpansionPanel>
 
                         {/* PAYMENT OPTIONS */}
-
                         <ExpansionPanel
-                           defaultExpanded={false}
-                           classes={{ root: "mui-expansionPanel-root" }}
+                           headerIcon={
+                              <ReactSVG
+                                 src={SVG_payment}
+                                 className="sectionIcon"
+                              />
+                           }
+                           headerTitle={"Payment configuration"}
+                           contentId={"expansionPanelDetails-container-payment"}
                         >
-                           <ExpansionPanelSummary
-                              expandIcon={<FontAwesomeIcon icon="angle-up" />}
-                           >
-                              <div className="cc">
-                                 <ReactSVG
-                                    src={SVG_payment}
-                                    className="sectionIcon"
-                                 />
-                                 <span>Payments configuration</span>
-                              </div>
-                           </ExpansionPanelSummary>
-                           <ExpansionPanelDetails>
-                              <div
-                                 id="expansionPanelDetails-container-payment"
-                                 className="expansionPanelDetails-container"
-                              >
-                                 <FormControl component="fieldset" required>
-                                    <RadioGroup
-                                       aria-label="paymentOpts"
-                                       name="paymentOpts"
-                                       value={payment.option}
-                                       onChange={this.paymentChange.bind(
-                                          null,
-                                          "option"
-                                       )}
-                                       className="paymentOpts"
-                                    >
-                                       <FormControlLabel
-                                          value="paypal"
-                                          control={
-                                             <Radio className="mui-radio-btn" />
-                                          }
-                                          label={
-                                             <img src={paypal} alt="paypal" />
-                                          }
-                                       />
-                                       <FormControlLabel
-                                          value="bank"
-                                          control={
-                                             <Radio className="mui-radio-btn" />
-                                          }
-                                          label={
-                                             <React.Fragment>
-                                                <FontAwesomeIcon icon="university" />{" "}
-                                                Bank
-                                             </React.Fragment>
-                                          }
-                                       />
-                                    </RadioGroup>
-                                 </FormControl>
-
-                                 <div style={paypalEmailStyle}>
-                                    <Field
-                                       name="paypalEmail"
-                                       component={this.renderField}
-                                    />
-                                 </div>
-
-                                 <div
-                                    id="profile-pay-banks"
-                                    style={payBanksStyle}
-                                    className="fadeIn mb"
-                                 >
-                                    <FormControl>
-                                       <div className="input-label">Region</div>
-                                       <Select
-                                          value={payment.region}
-                                          onChange={this.paymentChange.bind(
-                                             null,
-                                             "region"
-                                          )}
-                                          input={
-                                             <Input
-                                                name="region"
-                                                id="region-helper"
-                                             />
-                                          }
-                                          classes={{ root: "mui-select-root" }}
-                                          disableUnderline={true}
-                                          IconComponent={KeyboardArrowDown}
-                                          style={CSS.mb}
-                                       >
-                                          <MenuItem style={CSS.mb} value="">
-                                             <em>Please select a region</em>
-                                          </MenuItem>
-                                          <MenuItem style={CSS.mb} value="usa">
-                                             United States of America
-                                          </MenuItem>
-                                          <MenuItem style={CSS.mb} value="uk">
-                                             United Kingdom
-                                          </MenuItem>
-                                          <MenuItem style={CSS.mb} value="eu">
-                                             Europe
-                                          </MenuItem>
-                                       </Select>
-                                       <FormHelperText>
-                                          Don't see your country yet? You can
-                                          always use PayPal in the meantime{" "}
-                                          <span
-                                             role="img"
-                                             aria-label="thumbs-up"
-                                          >
-                                             👍
-                                          </span>
-                                       </FormHelperText>
-                                    </FormControl>
-
-                                    {payment.region !== "" && (
-                                       <div
-                                          id="profile-pay-banks-details"
-                                          style={payBanksDetailsStyle}
-                                          className="fadeIn"
-                                       >
-                                          <BankDetails
-                                             Field={Field}
-                                             renderField={this.renderField}
-                                             region={payment.region}
-                                          />
-                                       </div>
-                                    )}
-                                 </div>
-                              </div>
-                           </ExpansionPanelDetails>
+                           <PaymentConfig
+                              renderField={this.renderField}
+                              paymentChange={this.paymentChange}
+                              paypalEmailStyle={paypalEmailStyle}
+                              payBanksStyle={payBanksStyle}
+                              payBanksDetailsStyle={payBanksDetailsStyle}
+                              {...this.state}
+                              {...this.props}
+                           />
                         </ExpansionPanel>
 
                         <br />
@@ -657,24 +491,8 @@ const mapStateToProps = state => {
    };
 };
 
-const validateEmail = email => {
-   const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-   return re.test(String(email).toLowerCase());
-};
-
 const validate = values => {
    const errors = {};
-   const { email, password, password2 } = values;
-
-   const isEmailValid = validateEmail(email);
-
-   if (!isEmailValid) {
-      errors.email = "Please enter a valid email!";
-   }
-
-   if (password && password !== password2) {
-      errors.password2 = "Both passwords must be identical!";
-   }
 
    return errors;
 };
