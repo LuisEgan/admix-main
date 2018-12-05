@@ -3,5 +3,5 @@ export const onlyNums = value => {
         return value
     }
 
-    return value.replace(/[^\d]/g, '');
+    return +value.replace(/[^\d]/g, '');
 }

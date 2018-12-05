@@ -2,83 +2,104 @@ import React from "react";
 import { connect } from "react-redux";
 import { Field, reduxForm } from "redux-form";
 import Input from "./Input";
+import { onlyNums } from "../utils/normalizers";
 
 class AdmixCalculator extends React.Component {
   constructor(props) {
     super(props);
 
-    this.impressions = 0;
-    this.revenue = 0;
-    this.admixCut = 0;
-    this.expected = 0;
+    this.state = {
+      impressions: 0,
+      revenue: 0,
+      admixCut: 0,
+      expected: 0
+    };
 
-    this.changeInput = this.changeInput.bind(this);
+    this.updateInput = this.updateInput.bind(this);
   }
 
-  changeInput(e) {
-    const { state } = this;
-    const { exportValuesOnChange } = this.props;
+  updateInput(e) {
+    const { admixCalculatorForm } = this.props;
     const {
       target: { value, name }
     } = e;
-    state[name] = +value;
-    this.setState(state, () => {
-      exportValuesOnChange(state);
-    });
+
+    const values = { ...admixCalculatorForm };
+    values[name] = onlyNums(value);
+
+    const { cpm, mau, session, avg } = values;
+    const newState = { ...this.state };
+
+    newState.impressions = mau * session * avg;
+    newState.revenue = ((newState.impressions * cpm) / 1000).toFixed(2);
+    newState.admixCut = (newState.revenue / 5).toFixed(2);
+    newState.expected = (newState.revenue - newState.admixCut).toFixed(2);
+
+    this.setState(newState);
   }
 
   renderField(field) {
-    const {
-      input,
-      meta: { error }
-    } = field;
+    const { input } = field;
 
-    return (
-      <div className="redux-form-inputs-container">
-        <Input {...input} id={input.name} />
-      </div>
-    );
+    return <Input {...input} id={input.name} />;
   }
 
   render() {
-    // this.impressions = mau * session * avg;
-    // this.revenue = (this.impressions * cpm) / 1000;
-    // this.admixCut = this.revenue / 5;
-    // this.expected = this.revenue - this.admixCut;
+    const { impressions, revenue, admixCut, expected } = this.state;
 
     return (
       <div className="admix-calculator">
         <div>Expected CPM ($)</div>
         <div>
-          <Field component={this.renderField} name="cpm" />
+          <Field
+            component={this.renderField}
+            name="cpm"
+            normalize={onlyNums}
+            onChange={this.updateInput}
+          />
         </div>
 
         <div>MAU</div>
         <div>
-          <Field component={this.renderField} name="mau" />
+          <Field
+            component={this.renderField}
+            name="mau"
+            normalize={onlyNums}
+            onChange={this.updateInput}
+          />
         </div>
 
         <div>Session per user / month</div>
         <div>
-          <Field component={this.renderField} name="session" />
+          <Field
+            component={this.renderField}
+            name="session"
+            normalize={onlyNums}
+            onChange={this.updateInput}
+          />
         </div>
 
         <div>Avg ads per session</div>
         <div>
-          <Field component={this.renderField} name="avg" />
+          <Field
+            component={this.renderField}
+            name="avg"
+            normalize={onlyNums}
+            onChange={this.updateInput}
+          />
         </div>
 
         <div id="admixCalc-impressions">Impressions generated</div>
-        <div>{this.impressions}</div>
+        <div>{impressions}</div>
 
         <div>Gross revenue ($)</div>
-        <div>$ {this.revenue}</div>
+        <div>$ {revenue}</div>
 
         <div>Admix 20% cut ($)</div>
-        <div>$ {this.admixCut}</div>
+        <div>$ {admixCut}</div>
 
         <div id="admixCalc-expected">Your expected monthly revenue</div>
-        <div>$ {this.expected}</div>
+        <div>$ {expected}</div>
       </div>
     );
   }
@@ -86,6 +107,9 @@ class AdmixCalculator extends React.Component {
 
 const mapStateToProps = (state, props) => {
   const { initialValues } = props;
+  const {
+    form: { admixCalculatorForm }
+  } = state;
 
   return {
     initialValues: {
@@ -94,7 +118,8 @@ const mapStateToProps = (state, props) => {
       session: 0,
       avg: 0,
       ...initialValues
-    }
+    },
+    admixCalculatorForm: admixCalculatorForm ? admixCalculatorForm.values : {}
   };
 };
 
