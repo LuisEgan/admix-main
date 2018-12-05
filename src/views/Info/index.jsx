@@ -202,8 +202,7 @@ class Info extends Component {
       ...values
     };
 
-    console.log("appData: ", appData);
-    // dispatch(updateApp({ appData, accessToken, admintoken }));
+    dispatch(updateApp({ appData, accessToken, admintoken }));
   }
 
   handleDelete() {
