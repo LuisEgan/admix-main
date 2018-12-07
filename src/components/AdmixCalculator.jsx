@@ -4,7 +4,7 @@ import { Field, reduxForm } from "redux-form";
 import Input from "./Input";
 import { onlyNums } from "../utils/normalizers";
 
-class AdmixCalculator extends React.Component {
+export class AdmixCalculator extends React.Component {
   constructor(props) {
     super(props);
 
@@ -90,7 +90,7 @@ class AdmixCalculator extends React.Component {
         </div>
 
         <div id="admixCalc-impressions">Impressions generated</div>
-        <div>{impressions}</div>
+        <div id="impressions-generated">{impressions}</div>
 
         <div>Gross revenue ($)</div>
         <div>$ {revenue}</div>
