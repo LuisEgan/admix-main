@@ -2,7 +2,7 @@
 // import reportData from "../assets/data/placementDailyReport-total.json";
 
 // const dns = "http://ec2-52-15-223-69.us-east-2.compute.amazonaws.com:3006";
-const dns = "http://ec2-user@18.188.77.242";
+const dns = "http://ec2-18-188-77-242.us-east-2.compute.amazonaws.com";
 // const dns = "https://api.admix.in";
 
 function async () {
