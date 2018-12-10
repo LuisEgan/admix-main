@@ -30,10 +30,10 @@ export class AdmixCalculator extends React.Component {
     const { cpm, mau, session, avg } = values;
     const newState = { ...this.state };
 
-    newState.impressions = mau * session * avg;
-    newState.revenue = ((newState.impressions * cpm) / 1000).toFixed(2);
-    newState.admixCut = (newState.revenue / 5).toFixed(2);
-    newState.expected = (newState.revenue - newState.admixCut).toFixed(2);
+    newState.impressions = `${(mau * session * avg).toFixed(2)}`;
+    newState.revenue = `${((newState.impressions * cpm) / 1000).toFixed(2)}`;
+    newState.admixCut = `${(newState.revenue / 5).toFixed(2)}`;
+    newState.expected = `${(newState.revenue - newState.admixCut).toFixed(2)}`;
 
     this.setState(newState);
   }
@@ -90,16 +90,16 @@ export class AdmixCalculator extends React.Component {
         </div>
 
         <div id="admixCalc-impressions">Impressions generated</div>
-        <div id="impressions-generated">{impressions}</div>
+        <div id="impressions">{impressions}</div>
 
         <div>Gross revenue ($)</div>
-        <div>$ {revenue}</div>
+        <div id="revenue">$ {revenue}</div>
 
         <div>Admix 20% cut ($)</div>
-        <div>$ {admixCut}</div>
+        <div id="admixCut">$ {admixCut}</div>
 
         <div id="admixCalc-expected">Your expected monthly revenue</div>
-        <div>$ {expected}</div>
+        <div id="expected">$ {expected}</div>
       </div>
     );
   }
