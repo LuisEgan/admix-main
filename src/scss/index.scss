@@ -3688,3 +3688,41 @@ $ballSize: 20px;
             fill: black;
       }
 }
+
+.admix-calculator {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 15px 20px;
+      background: white;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px #c9c9c9;
+
+      >div {
+            display: flex;
+            align-items: center;
+
+            &:nth-child(2n+1) {
+                  width: 35%;
+            }
+
+            &:nth-child(2n) {
+                  width: 65%;
+            }
+
+            padding: 5px 0;
+      }
+
+      .input {
+            min-height: unset;
+      }
+
+      #admixCalc-impressions,
+      #admixCalc-impressions+div {
+            margin-top: 20px;
+      }
+
+      #admixCalc-expected,
+      #admixCalc-expected+div {
+            background: #ccffcc;
+      }
+}

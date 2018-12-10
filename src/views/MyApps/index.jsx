@@ -505,7 +505,7 @@ class MyApps extends Component {
       return appsRe.map((app, i) => {
          let { _id, userId, name, appState } = app;
 
-         if (appState === C.APP_STATES.deleted) return;
+         if (appState === C.APP_STATES.deleted) return null;
 
          const selectedAppClass =
             selectedApp && selectedApp._id === _id ? "app-selected" : "";
