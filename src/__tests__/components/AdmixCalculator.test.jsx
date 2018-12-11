@@ -10,6 +10,12 @@ import __conn_AdmixCalculator, {
   AdmixCalculator
 } from "../../components/AdmixCalculator";
 
+/*
+ * TEST INFO
+ * Functionality: The AdmixCalculator component
+ * Given: On the /info on the calculator tab
+ */
+
 const initialValues = {
   cpm: 20,
   mau: 0,
@@ -64,18 +70,22 @@ describe("------- <AdmixCalculator />", () => {
     wrapper.unmount();
   });
 
-  it("renders properly", () => {
+  it("renders Provider component which wrapps the AdmixCalculator component and holds the redux state properly", () => {
+    /*
+     * When: Initialization
+     * Then: The Provider component exists
+     */
     expect(wrapper.length).toEqual(1);
   });
 
-  it("has the proper inputs", () => {
+  it("render the proper inputs with their proper name", () => {
     expect(cpm.exists()).toBeTruthy();
     expect(mau.exists()).toBeTruthy();
     expect(session.exists()).toBeTruthy();
     expect(avg.exists()).toBeTruthy();
   });
 
-  it("has the proper outputs", () => {
+  it("render the proper inputs with their proper id", () => {
     const impressions = calculatorWrapper.find("#impressions");
     expect(impressions.exists()).toBeTruthy();
 
