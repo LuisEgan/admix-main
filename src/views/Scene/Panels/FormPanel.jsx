@@ -345,7 +345,7 @@ export default class FormPanel extends Component {
   }
 
   render() {
-    const { slidedIn, subCategories } = this.state;
+    const { slidedIn } = this.state;
     const { sceneMounted, mouseOnPanel, displayMode } = this.props;
 
     const slideAnim = sceneMounted
