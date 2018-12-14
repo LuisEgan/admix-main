@@ -197,7 +197,7 @@ export default class FormPanel extends Component {
 
       if (dropdown === "category") {
          newState.savedInputs.category = value;
-         newState.subCategories = dbSubCategories[value];
+         newState.subCategories = dbSubCategories[value] || [];
       } else {
          newState.savedInputs.subCategory = value;
       }
@@ -347,7 +347,7 @@ export default class FormPanel extends Component {
    }
 
    render() {
-      const { slidedIn } = this.state;
+      const { slidedIn, subCategories } = this.state;
       const { sceneMounted, mouseOnPanel, displayMode } = this.props;
 
       const slideAnim = sceneMounted
