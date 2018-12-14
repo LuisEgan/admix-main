@@ -210,7 +210,7 @@ export default class FormPanel extends Component {
                save: false,
                placementId: savedInputs.placementId,
                newValue: value
-            });
+            }, e);
          }
       });
    }

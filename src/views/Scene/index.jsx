@@ -1023,6 +1023,7 @@ class Scene extends Component {
                  ].on3d
       });
 
+      // const value = newValue ? newValue : e ? e.target.value : "";
       const value = newValue ? newValue : e.target.value;
       let {
          catsSelectedByPlacementId,
@@ -1052,7 +1053,7 @@ class Scene extends Component {
                   dropdown,
                   newValue: value,
                   save: false
-               });
+               }, e);
             }
          }
       );
