@@ -6,7 +6,7 @@
 
 const isProd = process.env.NODE_ENV !== "development";
 
-const dns = !isProd ? "https://api.admix.in": "http://sandbox.api.admix.in";
+const dns = isProd ? "https://api.admix.in": "http://sandbox.api.admix.in";
 console.warn('dns: ', dns);
 
 function async() {
