@@ -624,35 +624,12 @@ class MyApps extends Component {
 
     return (
       <div className="step-container" id="apps">
-        {showPopup && (
-          <Popup>
-            <span className="popup-title">Ready to go live?</span>
-            <br />
-            <br />
-            <span className="popup-text">
-              Your app will be submitted for review to make sure all is ok. This
-              can take 1 to 2h. After that, you'll start to make revenue.
-            </span>
-            <br />
-            <br />
-            <span className="popup-btns">
-              <button
-                className="btn"
-                id="review-btn"
-                onClick={this.handleSubmitForReview}
-              >
-                Submit for review
-              </button>
-              <button
-                className="cancel-btn mb"
-                id="cancel-btn"
-                onClick={this.togglePopup}
-              >
-                Cancel
-              </button>
-            </span>
-          </Popup>
-        )}
+        <Popup showPopup={showPopup} togglePopup={this.togglePopup}>
+          <MyAppsPopup
+            handleSubmitForReview={this.handleSubmitForReview}
+            togglePopup={this.togglePopup}
+          />
+        </Popup>
 
         <div id="apps-header" className="step-title">
           <h3 className="st sc-h3">My apps</h3>
@@ -695,6 +672,30 @@ class MyApps extends Component {
     );
   }
 }
+
+const MyAppsPopup = ({ handleSubmitForReview, togglePopup }) => {
+  return (
+    <React.Fragment>
+      <span className="popup-title">Ready to go live?</span>
+      <br />
+      <br />
+      <span className="popup-text">
+        Your app will be submitted for review to make sure all is ok. This can
+        take 1 to 2h. After that, you'll start to make revenue.
+      </span>
+      <br />
+      <br />
+      <span className="popup-btns">
+        <button className="btn" id="review-btn" onClick={handleSubmitForReview}>
+          Submit for review
+        </button>
+        <button className="cancel-btn mb" id="cancel-btn" onClick={togglePopup}>
+          Cancel
+        </button>
+      </span>
+    </React.Fragment>
+  );
+};
 
 const mapStateToProps = state => ({
   apps: state.app.get("apps"),
