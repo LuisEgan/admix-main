@@ -2,13 +2,6 @@
 @import url("./scss/animate.min.css");
 @import url('https://fonts.googleapis.com/css?family=Montserrat:400,600');
 
-// @font-face {
-//       font-family: "Montserrat-SemiBold";
-//       src: url("./assets/font/Montserrat-SemiBold.ttf");
-//       font-weight: normal;
-//       font-style: normal;
-// }
-
 $mobileBreakpoint: 830px;
 $blueAdmix: #157cc1;
 $grey-border: #eee;
@@ -1126,6 +1119,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
 
             .inactive {
                   color: #aabbd4;
+
                   svg {
                         color: #dde4ee;
                   }
@@ -1593,7 +1587,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
             border: solid 2px;
             padding: 0 5px;
             flex-grow: 1;
-            width: 30%;
+            // width: 30%;
             position: relative;
             transition: 1.2s;
 
@@ -1608,7 +1602,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
 
             &:nth-child(2) {
                   border-left: none;
-                  width: 40%;
+                  // width: 40%;
             }
 
             &:last-child() {
@@ -1645,12 +1639,17 @@ $inputsFontSize: calc(0.45em+0.3vw);
             }
       }
 
+      .pending {
+            border-color: #4d4d4d;
+            color: #4d4d4d;
+      }
+
       .inactive {
             border-color: #d9d9d9;
             color: #d9d9d9;
       }
 
-      .pending {
+      .sandbox {
             border-color: orange;
             color: orange;
       }
@@ -1864,6 +1863,22 @@ $inputsFontSize: calc(0.45em+0.3vw);
 // APPS ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------------
 #apps {
+      .popup {
+            .popup-btns {
+                  display: flex;
+                  flex-flow: column;
+            }
+
+            #review-btn {
+                  background-color: #0066ff;
+                  color: white;
+            }
+
+            #cancel-btn {
+                  margin-top: 5px;
+            }
+      }
+
       .loadingSVG {
             margin-top: 5vh;
       }
@@ -3408,6 +3423,13 @@ $ballSize: 20px;
       }
 }
 
+.cancel-btn {
+      border: 0;
+      background: transparent;
+      padding: .375rem .75rem;
+      color: $grey-text
+}
+
 .toggleBtn {
 
       *,
@@ -3424,11 +3446,6 @@ $ballSize: 20px;
             text-align: center;
       }
 
-      // .ios-toggle,
-      // .ios-toggle:active { // position: absolute; // top: -5000px; // height: 0; // width: 0; // opacity: 0;
-      // border: none;
-      // outline: none;
-      // }
       .checkbox-label {
             display: block;
             position: relative; // padding: 10px;
@@ -3460,20 +3477,6 @@ $ballSize: 20px;
                   box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2), 0 0 0 2px #c9ced6;
             }
       }
-
-      // .checkbox-label:after {
-      // content: attr(data-off);
-      // display: block;
-      // position: absolute;
-      // z-index: 0;
-      // top: 0;
-      // left: -300px;
-      // padding: 0 10px;
-      // height: 100%;
-      // width: 300px;
-      // text-align: right;
-      // color: #bfbfbf;
-      // white-space: nowrap;}
       .ios-toggle:checked+.checkbox-label {
             box-shadow: inset 0 0 0 20px #00d664, 0 0 0 2px #00d664;
       }
@@ -3483,12 +3486,6 @@ $ballSize: 20px;
             left: 25px;
             box-shadow: 0 0 0 2px transparent, 0 3px 3px rgba(0, 0, 0, 0.3);
       }
-
-      // .ios-toggle:checked+.checkbox-label:after {
-      // content: attr(data-on);
-      // left: 40px;
-      // width: 36px;
-      // }
 }
 
 .checkbox {
@@ -3735,5 +3732,38 @@ $ballSize: 20px;
       #admixCalc-expected,
       #admixCalc-expected+div {
             background: #ccffcc;
+      }
+}
+
+.popup {
+      @extend .cc;
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      background-color: rgba(0, 0, 0, .5);
+      z-index: 9999;
+
+      .popup-inner {
+            width: 30%;
+            background: white;
+            padding: 2% 5%;
+            border-radius: 5px;
+            text-align: center;
+
+            .popup-title {
+                  @extend .st;
+                  padding: 5px 0;
+            }
+
+            .popup-text {
+                  @extend .mb;
+                  padding: 5px;
+            }
+
+            .gradient-btn {
+                  width: 100%;
+            }
       }
 }
