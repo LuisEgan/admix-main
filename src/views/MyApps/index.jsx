@@ -46,6 +46,7 @@ class MyApps extends Component {
     super(props);
 
     this.state = {
+      reviewClicked: false,
       showPopup: false,
       showContent: false,
       appSelected: false,
@@ -104,7 +105,8 @@ class MyApps extends Component {
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    let { apps } = nextProps;
+    let newState = {};
+    let { apps, asyncLoading } = nextProps;
     apps = Array.isArray(apps) ? apps : [];
     const activeApps = [];
     apps.forEach(app => {
@@ -113,7 +115,14 @@ class MyApps extends Component {
     });
 
     const allAppsIds = apps.map(app => app._id);
-    return { allAppsIds, activeApps };
+
+    newState = { allAppsIds, activeApps };
+
+    if (prevState.reviewClicked && !asyncLoading) {
+      newState.showPopup = false;
+    }
+
+    return newState;
   }
 
   togglePopup() {
@@ -570,16 +579,8 @@ class MyApps extends Component {
   handleSubmitForReview() {
     const { dispatch, accessToken } = this.props;
     const {
-      clickedApp: { _id, platformName, name }
+      clickedApp: { _id }
     } = this.state;
-
-    // const appDetails = {
-    //   _id,
-    //   platformName,
-    //   name,
-    //   isActive: false,
-    //   appState: C.APP_STATES.pending
-    // };
 
     const appDetails = {
       appId: _id,
@@ -589,9 +590,9 @@ class MyApps extends Component {
       }
     };
 
-    this.togglePopup();
-
-    dispatch(toggleAppStatus(appDetails, accessToken));
+    this.setState({ reviewClicked: true }, () => {
+      dispatch(toggleAppStatus(appDetails, accessToken));
+    });
   }
 
   render() {
@@ -626,6 +627,7 @@ class MyApps extends Component {
       <div className="step-container" id="apps">
         <Popup showPopup={showPopup} togglePopup={this.togglePopup}>
           <MyAppsPopup
+            asyncLoading={asyncLoading}
             handleSubmitForReview={this.handleSubmitForReview}
             togglePopup={this.togglePopup}
           />
@@ -673,7 +675,7 @@ class MyApps extends Component {
   }
 }
 
-const MyAppsPopup = ({ handleSubmitForReview, togglePopup }) => {
+const MyAppsPopup = ({ asyncLoading, handleSubmitForReview, togglePopup }) => {
   return (
     <React.Fragment>
       <span className="popup-title">Ready to go live?</span>
@@ -686,9 +688,22 @@ const MyAppsPopup = ({ handleSubmitForReview, togglePopup }) => {
       <br />
       <br />
       <span className="popup-btns">
-        <button className="btn" id="review-btn" onClick={handleSubmitForReview}>
-          Submit for review
-        </button>
+        {asyncLoading && (
+          <button className="btn" id="review-btn" type="button">
+            Loading...
+          </button>
+        )}
+
+        {!asyncLoading && (
+          <button
+            className="btn"
+            id="review-btn"
+            onClick={handleSubmitForReview}
+          >
+            Submit for review
+          </button>
+        )}
+
         <button className="cancel-btn mb" id="cancel-btn" onClick={togglePopup}>
           Cancel
         </button>
