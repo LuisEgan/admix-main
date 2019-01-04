@@ -18,6 +18,30 @@ export class AdmixCalculator extends React.Component {
     this.updateInput = this.updateInput.bind(this);
   }
 
+  static getDerivedStateFromProps(nextProps, prevState) {
+    let newState = {};
+
+    const { admixCalculatorForm } = nextProps;
+    const values = { ...admixCalculatorForm };
+    const { cpm, mau, session, avg } = values;
+
+    if (
+      cpm !== prevState.cpm &&
+      mau !== prevState.mau &&
+      session !== prevState.session &&
+      avg !== prevState.avg
+    ) {
+      newState.impressions = `${(mau * session * avg).toFixed(2)}`;
+      newState.revenue = `${((newState.impressions * cpm) / 1000).toFixed(2)}`;
+      newState.admixCut = `${(newState.revenue / 5).toFixed(2)}`;
+      newState.expected = `${(newState.revenue - newState.admixCut).toFixed(
+        2
+      )}`;
+    }
+
+    return newState;
+  }
+
   updateInput(e) {
     const { admixCalculatorForm } = this.props;
     const {
