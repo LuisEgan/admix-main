@@ -1123,6 +1123,17 @@ $inputsFontSize: calc(0.45em+0.3vw);
             .active {
                   background-color: #F5F7FA;
             }
+
+            .inactive {
+                  color: #aabbd4;
+                  svg {
+                        color: #dde4ee;
+                  }
+
+                  &:hover {
+                        cursor: not-allowed;
+                  }
+            }
       }
 
       .panel-footer {

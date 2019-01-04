@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import { NavLink } from "react-router-dom";
 import _a from "../../utils/analytics";
 import { Field, reduxForm, change } from "redux-form";
 import routeCodes from "../../config/routeCodes";
@@ -163,17 +164,9 @@ class Info extends Component {
     } = this.props;
     let { isActive } = selectedApp;
 
-    let appState;
-    if (values.storeurl === "") {
-      appState = isActive ? C.APP_STATES.pending : C.APP_STATES.inactive;
-    } else {
-      appState = isActive ? C.APP_STATES.live : C.APP_STATES.inactive;
-    }
-
     const appData = {
       platformName: selectedApp.platformName,
       name: selectedApp.name,
-      appState,
       appId: selectedApp._id,
       metrics: {
         dau: values.dau || null,
@@ -217,7 +210,6 @@ class Info extends Component {
       isActive: false
     };
 
-    console.log("appData: ", appData);
     this.setState({ deleteClicked: true }, () => {
       dispatch(updateApp({ appData, accessToken, admintoken }));
     });
@@ -311,7 +303,7 @@ class Info extends Component {
 
   render() {
     const { show } = this;
-    const { asyncData, selectedApp, handleSubmit, calculatorInitialValues } = this.props;
+    const { selectedApp, handleSubmit, calculatorInitialValues } = this.props;
     const { deleteClicked } = this.state;
 
     this.breadcrumbs = [
@@ -329,10 +321,14 @@ class Info extends Component {
       }
     ];
 
-    const urlAct = show("url") ? "active" : "";
-    const audAct = show("aud") ? "active" : "";
-    const delAct = show("del") ? "active" : "";
-    const calAct = show("cal") ? "active" : "";
+    let urlAct = show("url") ? "active" : "";
+    let audAct = show("aud") ? "active" : "";
+    let delAct = show("del") ? "active" : "";
+    let calAct = show("cal") ? "active" : "";
+
+    if (deleteClicked) {
+      urlAct = audAct = delAct = calAct = "inactive";
+    }
 
     return (
       <div className="mb page-withPanel-container" id="info">
@@ -348,7 +344,7 @@ class Info extends Component {
           <div className="list-group">
             <div
               className={`${urlAct}`}
-              onClick={this.changeView.bind(null, "url")}
+              onClick={deleteClicked ? null : this.changeView.bind(null, "url")}
             >
               <span>App store URL</span>
               {show("url") ? (
@@ -359,7 +355,7 @@ class Info extends Component {
             </div>
             <div
               className={`${audAct}`}
-              onClick={this.changeView.bind(null, "aud")}
+              onClick={deleteClicked ? null : this.changeView.bind(null, "aud")}
             >
               <span>Audience breakdown</span>
               {show("aud") ? (
@@ -370,7 +366,7 @@ class Info extends Component {
             </div>
             <div
               className={`${calAct}`}
-              onClick={this.changeView.bind(null, "cal")}
+              onClick={deleteClicked ? null : this.changeView.bind(null, "cal")}
             >
               <span>Revenue calculator</span>
               {show("cal") ? (
@@ -381,7 +377,7 @@ class Info extends Component {
             </div>
             <div
               className={`${delAct} delete-arrow`}
-              onClick={this.changeView.bind(null, "del")}
+              onClick={deleteClicked ? null : this.changeView.bind(null, "del")}
             >
               <span>Delete app</span>
               {show("del") ? (
@@ -391,7 +387,7 @@ class Info extends Component {
               )}
             </div>
           </div>
-          <PanelFooter app={selectedApp} {...this.props} />
+          <PanelFooter app={selectedApp} hideInner={deleteClicked} {...this.props} />
         </div>
 
         <div className="page-content">
@@ -452,28 +448,42 @@ class Info extends Component {
 
           {show("del") && (
             <div id="info-del">
-              <span className="sst" style={{ color: "red" }}>
-                Warning!
-              </span>{" "}
-              <br />
-              <br />
-              This will inactivate your app and you will not be able to activate
-              it and it will dissappear from your "My apps" menu. <br />
-              <span className="mbs">
-                Note: you can re-activate it by contacting{" "}
-                <a href="mailto:support@admix.in">support@admix.in</a>
-              </span>{" "}
-              <br />
-              <br />
-              {deleteClicked && <div>{asyncData && asyncData.mssg}</div>}
               {!deleteClicked && (
-                <button
-                  className="gradient-btn"
-                  type="button"
-                  onClick={this.handleDelete}
-                >
-                  Confirm
-                </button>
+                <React.Fragment>
+                  <span className="sst" style={{ color: "red" }}>
+                    Warning!
+                  </span>{" "}
+                  <br />
+                  <br />
+                  This will inactivate your app and you will not be able to
+                  activate it and it will dissappear from your "My apps" menu.{" "}
+                  <br />
+                  <span className="mbs">
+                    Note: you can re-activate it by contacting{" "}
+                    <a href="mailto:support@admix.in">support@admix.in</a>
+                  </span>{" "}
+                  <br />
+                  <br />
+                  <button
+                    className="gradient-btn"
+                    type="button"
+                    onClick={this.handleDelete}
+                  >
+                    Confirm
+                  </button>
+                </React.Fragment>
+              )}
+
+              {deleteClicked && (
+                <div>
+                  <NavLink
+                    style={{ margin: "auto", width: "20vw" }}
+                    className="gradient-btn cc"
+                    to="/myapps"
+                  >
+                    Go back to My Apps
+                  </NavLink>
+                </div>
               )}
             </div>
           )}
