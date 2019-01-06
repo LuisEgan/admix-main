@@ -28,7 +28,7 @@ export default class Congratulations extends Component {
                      <div>
                         <a
                            className="btn-dark mb"
-                           href="https://admix.in/wp-content/uploads/2018/11/Admix.Unity_Rev1.5.1_Release.unitypackage"
+                           href="https://admix.in/wp-content/uploads/2019/01/Admix.Unity_Rev1.5.2_Release.unitypackage"
                            target="_blank"
                            rel="noopener noreferrer"
                            onClick={this.handleDownload.bind(null, "unity")}
@@ -75,9 +75,9 @@ export default class Congratulations extends Component {
                <div className="mb download-bottom-section">
                   <div>
                      <span className="subtitle">VERSION</span>
-                     <span>Admix.Unity_Rev1.5.1_Release.unitypackage</span>
+                     <span>Admix.Unity_Rev1.5.2_Release.unitypackage</span>
                      <span className="subtitle">SIZE</span>
-                     <span>4MB</span>
+                     <span>2MB</span>
                      <span className="subtitle">REQUIREMENTS</span>
                      <span>Unity 2017.4.14f1 LTS and above</span>
                   </div>
