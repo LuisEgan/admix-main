@@ -164,17 +164,9 @@ class Info extends Component {
     } = this.props;
     let { isActive } = selectedApp;
 
-    let appState;
-    if (values.storeurl === "") {
-      appState = isActive ? C.APP_STATES.pending : C.APP_STATES.inactive;
-    } else {
-      appState = isActive ? C.APP_STATES.live : C.APP_STATES.inactive;
-    }
-
     const appData = {
       platformName: selectedApp.platformName,
       name: selectedApp.name,
-      appState,
       appId: selectedApp._id,
       metrics: {
         dau: values.dau || null,

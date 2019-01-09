@@ -10,6 +10,12 @@ import __conn_AdmixCalculator, {
   AdmixCalculator
 } from "../../components/AdmixCalculator";
 
+/*
+ * TEST INFO
+ * Functionality: The AdmixCalculator component
+ * Given: On the /info on the calculator tab
+ */
+
 const initialValues = {
   cpm: 20,
   mau: 0,
@@ -64,18 +70,28 @@ describe("------- <AdmixCalculator />", () => {
     wrapper.unmount();
   });
 
-  it("renders properly", () => {
+  it("renders Provider component which wrapps the AdmixCalculator component and holds the redux state properly", () => {
+    /*
+     * When: Initialization
+     */
     expect(wrapper.length).toEqual(1);
   });
 
-  it("has the proper inputs", () => {
+  it("render the proper inputs with their proper name", () => {
+    /*
+     * When: Initialization
+     */
     expect(cpm.exists()).toBeTruthy();
     expect(mau.exists()).toBeTruthy();
     expect(session.exists()).toBeTruthy();
     expect(avg.exists()).toBeTruthy();
   });
 
-  it("has the proper outputs", () => {
+  it("render the proper inputs with their proper id", () => {
+    /*
+     * When: Initialization
+     */
+
     const impressions = calculatorWrapper.find("#impressions");
     expect(impressions.exists()).toBeTruthy();
 
@@ -92,6 +108,10 @@ describe("------- <AdmixCalculator />", () => {
   // * ---------- Impressions
 
   it("shows impressions correctly on input", () => {
+    /*
+     * When: user inputs values the correct calculation is displayed
+     */
+
     const impressions = calculatorWrapper.find("#impressions");
     const expectedResult = `${impressionsTestRes.toFixed(2)}`;
     expect(impressions.text()).toEqual(expectedResult);
@@ -100,6 +120,10 @@ describe("------- <AdmixCalculator />", () => {
   // * ---------- Revenue
 
   it("shows revenue correctly on input", () => {
+    /*
+     * When: user inputs values the correct calculation is displayed
+     */
+
     const revenue = calculatorWrapper.find("#revenue");
     const expectedResult = `$ ${revenueTestRes.toFixed(2)}`;
     expect(revenue.text()).toEqual(expectedResult);
@@ -108,6 +132,10 @@ describe("------- <AdmixCalculator />", () => {
   // * ---------- Admix cut
 
   it("shows admixCut correctly on input", () => {
+    /*
+     * When: user inputs values the correct calculation is displayed
+     */
+
     const admixCut = calculatorWrapper.find("#admixCut");
     const expectedResult = `$ ${admixCutTestRes.toFixed(2)}`;
     expect(admixCut.text()).toEqual(expectedResult);
@@ -116,6 +144,10 @@ describe("------- <AdmixCalculator />", () => {
   // * ---------- Expected
 
   it("shows expected correctly on input", () => {
+    /*
+     * When: user inputs values the correct calculation is displayed
+     */
+
     const expected = calculatorWrapper.find("#expected");
     const expectedResult = `$ ${expectTestRes.toFixed(2)}`;
     expect(expected.text()).toEqual(expectedResult);
