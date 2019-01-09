@@ -6,7 +6,8 @@
 
 const isProd = process.env.NODE_ENV !== "development";
 
-const dns = isProd ? "https://api.admix.in" : "http://sandbox.api.admix.in";
+// const dns = isProd ? "https://api.admix.in" : "http://sandbox.api.admix.in";
+const dns = isProd ? "https://api.admix.in" : "http://localhost:3000";
 console.warn("dns: ", dns);
 
 function async() {
@@ -176,8 +177,8 @@ const getUserData = accessToken =>
   }).then(response => response.json());
 
 const toggleAppStatus = (accessToken, data) =>
-  fetch(`${dns}/api/v1/user/setApps`, {
-    method: "POST",
+  fetch(`${dns}/api/v2/apps/update`, {
+    method: "PUT",
     headers: new Headers({
       "Content-Type": "application/json",
       "x-access-token": accessToken
