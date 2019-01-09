@@ -6,8 +6,8 @@
 
 const isProd = process.env.NODE_ENV !== "development";
 
-const dns = isProd ? "https://api.admix.in": "http://sandbox.api.admix.in";
-console.warn('dns: ', dns);
+const dns = isProd ? "https://api.admix.in" : "http://sandbox.api.admix.in";
+console.warn("dns: ", dns);
 
 function async() {
   return fetch("http://date.jsontest.com/").then(response => response.json());
@@ -218,20 +218,15 @@ const updatePlacements = (accessToken, data) =>
 // const getReportData = (accessToken, data) => reportData;
 
 const getReportData = (accessToken, data) =>
-  fetch(
-    //   `http://ec2-52-200-109-193.compute-1.amazonaws.com:3020/report/placement/daily`,
-    // PROD - HTTPS
-    // `https://report.admix.in/report/placement/daily`, {
-    `https://report.admix.in/report/placement/daily`,
-    {
-      method: "POST",
-      headers: new Headers({
-        "Content-Type": "application/json"
-        // "x-access-token": accessToken
-      }),
-      body: JSON.stringify(data)
-    }
-  ).then(response => response.json());
+  fetch(`https://report.admix.in/report/placement/daily`, {
+    method: "POST",
+    headers: new Headers({
+      "Content-Type": "application/json",
+      "x-auth-token":
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YzE4ZmI1MmQ0ZGJjMTY0M2ZjN2ZhYTQiLCJuYW1lIjoiQWRtaW4gUGxhdGZvcm0iLCJlbWFpbCI6ImFkbWluQGFkbWl4LmluIiwicm9sZSI6MCwiaWF0IjoxNTQ1MTQxMDc0fQ.JoRcsmbGM4llyT2KxvDSVdshdAbufVG2DyGYjwUXDao"
+    }),
+    body: JSON.stringify(data)
+  }).then(response => response.json());
 
 export default {
   async,
