@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { toggleAppStatus } from "../actions";
 
 import _a from "../utils/analytics";
@@ -82,7 +83,6 @@ class AppStateToggle extends React.Component {
   }
 
   liveText(appState) {
-
     const text =
       appState === C.APP_STATES.pending
         ? {
@@ -169,7 +169,7 @@ class AppStateToggle extends React.Component {
           onMouseEnter={this.handleMouseHover.bind(null, C.APP_STATES.live)}
           onMouseLeave={this.handleMouseHover.bind(null, C.APP_STATES.live)}
         >
-          <span>{this.liveText(appState).title}</span>
+          <span id="AppStateToggle-liveText">{this.liveText(appState).title}</span>
           {displayTooltip && (
             <div className="admix-tooltip" style={liveTooltip}>
               {this.liveText(appState).tooltip}
@@ -180,5 +180,14 @@ class AppStateToggle extends React.Component {
     );
   }
 }
+
+AppStateToggle.propTypes = {
+  app: PropTypes.object.isRequired,
+  displayTooltip: PropTypes.bool
+};
+
+AppStateToggle.defaultProps = {
+  app: {}
+};
 
 export default AppStateToggle;
