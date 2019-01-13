@@ -75,7 +75,7 @@ function resendSignUpEmail(data) {
 }
 
 const updateUser = (accessToken, data) =>
-  fetch(`${dns}/api/v1/user/updateUser`, {
+  fetch(`${dns}/api/v2/user/update`, {
     method: "PUT",
     headers: new Headers({
       "Content-Type": "application/json",
