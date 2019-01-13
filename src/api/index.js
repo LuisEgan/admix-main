@@ -55,7 +55,7 @@ function login(data) {
 }
 
 function signup(data) {
-  return fetch(dns + "/api/v1/user/signup", {
+  return fetch(dns + "/api/v2/auth/signup", {
     method: "POST",
     headers: new Headers({
       "Content-Type": "application/json"
