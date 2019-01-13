@@ -476,7 +476,7 @@ const actionsMap = {
                   scene.placements = [];
                   Array.isArray(placements) &&
                         placements.forEach((placement, i) => {
-                              if (scene._id === placement.sceneId._id) {
+                              if (scene._id === placement.sceneId) {
                                     const placementToPush = cloneDeep(placements[i]);
                                     placementToPush.addedPrefix = false;
 
