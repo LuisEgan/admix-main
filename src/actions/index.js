@@ -542,16 +542,16 @@ export const fetchUserImgURL = (imgURL, accessToken) => dispatch => {
       dispatch(setUserImgURL(imgURL));
 };
 
-export const updateUser = (userId, update, accessToken) => dispatch => {
+export const updateUser = (userId, newData, accessToken) => dispatch => {
       dispatch(asyncStart());
 
-      const data = {
+      const body = {
             userId,
-            update
+            newData
       }
 
       api
-            .updateUser(accessToken, data)
+            .updateUser(accessToken, body)
             .then(data => {
                   dispatch(updateUserRes(data));
                   if (data.status) {
