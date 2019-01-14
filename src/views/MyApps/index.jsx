@@ -8,6 +8,7 @@ import {
   getApps,
   getUserData,
   selectApp,
+  updateUser,
   toggleAppStatus,
   getReportData,
   setInitialReportApp,
@@ -577,7 +578,7 @@ class MyApps extends Component {
   }
 
   handleSubmitForReview() {
-    const { dispatch, accessToken } = this.props;
+    const { dispatch, accessToken, userData } = this.props;
     const {
       clickedApp: { _id }
     } = this.state;
@@ -592,6 +593,7 @@ class MyApps extends Component {
 
     this.setState({ reviewClicked: true }, () => {
       dispatch(toggleAppStatus(appDetails, accessToken));
+      dispatch(updateUser(userData._id, { status: 4 }, accessToken));
     });
   }
 
