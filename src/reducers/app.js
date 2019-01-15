@@ -124,7 +124,7 @@ const actionsMap = {
     let asyncError = Array.isArray(message) ? message[0].msg : message;
 
     // Fallback
-    asyncError === "" && (asyncError = statusMessage);
+    (!asyncError || asyncError === "") && (asyncError = statusMessage);
 
     const asyncData = {
       mssg: asyncError || "Oops.. Something went wrong",
