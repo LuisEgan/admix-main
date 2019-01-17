@@ -18,9 +18,9 @@ function cloudinayImgUpload(accessToken, data) {
     method: "POST",
     headers: new Headers({
       "x-access-token": accessToken,
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     }),
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   }).then(response => response.json());
 }
 
@@ -28,9 +28,9 @@ function cloudinayImgURL(accessToken, data) {
   return fetch(dns + "/api/v1/user/cloudinayImgURL", {
     method: "POST",
     headers: new Headers({
-      "x-access-token": accessToken
+      "x-access-token": accessToken,
     }),
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   }).then(response => response.json());
 }
 
@@ -38,8 +38,8 @@ function isAdmin(accessToken) {
   return fetch(dns + "/api/v1/user/verify/isAdmin", {
     method: "GET",
     headers: new Headers({
-      "x-access-token": accessToken
-    })
+      "x-access-token": accessToken,
+    }),
   }).then(response => response.json());
 }
 
@@ -47,9 +47,9 @@ function login(data) {
   return fetch(dns + "/api/v1/user/login", {
     method: "POST",
     headers: new Headers({
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     }),
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   }).then(response => response.json());
 }
 
@@ -57,9 +57,9 @@ function signup(data) {
   return fetch(dns + "/api/v2/auth/signup", {
     method: "POST",
     headers: new Headers({
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     }),
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   }).then(response => response.json());
 }
 
@@ -67,9 +67,9 @@ function resendSignUpEmail(data) {
   return fetch(dns + "/api/v1/user/resendSignUpEmail", {
     method: "POST",
     headers: new Headers({
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     }),
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   }).then(response => response.json());
 }
 
@@ -78,18 +78,18 @@ const updateUser = (accessToken, data) =>
     method: "PUT",
     headers: new Headers({
       "Content-Type": "application/json",
-      "x-access-token": accessToken
+      "x-access-token": accessToken,
     }),
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   }).then(response => response.json());
 
 function forgotPass(data) {
   return fetch(dns + "/api/v1/user/forgot", {
     method: "POST",
     headers: new Headers({
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     }),
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   }).then(response => response.json());
 }
 
@@ -98,9 +98,9 @@ function changeEmail(accessToken, data) {
     method: "POST",
     headers: new Headers({
       "Content-Type": "application/json",
-      "x-access-token": accessToken
+      "x-access-token": accessToken,
     }),
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   }).then(response => response.json());
 }
 
@@ -108,9 +108,9 @@ function setNewPass(data) {
   return fetch(dns + "/api/v1/user/setNewPassword", {
     method: "POST",
     headers: new Headers({
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     }),
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   }).then(response => response.json());
 }
 
@@ -118,9 +118,9 @@ function setNewEmail(data) {
   return fetch(dns + "/api/v1/user/setNewEmail", {
     method: "POST",
     headers: new Headers({
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     }),
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   }).then(response => response.json());
 }
 
@@ -128,8 +128,8 @@ function getAppsAll(accessToken, data) {
   return fetch(dns + "/api/v1/user/getApps", {
     method: "GET",
     headers: new Headers({
-      "x-access-token": accessToken
-    })
+      "x-access-token": accessToken,
+    }),
   }).then(response => response.json());
 }
 
@@ -138,9 +138,9 @@ function getApps(accessToken, data) {
     method: "POST",
     headers: new Headers({
       "x-access-token": accessToken,
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     }),
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   }).then(response => response.json());
 }
 
@@ -149,9 +149,9 @@ function updateApp(accessToken, data) {
     method: "POST",
     headers: new Headers({
       "x-access-token": accessToken,
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     }),
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   }).then(response => response.json());
 }
 
@@ -161,9 +161,9 @@ function getAppsAdmin(accessToken, adminToken, data) {
     headers: new Headers({
       "x-access-token": accessToken,
       "x-admin-token": adminToken,
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     }),
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   }).then(response => response.json());
 }
 
@@ -171,8 +171,8 @@ const getUserData = accessToken =>
   fetch(`${dns}/api/v1/user/getPrefs`, {
     method: "GET",
     headers: new Headers({
-      "x-access-token": accessToken
-    })
+      "x-access-token": accessToken,
+    }),
   }).then(response => response.json());
 
 const toggleAppStatus = (accessToken, data) =>
@@ -180,9 +180,9 @@ const toggleAppStatus = (accessToken, data) =>
     method: "PUT",
     headers: new Headers({
       "Content-Type": "application/json",
-      "x-access-token": accessToken
+      "x-access-token": accessToken,
     }),
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   }).then(response => response.json());
 
 const getScenes = (accessToken, data) =>
@@ -190,9 +190,9 @@ const getScenes = (accessToken, data) =>
     method: "POST",
     headers: new Headers({
       "Content-Type": "application/json",
-      "x-access-token": accessToken
+      "x-access-token": accessToken,
     }),
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   }).then(response => response.json());
 
 const getPlacements = (accessToken, data) =>
@@ -200,9 +200,9 @@ const getPlacements = (accessToken, data) =>
     method: "POST",
     headers: new Headers({
       "Content-Type": "application/json",
-      "x-access-token": accessToken
+      "x-access-token": accessToken,
     }),
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   }).then(response => response.json());
 
 const updatePlacements = (accessToken, data) =>
@@ -210,22 +210,22 @@ const updatePlacements = (accessToken, data) =>
     method: "POST",
     headers: new Headers({
       "Content-Type": "application/json",
-      "x-access-token": accessToken
+      "x-access-token": accessToken,
     }),
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   }).then(response => response.json());
 
 // const getReportData = (accessToken, data) => reportData;
 
 const getReportData = (accessToken, data) =>
-  fetch(`https://report.admix.in/report/placement/daily`, {
+  fetch(`https://report.admin.in/report/placement/daily`, {
     method: "POST",
     headers: new Headers({
       "Content-Type": "application/json",
       "x-auth-token":
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YzE4ZmI1MmQ0ZGJjMTY0M2ZjN2ZhYTQiLCJuYW1lIjoiQWRtaW4gUGxhdGZvcm0iLCJlbWFpbCI6ImFkbWluQGFkbWl4LmluIiwicm9sZSI6MCwiaWF0IjoxNTQ1MTQxMDc0fQ.JoRcsmbGM4llyT2KxvDSVdshdAbufVG2DyGYjwUXDao"
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YmU0NDc5MTIxMDBjMTMxZjJhNDQwYzEiLCJuYW1lIjoiQWRtaW4gUGxhdGZvcm0iLCJlbWFpbCI6ImFkbWluQGFkbWl4LmluIiwicm9sZSI6MCwiaWF0IjoxNTQxNjg3MTg1fQ.HcV0VUmfIHdHUHvH-EjWx35VKHj1H_IrSrBvW8Dz4lQ",
     }),
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   }).then(response => response.json());
 
 export default {
@@ -250,5 +250,5 @@ export default {
   getScenes,
   getPlacements,
   updatePlacements,
-  getReportData
+  getReportData,
 };
