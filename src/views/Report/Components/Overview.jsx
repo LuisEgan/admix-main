@@ -465,8 +465,8 @@ export default class Overview extends Component {
         totalByDate.revenue[date] = (totalByDate.revenue[date] / 1000).toFixed(
           2,
         );
-        revenueData.push(totalByDate.revenue[date]);
       }
+      revenueData.push(totalByDate.revenue[date] || 0);
       impressionData.push(totalByDate.impression[date] || 0);
     });
 
