@@ -1,18 +1,7 @@
-// import reportData from "../assets/data/placementDailyReport.json";
-// import reportData from "../assets/data/placementDailyReport-total.json";
-
-// const dns = "http://ec2-52-15-223-69.us-east-2.compute.amazonaws.com:3006";
-// const dns = "http://ec2-18-188-77-242.us-east-2.compute.amazonaws.com";
-
 const isProd = process.env.NODE_ENV !== "development";
 
-// const dns = isProd ? "https://api.admix.in" : "http://sandbox.api.admix.in";
 const dns = isProd ? "https://api.admix.in" : "http://localhost:3000";
-console.warn("dns: ", dns);
-
-function async() {
-  return fetch("http://date.jsontest.com/").then(response => response.json());
-}
+!isProd && console.warn("dns: ", dns);
 
 function cloudinayImgUpload(accessToken, data) {
   return fetch(dns + "/api/v1/user/cloudinaryUpload", {
@@ -230,7 +219,6 @@ const getReportData = (accessToken, data) =>
   }).then(response => response.json());
 
 export default {
-  async,
   cloudinayImgUpload,
   cloudinayImgURL,
   isAdmin,
