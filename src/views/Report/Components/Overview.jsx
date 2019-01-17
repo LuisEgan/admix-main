@@ -244,9 +244,9 @@ export default class Overview extends Component {
          for (let date in selectedApps[appId].reportData.byDate) {
             reportData.push({
                date,
-               impression:
+               impression: isNaN(selectedApps[appId].reportData.byDate[date].impression) ? 0 :
                   selectedApps[appId].reportData.byDate[date].impression,
-               revenue: (
+               revenue: isNaN(selectedApps[appId].reportData.byDate[date].revenue / 1000) ? 0 : (
                   selectedApps[appId].reportData.byDate[date].revenue / 1000
                ).toFixed(2)
             });
