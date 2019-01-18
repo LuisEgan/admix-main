@@ -1664,6 +1664,18 @@ $inputsFontSize: calc(0.45em+0.3vw);
       min-height: 100%;
       background-color: white;
 
+      form {
+            width: 70%;
+
+            .login-input {
+                  margin-bottom: 10%;
+            }
+
+            .gradient-btn {
+                  width: 100%;
+            }
+      }
+
       a {
             color: #14B9BE;
       }
@@ -1678,7 +1690,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
                   flex-flow: column;
 
                   >div {
-                        height: 20%;
                         display: flex;
                         justify-content: center;
                         align-items: center;
@@ -1687,6 +1698,8 @@ $inputsFontSize: calc(0.45em+0.3vw);
                               width: 40%
                         }
                   }
+
+
 
                   >span {
                         @extend .mb;
@@ -1780,77 +1793,107 @@ $inputsFontSize: calc(0.45em+0.3vw);
             }
       }
 
-      #login-register {
-            >form {
-                  display: block;
+      #login-header {
+            height: 20%;
+      }
 
-                  >div {
-                        margin: auto;
+      #login-title {
+            height: 10%;
 
-                        &:first-child {
-                              min-height: 80px;
-                        }
-
-                        &:last-child {
-                              text-align: center;
-                              margin-bottom: 5vh;
-
-                        }
-                  }
-            }
-
-            .password-eye {
-                  bottom: 30%;
-            }
-
-            .login-feedback-thumb {
-                  bottom: 30px;
+            >div {
+                  @extend .cc;
+                  width: 70%;
+                  height: 100%;
+                  border-bottom: solid #F5F7FA;
             }
       }
 
-      #forgotPass {
-            .password-eye {
-                  bottom: 30%;
+      #login-forms {
+            height: 60%;
+      }
+
+      #login-nav {
+            height: 10%;
+
+            > div {
+                  @extend .cc;
+                  width: 70%;
+                  height: 100%;
+                  border-top: solid #F5F7FA;
             }
       }
 
-      .login-feedback-thumb {
-            position: absolute;
-            right: -40px;
-            font-size: 1.5em;
-            bottom: 15px;
-            animation: fadeIn cubic-bezier(0.44, 0.26, 0.58, 0.82) 1.2s forwards, rotate-x-180 1s forwards;
-      }
+      // #login-register {
+      //       >form {
+      //             display: block;
 
-      .login-guidelines {
-            @extend .mbs;
-            color: #d9d9d9;
-      }
+      //             >div {
+      //                   margin: auto;
 
-      .login-btn-container {
-            flex-flow: column;
-            text-align: center;
-      }
+      //                   &:first-child {
+      //                         min-height: 80px;
+      //                   }
 
-      .input {
-            margin-top: 5px;
-      }
+      //                   &:last-child {
+      //                         text-align: center;
+      //                         margin-bottom: 5vh;
 
-      .password-eye {
-            font-size: 2em;
-            bottom: 16%;
-            color: #14B9BE;
+      //                   }
+      //             }
+      //       }
 
-            padding: 2%;
+      //       .password-eye {
+      //             bottom: 30%;
+      //       }
 
-            &:hover {
-                  padding: 0.5%;
-            }
-      }
+      //       .login-feedback-thumb {
+      //             bottom: 30px;
+      //       }
+      // }
 
-      .asyncMssg {
-            margin: 5px 0;
-      }
+      // #forgotPass {
+      //       .password-eye {
+      //             bottom: 30%;
+      //       }
+      // }
+
+      // .login-feedback-thumb {
+      //       position: absolute;
+      //       right: -40px;
+      //       font-size: 1.5em;
+      //       bottom: 15px;
+      //       animation: fadeIn cubic-bezier(0.44, 0.26, 0.58, 0.82) 1.2s forwards, rotate-x-180 1s forwards;
+      // }
+
+      // .login-guidelines {
+      //       @extend .mbs;
+      //       color: #d9d9d9;
+      // }
+
+      // .login-btn-container {
+      //       flex-flow: column;
+      //       text-align: center;
+      // }
+
+      // .input {
+      //       margin-top: 5px;
+      // }
+
+      // .password-eye {
+      //       font-size: 2em;
+      //       bottom: 16%;
+      //       color: #14B9BE;
+
+      //       padding: 2%;
+
+      //       &:hover {
+      //             padding: 0.5%;
+      //       }
+      // }
+
+      // .asyncMssg {
+      //       margin: 5px 0;
+      // }
 }
 
 // ----------------------------------------------------------------------------------------------------------
