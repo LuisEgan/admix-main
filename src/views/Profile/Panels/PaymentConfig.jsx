@@ -24,7 +24,7 @@ const regions = [
   { title: <em>Please select a region</em>, value: "" },
   { title: "United States of America", value: "usa" },
   { title: "United Kingdom", value: "uk" },
-  { title: "Europe", value: "eu" }
+  { title: "Europe", value: "eu" },
 ];
 
 export default class PaymentConfig extends React.PureComponent {
@@ -33,7 +33,7 @@ export default class PaymentConfig extends React.PureComponent {
 
     this.state = {
       invoiceCheck: false,
-      oninvoiceCheck: false
+      oninvoiceCheck: false,
     };
 
     this.handleInvoiceCheck = this.handleInvoiceCheck.bind(this);
@@ -56,7 +56,7 @@ export default class PaymentConfig extends React.PureComponent {
       payment,
       paypalEmailStyle,
       payBanksStyle,
-      payBanksDetailsStyle
+      payBanksDetailsStyle,
     } = this.props;
 
     const { invoiceCheck, oninvoiceCheck } = this.state;
@@ -67,7 +67,6 @@ export default class PaymentConfig extends React.PureComponent {
           title="By ticking this box you’ll be paid automatically every month if your
        balance exceeds $500"
           placement="right"
-          classes={{ tooltip: { maxWidth: "50px" } }}
         >
           <FormControlLabel
             control={
