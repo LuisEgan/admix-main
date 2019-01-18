@@ -9,12 +9,16 @@ import {
 import storage from "redux-persist/lib/storage";
 import immutableTransform from "redux-persist-transform-immutable";
 import thunk from "redux-thunk";
-import logger from "./redux-logger";
+import { createLogger } from "redux-logger";
 
 import rootReducer from "../reducers";
 import persistReducer from "redux-persist/lib/persistReducer";
 
 const isProduction = process.env.NODE_ENV === "production";
+
+const logger = createLogger({
+    collapsed: true
+})
 
 const middleware = isProduction ?
     applyMiddleware(thunk) :
