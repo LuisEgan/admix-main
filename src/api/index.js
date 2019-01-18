@@ -3,48 +3,60 @@ const isProd = process.env.NODE_ENV !== "development";
 const dns = isProd ? "https://api.admix.in" : "http://localhost:3000";
 !isProd && console.warn("dns: ", dns);
 
-const cloudinayImgUpload = (accessToken, data) => {
-  return fetch(dns + "/api/v1/user/cloudinaryUpload", {
-    method: "POST",
-    headers: new Headers({
-      "x-access-token": accessToken,
-      "Content-Type": "application/json",
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
+// TODO return error!
+
+const cloudinayImgUpload = async (accessToken, data) => {
+  try {
+    const res = await fetch(dns + "/api/v2/cloudinary/upload", {
+      method: "POST",
+      headers: new Headers({
+        "x-access-token": accessToken,
+        "Content-Type": "application/json",
+      }),
+      body: JSON.stringify(data),
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ cloudinayImgUpload: ", error);
+  }
 };
 
-const cloudinayImgURL = (accessToken, data) => {
-  return fetch(dns + "/api/v1/user/cloudinayImgURL", {
-    method: "POST",
-    headers: new Headers({
-      "x-access-token": accessToken,
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
+const cloudinayImgURL = async (accessToken, data) => {
+  try {
+    const res = await fetch(dns + "/api/v2/cloudinary/imgurl", {
+      method: "POST",
+      headers: new Headers({
+        "x-access-token": accessToken,
+        "Content-Type": "application/json",
+      }),
+      body: JSON.stringify(data),
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ cloudinayImgURL: ", error);
+  }
 };
 
-const isAdmin = accessToken => {
-  return fetch(dns + "/api/v1/user/verify/isAdmin", {
-    method: "GET",
-    headers: new Headers({
-      "x-access-token": accessToken,
-    }),
-  }).then(response => response.json());
-};
+const login = async data => {
+  try {
+    const res = fetch(dns + "/api/v2/auth/login", {
+      method: "POST",
+      headers: new Headers({
+        "Content-Type": "application/json",
+      }),
+      body: JSON.stringify(data),
+    });
 
-const login = data => {
-  return fetch(dns + "/api/v1/user/login", {
-    method: "POST",
-    headers: new Headers({
-      "Content-Type": "application/json",
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
+    return res.json();
+  } catch (error) {
+    console.log("API ERROR @ login: ", error);
+  }
 };
 
 const signup = data => {
-  return fetch(dns + "/api/v1/user/signup", {
+  return fetch(dns + "/api/v2/user/signup", {
     method: "POST",
     headers: new Headers({
       "Content-Type": "application/json",
@@ -54,7 +66,7 @@ const signup = data => {
 };
 
 const resendSignUpEmail = data => {
-  return fetch(dns + "/api/v1/user/resendSignUpEmail", {
+  return fetch(dns + "/api/v2/user/resendSignUpEmail", {
     method: "POST",
     headers: new Headers({
       "Content-Type": "application/json",
@@ -74,7 +86,7 @@ const updateUser = (accessToken, data) =>
   }).then(response => response.json());
 
 const forgotPass = data => {
-  return fetch(dns + "/api/v1/user/forgot", {
+  return fetch(dns + "/api/v2/user/forgot", {
     method: "POST",
     headers: new Headers({
       "Content-Type": "application/json",
@@ -84,7 +96,7 @@ const forgotPass = data => {
 };
 
 const changeEmail = (accessToken, data) => {
-  return fetch(dns + "/api/v1/user/changeEmail", {
+  return fetch(dns + "/api/v2/user/changeEmail", {
     method: "POST",
     headers: new Headers({
       "Content-Type": "application/json",
@@ -95,7 +107,7 @@ const changeEmail = (accessToken, data) => {
 };
 
 const setNewPass = data => {
-  return fetch(dns + "/api/v1/user/setNewPassword", {
+  return fetch(dns + "/api/v2/user/setNewPassword", {
     method: "POST",
     headers: new Headers({
       "Content-Type": "application/json",
@@ -105,7 +117,7 @@ const setNewPass = data => {
 };
 
 const setNewEmail = data => {
-  return fetch(dns + "/api/v1/user/setNewEmail", {
+  return fetch(dns + "/api/v2/user/setNewEmail", {
     method: "POST",
     headers: new Headers({
       "Content-Type": "application/json",
@@ -115,7 +127,7 @@ const setNewEmail = data => {
 };
 
 const getAppsAll = (accessToken, data) => {
-  return fetch(dns + "/api/v1/user/getApps", {
+  return fetch(dns + "/api/v2/user/getApps", {
     method: "GET",
     headers: new Headers({
       "x-access-token": accessToken,
@@ -124,7 +136,7 @@ const getAppsAll = (accessToken, data) => {
 };
 
 const getApps = (accessToken, data) => {
-  return fetch(dns + "/api/v1/user/getApps", {
+  return fetch(dns + "/api/v2/user/getApps", {
     method: "POST",
     headers: new Headers({
       "x-access-token": accessToken,
@@ -135,7 +147,7 @@ const getApps = (accessToken, data) => {
 };
 
 const updateApp = (accessToken, data) => {
-  return fetch(dns + "/api/v1/user/setApps", {
+  return fetch(dns + "/api/v2/user/setApps", {
     method: "POST",
     headers: new Headers({
       "x-access-token": accessToken,
@@ -146,7 +158,7 @@ const updateApp = (accessToken, data) => {
 };
 
 const getAppsAdmin = (accessToken, adminToken, data) => {
-  return fetch(dns + "/api/v1/user/getAppsAdmin", {
+  return fetch(dns + "/api/v2/user/getAppsAdmin", {
     method: "POST",
     headers: new Headers({
       "x-access-token": accessToken,
@@ -158,7 +170,7 @@ const getAppsAdmin = (accessToken, adminToken, data) => {
 };
 
 const getUserData = accessToken =>
-  fetch(`${dns}/api/v1/user/getPrefs`, {
+  fetch(`${dns}/api/v2/user/getPrefs`, {
     method: "GET",
     headers: new Headers({
       "x-access-token": accessToken,
@@ -166,7 +178,7 @@ const getUserData = accessToken =>
   }).then(response => response.json());
 
 const toggleAppStatus = (accessToken, data) =>
-  fetch(`${dns}/api/v1/user/setApps`, {
+  fetch(`${dns}/api/v2/user/setApps`, {
     method: "POST",
     headers: new Headers({
       "Content-Type": "application/json",
@@ -176,7 +188,7 @@ const toggleAppStatus = (accessToken, data) =>
   }).then(response => response.json());
 
 const getScenes = (accessToken, data) =>
-  fetch(`${dns}/api/v1/user/getScenes`, {
+  fetch(`${dns}/api/v2/user/getScenes`, {
     method: "POST",
     headers: new Headers({
       "Content-Type": "application/json",
@@ -186,7 +198,7 @@ const getScenes = (accessToken, data) =>
   }).then(response => response.json());
 
 const getPlacements = (accessToken, data) =>
-  fetch(`${dns}/api/v1/user/getPlacements`, {
+  fetch(`${dns}/api/v2/user/getPlacements`, {
     method: "POST",
     headers: new Headers({
       "Content-Type": "application/json",
@@ -196,7 +208,7 @@ const getPlacements = (accessToken, data) =>
   }).then(response => response.json());
 
 const updatePlacements = (accessToken, data) =>
-  fetch(`${dns}/api/v1/user/updatePlacements`, {
+  fetch(`${dns}/api/v2/user/updatePlacements`, {
     method: "POST",
     headers: new Headers({
       "Content-Type": "application/json",
@@ -221,7 +233,6 @@ const getReportData = (accessToken, data) =>
 export default {
   cloudinayImgUpload,
   cloudinayImgURL,
-  isAdmin,
   login,
   signup,
   resendSignUpEmail,
