@@ -3,7 +3,7 @@ const isProd = process.env.NODE_ENV !== "development";
 const dns = isProd ? "https://api.admix.in" : "http://localhost:3000";
 !isProd && console.warn("dns: ", dns);
 
-function cloudinayImgUpload(accessToken, data) {
+const cloudinayImgUpload = (accessToken, data) => {
   return fetch(dns + "/api/v1/user/cloudinaryUpload", {
     method: "POST",
     headers: new Headers({
@@ -12,9 +12,9 @@ function cloudinayImgUpload(accessToken, data) {
     }),
     body: JSON.stringify(data),
   }).then(response => response.json());
-}
+};
 
-function cloudinayImgURL(accessToken, data) {
+const cloudinayImgURL = (accessToken, data) => {
   return fetch(dns + "/api/v1/user/cloudinayImgURL", {
     method: "POST",
     headers: new Headers({
@@ -22,18 +22,18 @@ function cloudinayImgURL(accessToken, data) {
     }),
     body: JSON.stringify(data),
   }).then(response => response.json());
-}
+};
 
-function isAdmin(accessToken) {
+const isAdmin = accessToken => {
   return fetch(dns + "/api/v1/user/verify/isAdmin", {
     method: "GET",
     headers: new Headers({
       "x-access-token": accessToken,
     }),
   }).then(response => response.json());
-}
+};
 
-function login(data) {
+const login = data => {
   return fetch(dns + "/api/v1/user/login", {
     method: "POST",
     headers: new Headers({
@@ -41,9 +41,9 @@ function login(data) {
     }),
     body: JSON.stringify(data),
   }).then(response => response.json());
-}
+};
 
-function signup(data) {
+const signup = data => {
   return fetch(dns + "/api/v1/user/signup", {
     method: "POST",
     headers: new Headers({
@@ -51,9 +51,9 @@ function signup(data) {
     }),
     body: JSON.stringify(data),
   }).then(response => response.json());
-}
+};
 
-function resendSignUpEmail(data) {
+const resendSignUpEmail = data => {
   return fetch(dns + "/api/v1/user/resendSignUpEmail", {
     method: "POST",
     headers: new Headers({
@@ -61,7 +61,7 @@ function resendSignUpEmail(data) {
     }),
     body: JSON.stringify(data),
   }).then(response => response.json());
-}
+};
 
 const updateUser = (accessToken, data) =>
   fetch(`${dns}/api/v2/user/update`, {
@@ -73,7 +73,7 @@ const updateUser = (accessToken, data) =>
     body: JSON.stringify(data),
   }).then(response => response.json());
 
-function forgotPass(data) {
+const forgotPass = data => {
   return fetch(dns + "/api/v1/user/forgot", {
     method: "POST",
     headers: new Headers({
@@ -81,9 +81,9 @@ function forgotPass(data) {
     }),
     body: JSON.stringify(data),
   }).then(response => response.json());
-}
+};
 
-function changeEmail(accessToken, data) {
+const changeEmail = (accessToken, data) => {
   return fetch(dns + "/api/v1/user/changeEmail", {
     method: "POST",
     headers: new Headers({
@@ -92,9 +92,9 @@ function changeEmail(accessToken, data) {
     }),
     body: JSON.stringify(data),
   }).then(response => response.json());
-}
+};
 
-function setNewPass(data) {
+const setNewPass = data => {
   return fetch(dns + "/api/v1/user/setNewPassword", {
     method: "POST",
     headers: new Headers({
@@ -102,9 +102,9 @@ function setNewPass(data) {
     }),
     body: JSON.stringify(data),
   }).then(response => response.json());
-}
+};
 
-function setNewEmail(data) {
+const setNewEmail = data => {
   return fetch(dns + "/api/v1/user/setNewEmail", {
     method: "POST",
     headers: new Headers({
@@ -112,18 +112,18 @@ function setNewEmail(data) {
     }),
     body: JSON.stringify(data),
   }).then(response => response.json());
-}
+};
 
-function getAppsAll(accessToken, data) {
+const getAppsAll = (accessToken, data) => {
   return fetch(dns + "/api/v1/user/getApps", {
     method: "GET",
     headers: new Headers({
       "x-access-token": accessToken,
     }),
   }).then(response => response.json());
-}
+};
 
-function getApps(accessToken, data) {
+const getApps = (accessToken, data) => {
   return fetch(dns + "/api/v1/user/getApps", {
     method: "POST",
     headers: new Headers({
@@ -132,9 +132,9 @@ function getApps(accessToken, data) {
     }),
     body: JSON.stringify(data),
   }).then(response => response.json());
-}
+};
 
-function updateApp(accessToken, data) {
+const updateApp = (accessToken, data) => {
   return fetch(dns + "/api/v1/user/setApps", {
     method: "POST",
     headers: new Headers({
@@ -143,9 +143,9 @@ function updateApp(accessToken, data) {
     }),
     body: JSON.stringify(data),
   }).then(response => response.json());
-}
+};
 
-function getAppsAdmin(accessToken, adminToken, data) {
+const getAppsAdmin = (accessToken, adminToken, data) => {
   return fetch(dns + "/api/v1/user/getAppsAdmin", {
     method: "POST",
     headers: new Headers({
@@ -155,7 +155,7 @@ function getAppsAdmin(accessToken, adminToken, data) {
     }),
     body: JSON.stringify(data),
   }).then(response => response.json());
-}
+};
 
 const getUserData = accessToken =>
   fetch(`${dns}/api/v1/user/getPrefs`, {
