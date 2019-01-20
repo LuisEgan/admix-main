@@ -4,6 +4,7 @@ import storage from "redux-persist/lib/storage";
 import immutableTransform from "redux-persist-transform-immutable";
 import thunk from "redux-thunk";
 import { createLogger } from "redux-logger";
+import Immutable from "immutable";
 
 import rootReducer from "../reducers";
 import persistReducer from "redux-persist/lib/persistReducer";
@@ -12,6 +13,18 @@ const isProduction = process.env.NODE_ENV === "production";
 
 const logger = createLogger({
   collapsed: true,
+  stateTransformer: state => {
+    let newState = {};
+
+    for (let i of Object.keys(state)) {
+      if (Immutable.Iterable.isIterable(state[i])) {
+        newState[i] = state[i].toJS();
+      } else {
+        newState[i] = state[i];
+      }
+    }
+    return newState;
+  },
 });
 
 const middleware = isProduction
