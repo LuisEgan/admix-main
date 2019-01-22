@@ -28,7 +28,7 @@ import Select from "@material-ui/core/Select";
 import { KeyboardArrowDown } from "@material-ui/icons";
 
 import AppsStateToggle from "../../components/AppStateToggle";
-import Input from "../../components/Input";
+import Input from "../../components/inputs/TextInput";
 import SVG from "../../components/SVG";
 import CSS from "../../utils/InLineCSS";
 

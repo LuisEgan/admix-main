@@ -2,18 +2,11 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import _a from "../../utils/analytics";
 import PropTypes from "prop-types";
-import {
-  login,
-  signup,
-  resendSignUpEmail,
-  forgotPass,
-  resetAsync,
-} from "../../actions";
-import { Field, reduxForm, reset } from "redux-form";
+import { signup, resendSignUpEmail, forgotPass } from "../../actions";
+import { Field } from "redux-form";
 
-import Input from "../../components/Input";
+import Input from "../../components/inputs/TextInput";
 
-import ToggleDisplay from "react-toggle-display";
 import STR from "../../utils/strFuncs";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import admixLogo from "../../assets/img/logo.png";
@@ -24,11 +17,9 @@ import ResetForm from "./ResetForm";
 const { ga } = _a;
 
 const Forms = {
-  Login: (tv, rf) => <LoginForm toggleView={tv} renderFields={rf} />,
-  "Recover Password": (tv, rf) => (
-    <SignupForm toggleView={tv} renderFields={rf} />
-  ),
-  Register: (tv, rf) => <ResetForm toggleView={tv} renderFields={rf} />,
+  Login: <LoginForm />,
+  "Recover Password": <SignupForm />,
+  Register: <ResetForm />,
 };
 
 class Login extends Component {
@@ -52,55 +43,22 @@ class Login extends Component {
       show: "Login",
     };
 
-    this.handleLogin = this.handleLogin.bind(this);
     this.handleforgotPass = this.handleforgotPass.bind(this);
     this.handleSignup = this.handleSignup.bind(this);
     this.resendSignUpEmail = this.resendSignUpEmail.bind(this);
 
-    this.resetAsync = this.resetAsync.bind(this);
-    this.togglePassInputType = this.togglePassInputType.bind(this);
     this.toggleView = this.toggleView.bind(this);
 
     this.toggleCheckbox = this.toggleCheckbox.bind(this);
-    this.enableRegisterBtn = this.enableRegisterBtn.bind(this);
-
-    this.eye = this.eye.bind(this);
 
     this.renderFields = this.renderFields.bind(this);
   }
 
-  componentDidMount() {
-    const {
-      location: { search },
-      dispatch,
-    } = this.props;
-    const show = search.split("?")[1];
-    (show === "register" || show === "forgotPass") && this.setState({ show });
-    dispatch(resetAsync());
-    dispatch(reset("loginForm"));
-  }
-
-  resetAsync() {
-    const { dispatch } = this.props;
-    dispatch(resetAsync());
-  }
-
   toggleView(show, e) {
     e.preventDefault();
-    const { dispatch } = this.props;
-    dispatch(resetAsync());
     this.setState({
       show,
-      email: "",
-      password: "",
-      name: "",
     });
-  }
-
-  togglePassInputType() {
-    let { passInputType } = this.state;
-    passInputType = passInputType === "password" ? "text" : "password";
-    this.setState({ passInputType });
   }
 
   resendSignUpEmail() {
@@ -112,49 +70,6 @@ class Login extends Component {
     const newState = this.state;
     newState[checkbox] = !newState[checkbox];
     this.setState(newState);
-  }
-
-  // ERROS HANDLING ---------------------------------------------------------
-
-  isError({ input, asyncError }) {
-    if (
-      input === "emailLogin" &&
-      (asyncError === "Invalid Username" ||
-        asyncError === "User Not Found" ||
-        asyncError === "Invalid Username or Password")
-    )
-      return true;
-    else if (
-      input === "passLogin" &&
-      (asyncError === "Invalid Password" ||
-        asyncError === "Invalid Username or Password")
-    )
-      return true;
-    else if (input === "emailForgot" && asyncError === "User Not Found")
-      return true;
-    else if (input === "emailReg" && asyncError === "User Already Exists")
-      return true;
-
-    return false;
-  }
-
-  enableRegisterBtn() {
-    //  const { reduxForm } = this.props;
-    //  const { policy, consent } = this.state;
-
-    //  let syncErrors = {};
-    //  let values = {};
-
-    //  if (reduxForm && reduxForm.loginForm) {
-    //    syncErrors = reduxForm.loginForm.syncErrors;
-    //    values = reduxForm.loginForm.values;
-    //  }
-    //  const { nameReg, emailReg, passReg1, passReg2 } = values;
-
-    //  if (nameReg && emailReg && passReg1 && passReg2) {
-    //    return !syncErrors && policy && consent;
-    //  }
-    return false;
   }
 
   // ICONS ---------------------------------------------------------
@@ -171,20 +86,6 @@ class Login extends Component {
   }
 
   // HANDLES ---------------------------------------------------------
-
-  handleLogin(e) {
-    if (e) e.preventDefault();
-    let {
-      reduxForm: {
-        loginForm: {
-          values: { emailLogin, passLogin },
-        },
-      },
-      login,
-    } = this.props;
-
-    login(emailLogin.toLowerCase(), passLogin);
-  }
 
   handleforgotPass(e) {
     _a.track(ga.actions.account.passwordChangeRequest, {
@@ -282,13 +183,7 @@ class Login extends Component {
       return (
         <div>
           <span className="input-label">{label}</span>
-          <Input
-            {...input}
-            type={type}
-            className="mb"
-            id={input.name}
-            onFocus={this.resetAsync}
-          />
+          <Input {...input} type={type} className="mb" id={input.name} />
           <span className="login-guidelines" style={guidelineStyle}>
             {guideline}
           </span>
@@ -322,51 +217,7 @@ class Login extends Component {
   }
 
   render() {
-    let { asyncError, asyncData, asyncLoading, handleSubmit } = this.props;
-    const { show, passInputType } = this.state;
-
-    const registerBtnEnabled = this.enableRegisterBtn();
-    const registerBtnStyle = registerBtnEnabled ? {} : { opacity: 0.5 };
-    const registerBtnClass = registerBtnEnabled ? "" : "forbidden-cursor";
-
-    const loginFields = [
-      {
-        input: "emailLogin",
-      },
-      {
-        input: "passLogin",
-        icon: this.eye(),
-        type: passInputType,
-      },
-    ];
-
-    const forgotFields = [
-      {
-        input: "emailForgot",
-      },
-    ];
-
-    const registerFields = [
-      {
-        input: "nameReg",
-        guideline: "only letters",
-      },
-      {
-        input: "emailReg",
-        guideline: "valid e-mail",
-      },
-      {
-        input: "passReg1",
-        icon: this.eye(),
-        type: passInputType,
-        guideline: "only letters",
-      },
-      {
-        input: "passReg2",
-        icon: this.eye(),
-        type: passInputType,
-      },
-    ];
+    const { show } = this.state;
 
     return (
       <div id="login">
@@ -379,12 +230,10 @@ class Login extends Component {
             <div>{show}</div>
           </div>
 
-          <div id="login-forms">{Forms[show](this.toggleView)}</div>
+          <div id="login-forms">{Forms[show]}</div>
 
           <div id="login-nav">
-            <div>
-               buttons
-            </div>
+            <div>buttons</div>
           </div>
         </div>
 
@@ -428,38 +277,21 @@ const validate = values => {
   return errors;
 };
 
-const formConfig = {
-  form: "OLDloginForm",
-  validate,
-};
-
 const mapStateToProps = state => {
-  const initialValues = {
-    emailLogin: "",
-    passLogin: "",
-  };
-
   return {
     asyncData: state.app.get("asyncData"),
     asyncError: state.app.get("asyncError"),
     asyncLoading: state.app.get("asyncLoading"),
     signupInfo: state.app.get("signupInfo"),
     isLoggedIn: state.app.get("isLoggedIn"),
-    reduxForm: state.form,
-    initialValues,
   };
 };
 
-const mapDispatchToProps = dispatch => ({
-  login: (email, password) => dispatch(login(email, password)),
-});
-
-Login = reduxForm(formConfig)(Login);
 Login = connect(mapStateToProps)(Login);
 
 export default Login;
 
-{
+// {
   /* <ToggleDisplay show={show === "login"} id="login-login">
                   <form onSubmit={handleSubmit(this.handleLogin)}>
                      <div className="st">Login</div>
@@ -634,4 +466,4 @@ export default Login;
                      </div>
                   </form>
                </ToggleDisplay> */
-}
+// }

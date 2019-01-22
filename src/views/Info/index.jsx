@@ -4,13 +4,14 @@ import { NavLink } from "react-router-dom";
 import _a from "../../utils/analytics";
 import { Field, reduxForm, change } from "redux-form";
 import routeCodes from "../../config/routeCodes";
-import { updateApp, asyncError } from "../../actions";
+import { updateApp } from "../../actions";
+import { setAsyncLoading } from "../../actions/asyncActions";
 import PropTypes from "prop-types";
 import validate from "validate.js";
 
 import Breadcrumbs from "../../components/Breadcrumbs";
 import PanelFooter from "../../components/PanelFooter";
-import Input from "../../components/Input";
+import Input from "../../components/inputs/TextInput";
 import AdmixCalculator from "../../components/AdmixCalculator";
 import ReactSVG from "react-svg";
 
@@ -29,7 +30,7 @@ import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import {
   KeyboardArrowDown,
   KeyboardArrowRight,
-  Timeline
+  Timeline,
 } from "@material-ui/icons";
 // import SVG from "../../components/SVG";
 
@@ -37,7 +38,7 @@ const { ga } = _a;
 
 class Info extends Component {
   static propTypes = {
-    dispatch: PropTypes.func
+    dispatch: PropTypes.func,
   };
 
   constructor(props) {
@@ -45,7 +46,7 @@ class Info extends Component {
 
     this.state = {
       show: "cal",
-      deleteClicked: false
+      deleteClicked: false,
     };
 
     this.expMetrics = {
@@ -54,22 +55,22 @@ class Info extends Component {
       fields: [
         {
           title: "DAU",
-          name: "dau"
+          name: "dau",
         },
         {
           title: "MAU",
-          name: "mau"
+          name: "mau",
         },
         {
           title: "Session per users/month",
-          name: "avgTimePerSession"
+          name: "avgTimePerSession",
         },
         {
           title: "Average time per session",
           name: "sessions",
-          optional: ["%"]
-        }
-      ]
+          optional: ["%"],
+        },
+      ],
     };
 
     this.expGeos = {
@@ -80,21 +81,21 @@ class Info extends Component {
       fields: [
         {
           title: "US (%)",
-          name: "us"
+          name: "us",
         },
         {
           title: "UK (%)",
-          name: "uk"
+          name: "uk",
         },
         {
           title: "EU (%)",
-          name: "eu"
+          name: "eu",
         },
         {
           title: "Rest of the world (%)",
-          name: "world"
-        }
-      ]
+          name: "world",
+        },
+      ],
     };
 
     this.expDemos = {
@@ -103,33 +104,33 @@ class Info extends Component {
       fields: [
         {
           title: "Male (%)",
-          name: "male"
+          name: "male",
         },
         {
           title: "Female (%)",
-          name: "female"
+          name: "female",
         },
         {
           title: "15 - 24",
-          name: "young"
+          name: "young",
         },
         {
           title: "24 - 34",
-          name: "youngMid"
+          name: "youngMid",
         },
         {
           title: "35 - 44",
-          name: "mid"
+          name: "mid",
         },
         {
           title: "45 - 54",
-          name: "senior"
+          name: "senior",
         },
         {
           title: "55 - older",
-          name: "old"
-        }
-      ]
+          name: "old",
+        },
+      ],
     };
 
     this.changeView = this.changeView.bind(this);
@@ -152,7 +153,7 @@ class Info extends Component {
 
   handleUpdateInfo(values) {
     _a.track(ga.actions.apps.modifyStoreUrl, {
-      category: ga.categories.apps
+      category: ga.categories.apps,
     });
 
     const {
@@ -160,9 +161,8 @@ class Info extends Component {
       admintoken,
       dispatch,
       selectedApp,
-      admixCalculatorForm
+      admixCalculatorForm,
     } = this.props;
-    let { isActive } = selectedApp;
 
     const appData = {
       platformName: selectedApp.platformName,
@@ -172,12 +172,12 @@ class Info extends Component {
         dau: values.dau || null,
         mau: values.mau || null,
         avgTimePerSession: values.avgTimePerSession || null,
-        sessions: values.session || null
+        sessions: values.session || null,
       },
       geos: {
         us: +values.us || null,
         uk: +values.uk || null,
-        eu: +values.eu || null
+        eu: +values.eu || null,
       },
       demographics: {
         male: values.male,
@@ -186,13 +186,13 @@ class Info extends Component {
           youngMid: values.youngMid,
           mid: values.mid,
           senior: values.senior,
-          old: values.old
-        }
+          old: values.old,
+        },
       },
       calculator: {
-        ...admixCalculatorForm
+        ...admixCalculatorForm,
       },
-      ...values
+      ...values,
     };
 
     dispatch(updateApp({ appData, accessToken, admintoken }));
@@ -207,7 +207,7 @@ class Info extends Component {
       name,
       appId: selectedApp._id,
       appState: "deleted",
-      isActive: false
+      isActive: false,
     };
 
     this.setState({ deleteClicked: true }, () => {
@@ -223,7 +223,7 @@ class Info extends Component {
   renderField(field) {
     const {
       input,
-      meta: { error }
+      meta: { error },
     } = field;
 
     return (
@@ -254,7 +254,7 @@ class Info extends Component {
 
   renderExpansionPanel({ panelIcon, panelTitle, fields }) {
     let {
-      reduxForm: { infoForm }
+      reduxForm: { infoForm },
     } = this.props;
 
     let us = 0,
@@ -309,16 +309,16 @@ class Info extends Component {
     this.breadcrumbs = [
       {
         title: "My apps",
-        route: routeCodes.MYAPPS
+        route: routeCodes.MYAPPS,
       },
       {
         title: selectedApp.name,
-        route: routeCodes.SCENE
+        route: routeCodes.SCENE,
       },
       {
         title: "App info",
-        route: routeCodes.INFO
-      }
+        route: routeCodes.INFO,
+      },
     ];
 
     let urlAct = show("url") ? "active" : "";
@@ -387,7 +387,11 @@ class Info extends Component {
               )}
             </div>
           </div>
-          <PanelFooter app={selectedApp} hideInner={deleteClicked} {...this.props} />
+          <PanelFooter
+            app={selectedApp}
+            hideInner={deleteClicked}
+            {...this.props}
+          />
         </div>
 
         <div className="page-content">
@@ -422,19 +426,19 @@ class Info extends Component {
                 {this.renderExpansionPanel({
                   panelIcon: this.expMetrics.panelIcon,
                   panelTitle: this.expMetrics.panelTitle,
-                  fields: this.expMetrics.fields
+                  fields: this.expMetrics.fields,
                 })}
 
                 {this.renderExpansionPanel({
                   panelIcon: this.expGeos.panelIcon,
                   panelTitle: this.expGeos.panelTitle,
-                  fields: this.expGeos.fields
+                  fields: this.expGeos.fields,
                 })}
 
                 {this.renderExpansionPanel({
                   panelIcon: this.expDemos.panelIcon,
                   panelTitle: this.expDemos.panelTitle,
-                  fields: this.expDemos.fields
+                  fields: this.expDemos.fields,
                 })}
               </div>
             )}
@@ -499,7 +503,7 @@ const mapStateToProps = state => {
   const asyncData = state.app.get("asyncData");
   let { storeurl, metrics, geos, demographics, calculator } = selectedApp;
   const {
-    form: { admixCalculatorForm }
+    form: { admixCalculatorForm },
   } = state;
 
   metrics = metrics || {};
@@ -520,10 +524,10 @@ const mapStateToProps = state => {
       ...metrics,
       ...geos,
       male: demographics.male,
-      ...demographics.byAge
+      ...demographics.byAge,
     },
     admixCalculatorForm: admixCalculatorForm ? admixCalculatorForm.values : {},
-    calculatorInitialValues: calculator
+    calculatorInitialValues: calculator,
   };
 };
 
@@ -555,13 +559,13 @@ const validateForm = values => {
 
 const onSubmitFail = (errors, dispatch) => {
   const error = errors ? { message: errors.storeurl } : {};
-  dispatch(asyncError(error));
+  dispatch(setAsyncLoading(error));
 };
 
 const formConfig = {
   form: "infoForm",
   validate: validateForm,
-  onSubmitFail
+  onSubmitFail,
 };
 
 Info = reduxForm(formConfig)(Info);

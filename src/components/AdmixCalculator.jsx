@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Field, reduxForm } from "redux-form";
-import Input from "./Input";
+import Input from "./inputs/TextInput";
 import { onlyNums } from "../utils/normalizers";
 
 export class AdmixCalculator extends React.Component {

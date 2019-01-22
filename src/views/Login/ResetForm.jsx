@@ -1,7 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { Field, reduxForm, reset } from "redux-form";
-import _a from "../../utils/analytics";
+import { reduxForm } from "redux-form";
 
 class ResetForm extends React.Component {
   render() {

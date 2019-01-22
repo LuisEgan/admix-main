@@ -1,11 +1,7 @@
 import api from "../api";
 import _a from "../utils/analytics";
-
-export const ACTION = "ACTION";
-
-export const ACTION_START = "ACTION_START";
-export const ACTION_ERROR = "ACTION_ERROR";
-export const ACTION_SUCCESS = "ACTION_SUCCESS";
+import { setAsyncError, setAsyncLoading } from "./asyncActions";
+import C from "../utils/constants";
 
 export const REGISTER_REQUEST = "USERS_REGISTER_REQUEST",
   REGISTER_SUCCESS = "USERS_REGISTER_SUCCESS",
@@ -45,52 +41,12 @@ export const REGISTER_REQUEST = "USERS_REGISTER_REQUEST",
   SET_LOADED_SCENE = "SET_LOADED_SCENE",
   PERSIST_REHYDRATE = "persist/REHYDRATE";
 
-// Test action
-
-export function action() {
-  return {
-    type: ACTION,
-  };
-}
-
-export function load_webgl() {
-  return {
-    type: LOADED_WEBGL_SCRIPTS,
-  };
-}
-
-// Async action example
-
-function asyncStart() {
-  return {
-    type: ACTION_START,
-  };
-}
-
-function asyncSuccess(data) {
-  return {
-    type: ACTION_SUCCESS,
-    data,
-  };
-}
-
-export const asyncError = data => ({
-  type: ACTION_ERROR,
-  data,
-});
-
-export const resetAsync = () => ({
-  type: RESET_ASYNC,
-});
-
 const doLogin = data => {
   if (data.status) {
     return {
       type: LOGIN_SUCCESS,
       data,
     };
-  } else {
-    return asyncError(data);
   }
 };
 
@@ -106,8 +62,6 @@ function doSignup(data) {
       type: REGISTER_SUCCESS,
       data,
     };
-  } else {
-    return asyncError(data);
   }
 }
 
@@ -117,8 +71,6 @@ function doForgotPass(data) {
       type: FORGOT_PASS,
       data,
     };
-  } else {
-    return asyncError(data);
   }
 }
 
@@ -128,8 +80,6 @@ function dochangeEmail(data) {
       type: CHANGE_EMAIL,
       data,
     };
-  } else {
-    return asyncError(data);
   }
 }
 
@@ -139,8 +89,6 @@ function doSetPassword(data) {
       type: SET_PASS,
       data,
     };
-  } else {
-    return asyncError(data);
   }
 }
 
@@ -150,8 +98,6 @@ function doSetEmail(data) {
       type: SET_NEW_EMAIL,
       data,
     };
-  } else {
-    return asyncError(data);
   }
 }
 
@@ -161,8 +107,6 @@ function showApps(data) {
       type: APPS_SUCCESS,
       data,
     };
-  } else {
-    return asyncError(data);
   }
 }
 
@@ -173,8 +117,6 @@ const doSelectApp = (appId, data) => {
       type: SELECT_APP,
       data,
     };
-  } else {
-    return asyncError(data);
   }
 };
 
@@ -184,8 +126,6 @@ const doUpdateApp = data => {
       type: UPDATE_APP,
       data,
     };
-  } else {
-    return asyncError(data);
   }
 };
 
@@ -209,8 +149,6 @@ const setPlacements = data => {
       type: SET_PLACEMENTS,
       data,
     };
-  } else {
-    return asyncError(data);
   }
 };
 
@@ -220,8 +158,6 @@ const setplacementsByAppId = data => {
       type: SET_PLACEMENTS_BY_ID,
       data,
     };
-  } else {
-    return asyncError(data);
   }
 };
 
@@ -240,8 +176,6 @@ const showUserData = data => {
       type: USER_DATA_SUCCESS,
       data,
     };
-  } else {
-    return asyncError(data);
   }
 };
 
@@ -251,8 +185,6 @@ const doToggleAppStatus = data => {
       type: TOGGLE_APP_STATUS,
       data,
     };
-  } else {
-    return asyncError(data);
   }
 };
 
@@ -262,8 +194,6 @@ const pushPlacements = data => {
       type: UPDATE_PLACEMENTS,
       data,
     };
-  } else {
-    return asyncError(data);
   }
 };
 
@@ -294,8 +224,6 @@ const updateUserRes = data => {
       type: UPDATE_USER,
       data,
     };
-  } else {
-    return asyncError(data);
   }
 };
 
@@ -313,62 +241,47 @@ export const setLoadedScene = loadedScene => ({
 
 // FETCH =============================================
 
-export function async() {
-  return function(dispatch) {
-    dispatch(asyncStart());
-
-    api
-      .async()
-      .then(data => dispatch(asyncSuccess(data)))
-      .catch(error => dispatch(asyncError(error)));
+export const login = (username, password) => async dispatch => {
+  const data = {
+    username,
+    password,
   };
-}
 
-export function login(email, password) {
-  return function(dispatch) {
-    dispatch(asyncStart());
-    var data = {
-      username: email,
-      password: password,
-    };
+  dispatch(setAsyncLoading(true));
 
-    let loginData;
-    api
-      .login(data)
-      .then(data => {
-        loginData = data;
-        return api.getUserData(loginData.data.loginToken);
-      })
-      .then(data => {
-        const userData = data.data;
-        const userId = userData._id;
+  try {
+    const loginRes = await api.login(data);
+    if (!loginRes.status) throw C.ERRORS.failedLogin;
 
-        if (userId && window.analytics) {
-          const traits = {
-            name: userData.name,
-            email: userData.email.value,
-            companyName: userData.companyName,
-          };
-          _a.identify(userId, traits, {}, () => {
-            _a.track(_a.events.account.loggedIn);
-          });
-          dispatch(doLogin(loginData));
-        } else {
-          window.analytics && _a.track(_a.events.account.failedLogin);
-          dispatch(doLogin(loginData));
-        }
-      })
-      .catch(error => {
-        console.log("error: ", error);
+    const userRes = await api.getUserData(loginRes.data.loginToken);
+    if (!userRes.status) throw C.ERRORS.failedLogin;
 
-        return dispatch(asyncError(error));
+    const userData = userRes.data;
+    const userId = userData._id;
+    if (userId && window.analytics) {
+      const traits = {
+        name: userData.name,
+        email: userData.email.value,
+        companyName: userData.companyName,
+      };
+      _a.identify(userId, traits, {}, () => {
+        _a.track(_a.events.account.loggedIn);
       });
-  };
-}
+      dispatch(doLogin(userData));
+    } else {
+      window.analytics && _a.track(_a.events.account.failedLogin);
+      dispatch(doLogin(userData));
+    }
+
+    dispatch(setAsyncLoading(false));
+  } catch (error) {
+    console.error("error: ", error);
+    dispatch(setAsyncError(error));
+  }
+};
 
 export function signup(name, email, password) {
   return function(dispatch) {
-    dispatch(asyncStart());
     var data = {
       email,
       password,
@@ -384,13 +297,11 @@ export function signup(name, email, password) {
         }
         return dispatch(doSignup(data));
       })
-      .catch(error => dispatch(asyncError(error)));
+      .catch(error => dispatch(setAsyncError(error)));
   };
 }
 
 export const resendSignUpEmail = ({ userEmail, userName }) => dispatch => {
-  dispatch(asyncStart());
-
   const data = {
     userEmail,
     userName,
@@ -398,36 +309,30 @@ export const resendSignUpEmail = ({ userEmail, userName }) => dispatch => {
   api
     .resendSignUpEmail(data)
     .then(data => dispatch(doSignup(data)))
-    .catch(error => dispatch(asyncError(error)));
+    .catch(error => dispatch(setAsyncError(error)));
 };
 
 export const forgotPass = email => dispatch => {
-  dispatch(asyncStart());
-
   const data = {
     email,
   };
   api
     .forgotPass(data)
     .then(data => dispatch(doForgotPass(data)))
-    .catch(error => dispatch(asyncError(error)));
+    .catch(error => dispatch(setAsyncError(error)));
 };
 
 export const changeEmail = (email, accessToken) => dispatch => {
-  dispatch(asyncStart());
-
   const data = {
     email,
   };
   api
     .changeEmail(accessToken, data)
     .then(data => dispatch(dochangeEmail(data)))
-    .catch(error => dispatch(asyncError(error)));
+    .catch(error => dispatch(setAsyncError(error)));
 };
 
 export const setNewPass = ({ token, userId, newPass }) => dispatch => {
-  dispatch(asyncStart());
-
   const data = {
     token,
     userId,
@@ -436,12 +341,10 @@ export const setNewPass = ({ token, userId, newPass }) => dispatch => {
   api
     .setNewPass(data)
     .then(res => dispatch(doSetPassword(res)))
-    .catch(error => dispatch(asyncError(error)));
+    .catch(error => dispatch(setAsyncError(error)));
 };
 
 export const setNewEmail = ({ token, userId, newEmail }) => dispatch => {
-  dispatch(asyncStart());
-
   const data = {
     token,
     userId,
@@ -450,12 +353,10 @@ export const setNewEmail = ({ token, userId, newEmail }) => dispatch => {
   api
     .setNewEmail(data)
     .then(res => dispatch(doSetEmail(res)))
-    .catch(error => dispatch(asyncError(error)));
+    .catch(error => dispatch(setAsyncError(error)));
 };
 
 export const getApps = ({ accessToken, filterBy, adminToken }) => dispatch => {
-  dispatch(asyncStart());
-
   const data = {
     filterBy: filterBy || [],
   };
@@ -464,38 +365,32 @@ export const getApps = ({ accessToken, filterBy, adminToken }) => dispatch => {
     api
       .getApps(accessToken, data)
       .then(data => dispatch(showApps(data)))
-      .catch(error => dispatch(asyncError(error)));
+      .catch(error => dispatch(setAsyncError(error)));
   } else {
     api
       .getAppsAdmin(accessToken, adminToken, data)
       .then(data => dispatch(showApps(data)))
-      .catch(error => dispatch(asyncError(error)));
+      .catch(error => dispatch(setAsyncError(error)));
   }
 };
 
 export const getUserData = accessToken => dispatch => {
-  dispatch(asyncStart());
-
   api
     .getUserData(accessToken)
     .then(data => dispatch(showUserData(data)))
-    .catch(error => dispatch(asyncError(error)));
+    .catch(error => dispatch(setAsyncError(error)));
 };
 
 export const toggleAppStatus = (appDetails, accessToken) => dispatch => {
-  dispatch(asyncStart());
-
   api
     .toggleAppStatus(accessToken, appDetails)
     .then(data => {
       dispatch(doToggleAppStatus(data));
     })
-    .catch(error => dispatch(asyncError(error)));
+    .catch(error => dispatch(setAsyncError(error)));
 };
 
 export const imgUpload = (imgPath, userId, accessToken) => dispatch => {
-  dispatch(asyncStart());
-
   const data = {
     imgPath,
     userId,
@@ -510,19 +405,15 @@ export const imgUpload = (imgPath, userId, accessToken) => dispatch => {
       dispatch(getUserData(accessToken));
     })
     .catch(error => {
-      dispatch(asyncError(error));
+      dispatch(setAsyncError(error));
     });
 };
 
 export const fetchUserImgURL = (imgURL, accessToken) => dispatch => {
-  dispatch(asyncStart());
-
   dispatch(setUserImgURL(imgURL));
 };
 
 export const updateUser = (userId, newData, accessToken) => dispatch => {
-  dispatch(asyncStart());
-
   const body = {
     userId,
     newData,
@@ -537,15 +428,13 @@ export const updateUser = (userId, newData, accessToken) => dispatch => {
       }
     })
     .catch(error => {
-      dispatch(asyncError(error));
+      dispatch(setAsyncError(error));
     });
 };
 
 // APPS =============================================
 
 export const selectApp = (appId, accessToken) => dispatch => {
-  dispatch(asyncStart());
-
   const data = {
     appId,
   };
@@ -553,12 +442,10 @@ export const selectApp = (appId, accessToken) => dispatch => {
   api
     .getScenes(accessToken, data)
     .then(res => dispatch(doSelectApp(appId, res)))
-    .catch(error => dispatch(asyncError(error)));
+    .catch(error => dispatch(setAsyncError(error)));
 };
 
 export const updateApp = ({ appData, accessToken, adminToken }) => dispatch => {
-  dispatch(asyncStart());
-
   api
     .updateApp(accessToken, appData)
     .then(() => {
@@ -575,11 +462,10 @@ export const updateApp = ({ appData, accessToken, adminToken }) => dispatch => {
       dispatch(selectApp(appData.appId, accessToken));
       dispatch(doUpdateApp(res));
     })
-    .catch(error => dispatch(asyncError(error)));
+    .catch(error => dispatch(setAsyncError(error)));
 };
 
 export const getPlacements = (appId, sceneId, accessToken) => dispatch => {
-  dispatch(asyncStart());
   const data = {
     appId,
     sceneId,
@@ -588,11 +474,10 @@ export const getPlacements = (appId, sceneId, accessToken) => dispatch => {
   api
     .getPlacements(accessToken, data)
     .then(res => dispatch(setPlacements(res)))
-    .catch(error => dispatch(asyncError(error)));
+    .catch(error => dispatch(setAsyncError(error)));
 };
 
 export const getPlacementsByAppId = (appId, accessToken) => dispatch => {
-  dispatch(asyncStart());
   const data = {
     appId,
   };
@@ -600,7 +485,7 @@ export const getPlacementsByAppId = (appId, accessToken) => dispatch => {
   api
     .getPlacements(accessToken, data)
     .then(res => dispatch(setplacementsByAppId(res)))
-    .catch(error => dispatch(asyncError(error)));
+    .catch(error => dispatch(setAsyncError(error)));
 };
 
 export const updatePlacements = ({
@@ -608,18 +493,16 @@ export const updatePlacements = ({
   data,
   adminToken,
 }) => dispatch => {
-  dispatch(asyncStart());
-
   if (!adminToken) {
     api
       .updatePlacements(accessToken, data)
       .then(res => dispatch(pushPlacements(res)))
-      .catch(error => dispatch(asyncError(error)));
+      .catch(error => dispatch(setAsyncError(error)));
   } else {
     api
       .updatePlacementsAdmin(accessToken, adminToken, data)
       .then(data => dispatch(showApps(data)))
-      .catch(error => dispatch(asyncError(error)));
+      .catch(error => dispatch(setAsyncError(error)));
   }
 };
 
@@ -630,8 +513,6 @@ export const getReportData = ({
   accessToken,
   publisherId,
 }) => dispatch => {
-  dispatch(asyncStart());
-
   const currentDate = new Date();
 
   const data = {
@@ -654,7 +535,7 @@ export const getReportData = ({
       dispatch(sendReportData(res));
     })
     .catch(error => {
-      dispatch(asyncError(error));
+      dispatch(setAsyncError(error));
     });
 
   // const reportData = api.getReportData(appsIds);

@@ -1,10 +1,13 @@
 import React from "react";
 import { connect } from "react-redux";
-import { Field, reduxForm, reset } from "redux-form";
-import _a from "../../utils/analytics";
+import { reduxForm } from "redux-form";
 import { login } from "../../actions";
-import Input from "../../components/Input";
+import { setAsyncLoading } from "../../actions/asyncActions";
+import TextInput from "../../components/formInputs/TextInput";
 import STR from "../../utils/strFuncs";
+import C from "../../utils/constants";
+import { lowerCase } from "../../utils/normalizers";
+import isEqual from "lodash/isEqual";
 
 class LoginForm extends React.Component {
   constructor(props) {
@@ -13,45 +16,74 @@ class LoginForm extends React.Component {
     this.handleLogin = this.handleLogin.bind(this);
   }
 
+  shouldComponentUpdate = (nextProps, nextState) => {
+    const { loginForm, asyncError } = this.props;
+    if (
+      (loginForm &&
+        loginForm.values &&
+        !isEqual(loginForm.values, nextProps.loginForm.values)) ||
+      asyncError !== nextProps.asyncError
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
   handleLogin(values) {
-    // console.log("values: ", values);
-    // login(emailLogin.toLowerCase(), passLogin);
-  }
-
-  renderField(field) {
-    const { input } = field;
-
-    return (
-      <div className="mb login-input">
-        <span className="input-label">
-          {STR.capitalizeFirstLetter(input.name)}
-        </span>
-        <Input {...input} id={input.name} />
-      </div>
-    );
+    const { login } = this.props;
+    const { email, password } = values;
+    login(email, password);
   }
 
   render() {
-    const { handleSubmit } = this.props;
+    const { handleSubmit, asyncError } = this.props;
     return (
-      <form onSubmit={handleSubmit(this.handleLogin)}>
-        <Field name="email" component={this.renderField} />
-        <Field name="password" component={this.renderField} />
-        <button className="gradient-btn">Login</button>
-      </form>
+      <React.Fragment>
+        <form onSubmit={handleSubmit(this.handleLogin)}>
+          <TextInput
+            name="email"
+            formname="loginForm"
+            label="Email"
+            normalize={lowerCase}
+          />
+          <TextInput name="password" label="Password" normalize={lowerCase} />
+          <button className="gradient-btn">Login</button>
+        </form>
+        {asyncError && (
+          <div className="login-error asyncError animate fadeIn">
+            {asyncError}
+          </div>
+        )}
+      </React.Fragment>
     );
   }
 }
 
+const validate = values => {
+  const errors = {};
+
+  if (!values.email) errors.email = STR.randomArrayValue(C.ERRORS.noEmail);
+  if (!values.password)
+    errors.password = STR.randomArrayValue(C.ERRORS.noPassword);
+
+  return errors;
+};
+
 const formConfig = {
   form: "loginForm",
+  validate,
+  onSubmitFail: (errors, dispatch) => {
+    dispatch(setAsyncLoading(errors));
+  },
 };
 
 const mapStateToProps = state => {
   return {
-    asyncData: state.app.get("asyncData"),
-    asyncError: state.app.get("asyncError"),
-    asyncLoading: state.app.get("asyncLoading"),
+    asyncData: state.async.get("asyncData"),
+    asyncError: state.async.get("asyncError"),
+    asyncLoading: state.async.get("asyncLoading"),
+    loginForm: state.form.loginForm,
   };
 };
 

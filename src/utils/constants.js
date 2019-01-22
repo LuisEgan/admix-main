@@ -8,60 +8,45 @@ import Desktop from "../assets/img/unity-logo_20.png";
 import admix from "../assets/img/isologo.png";
 import sbvrSVG from "../assets/svg/SBVR.svg";
 
-// import Android from "../assets/img/android.png";
-// import WindowsEditor from "../assets/img/Thinking_Face_Emoji.png";
-
 import SVG from "../components/SVG";
 
-// export const ADMIX_OBJ_PREFIX = "__admixObj__";
 const ADMIX_OBJ_PREFIX = "__advirObj__";
 
 const APP_STATES = {
-    live: "live",
-    inactive: "inactive",
-    sandbox: "sandbox",
-    pending: "pending",
-    deleted: "deleted"
-}
+  live: "live",
+  inactive: "inactive",
+  sandbox: "sandbox",
+  pending: "pending",
+  deleted: "deleted",
+};
 
 const APP_ENGINES_IMGS = {
-    Unity,
-    Unreal,
-    "High Fidelity": HiFi,
-    Desktop,
-    SBVR: ( < ReactSVG src = {
-            sbvrSVG
-        }
-        className = "logo-SBVR" /
-        >
-    ),
-    // WindowsEditor,
-    // Android
-}
+  Unity,
+  Unreal,
+  "High Fidelity": HiFi,
+  Desktop,
+  SBVR: <ReactSVG src={sbvrSVG} className="logo-SBVR" />,
+};
 
 const LOGOS = {
-    Admix: ( < img src = {
-            admix
-        }
-        alt = "admix" / > ),
-    SBVR: ( < ReactSVG src = {
-            sbvrSVG
-        }
-        className = "logo-SBVR" /
-        >
-    ),
-    Unity: SVG.logoUnity,
-    Unreal: SVG.logoUnreal,
-    "High Fidelity": ( < img src = {
-            HiFi
-        }
-        alt = "hifi" / > ),
-    Paypal: SVG.logoPaypal,
-}
+  Admix: <img src={admix} alt="admix" />,
+  SBVR: <ReactSVG src={sbvrSVG} className="logo-SBVR" />,
+  Unity: SVG.logoUnity,
+  Unreal: SVG.logoUnreal,
+  "High Fidelity": <img src={HiFi} alt="hifi" />,
+  Paypal: SVG.logoPaypal,
+};
+
+const ERRORS = {
+  noEmail: ["🤔 No email?", "🤷‍ We need an email!", "😵 Who are you?"],
+  noPassword: ["🤔 Where's the password?", "🤷‍ We need a password!", "😵 Please enter a password"],
+  failedLogin: "Wrong username or password"
+};
 
 export default {
-    ADMIX_OBJ_PREFIX,
-    APP_STATES,
-    APP_ENGINES_IMGS,
-    LOGOS
-}
+  ADMIX_OBJ_PREFIX,
+  APP_STATES,
+  APP_ENGINES_IMGS,
+  LOGOS,
+  ERRORS,
+};

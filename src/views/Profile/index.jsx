@@ -24,7 +24,7 @@ import PaymentConfig from "./Panels/PaymentConfig";
 import SVG_personalInfo from "../../assets/svg/personal-information.svg";
 import SVG_payment from "../../assets/svg/payments-configuration.svg";
 
-import CustomInput from "../../components/Input";
+import CustomInput from "../../components/inputs/TextInput";
 
 import {
   CLOUDINARY_UPLOAD_PRESET,

@@ -15,7 +15,7 @@ class AppStateToggle extends React.Component {
     this.state = {
       oninactive: false,
       onsandbox: false,
-      onlive: false
+      onlive: false,
     };
 
     this.handleMouseHover = this.handleMouseHover.bind(this);
@@ -36,15 +36,15 @@ class AppStateToggle extends React.Component {
       onInactive,
       onSandbox,
       onLive,
-      onPending
+      onPending,
     } = this.props;
 
-    let { _id, platformName, name, reviewed } = app;
+    let { _id, reviewed } = app;
 
     _a.track(ga.actions.apps.toggleAppState, {
       category: ga.categories.apps,
       label: ga.labels.toggleAppState.onMyapps,
-      value: STR.appStateToNumber(newAppState)
+      value: STR.appStateToNumber(newAppState),
     });
 
     onClick && onClick();
@@ -63,20 +63,12 @@ class AppStateToggle extends React.Component {
       return;
     }
 
-    // const appDetails = {
-    //   _id,
-    //   platformName,
-    //   name,
-    //   isActive: newAppState === C.APP_STATES.live,
-    //   appState: newAppState
-    // };
-
     const appDetails = {
       appId: _id,
       newData: {
         isActive: newAppState === C.APP_STATES.live,
-        appState: newAppState
-      }
+        appState: newAppState,
+      },
     };
 
     dispatch(toggleAppStatus(appDetails, accessToken));
@@ -87,11 +79,11 @@ class AppStateToggle extends React.Component {
       appState === C.APP_STATES.pending
         ? {
             title: "Pending",
-            tooltip: "In PENDING mode, your app is being reviewed."
+            tooltip: "In PENDING mode, your app is being reviewed.",
           }
         : {
             title: STR.capitalizeFirstLetter(C.APP_STATES.live),
-            tooltip: "In LIVE mode, ads are delivering and generating revenue."
+            tooltip: "In LIVE mode, ads are delivering and generating revenue.",
           };
     return text;
   }
@@ -131,7 +123,7 @@ class AppStateToggle extends React.Component {
           onClick={this.handleAppStateClick.bind(
             null,
             app,
-            C.APP_STATES.inactive
+            C.APP_STATES.inactive,
           )}
           onMouseEnter={this.handleMouseHover.bind(null, C.APP_STATES.inactive)}
           onMouseLeave={this.handleMouseHover.bind(null, C.APP_STATES.inactive)}
@@ -149,7 +141,7 @@ class AppStateToggle extends React.Component {
           onClick={this.handleAppStateClick.bind(
             null,
             app,
-            C.APP_STATES.sandbox
+            C.APP_STATES.sandbox,
           )}
           onMouseEnter={this.handleMouseHover.bind(null, C.APP_STATES.sandbox)}
           onMouseLeave={this.handleMouseHover.bind(null, C.APP_STATES.sandbox)}
@@ -169,7 +161,9 @@ class AppStateToggle extends React.Component {
           onMouseEnter={this.handleMouseHover.bind(null, C.APP_STATES.live)}
           onMouseLeave={this.handleMouseHover.bind(null, C.APP_STATES.live)}
         >
-          <span id="AppStateToggle-liveText">{this.liveText(appState).title}</span>
+          <span id="AppStateToggle-liveText">
+            {this.liveText(appState).title}
+          </span>
           {displayTooltip && (
             <div className="admix-tooltip" style={liveTooltip}>
               {this.liveText(appState).tooltip}
@@ -183,11 +177,11 @@ class AppStateToggle extends React.Component {
 
 AppStateToggle.propTypes = {
   app: PropTypes.object.isRequired,
-  displayTooltip: PropTypes.bool
+  displayTooltip: PropTypes.bool,
 };
 
 AppStateToggle.defaultProps = {
-  app: {}
+  app: {},
 };
 
 export default AppStateToggle;

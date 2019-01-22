@@ -3,11 +3,6 @@ import { cloneDeep } from "lodash";
 import C from "../utils/constants";
 
 import {
-  ACTION,
-  ACTION_START,
-  ACTION_ERROR,
-  ACTION_SUCCESS,
-  RESET_ASYNC,
   FORGOT_PASS,
   CHANGE_EMAIL,
   SET_PASS,
@@ -27,7 +22,6 @@ import {
   RESET_SAVED_INPUTS,
   TOGGLE_APP_STATUS,
   USER_DATA_SUCCESS,
-  LOADED_WEBGL_SCRIPTS,
   REPORT_DATA,
   SET_INITIAL_REPORT_APP,
   UPDATE_PLACEMENTS,
@@ -43,9 +37,6 @@ const initialStateValues = {
   logoutCount: 0,
   counter: 0,
   isSnackBarOpen: false,
-  asyncLoading: false,
-  asyncError: null,
-  asyncData: null,
   isLoggedIn: false,
   accessToken: "",
   adminToken: "",
@@ -56,7 +47,6 @@ const initialStateValues = {
   placementsByAppId: {},
   savedApps: [],
   savedInputs: [],
-  load_webgl: false,
   reportData: {},
   initialReportAppId: [],
   userImgURL: "",
@@ -67,16 +57,6 @@ const initialStateValues = {
 export const initialState = Map({ ...initialStateValues });
 
 const actionsMap = {
-  [ACTION]: state => {
-    const counter = state.get("counter") + 1;
-
-    return state.merge(
-      Map({
-        counter,
-      }),
-    );
-  },
-
   [SNACKBAR_TOGGLE]: state => {
     let isSnackBarOpen = state.get("isSnackBarOpen");
     const isLoggedIn = state.get("isLoggedIn");
@@ -100,61 +80,6 @@ const actionsMap = {
     );
   },
 
-  [LOADED_WEBGL_SCRIPTS]: state => {
-    return state.merge(
-      Map({
-        load_webgl: true,
-      }),
-    );
-  },
-
-  // Async action
-  [ACTION_START]: state => {
-    return state.merge(
-      Map({
-        asyncLoading: true,
-        asyncError: null,
-      }),
-    );
-  },
-  [ACTION_ERROR]: (state, action) => {
-    const isLoggedIn = state.get("isLoggedIn");
-
-    const { message, statusMessage } = action.data;
-    let asyncError = Array.isArray(message) ? message[0].msg : message;
-
-    // Fallback
-    (!asyncError || asyncError === "") && (asyncError = statusMessage);
-
-    const asyncData = {
-      mssg: asyncError || "Oops.. Something went wrong",
-    };
-    const isSnackBarOpen = isLoggedIn;
-
-    const asyncLoading = false;
-    return state.merge(
-      Map({
-        asyncLoading,
-        asyncError,
-        asyncData,
-        isSnackBarOpen,
-      }),
-    );
-  },
-  [ACTION_SUCCESS]: (state, action) => {
-    const asyncLoading = false;
-    const asyncData = {};
-    let mssg = Array.isArray(action.data) ? action.data[0].msg : action.data;
-    asyncData.mssg = mssg;
-
-    return state.merge(
-      Map({
-        asyncLoading,
-        asyncData,
-      }),
-    );
-  },
-
   [REGISTER_SUCCESS]: (state, action) => {
     const to = action.data.message.emailObj.to[0];
     const signupInfo = {
@@ -162,119 +87,55 @@ const actionsMap = {
       userEmail: to.email,
     };
 
-    const asyncLoading = false;
-    const asyncData = {
-      mssg: "Success! Now, please confirm your email.",
-    };
     return state.merge(
       Map({
-        asyncLoading,
-        asyncData,
         signupInfo,
       }),
     );
   },
 
-  [RESET_ASYNC]: state => {
-    const asyncError = null;
-    const asyncData = null;
-    const asyncLoading = false;
-    return state.merge(
-      Map({
-        asyncError,
-        asyncData,
-        asyncLoading,
-      }),
-    );
-  },
-
   [FORGOT_PASS]: (state, data) => {
-    const asyncLoading = false;
-    const asyncData = {
-      mssg: "Success! Now, check your email for further instructions.",
-    };
     const isSnackBarOpen = true;
     return state.merge(
       Map({
-        asyncLoading,
-        asyncData,
         isSnackBarOpen,
       }),
     );
   },
 
   [CHANGE_EMAIL]: (state, data) => {
-    const asyncLoading = false;
-    const asyncData = {
-      mssg: "Success! Now, check your email for further instructions.",
-    };
     const isSnackBarOpen = true;
     return state.merge(
       Map({
-        asyncLoading,
-        asyncData,
         isSnackBarOpen,
       }),
     );
   },
 
   [UPDATE_USER]: (state, data) => {
-    const asyncLoading = false;
-    const asyncData = {
-      mssg: "Success! User updated!",
-    };
     const isSnackBarOpen = true;
     return state.merge(
       Map({
-        asyncLoading,
-        asyncData,
         isSnackBarOpen,
       }),
     );
   },
 
   [SET_PASS]: (state, data) => {
-    const asyncLoading = false;
-
-    const asyncData = {
-      mssg: Array.isArray(data.data.message)
-        ? data.data.message[0].msg
-        : data.data.message,
-    };
-    return state.merge(
-      Map({
-        asyncLoading,
-        asyncData,
-      }),
-    );
+    return state.merge(Map({}));
   },
 
   [SET_NEW_EMAIL]: (state, data) => {
-    const asyncLoading = false;
-
-    const asyncData = {
-      mssg: Array.isArray(data.data.message)
-        ? data.data.message[0].msg
-        : data.data.message,
-    };
-    return state.merge(
-      Map({
-        asyncLoading,
-        asyncData,
-      }),
-    );
+    return state.merge(Map({}));
   },
 
   [LOGIN_SUCCESS]: (state, action) => {
     const { data } = action.data;
     const isLoggedIn = true;
-    const asyncLoading = false;
 
     const newState = {
       isLoggedIn,
       accessToken: data.loginToken,
-      asyncLoading,
-      asyncData: null,
     };
 
     if (data.adminToken) {
@@ -292,22 +153,18 @@ const actionsMap = {
     );
   },
   [APPS_SUCCESS]: (state, action) => {
-    const asyncLoading = false;
     const apps = Array.isArray(action.data.data) ? action.data.data : [];
     return state.merge(
       Map({
         apps,
-        asyncLoading,
       }),
     );
   },
   [USER_DATA_SUCCESS]: (state, action) => {
-    const asyncLoading = false;
     const userData = action.data.data;
 
     return state.merge(
       Map({
-        asyncLoading,
         userData,
       }),
     );
@@ -328,25 +185,17 @@ const actionsMap = {
     });
     selectedApp.scenes = [...scenes];
 
-    const asyncLoading = false;
     return state.merge(
       Map({
         selectedApp,
-        asyncLoading,
       }),
     );
   },
   [UPDATE_APP]: (state, data) => {
-    const asyncData = {
-      mssg: "App updated!",
-    };
     const isSnackBarOpen = true;
 
-    const asyncLoading = false;
     return state.merge(
       Map({
-        asyncLoading,
-        asyncData,
         isSnackBarOpen,
       }),
     );
@@ -480,11 +329,9 @@ const actionsMap = {
           });
       });
 
-    const asyncLoading = false;
     return state.merge(
       Map({
         selectedApp,
-        asyncLoading,
       }),
     );
   },
@@ -499,10 +346,8 @@ const actionsMap = {
         delete newPcsById[placement._id]._id;
       });
 
-    const asyncLoading = false;
     return state.merge(
       Map({
-        asyncLoading,
         placementsByAppId: newPcsById,
       }),
     );
@@ -553,12 +398,10 @@ const actionsMap = {
       selectedApp.appState = updatedApp.appState;
     }
 
-    const asyncLoading = false;
     return state.merge(
       Map({
         apps,
         selectedApp,
-        asyncLoading,
       }),
     );
   },
@@ -569,10 +412,6 @@ const actionsMap = {
     // const selectedApp = {};
     // const apps = [];
 
-    const asyncLoading = false;
-    const asyncData = {
-      mssg: "Success! Placements saved!",
-    };
     const isSnackBarOpen = true;
 
     return state.merge(
@@ -580,15 +419,12 @@ const actionsMap = {
         // savedInputs,
         // selectedApp,
         // apps,
-        asyncLoading,
-        asyncData,
         isSnackBarOpen,
       }),
     );
   },
 
   [REPORT_DATA]: (state, data) => {
-    const asyncLoading = false;
     const reportData = {};
 
     data.data.data.forEach(elem => {
@@ -626,7 +462,6 @@ const actionsMap = {
     return state.merge(
       Map({
         reportData,
-        asyncLoading,
       }),
     );
   },
@@ -642,30 +477,22 @@ const actionsMap = {
   },
 
   [USER_IMG_UPLOAD]: (state, data) => {
-    const asyncLoading = false;
     const userImgURL = data.data.data.secure_url;
-    const asyncData = {
-      mssg: "Success! Image updated!",
-    };
     const isSnackBarOpen = true;
 
     return state.merge(
       Map({
-        asyncLoading,
         userImgURL,
-        asyncData,
         isSnackBarOpen,
       }),
     );
   },
 
   [SET_USER_IMG_URL]: (state, data) => {
-    const asyncLoading = false;
     const userImgURL = data.data;
 
     return state.merge(
       Map({
-        asyncLoading,
         userImgURL,
       }),
     );

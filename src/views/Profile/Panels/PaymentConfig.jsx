@@ -59,7 +59,7 @@ export default class PaymentConfig extends React.PureComponent {
       payBanksDetailsStyle,
     } = this.props;
 
-    const { invoiceCheck, oninvoiceCheck } = this.state;
+    const { invoiceCheck } = this.state;
 
     return (
       <React.Fragment>

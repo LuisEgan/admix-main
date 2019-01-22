@@ -41,7 +41,7 @@ const cloudinayImgURL = async (accessToken, data) => {
 
 const login = async data => {
   try {
-    const res = fetch(dns + "/api/v2/auth/login", {
+    const res = await fetch(dns + "/api/v2/auth/login", {
       method: "POST",
       headers: new Headers({
         "Content-Type": "application/json",
@@ -169,13 +169,21 @@ const getAppsAdmin = (accessToken, adminToken, data) => {
   }).then(response => response.json());
 };
 
-const getUserData = accessToken =>
-  fetch(`${dns}/api/v2/user/getPrefs`, {
-    method: "GET",
-    headers: new Headers({
-      "x-access-token": accessToken,
-    }),
-  }).then(response => response.json());
+const getUserData = async accessToken => {
+  try {
+    const res = await fetch(dns + "/api/v2/user/preferences", {
+      method: "GET",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "x-access-token": accessToken,
+      }),
+    });
+
+    return res.json();
+  } catch (error) {
+    console.log("API ERROR @ getUserData: ", error);
+  }
+};
 
 const toggleAppStatus = (accessToken, data) =>
   fetch(`${dns}/api/v2/user/setApps`, {
