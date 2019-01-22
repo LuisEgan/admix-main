@@ -1,25 +1,28 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import _a from "../../utils/analytics";
+import { Field } from "redux-form";
+import ReactSVG from "react-svg";
 import PropTypes from "prop-types";
 import { signup, resendSignUpEmail, forgotPass } from "../../actions";
-import { Field } from "redux-form";
+import _a from "../../utils/analytics";
 
 import Input from "../../components/inputs/TextInput";
 
 import STR from "../../utils/strFuncs";
-import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 import admixLogo from "../../assets/img/logo.png";
 import LoginForm from "./LoginForm";
-import SignupForm from "./SignupForm";
-import ResetForm from "./ResetForm";
+import RegisterForm from "./RegisterForm";
+import ForgotPassForm from "./ForgotPassForm";
+
+import logoUnity from "../../assets/svg/logo-unity.svg";
+import logoUE from "../../assets/svg/logo-unreal.svg";
 
 const { ga } = _a;
 
 const Forms = {
-  Login: <LoginForm />,
-  "Recover Password": <SignupForm />,
-  Register: <ResetForm />,
+  Login: ram => <LoginForm renderAsyncMessage={ram} />,
+  "Forgot Password": ram => <RegisterForm renderAsyncMessage={ram} />,
+  Register: ram => <ForgotPassForm renderAsyncMessage={ram} />,
 };
 
 class Login extends Component {
@@ -28,8 +31,6 @@ class Login extends Component {
     asyncError: PropTypes.string,
     asyncLoading: PropTypes.bool,
     counter: PropTypes.number,
-    isLoggedIn: PropTypes.bool,
-    // from react-redux connect
     dispatch: PropTypes.func,
   };
   constructor(props) {
@@ -52,13 +53,12 @@ class Login extends Component {
     this.toggleCheckbox = this.toggleCheckbox.bind(this);
 
     this.renderFields = this.renderFields.bind(this);
+    this.buttonStyle = this.buttonStyle.bind(this);
+    this.renderAsyncMessage = this.renderAsyncMessage.bind(this);
   }
 
-  toggleView(show, e) {
-    e.preventDefault();
-    this.setState({
-      show,
-    });
+  toggleView(show) {
+    this.setState({ show });
   }
 
   resendSignUpEmail() {
@@ -70,19 +70,6 @@ class Login extends Component {
     const newState = this.state;
     newState[checkbox] = !newState[checkbox];
     this.setState(newState);
-  }
-
-  // ICONS ---------------------------------------------------------
-
-  eye() {
-    return (
-      <FontAwesomeIcon
-        icon="eye"
-        onMouseEnter={this.togglePassInputType}
-        onMouseLeave={this.togglePassInputType}
-        className="password-eye"
-      />
-    );
   }
 
   // HANDLES ---------------------------------------------------------
@@ -216,6 +203,29 @@ class Login extends Component {
     });
   }
 
+  buttonStyle(button) {
+    const { show } = this.state;
+    return show === button ? { color: "#14b9be" } : {};
+  }
+
+  renderAsyncMessage() {
+    const { asyncError, asyncLoading } = this.props;
+
+    if (asyncLoading) {
+      return <div className="login-asyncMessage animate fadeIn">Loading...</div>;
+    }
+
+    return (
+      <React.Fragment>
+        {asyncError && (
+          <div className="login-asyncMessage asyncError animate fadeIn">
+            {asyncError}
+          </div>
+        )}
+      </React.Fragment>
+    );
+  }
+
   render() {
     const { show } = this.state;
 
@@ -230,13 +240,35 @@ class Login extends Component {
             <div>{show}</div>
           </div>
 
-          <div id="login-forms">{Forms[show]}</div>
+          <div id="login-forms">{Forms[show](this.renderAsyncMessage)}</div>
 
           <div id="login-nav">
-            <div>buttons</div>
+            <div>
+              <span
+                onClick={() => this.toggleView("Login")}
+                style={this.buttonStyle("Login")}
+              >
+                Login
+              </span>
+              <ReactSVG src={logoUnity} />
+              <span
+                onClick={() => this.toggleView("Register")}
+                style={this.buttonStyle("Register")}
+              >
+                Register
+              </span>
+              <ReactSVG src={logoUE} />
+              <span
+                onClick={() => this.toggleView("Forgot Password")}
+                style={this.buttonStyle("Forgot Password")}
+              >
+                Forgot Password
+              </span>
+            </div>
           </div>
         </div>
 
+        {/* Big right image */}
         <div />
       </div>
     );
@@ -279,7 +311,8 @@ const validate = values => {
 
 const mapStateToProps = state => {
   const {
-    app: { asyncData, asyncError, asyncLoading, signupInfo, isLoggedIn },
+    app: { signupInfo },
+    async: { asyncData, asyncError, asyncLoading },
   } = state;
 
   return {
@@ -287,7 +320,6 @@ const mapStateToProps = state => {
     asyncError,
     asyncLoading,
     signupInfo,
-    isLoggedIn,
   };
 };
 

@@ -82,6 +82,9 @@ class Input extends React.Component {
 
           {error && touched && <span className="asyncError">{error}</span>}
         </div>
+        <div className="input-guideline">
+         ...
+        </div>
       </div>
     );
   }

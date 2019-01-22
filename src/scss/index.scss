@@ -1164,7 +1164,8 @@ $inputsFontSize: calc(0.45em+0.3vw);
         @extend .cc;
         padding: 0 16px;
         height: 100%;
-        width: 100%; // margin-left: -16px;
+        width: 100%;
+        // margin-left: -16px;
       }
     }
   }
@@ -1326,7 +1327,8 @@ $inputsFontSize: calc(0.45em+0.3vw);
       color: #14b9be;
       background: white;
       transition: 0.5s;
-      cursor: pointer; // background-color: #999999;
+      cursor: pointer;
+      // background-color: #999999;
     }
   }
   .image-drop {
@@ -1485,7 +1487,8 @@ $inputsFontSize: calc(0.45em+0.3vw);
     @extend .cc;
     border: solid 2px;
     padding: 0 5px;
-    flex-grow: 1; // width: 30%;
+    flex-grow: 1;
+    // width: 30%;
     position: relative;
     transition: 1.2s;
     &:hover {
@@ -1555,20 +1558,25 @@ $inputsFontSize: calc(0.45em+0.3vw);
       width: 100%;
     }
   }
-  a, svg {
+  a,
+  svg,
+  g {
     color: #14b9be;
-  }
-  svg {
-    &:hover {
-      font-size: 1.5em;
-    }
+    fill: #14b9be;
   }
   .input {
     margin-bottom: 3vh;
+    svg {
+      &:hover {
+        font-size: 1.5em;
+      }
+    }
   }
-  .login-error {
+  .login-asyncMessage {
     position: absolute;
     bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
   }
   > div {
     height: 100%;
@@ -1618,8 +1626,17 @@ $inputsFontSize: calc(0.45em+0.3vw);
   }
   #login-nav {
     height: 10%;
+    svg {
+      padding: 1.2em;
+    }
+    span {
+      &:hover {
+        cursor: pointer;
+      }
+    }
     > div {
       @extend .cc;
+      flex-wrap: wrap;
       width: 70%;
       height: 100%;
       border-top: solid #f5f7fa;

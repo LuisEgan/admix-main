@@ -46,10 +46,10 @@ class LoginForm extends React.Component {
 
   togglePassInputType() {
     this.setState({ hidePass: !this.state.hidePass });
-  }
+  }  
 
   render() {
-    const { handleSubmit, asyncError } = this.props;
+    const { handleSubmit, renderAsyncMessage } = this.props;
     const { hidePass } = this.state;
     return (
       <React.Fragment>
@@ -70,12 +70,9 @@ class LoginForm extends React.Component {
             }
           />
           <button className="gradient-btn">Login</button>
+          {renderAsyncMessage()}
         </form>
-        {asyncError && (
-          <div className="login-error asyncError animate fadeIn">
-            {asyncError}
-          </div>
-        )}
+        
       </React.Fragment>
     );
   }

@@ -16,7 +16,7 @@ const actionsMap = {
     let asyncError, asyncMessage;
 
     if (asyncLoading) {
-      asyncError = false;
+      asyncError = null;
       asyncMessage = null;
     } else {
       asyncError = state.asyncLoading;

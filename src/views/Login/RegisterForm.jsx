@@ -18,10 +18,14 @@ const formConfig = {
 };
 
 const mapStateToProps = state => {
+  const {
+    app: { asyncData, asyncError, asyncLoading },
+  } = state;
+
   return {
-    asyncData: state.app.get("asyncData"),
-    asyncError: state.app.get("asyncError"),
-    asyncLoading: state.app.get("asyncLoading"),
+    asyncData,
+    asyncError,
+    asyncLoading,
   };
 };
 
