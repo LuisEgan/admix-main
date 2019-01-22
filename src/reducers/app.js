@@ -1,18 +1,11 @@
-import { Map } from "immutable";
-import { cloneDeep } from "lodash";
 import C from "../utils/constants";
 
 import {
-  FORGOT_PASS,
-  CHANGE_EMAIL,
-  SET_PASS,
-  SET_NEW_EMAIL,
   LOGIN_SUCCESS,
   LOGOUT_SUCCESS,
   REGISTER_SUCCESS,
   APPS_SUCCESS,
   SELECT_APP,
-  UPDATE_APP,
   RESET_SELECTED_APP,
   SAVE_APP,
   SET_PLACEMENT,
@@ -24,8 +17,6 @@ import {
   USER_DATA_SUCCESS,
   REPORT_DATA,
   SET_INITIAL_REPORT_APP,
-  UPDATE_PLACEMENTS,
-  UPDATE_USER,
   USER_IMG_UPLOAD,
   SET_USER_IMG_URL,
   SNACKBAR_TOGGLE,
@@ -33,7 +24,7 @@ import {
   SET_LOADED_SCENE,
 } from "../actions";
 
-const initialStateValues = {
+const initialState = {
   logoutCount: 0,
   counter: 0,
   isSnackBarOpen: false,
@@ -54,30 +45,20 @@ const initialStateValues = {
   loadedScenesByAppId: null,
 };
 
-export const initialState = Map({ ...initialStateValues });
-
 const actionsMap = {
   [SNACKBAR_TOGGLE]: state => {
-    let isSnackBarOpen = state.get("isSnackBarOpen");
-    const isLoggedIn = state.get("isLoggedIn");
+    let isSnackBarOpen = state.isSnackBarOpen;
+    const isLoggedIn = state.isLoggedIn;
 
     isSnackBarOpen = isLoggedIn ? !isSnackBarOpen : false;
 
-    return state.merge(
-      Map({
-        isSnackBarOpen,
-      }),
-    );
+    return { ...state, isSnackBarOpen };
   },
 
   [SET_APPS_FILTER_BY]: (state, action) => {
     const appsFilterBy = action.data;
 
-    return state.merge(
-      Map({
-        appsFilterBy,
-      }),
-    );
+    return { ...state, appsFilterBy };
   },
 
   [REGISTER_SUCCESS]: (state, action) => {
@@ -87,46 +68,7 @@ const actionsMap = {
       userEmail: to.email,
     };
 
-    return state.merge(
-      Map({
-        signupInfo,
-      }),
-    );
-  },
-
-  [FORGOT_PASS]: (state, data) => {
-    const isSnackBarOpen = true;
-    return state.merge(
-      Map({
-        isSnackBarOpen,
-      }),
-    );
-  },
-
-  [CHANGE_EMAIL]: (state, data) => {
-    const isSnackBarOpen = true;
-    return state.merge(
-      Map({
-        isSnackBarOpen,
-      }),
-    );
-  },
-
-  [UPDATE_USER]: (state, data) => {
-    const isSnackBarOpen = true;
-    return state.merge(
-      Map({
-        isSnackBarOpen,
-      }),
-    );
-  },
-
-  [SET_PASS]: (state, data) => {
-    return state.merge(Map({}));
-  },
-
-  [SET_NEW_EMAIL]: (state, data) => {
-    return state.merge(Map({}));
+    return { ...state, signupInfo };
   },
 
   [LOGIN_SUCCESS]: (state, action) => {
@@ -142,36 +84,22 @@ const actionsMap = {
       newState.adminToken = data.adminToken;
     }
 
-    return state.merge(Map(newState));
+    return { ...state, newState };
   },
-  [LOGOUT_SUCCESS]: (state, action) => {
-    return state.merge(
-      Map({
-        ...initialStateValues,
-        logoutCount: 2,
-      }),
-    );
+  [LOGOUT_SUCCESS]: () => {
+    return { ...initialState, logoutCount: 2 };
   },
   [APPS_SUCCESS]: (state, action) => {
     const apps = Array.isArray(action.data.data) ? action.data.data : [];
-    return state.merge(
-      Map({
-        apps,
-      }),
-    );
+    return { ...state, apps };
   },
   [USER_DATA_SUCCESS]: (state, action) => {
     const userData = action.data.data;
-
-    return state.merge(
-      Map({
-        userData,
-      }),
-    );
+    return { ...state, userData };
   },
 
   [SELECT_APP]: (state, data) => {
-    const apps = state.get("apps");
+    const apps = [...state.apps];
     let selectedApp = {};
     const { appId } = data.data;
     const scenes = [...data.data.data];
@@ -185,35 +113,16 @@ const actionsMap = {
     });
     selectedApp.scenes = [...scenes];
 
-    return state.merge(
-      Map({
-        selectedApp,
-      }),
-    );
-  },
-  [UPDATE_APP]: (state, data) => {
-    const isSnackBarOpen = true;
-
-    return state.merge(
-      Map({
-        isSnackBarOpen,
-      }),
-    );
+    return { ...state, selectedApp };
   },
 
   [RESET_SELECTED_APP]: state => {
     const selectedApp = {};
     const placementsByAppId = {};
-    return state.merge(
-      Map({
-        selectedApp,
-        placementsByAppId,
-      }),
-    );
+    return { ...state, selectedApp, placementsByAppId };
   },
   [SAVE_APP]: (state, { app }) => {
-    let savedApps = state.get("savedApps");
-    // savedApps = savedApps ? savedApps : [];
+    let savedApps = [...state.savedApps];
     const { savedInputs, scenes, selectedScene } = app;
     delete app.savedInputs;
     delete app.selectedScene;
@@ -260,26 +169,17 @@ const actionsMap = {
         return false;
       });
     }
-
-    return state.merge(
-      Map({
-        savedApps,
-      }),
-    );
+    return { ...state, savedApps };
   },
 
   [SET_PLACEMENT]: (state, { placementOpt }) => {
-    let selectedApp = state.get("selectedApp");
+    let selectedApp = { ...state.selectedApp };
     selectedApp.placementOpt = placementOpt;
-    return state.merge(
-      Map({
-        selectedApp,
-      }),
-    );
+    return { ...state, selectedApp };
   },
   [SET_PLACEMENTS]: (state, data) => {
-    const selectedApp = state.get("selectedApp");
-    const apps = state.get("apps");
+    const selectedApp = { ...state.selectedApp };
+    const apps = [...state.apps];
     const placements = data.data.data;
 
     apps.forEach(app => {
@@ -290,7 +190,7 @@ const actionsMap = {
           Array.isArray(placements) &&
             placements.forEach((placement, i) => {
               if (scene._id === placement.sceneId._id) {
-                const placementToPush = cloneDeep(placements[i]);
+                const placementToPush = { ...placements[i] };
                 placementToPush.addedPrefix = false;
 
                 if (
@@ -313,7 +213,7 @@ const actionsMap = {
         Array.isArray(placements) &&
           placements.forEach((placement, i) => {
             if (scene._id === placement.sceneId) {
-              const placementToPush = cloneDeep(placements[i]);
+              const placementToPush = { ...placements[i] };
               placementToPush.addedPrefix = false;
 
               if (
@@ -329,60 +229,45 @@ const actionsMap = {
           });
       });
 
-    return state.merge(
-      Map({
-        selectedApp,
-      }),
-    );
+    return { ...state, selectedApp };
   },
+
   [SET_PLACEMENTS_BY_ID]: (state, data) => {
-    let placementsByAppId = state.get("placementsByAppId");
+    let placementsByAppId = { ...state.placementsByAppId };
     const placements = Array.isArray(data.data.data) ? [...data.data.data] : [];
-    let newPcsById = placements.length > 0 ? cloneDeep(placementsByAppId) : {};
+    let newPcsById = placements.length > 0 ? { ...placementsByAppId } : {};
 
     placements &&
       placements.forEach(placement => {
-        newPcsById[placement._id] = cloneDeep(placement);
+        newPcsById[placement._id] = { ...placement };
         delete newPcsById[placement._id]._id;
       });
 
-    return state.merge(
-      Map({
-        placementsByAppId: newPcsById,
-      }),
-    );
+    return { ...state, placementsByAppId: newPcsById };
   },
 
   [SAVE_INPUTS]: (state, { toSaveInputs }) => {
-    let savedInputs = state.get("savedInputs");
-    const newInput = cloneDeep(toSaveInputs);
+    let savedInputs = [...state.savedInputs];
+    const newInput = { ...toSaveInputs };
     savedInputs = !!savedInputs ? savedInputs : [];
 
-    // Slice out the savedInput if it was already saved
+    // * Slice out the savedInput if it was already saved
     savedInputs = savedInputs.filter(input => {
       return input.placementName !== toSaveInputs.placementName;
     });
 
     savedInputs = [...savedInputs, newInput];
 
-    return state.merge(
-      Map({
-        savedInputs,
-      }),
-    );
+    return { ...state, savedInputs };
   },
 
   [RESET_SAVED_INPUTS]: state => {
-    return state.merge(
-      Map({
-        savedInputs: [],
-      }),
-    );
+    return { ...state, savedInputs: [] };
   },
 
   [TOGGLE_APP_STATUS]: (state, data) => {
-    let apps = state.get("apps");
-    let selectedApp = state.get("selectedApp");
+    let apps = [...state.apps];
+    let selectedApp = { ...state.selectedApp };
 
     const updatedApp = data.data.data;
     const { _id } = updatedApp;
@@ -398,37 +283,14 @@ const actionsMap = {
       selectedApp.appState = updatedApp.appState;
     }
 
-    return state.merge(
-      Map({
-        apps,
-        selectedApp,
-      }),
-    );
-  },
-
-  [UPDATE_PLACEMENTS]: (state, data) => {
-    // this are for when there's a validation page
-    // const savedInputs = [];
-    // const selectedApp = {};
-    // const apps = [];
-
-    const isSnackBarOpen = true;
-
-    return state.merge(
-      Map({
-        // savedInputs,
-        // selectedApp,
-        // apps,
-        isSnackBarOpen,
-      }),
-    );
+    return { ...state, apps, selectedApp };
   },
 
   [REPORT_DATA]: (state, data) => {
     const reportData = {};
 
     data.data.data.forEach(elem => {
-      const elemClone = cloneDeep(elem);
+      const elemClone = { ...elem };
       const {
         date,
         keys: { appid },
@@ -459,55 +321,34 @@ const actionsMap = {
       }
     });
 
-    return state.merge(
-      Map({
-        reportData,
-      }),
-    );
+    return { ...state, reportData };
   },
   [SET_INITIAL_REPORT_APP]: (state, data) => {
     const appsIds = data.data;
     const initialReportAppId = Array.isArray(appsIds) ? appsIds : [appsIds];
 
-    return state.merge(
-      Map({
-        initialReportAppId,
-      }),
-    );
+    return { ...state, initialReportAppId };
   },
 
   [USER_IMG_UPLOAD]: (state, data) => {
     const userImgURL = data.data.data.secure_url;
     const isSnackBarOpen = true;
 
-    return state.merge(
-      Map({
-        userImgURL,
-        isSnackBarOpen,
-      }),
-    );
+    return { ...state, userImgURL, isSnackBarOpen };
   },
 
   [SET_USER_IMG_URL]: (state, data) => {
     const userImgURL = data.data;
 
-    return state.merge(
-      Map({
-        userImgURL,
-      }),
-    );
+    return { ...state, userImgURL };
   },
 
   [SET_LOADED_SCENE]: (state, data) => {
-    let loadedScenesByAppId = state.get("loadedScenesByAppId") || {};
+    let loadedScenesByAppId = state.loadedScenesByAppId || {};
 
     loadedScenesByAppId[data.loadedScene.appId] = { ...data.loadedScene };
 
-    return state.merge(
-      Map({
-        loadedScenesByAppId,
-      }),
-    );
+    return { ...state, loadedScenesByAppId };
   },
 };
 

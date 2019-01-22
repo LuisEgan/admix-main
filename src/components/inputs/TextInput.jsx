@@ -16,42 +16,52 @@ class Input extends React.Component {
       focused: false,
     };
 
-    this.onFocus = this.onFocus.bind(this);
     this.forceFocus = this.forceFocus.bind(this);
+    this.onFocus = this.onFocus.bind(this);
   }
 
   shouldComponentUpdate = (nextProps, nextState) => {
-    const { value, touched } = this.props;
+    const { value, touched, type } = this.props;
     const { focused } = this.state;
 
-    if (value !== nextProps.value || focused !== nextState.focused || touched !== nextState.touched ) {
+    // console.warn("name", this.props.name);
+    // console.log('value !== nextProps.value: ', value !== nextProps.value);
+    // console.log('focused !== nextState.focused: ', focused !== nextState.focused);
+    // console.log('type !== nextState.type: ', type !== nextState.type);
+    // console.log('touched !== nextProps.touched: ', touched !== nextProps.touched);
+
+    if (
+      value !== nextProps.value ||
+      touched !== nextProps.touched ||
+      type !== nextProps.type ||
+      focused !== nextState.focused
+    ) {
       return true;
     }
     return false;
   };
 
-  onFocus() {
-    const { onFocus, onBlur } = this.props;
-    const { focused } = this.state;
-
-    onFocus && onFocus();
-    onBlur && onBlur();
-
-    this.setState({ focused: !focused });
-  }
-
   forceFocus() {
     this.input.focus();
   }
 
+  onFocus() {
+    const { onFocus } = this.props;
+    this.setState({ focused: true }, () => {
+      onFocus && onFocus();
+    });
+  }
+
   render() {
-    const { icon, rootstyle, label, error, touched } = this.props;
+    const { icon, touched, error, ...inputProps } = this.props;
+    const { label } = inputProps;
     const { focused } = this.state;
-    const inputStyle = focused
-      ? error
+    const inputStyle =
+      error && touched
         ? { borderColor: "red" }
-        : { borderColor: "#14B9BE" }
-      : rootstyle;
+        : focused
+        ? { borderColor: "#14B9BE" }
+        : {};
 
     return (
       <div className="input mb" onClick={this.forceFocus}>
@@ -62,18 +72,15 @@ class Input extends React.Component {
           {icon && <div id="input-icon">{icon}</div>}
           <div>
             <input
-              {...this.props}
+              {...inputProps}
               ref={i => {
                 this.input = i;
               }}
               onFocus={this.onFocus}
-              onBlur={this.onFocus}
             />
           </div>
 
-          {error && touched !== 0 && (
-            <span className="asyncError">{error}</span>
-          )}
+          {error && touched && <span className="asyncError">{error}</span>}
         </div>
       </div>
     );

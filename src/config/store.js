@@ -20,7 +20,7 @@ const middleware = isProduction
 const persistConfig = {
   key: "root",
   storage,
-  blacklist: ["async"],
+  blacklist: ["async", "form"],
   whitelist: ["app"],
 };
 

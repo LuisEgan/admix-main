@@ -1164,8 +1164,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
         @extend .cc;
         padding: 0 16px;
         height: 100%;
-        width: 100%;
-        // margin-left: -16px;
+        width: 100%; // margin-left: -16px;
       }
     }
   }
@@ -1327,8 +1326,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
       color: #14b9be;
       background: white;
       transition: 0.5s;
-      cursor: pointer;
-      // background-color: #999999;
+      cursor: pointer; // background-color: #999999;
     }
   }
   .image-drop {
@@ -1487,8 +1485,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
     @extend .cc;
     border: solid 2px;
     padding: 0 5px;
-    flex-grow: 1;
-    // width: 30%;
+    flex-grow: 1; // width: 30%;
     position: relative;
     transition: 1.2s;
     &:hover {
@@ -1558,8 +1555,13 @@ $inputsFontSize: calc(0.45em+0.3vw);
       width: 100%;
     }
   }
-  a {
+  a, svg {
     color: #14b9be;
+  }
+  svg {
+    &:hover {
+      font-size: 1.5em;
+    }
   }
   .input {
     margin-bottom: 3vh;
@@ -3060,10 +3062,15 @@ $ballSize: 20px;
     }
   }
   #input-icon {
+    position: absolute;
+    right: 0;
     display: flex;
     align-items: center;
     max-width: 30px;
     margin: 0 15px;
+    &:hover {
+      cursor: pointer;
+    }
     > div {
       display: flex;
       align-items: center;
