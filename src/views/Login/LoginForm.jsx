@@ -3,26 +3,34 @@ import { connect } from "react-redux";
 import { reduxForm } from "redux-form";
 import { login } from "../../actions";
 import { setAsyncLoading } from "../../actions/asyncActions";
-import TextInput from "../../components/formInputs/TextInput";
+import TextInput from "../../components/formInputs/FormTextInput";
 import STR from "../../utils/strFuncs";
 import C from "../../utils/constants";
 import { lowerCase } from "../../utils/normalizers";
 import isEqual from "lodash/isEqual";
+import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 
 class LoginForm extends React.Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      hidePass: true,
+    };
+
     this.handleLogin = this.handleLogin.bind(this);
+    this.togglePassInputType = this.togglePassInputType.bind(this);
   }
 
   shouldComponentUpdate = (nextProps, nextState) => {
     const { loginForm, asyncError } = this.props;
+    const { hidePass } = this.state;
     if (
       (loginForm &&
         loginForm.values &&
         !isEqual(loginForm.values, nextProps.loginForm.values)) ||
-      asyncError !== nextProps.asyncError
+      asyncError !== nextProps.asyncError ||
+      hidePass !== nextState.hidePass
     ) {
       return true;
     }
@@ -36,8 +44,13 @@ class LoginForm extends React.Component {
     login(email, password);
   }
 
+  togglePassInputType() {
+    this.setState({ hidePass: !this.state.hidePass });
+  }
+
   render() {
     const { handleSubmit, asyncError } = this.props;
+    const { hidePass } = this.state;
     return (
       <React.Fragment>
         <form onSubmit={handleSubmit(this.handleLogin)}>
@@ -47,7 +60,15 @@ class LoginForm extends React.Component {
             label="Email"
             normalize={lowerCase}
           />
-          <TextInput name="password" label="Password" normalize={lowerCase} />
+          <TextInput
+            name="password"
+            type={hidePass ? "password" : "text"}
+            label="Password"
+            normalize={lowerCase}
+            icon={
+              <FontAwesomeIcon icon="eye" onClick={this.togglePassInputType} />
+            }
+          />
           <button className="gradient-btn">Login</button>
         </form>
         {asyncError && (
@@ -67,6 +88,7 @@ const validate = values => {
   if (!values.password)
     errors.password = STR.randomArrayValue(C.ERRORS.noPassword);
 
+  console.log("errors: ", errors);
   return errors;
 };
 
@@ -79,11 +101,16 @@ const formConfig = {
 };
 
 const mapStateToProps = state => {
+  const {
+    async: { asyncData, asyncError, asyncLoading },
+    form: { loginForm },
+  } = state;
+
   return {
-    asyncData: state.async.get("asyncData"),
-    asyncError: state.async.get("asyncError"),
-    asyncLoading: state.async.get("asyncLoading"),
-    loginForm: state.form.loginForm,
+    asyncData,
+    asyncError,
+    asyncLoading,
+    loginForm,
   };
 };
 

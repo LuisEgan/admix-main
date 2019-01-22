@@ -278,12 +278,16 @@ const validate = values => {
 };
 
 const mapStateToProps = state => {
+  const {
+    app: { asyncData, asyncError, asyncLoading, signupInfo, isLoggedIn },
+  } = state;
+
   return {
-    asyncData: state.app.get("asyncData"),
-    asyncError: state.app.get("asyncError"),
-    asyncLoading: state.app.get("asyncLoading"),
-    signupInfo: state.app.get("signupInfo"),
-    isLoggedIn: state.app.get("isLoggedIn"),
+    asyncData,
+    asyncError,
+    asyncLoading,
+    signupInfo,
+    isLoggedIn,
   };
 };
 
@@ -292,7 +296,7 @@ Login = connect(mapStateToProps)(Login);
 export default Login;
 
 // {
-  /* <ToggleDisplay show={show === "login"} id="login-login">
+/* <ToggleDisplay show={show === "login"} id="login-login">
                   <form onSubmit={handleSubmit(this.handleLogin)}>
                      <div className="st">Login</div>
                      <div>
