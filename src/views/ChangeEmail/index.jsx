@@ -1,10 +1,12 @@
 import React, { Component } from "react";
 import _a from "../../utils/analytics";
 import { connect } from "react-redux";
-import { setNewEmail } from "../../actions";
+import actions from "../../actions";
 import STR from "../../utils/strFuncs";
 
 const { ga } = _a;
+
+const { setNewEmail } = actions;
 
 class ChangeEmail extends Component {
   constructor(props) {

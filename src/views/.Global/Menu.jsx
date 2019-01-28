@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { NavLink } from "react-router-dom";
 import routeCodes from "../../config/routeCodes";
 import PropTypes from "prop-types";
-import { logout, fetchUserImgURL } from "../../actions";
+import actions from "../../actions";
 import logoImg20 from "../../assets/img/logo_20.png";
 import defaultImg from "../../assets/img/default_pic.jpg";
 
@@ -14,6 +14,8 @@ import MUIMenu from "@material-ui/core/Menu";
 import SVG from "../../components/SVG";
 
 import { CLOUDINARY_IMG_URL } from "../../config/cloudinary";
+
+const { logout, fetchUserImgURL } = actions;
 
 class Menu extends Component {
   static propTypes = {

@@ -22,7 +22,7 @@ import {
   SNACKBAR_TOGGLE,
   SET_APPS_FILTER_BY,
   SET_LOADED_SCENE,
-} from "../actions";
+} from "../actions/actions";
 
 const initialState = {
   logoutCount: 0,

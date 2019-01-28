@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { reduxForm } from "redux-form";
-import { register } from "../../actions";
+import actions from "../../actions";
 import { resetAsync } from "../../actions/asyncActions";
 import TextInput from "../../components/formInputs/FormTextInput";
 import Checkbox from "../../components/formInputs/FormCheckbox";
@@ -9,6 +9,8 @@ import STR from "../../utils/strFuncs";
 import { lowerCase } from "../../utils/normalizers";
 import isEqual from "lodash/isEqual";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+
+const { register } = actions;
 
 class RegisterForm extends React.Component {
   constructor(props) {

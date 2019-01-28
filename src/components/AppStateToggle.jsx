@@ -1,12 +1,14 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { toggleAppStatus } from "../actions";
+import actions from "../actions";
 
 import _a from "../utils/analytics";
 import C from "../utils/constants";
 import STR from "../utils/strFuncs";
 
 const { ga } = _a;
+
+const { toggleAppStatus } = actions;
 
 class AppStateToggle extends React.Component {
   constructor(props) {

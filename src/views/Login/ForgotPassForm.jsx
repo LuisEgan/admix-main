@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { reduxForm } from "redux-form";
-import { forgotPass } from "../../actions";
+import actions from "../../actions";
 import { resetAsync } from "../../actions/asyncActions";
 import TextInput from "../../components/formInputs/FormTextInput";
 import STR from "../../utils/strFuncs";
@@ -9,6 +9,7 @@ import C from "../../utils/constants";
 import { lowerCase } from "../../utils/normalizers";
 import isEqual from "lodash/isEqual";
 
+const { forgotPass } = actions;
 class ForgotPassForm extends React.Component {
   constructor(props) {
     super(props);

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { withLastLocation } from "react-router-last-location";
 import { connect } from "react-redux";
-import { logout } from "../../actions";
+import actions from "../../actions";
 
 import Routes from "../../config/routes";
 import Menu from "../.Global/Menu";
@@ -11,6 +11,8 @@ import Snackbar from "../.Global/SnackBar";
 
 import _a from "../../utils/analytics";
 import STR from "../../utils/strFuncs";
+
+const { logout } = actions;
 
 class ErrorCatcher extends React.Component {
   constructor(props) {
@@ -71,7 +73,7 @@ class App extends Component {
       lastLocation,
       logoutCount,
     } = this.props;
-    
+
     if (logoutCount !== 2) {
       this.forceLogout();
       return null;

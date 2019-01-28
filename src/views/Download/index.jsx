@@ -2,10 +2,11 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import _a from "../../utils/analytics";
 import SVG from "../../components/SVG";
-import { updateUser } from "../../actions";
+import actions from "../../actions";
 
 const { ga } = _a;
 
+const { updateUser } = actions;
 class Download extends Component {
   constructor(props) {
     super(props);

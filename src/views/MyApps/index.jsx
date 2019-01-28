@@ -4,20 +4,7 @@ import { Redirect, NavLink } from "react-router-dom";
 import routeCodes from "../../config/routeCodes";
 import _a from "../../utils/analytics";
 import PropTypes from "prop-types";
-import {
-  getApps,
-  getUserData,
-  selectApp,
-  updateUser,
-  toggleAppStatus,
-  getReportData,
-  setInitialReportApp,
-  resetSavedInputs,
-  resetSelectedApp,
-  setUserImgURL,
-  setAppsFilterBy,
-  getPlacementsByAppId,
-} from "../../actions";
+import actions from "../../actions";
 import Popup from "../../components/Popup";
 import C from "../../utils/constants";
 import STR from "../../utils/strFuncs";
@@ -33,6 +20,21 @@ import SVG from "../../components/SVG";
 import CSS from "../../utils/InLineCSS";
 
 const { ga } = _a;
+
+const {
+  getApps,
+  getUserData,
+  selectApp,
+  updateUser,
+  toggleAppStatus,
+  getReportData,
+  setInitialReportApp,
+  resetSavedInputs,
+  resetSelectedApp,
+  setUserImgURL,
+  setAppsFilterBy,
+  getPlacementsByAppId,
+} = actions;
 
 class MyApps extends Component {
   static propTypes = {
@@ -311,22 +313,15 @@ class MyApps extends Component {
       return str;
     };
 
-    let {
-      //    location: { search },
-      userData,
-      appsFilterBy,
-    } = this.props;
+    let { userData, appsFilterBy } = this.props;
     let { filterBy } = this.state;
 
     appsFilterBy = appsFilterBy || [];
     filterBy = Object.keys(appsFilterBy).length > 0 ? appsFilterBy : filterBy;
 
-    // const isAdmin = search === "?iamanadmin";
-
     const filterTypes = userData.isAdmin
       ? [
           "name",
-          //   "_id",
           "email.value",
           "userName",
           "appEngine",
@@ -334,7 +329,6 @@ class MyApps extends Component {
           "platformName",
         ]
       : ["name", "isActive", "appEngine"];
-    //      ["name", "appEngine", "isActive", "platformName"];
 
     const appEnginesOpts = Object.keys(C.APP_ENGINES_IMGS).map(engine => {
       return (
@@ -429,6 +423,7 @@ class MyApps extends Component {
                       filterIndex: i,
                       attr: filterType,
                     })}
+                    name={filterType}
                   />
                 </div>
               );

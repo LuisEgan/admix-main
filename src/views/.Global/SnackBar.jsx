@@ -1,10 +1,12 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { snackbarToggle } from "../../actions";
+import actions from "../../actions";
 import Snackbar from "@material-ui/core/Snackbar";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
+
+const { snackbarToggle } = actions;
 
 const smilies = ["😀", "😁", "😎", "🙂", "💪", "👍", "🤘", "✌️"];
 

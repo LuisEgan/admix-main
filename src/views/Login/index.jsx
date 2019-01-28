@@ -1,12 +1,14 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { resendSignUpEmail } from "../../actions";
+import actions from "../../actions";
 
 import admixLogo from "../../assets/img/logo.png";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import ForgotPassForm from "./ForgotPassForm";
+
+const { resendSignUpEmail } = actions;
 
 const views = {
   login: "Login",

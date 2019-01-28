@@ -3,7 +3,7 @@ import _a from "../../utils/analytics";
 import { connect } from "react-redux";
 import { Field, reduxForm, reset } from "redux-form";
 import { NavLink } from "react-router-dom";
-import { setNewPass } from "../../actions";
+import actions from "../../actions";
 
 import Input from "../../components/inputs/TextInput";
 
@@ -12,6 +12,8 @@ import admixLogo from "../../assets/img/logo.png";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 
 const { ga } = _a;
+
+const { setNewPass } = actions;
 
 class ForgotPass extends Component {
   constructor(props) {

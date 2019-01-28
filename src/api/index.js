@@ -108,14 +108,15 @@ const setNewEmail = async data => {
 // ************ //
 
 // ! there shouldn't be 2 for getting apps, 1 is enough for getting 1 app or all.
-const getAppsAll = async accessToken => {
+const getAppsAll = async (accessToken, data) => {
   try {
     const res = await fetch(dns + "/api/v2/apps/all", {
-      method: "GET",
+      method: "POST",
       headers: new Headers({
         "Content-Type": "application/json",
         "x-access-token": accessToken,
       }),
+      body: JSON.stringify(data),
     });
 
     return res.json();
@@ -124,14 +125,15 @@ const getAppsAll = async accessToken => {
   }
 };
 
-const getApps = async accessToken => {
+const getApps = async (accessToken, data) => {
   try {
     const res = await fetch(dns + "/api/v2/apps/all", {
-      method: "GET",
+      method: "POST",
       headers: new Headers({
         "Content-Type": "application/json",
         "x-access-token": accessToken,
       }),
+      body: JSON.stringify(data),
     });
 
     return res.json();
@@ -158,15 +160,16 @@ const updateApp = async (accessToken, data) => {
   }
 };
 
-const getAppsAdmin = async (accessToken, adminToken) => {
+const getAppsAdmin = async (accessToken, adminToken, data) => {
   try {
     const res = await fetch(dns + "/api/v2/admin/data/apps", {
-      method: "GET",
+      method: "POST",
       headers: new Headers({
         "Content-Type": "application/json",
         "x-access-token": accessToken,
         "x-admin-token": adminToken,
       }),
+      body: JSON.stringify(data),
     });
 
     return res.json();
@@ -196,9 +199,9 @@ const toggleAppStatus = async (accessToken, data) => {
 // * SCENES
 // ************ //
 
-const getScenes = async accessToken => {
+const getScenes = async (accessToken, appId) => {
   try {
-    const res = await fetch(dns + "/api/v2/scenes", {
+    const res = await fetch(`${dns}/api/v2/scenes/${appId}`, {
       method: "GET",
       headers: new Headers({
         "Content-Type": "application/json",
@@ -217,14 +220,14 @@ const getScenes = async accessToken => {
 // ************ //
 
 const getPlacements = async (accessToken, data) => {
+  const { appId, sceneId } = data;
   try {
-    const res = await fetch(dns + "/api/v2/placements", {
-      method: "POST",
+    const res = await fetch(`${dns}/api/v2/placements/${appId}/${sceneId}`, {
+      method: "GET",
       headers: new Headers({
         "Content-Type": "application/json",
         "x-access-token": accessToken,
       }),
-      body: JSON.stringify(data),
     });
 
     return res.json();
@@ -236,7 +239,7 @@ const getPlacements = async (accessToken, data) => {
 const updatePlacements = async (accessToken, data) => {
   try {
     const res = await fetch(dns + "/api/v2/placements/update", {
-      method: "POST",
+      method: "PUT",
       headers: new Headers({
         "Content-Type": "application/json",
         "x-access-token": accessToken,

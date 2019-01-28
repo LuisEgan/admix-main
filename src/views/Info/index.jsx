@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 import _a from "../../utils/analytics";
 import { Field, reduxForm, change } from "redux-form";
 import routeCodes from "../../config/routeCodes";
-import { updateApp } from "../../actions";
+import actions from "../../actions";
 import { setAsyncLoading } from "../../actions/asyncActions";
 import PropTypes from "prop-types";
 import validate from "validate.js";
@@ -36,6 +36,7 @@ import {
 
 const { ga } = _a;
 
+const { updateApp } = actions;
 class Info extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
@@ -498,10 +499,11 @@ class Info extends Component {
 }
 
 const mapStateToProps = state => {
-  const userData = state.app.get("userData");
-  const selectedApp = state.app.get("selectedApp");
-  const asyncData = state.app.get("asyncData");
-  let { storeurl, metrics, geos, demographics, calculator } = selectedApp;
+  const {
+    app,
+    async: { asyncMessage, asyncError, asyncLoading },
+  } = state;
+  let { storeurl, metrics, geos, demographics, calculator } = app.selectedApp;
   const {
     form: { admixCalculatorForm },
   } = state;
@@ -511,13 +513,10 @@ const mapStateToProps = state => {
   demographics = demographics || {};
 
   return {
-    accessToken: state.app.get("accessToken"),
-    isLoggedIn: state.app.get("isLoggedIn"),
-    userImgURL: state.app.get("userImgURL"),
-    asyncLoading: state.app.get("asyncLoading"),
-    asyncData,
-    selectedApp,
-    userData,
+    ...app,
+    asyncMessage,
+    asyncError,
+    asyncLoading,
     reduxForm: state.form,
     initialValues: {
       storeurl,
