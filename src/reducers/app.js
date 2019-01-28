@@ -72,11 +72,10 @@ const actionsMap = {
   },
 
   [LOGIN_SUCCESS]: (state, action) => {
-    const { data } = action.data;
-    const isLoggedIn = true;
+    const { data } = action;
 
     const newState = {
-      isLoggedIn,
+      isLoggedIn: true,
       accessToken: data.loginToken,
     };
 
@@ -84,7 +83,7 @@ const actionsMap = {
       newState.adminToken = data.adminToken;
     }
 
-    return { ...state, newState };
+    return { ...state, ...newState };
   },
   [LOGOUT_SUCCESS]: () => {
     return { ...initialState, logoutCount: 2 };

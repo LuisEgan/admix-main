@@ -1,12 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Field } from "redux-form";
-import Input from "../inputs/TextInput";
+import Checkbox from "../inputs/Checkbox";
 
 class FormTextInput extends React.PureComponent {
   static propTypes = {
     name: PropTypes.string.isRequired,
-    label: PropTypes.string,
+    id: PropTypes.string.isRequired,
   };
 
   constructor(props) {
@@ -16,17 +16,15 @@ class FormTextInput extends React.PureComponent {
   }
 
   renderField(field) {
-    const { normalize, simulateType, ...inputProps } = this.props;
-
     const {
       input,
       meta: { error, touched },
     } = field;
 
     return (
-      <Input
+      <Checkbox
         {...input}
-        {...inputProps}
+        {...this.props}
         id={input.name}
         error={error}
         touched={touched}
@@ -35,7 +33,9 @@ class FormTextInput extends React.PureComponent {
   }
 
   render() {
-    return <Field component={this.renderField} {...this.props} />;
+    return (
+      <Field component={this.renderField} type="checkbox" {...this.props} />
+    );
   }
 }
 

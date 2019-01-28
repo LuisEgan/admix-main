@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { reduxForm } from "redux-form";
 import { login } from "../../actions";
-import { setAsyncLoading } from "../../actions/asyncActions";
+import { resetAsync } from "../../actions/asyncActions";
 import TextInput from "../../components/formInputs/FormTextInput";
 import STR from "../../utils/strFuncs";
 import C from "../../utils/constants";
@@ -21,6 +21,11 @@ class LoginForm extends React.Component {
     this.handleLogin = this.handleLogin.bind(this);
     this.togglePassInputType = this.togglePassInputType.bind(this);
   }
+
+  componentDidMount = () => {
+    const { resetAsync } = this.props;
+    resetAsync();
+  };
 
   shouldComponentUpdate = (nextProps, nextState) => {
     const { loginForm, asyncError } = this.props;
@@ -46,7 +51,7 @@ class LoginForm extends React.Component {
 
   togglePassInputType() {
     this.setState({ hidePass: !this.state.hidePass });
-  }  
+  }
 
   render() {
     const { handleSubmit, renderAsyncMessage } = this.props;
@@ -54,12 +59,7 @@ class LoginForm extends React.Component {
     return (
       <React.Fragment>
         <form onSubmit={handleSubmit(this.handleLogin)}>
-          <TextInput
-            name="email"
-            formname="loginForm"
-            label="Email"
-            normalize={lowerCase}
-          />
+          <TextInput name="email" label="Email" normalize={lowerCase} />
           <TextInput
             name="password"
             type={hidePass ? "password" : "text"}
@@ -72,7 +72,6 @@ class LoginForm extends React.Component {
           <button className="gradient-btn">Login</button>
           {renderAsyncMessage()}
         </form>
-        
       </React.Fragment>
     );
   }
@@ -85,16 +84,12 @@ const validate = values => {
   if (!values.password)
     errors.password = STR.randomArrayValue(C.ERRORS.noPassword);
 
-  console.log("errors: ", errors);
   return errors;
 };
 
 const formConfig = {
   form: "loginForm",
   validate,
-  onSubmitFail: (errors, dispatch) => {
-    dispatch(setAsyncLoading(errors));
-  },
 };
 
 const mapStateToProps = state => {
@@ -113,6 +108,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => ({
   login: (email, password) => dispatch(login(email, password)),
+  resetAsync: () => dispatch(resetAsync()),
 });
 
 LoginForm = reduxForm(formConfig)(LoginForm);

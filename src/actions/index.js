@@ -1,6 +1,10 @@
 import api from "../api";
 import _a from "../utils/analytics";
-import { setAsyncError, setAsyncLoading } from "./asyncActions";
+import {
+  setAsyncError,
+  setAsyncLoading,
+  setAsyncMessage,
+} from "./asyncActions";
 import C from "../utils/constants";
 
 export const REGISTER_REQUEST = "USERS_REGISTER_REQUEST",
@@ -8,10 +12,9 @@ export const REGISTER_REQUEST = "USERS_REGISTER_REQUEST",
   REGISTER_FAILURE = "USERS_REGISTER_FAILURE",
   RESET_ASYNC = "RESET_ASYNC",
   LOGIN_REQUEST = "USERS_LOGIN_REQUEST",
-  LOGIN_SUCCESS = "USERS_LOGIN_SUCCESS",
+  LOGIN_SUCCESS = "LOGIN_SUCCESS",
   LOGOUT_SUCCESS = "USERS_LOGOUT_SUCCESS",
   LOGIN_FAILURE = "USERS_LOGIN_FAILURE",
-  FORGOT_PASS = "USERS_FORGOT_PASS",
   CHANGE_EMAIL = "USERS_CHANGE_EMAIL",
   SET_PASS = "USERS_SET_PASS",
   SET_NEW_EMAIL = "USERS_SET_NEW_EMAIL",
@@ -41,37 +44,10 @@ export const REGISTER_REQUEST = "USERS_REGISTER_REQUEST",
   SET_LOADED_SCENE = "SET_LOADED_SCENE",
   PERSIST_REHYDRATE = "persist/REHYDRATE";
 
-const doLogin = data => {
-  if (data.status) {
-    return {
-      type: LOGIN_SUCCESS,
-      data,
-    };
-  }
-};
-
 export function logout() {
   return {
     type: LOGOUT_SUCCESS,
   };
-}
-
-function doSignup(data) {
-  if (data.status) {
-    return {
-      type: REGISTER_SUCCESS,
-      data,
-    };
-  }
-}
-
-function doForgotPass(data) {
-  if (data.status) {
-    return {
-      type: FORGOT_PASS,
-      data,
-    };
-  }
 }
 
 function dochangeEmail(data) {
@@ -96,15 +72,6 @@ function doSetEmail(data) {
   if (data.status) {
     return {
       type: SET_NEW_EMAIL,
-      data,
-    };
-  }
-}
-
-function showApps(data) {
-  if (data.status) {
-    return {
-      type: APPS_SUCCESS,
       data,
     };
   }
@@ -179,15 +146,6 @@ const showUserData = data => {
   }
 };
 
-const doToggleAppStatus = data => {
-  if (data.status) {
-    return {
-      type: TOGGLE_APP_STATUS,
-      data,
-    };
-  }
-};
-
 const pushPlacements = data => {
   if (data.status) {
     return {
@@ -242,12 +200,12 @@ export const setLoadedScene = loadedScene => ({
 // FETCH =============================================
 
 export const login = (username, password) => async dispatch => {
+  dispatch(setAsyncLoading(true));
+
   const data = {
     username,
     password,
   };
-
-  dispatch(setAsyncLoading(true));
 
   try {
     const loginRes = await api.login(data);
@@ -256,7 +214,7 @@ export const login = (username, password) => async dispatch => {
     const userRes = await api.getUserData(loginRes.data.loginToken);
     if (!userRes.status) throw C.ERRORS.failedLogin;
 
-    const userData = userRes.data;
+    const userData = { ...loginRes.data, ...userRes.data };
     const userId = userData._id;
     if (userId && window.analytics) {
       const traits = {
@@ -267,10 +225,16 @@ export const login = (username, password) => async dispatch => {
       _a.identify(userId, traits, {}, () => {
         _a.track(_a.events.account.loggedIn);
       });
-      dispatch(doLogin(userData));
+      dispatch({
+        type: LOGIN_SUCCESS,
+        data: userData,
+      });
     } else {
       window.analytics && _a.track(_a.events.account.failedLogin);
-      dispatch(doLogin(userData));
+      dispatch({
+        type: LOGIN_SUCCESS,
+        data: userData,
+      });
     }
 
     dispatch(setAsyncLoading(false));
@@ -280,97 +244,158 @@ export const login = (username, password) => async dispatch => {
   }
 };
 
-export function signup(name, email, password) {
-  return function(dispatch) {
-    var data = {
-      email,
-      password,
-      name,
-    };
-    api
-      .signup(data)
-      .then(data => {
-        if (data.status) {
-          _a.track(_a.events.account.created);
-        } else {
-          _a.track(_a.events.account.createdFailed);
-        }
-        return dispatch(doSignup(data));
-      })
-      .catch(error => dispatch(setAsyncError(error)));
+export const register = (name, email, password) => async dispatch => {
+  dispatch(setAsyncLoading(true));
+  const data = {
+    email,
+    password,
+    name,
   };
-}
+
+  try {
+    const res = await api.register(data);
+    if (res.status) {
+      _a.track(_a.events.account.created);
+    } else {
+      _a.track(_a.events.account.createdFailed);
+      throw res.message;
+    }
+
+    dispatch({
+      type: REGISTER_SUCCESS,
+      data: res,
+    });
+    dispatch(setAsyncMessage(C.SUCCESS.emailSent));
+    dispatch(setAsyncLoading(false));
+  } catch (error) {
+    console.error("error: ", error);
+    const correct =
+      typeof error !== "object"
+        ? error.indexOf("duplicate") >= 0
+          ? C.ERRORS.userExists
+          : error
+        : error;
+    dispatch(setAsyncError(correct));
+  }
+};
 
 export const resendSignUpEmail = ({ userEmail, userName }) => dispatch => {
+  // const data = {
+  //   userEmail,
+  //   userName,
+  // };
+  // api
+  //   .resendSignUpEmail(data)
+  //   .then(data => dispatch(doSignup(data)))
+  //   .catch(error => dispatch(setAsyncError(error)));
+};
+
+export const forgotPass = userEmail => async dispatch => {
+  dispatch(setAsyncLoading(true));
   const data = {
     userEmail,
-    userName,
   };
-  api
-    .resendSignUpEmail(data)
-    .then(data => dispatch(doSignup(data)))
-    .catch(error => dispatch(setAsyncError(error)));
+
+  try {
+    const res = await api.forgotPass(data);
+    if (!res.status) throw res.message;
+
+    dispatch(setAsyncMessage(C.SUCCESS.emailSent));
+  } catch (error) {
+    console.error("error: ", error);
+    dispatch(setAsyncError(error));
+  }
 };
 
-export const forgotPass = email => dispatch => {
+export const changeEmail = (email, accessToken) => async dispatch => {
+  dispatch(setAsyncLoading(true));
   const data = {
     email,
   };
-  api
-    .forgotPass(data)
-    .then(data => dispatch(doForgotPass(data)))
-    .catch(error => dispatch(setAsyncError(error)));
+
+  try {
+    const res = await api.changeEmail(accessToken, data);
+    if (!res.status) throw res.message;
+
+    dispatch(setAsyncMessage(C.SUCCESS.emailSent));
+  } catch (error) {
+    console.error("error: ", error);
+    dispatch(setAsyncError(error));
+  }
 };
 
-export const changeEmail = (email, accessToken) => dispatch => {
-  const data = {
-    email,
-  };
-  api
-    .changeEmail(accessToken, data)
-    .then(data => dispatch(dochangeEmail(data)))
-    .catch(error => dispatch(setAsyncError(error)));
-};
-
-export const setNewPass = ({ token, userId, newPass }) => dispatch => {
+export const setNewPass = ({ token, userId, newPass }) => async dispatch => {
+  dispatch(setAsyncLoading(true));
   const data = {
     token,
     userId,
     newPass,
   };
-  api
-    .setNewPass(data)
-    .then(res => dispatch(doSetPassword(res)))
-    .catch(error => dispatch(setAsyncError(error)));
+
+  try {
+    const res = await api.setNewPass(data);
+    if (!res.status) throw res.message;
+
+    dispatch(setAsyncMessage(C.SUCCESS.emailSent));
+  } catch (error) {
+    console.error("error: ", error);
+    dispatch(setAsyncError(error));
+  }
+
+  // api
+  //   .setNewPass(data)
+  //   .then(res => dispatch(doSetPassword(res)))
+  //   .catch(error => dispatch(setAsyncError(error)));
 };
 
-export const setNewEmail = ({ token, userId, newEmail }) => dispatch => {
+export const setNewEmail = ({ token, userId, newEmail }) => async dispatch => {
+  dispatch(setAsyncLoading(true));
   const data = {
     token,
     userId,
     newEmail,
   };
-  api
-    .setNewEmail(data)
-    .then(res => dispatch(doSetEmail(res)))
-    .catch(error => dispatch(setAsyncError(error)));
+
+  try {
+    const res = await api.setNewEmail(data);
+    if (!res.status) throw res.message;
+
+    dispatch(setAsyncMessage(C.SUCCESS.emailSent));
+  } catch (error) {
+    console.log("error: ", error);
+    dispatch(setAsyncError(error));
+  }
+
+  // api
+  //   .setNewEmail(data)
+  //   .then(res => dispatch(doSetEmail(res)))
+  //   .catch(error => dispatch(setAsyncError(error)));
 };
 
-export const getApps = ({ accessToken, filterBy, adminToken }) => dispatch => {
+export const getApps = ({
+  accessToken,
+  filterBy,
+  adminToken,
+}) => async dispatch => {
+  dispatch(setAsyncLoading(true));
   const data = {
     filterBy: filterBy || [],
   };
 
-  if (!adminToken) {
-    api
-      .getApps(accessToken, data)
-      .then(data => dispatch(showApps(data)))
-      .catch(error => dispatch(setAsyncError(error)));
-  } else {
-    api
-      .getAppsAdmin(accessToken, adminToken, data)
-      .then(data => dispatch(showApps(data)))
-      .catch(error => dispatch(setAsyncError(error)));
+  try {
+    const res = !adminToken
+      ? await api.getApps(accessToken, data)
+      : await api.getAppsAdmin(accessToken, adminToken, data);
+    if (!res.status) throw res.message;
+
+    dispatch({
+      type: APPS_SUCCESS,
+      data: res,
+    });
+    dispatch(setAsyncLoading(false));
+  } catch (error) {
+    console.log("error: ", error);
+    dispatch(setAsyncError(error));
   }
 };
 
@@ -381,13 +406,21 @@ export const getUserData = accessToken => dispatch => {
     .catch(error => dispatch(setAsyncError(error)));
 };
 
-export const toggleAppStatus = (appDetails, accessToken) => dispatch => {
-  api
-    .toggleAppStatus(accessToken, appDetails)
-    .then(data => {
-      dispatch(doToggleAppStatus(data));
-    })
-    .catch(error => dispatch(setAsyncError(error)));
+export const toggleAppStatus = (appDetails, accessToken) => async dispatch => {
+  dispatch(setAsyncLoading(true));
+
+  try {
+    const res = await api.toggleAppStatus(accessToken, appDetails);
+
+    dispatch({
+      type: TOGGLE_APP_STATUS,
+      data: res,
+    });
+    dispatch(setAsyncLoading(false));
+  } catch (error) {
+    console.log("error: ", error);
+    dispatch(setAsyncError(error));
+  }
 };
 
 export const imgUpload = (imgPath, userId, accessToken) => dispatch => {
@@ -445,7 +478,11 @@ export const selectApp = (appId, accessToken) => dispatch => {
     .catch(error => dispatch(setAsyncError(error)));
 };
 
-export const updateApp = ({ appData, accessToken, adminToken }) => dispatch => {
+export const updateApp = ({
+  appData,
+  accessToken,
+  adminToken,
+}) => async dispatch => {
   api
     .updateApp(accessToken, appData)
     .then(() => {
@@ -501,7 +538,12 @@ export const updatePlacements = ({
   } else {
     api
       .updatePlacementsAdmin(accessToken, adminToken, data)
-      .then(data => dispatch(showApps(data)))
+      .then(data =>
+        dispatch({
+          type: APPS_SUCCESS,
+          data,
+        }),
+      )
       .catch(error => dispatch(setAsyncError(error)));
   }
 };

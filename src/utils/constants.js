@@ -38,9 +38,21 @@ const LOGOS = {
 };
 
 const ERRORS = {
+  error: "Sorry there was an error, please try again later",
   noEmail: ["🤔 No email?", "🤷‍ We need an email!", "😵 Who are you?"],
-  noPassword: ["🤔 Where's the password?", "🤷‍ We need a password!", "😵 Please enter a password"],
-  failedLogin: "Wrong username or password"
+  noPassword: [
+    "🤔 Where's the password?",
+    "🤷‍ We need a password!",
+    "😵 Please enter a password",
+  ],
+  failedLogin: "Wrong username or password",
+  userExists: "Sorry, that user already exists!",
+  onlyLetters: "This can only contain letters!",
+  onlyNumbers: "This can only contain numbers!",
+};
+
+const SUCCESS = {
+  emailSent: "Success! Check your email for further instructions 😉",
 };
 
 export default {
@@ -49,4 +61,5 @@ export default {
   APP_ENGINES_IMGS,
   LOGOS,
   ERRORS,
+  SUCCESS,
 };

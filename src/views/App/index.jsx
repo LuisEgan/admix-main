@@ -12,6 +12,26 @@ import Snackbar from "../.Global/SnackBar";
 import _a from "../../utils/analytics";
 import STR from "../../utils/strFuncs";
 
+class ErrorCatcher extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  componentDidCatch(error, info) {
+    console.log("info: ", info);
+    console.log("error: ", error);
+    this.setState({ hasError: true });
+  }
+
+  render() {
+    // if (this.state.hasError) {
+    //   return <h1>Something went wrong.</h1>;
+    // }
+    return this.props.children;
+  }
+}
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -51,7 +71,7 @@ class App extends Component {
       lastLocation,
       logoutCount,
     } = this.props;
-
+    
     if (logoutCount !== 2) {
       this.forceLogout();
       return null;
@@ -67,25 +87,27 @@ class App extends Component {
     const contentStyle = !isLoggedIn ? { width: "100%" } : {};
 
     return (
-      <div className="App">
-        <Menu
-          isLoggedIn={isLoggedIn}
-          location={location}
-          history={history}
-          onRef={ref => (this.menu = ref)}
-        />
-        <div id="Page">
-          <SideMenu location={location} history={history} />
-          <div id="content" style={contentStyle}>
-            <Routes
-              isLoggedIn={isLoggedIn}
-              location={location}
-              updateMenuImg={this.updateMenuImg}
-            />
+      <ErrorCatcher>
+        <div className="App">
+          <Menu
+            isLoggedIn={isLoggedIn}
+            location={location}
+            history={history}
+            onRef={ref => (this.menu = ref)}
+          />
+          <div id="Page">
+            <SideMenu location={location} history={history} />
+            <div id="content" style={contentStyle}>
+              <Routes
+                isLoggedIn={isLoggedIn}
+                location={location}
+                updateMenuImg={this.updateMenuImg}
+              />
+            </div>
           </div>
+          <Snackbar />
         </div>
-        <Snackbar />
-      </div>
+      </ErrorCatcher>
     );
   }
 }

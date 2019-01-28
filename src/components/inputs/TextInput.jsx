@@ -6,7 +6,8 @@ class Input extends React.Component {
     name: PropTypes.string.isRequired,
     rootstyle: PropTypes.object,
     label: PropTypes.string,
-    error: PropTypes.string,
+    error: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+    showErrors: PropTypes.bool,
   };
 
   constructor(props) {
@@ -23,12 +24,6 @@ class Input extends React.Component {
   shouldComponentUpdate = (nextProps, nextState) => {
     const { value, touched, type } = this.props;
     const { focused } = this.state;
-
-    // console.warn("name", this.props.name);
-    // console.log('value !== nextProps.value: ', value !== nextProps.value);
-    // console.log('focused !== nextState.focused: ', focused !== nextState.focused);
-    // console.log('type !== nextState.type: ', type !== nextState.type);
-    // console.log('touched !== nextProps.touched: ', touched !== nextProps.touched);
 
     if (
       value !== nextProps.value ||
@@ -53,8 +48,16 @@ class Input extends React.Component {
   }
 
   render() {
-    const { icon, touched, error, ...inputProps } = this.props;
-    const { label } = inputProps;
+    let {
+      icon,
+      touched,
+      error,
+      guideline,
+      customonchange,
+      ...inputProps
+    } = this.props;
+
+    const { label, onChange } = inputProps;
     const { focused } = this.state;
     const inputStyle =
       error && touched
@@ -62,6 +65,13 @@ class Input extends React.Component {
         : focused
         ? { borderColor: "#14B9BE" }
         : {};
+
+    const guidelineStyle = touched
+      ? error
+        ? { color: "red" }
+        : { color: "green" }
+      : {};
+    error = typeof error === "object" ? JSON.stringify(error) : error;
 
     return (
       <div className="input mb" onClick={this.forceFocus}>
@@ -73,6 +83,10 @@ class Input extends React.Component {
           <div>
             <input
               {...inputProps}
+              onChange={e => {
+                onChange(e);
+                customonchange && customonchange(e);
+              }}
               ref={i => {
                 this.input = i;
               }}
@@ -82,8 +96,8 @@ class Input extends React.Component {
 
           {error && touched && <span className="asyncError">{error}</span>}
         </div>
-        <div className="input-guideline">
-         ...
+        <div className="input-guideline" style={guidelineStyle}>
+          {guideline}
         </div>
       </div>
     );

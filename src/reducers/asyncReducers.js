@@ -1,7 +1,13 @@
-import { SET_LOADING, ASYNC_ERROR, RESET_ASYNC } from "../actions/asyncActions";
+import {
+  SET_LOADING,
+  ASYNC_ERROR,
+  ASYNC_MESSAGE,
+  RESET_ASYNC,
+} from "../actions/asyncActions";
+import C from "../utils/constants";
 
 const initialState = {
-  asyncLoading: false,
+  asyncLoading: null,
   asyncError: null,
   asyncMessage: null,
 };
@@ -12,14 +18,15 @@ const actionsMap = {
   },
 
   [SET_LOADING]: (state, action) => {
-    const { asyncLoading } = action;
+    let { asyncLoading } = action;
     let asyncError, asyncMessage;
 
     if (asyncLoading) {
       asyncError = null;
       asyncMessage = null;
+      asyncLoading = "Loading..."
     } else {
-      asyncError = state.asyncLoading;
+      asyncError = state.asyncError;
       asyncMessage = state.asyncMessage;
     }
 
@@ -27,10 +34,16 @@ const actionsMap = {
   },
 
   [ASYNC_ERROR]: (state, action) => {
-    const { asyncError } = action;
-    const asyncLoading = false;
+    let { asyncError } = action;
+    asyncError = typeof asyncError === "object" ? C.ERRORS.error : asyncError;
 
-    return { ...state, asyncLoading, asyncError };
+    return { ...initialState, asyncError };
+  },
+
+  [ASYNC_MESSAGE]: (state, action) => {
+    const { asyncMessage } = action;
+
+    return { ...initialState, asyncMessage };
   },
 };
 

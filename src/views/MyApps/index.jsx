@@ -16,7 +16,7 @@ import {
   resetSelectedApp,
   setUserImgURL,
   setAppsFilterBy,
-  getPlacementsByAppId
+  getPlacementsByAppId,
 } from "../../actions";
 import Popup from "../../components/Popup";
 import C from "../../utils/constants";
@@ -38,9 +38,9 @@ class MyApps extends Component {
   static propTypes = {
     apps: PropTypes.array,
     accessToken: PropTypes.string,
-    asyncLoading: PropTypes.bool,
+    asyncLoading: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
     userData: PropTypes.object,
-    dispatch: PropTypes.func
+    dispatch: PropTypes.func,
   };
 
   constructor(props) {
@@ -60,7 +60,7 @@ class MyApps extends Component {
 
       filterBy: [],
       showFilter: true,
-      userUsedFilter: false
+      userUsedFilter: false,
     };
 
     this.togglePopup = this.togglePopup.bind(this);
@@ -84,7 +84,7 @@ class MyApps extends Component {
       accessToken,
       adminToken,
       userData,
-      appsFilterBy
+      appsFilterBy,
     } = this.props;
     apps = Array.isArray(apps) ? apps : [];
     const activeApps = [];
@@ -96,8 +96,9 @@ class MyApps extends Component {
     const allAppsIds = apps.map(app => app._id);
     this.setState({ allAppsIds, activeApps, filterBy: appsFilterBy || [] });
 
-    (!appsFilterBy || appsFilterBy.length === 0) &&
+    if (!appsFilterBy || appsFilterBy.length === 0) {
       dispatch(getApps({ accessToken, adminToken }));
+    }
     dispatch(resetSelectedApp());
     dispatch(getUserData(accessToken));
     dispatch(setUserImgURL(CLOUDINARY_IMG_URL + userData._id + ".png"));
@@ -159,8 +160,8 @@ class MyApps extends Component {
     _a.track(
       ga.actions.navigationLinks[isGlobal ? "toGlobalReport" : "toReport"],
       {
-        category: ga.categories.navigationLinks
-      }
+        category: ga.categories.navigationLinks,
+      },
     );
 
     const { dispatch, accessToken, userData } = this.props;
@@ -180,8 +181,8 @@ class MyApps extends Component {
       getReportData({
         appsIds,
         accessToken,
-        publisherId: userId || userData._id
-      })
+        publisherId: userId || userData._id,
+      }),
     );
 
     dispatch(setInitialReportApp(appsIds));
@@ -197,7 +198,7 @@ class MyApps extends Component {
         ? ga.actions.apps.openFilter
         : ga.actions.apps.addFilter;
     _a.track(_aAction, {
-      category: ga.categories.apps
+      category: ga.categories.apps,
     });
 
     const { filterBy } = this.state;
@@ -210,7 +211,7 @@ class MyApps extends Component {
       platformName: "",
 
       userName: "",
-      appEngine: ""
+      appEngine: "",
     };
 
     filterBy.push(newFilter);
@@ -220,7 +221,7 @@ class MyApps extends Component {
 
   deleteFilter(i) {
     _a.track(ga.actions.apps.deleteFilter, {
-      category: ga.categories.apps
+      category: ga.categories.apps,
     });
 
     const { accessToken, adminToken, dispatch } = this.props;
@@ -237,7 +238,7 @@ class MyApps extends Component {
     const usedAttr = !!filterBy[filterIndex][attr];
 
     let {
-      target: { value }
+      target: { value },
     } = e;
 
     value =
@@ -303,7 +304,7 @@ class MyApps extends Component {
           break;
         default:
           str = `${STR.capitalizeFirstLetter(
-            str.substring(0, uppIndex)
+            str.substring(0, uppIndex),
           )} ${str.substring(uppIndex, str.length)}`;
       }
 
@@ -313,7 +314,7 @@ class MyApps extends Component {
     let {
       //    location: { search },
       userData,
-      appsFilterBy
+      appsFilterBy,
     } = this.props;
     let { filterBy } = this.state;
 
@@ -330,7 +331,7 @@ class MyApps extends Component {
           "userName",
           "appEngine",
           "isActive",
-          "platformName"
+          "platformName",
         ]
       : ["name", "isActive", "appEngine"];
     //      ["name", "appEngine", "isActive", "platformName"];
@@ -357,13 +358,13 @@ class MyApps extends Component {
         style={CSS.mb}
       >
         Inactive
-      </MenuItem>
+      </MenuItem>,
     ];
 
     const platformOpts = [
       <MenuItem value="Android" key="android" style={CSS.mb}>
         Android
-      </MenuItem>
+      </MenuItem>,
     ];
 
     return (
@@ -405,7 +406,7 @@ class MyApps extends Component {
                       value={selectValue}
                       onChange={this.setFilter.bind(null, {
                         filterIndex: i,
-                        attr: filterType
+                        attr: filterType,
                       })}
                       classes={{ root: "mui-select-root" }}
                       disableUnderline={true}
@@ -426,7 +427,7 @@ class MyApps extends Component {
                     value={filter[filterType]}
                     onChange={this.setFilter.bind(null, {
                       filterIndex: i,
-                      attr: filterType
+                      attr: filterType,
                     })}
                   />
                 </div>
@@ -498,7 +499,7 @@ class MyApps extends Component {
                 <button
                   onClick={this.selectApp.bind(null, {
                     appId: _id,
-                    redirect: routeCodes.SCENE
+                    redirect: routeCodes.SCENE,
                   })}
                 >
                   {SVG.setup}
@@ -506,7 +507,7 @@ class MyApps extends Component {
                 <button
                   onClick={this.selectApp.bind(null, {
                     appId: _id,
-                    redirect: routeCodes.INFO
+                    redirect: routeCodes.INFO,
                   })}
                 >
                   {SVG.info}
@@ -516,7 +517,7 @@ class MyApps extends Component {
                 <button
                   onClick={this.getReportData.bind(null, {
                     appsIds: _id,
-                    userId
+                    userId,
                   })}
                 >
                   {SVG.report}
@@ -556,7 +557,7 @@ class MyApps extends Component {
               className="btn btn-dark"
               onClick={() => {
                 _a.track(ga.actions.navigationLinks.toDownloadNoApps, {
-                  category: ga.categories.navigationLinks
+                  category: ga.categories.navigationLinks,
                 });
               }}
             >
@@ -580,15 +581,15 @@ class MyApps extends Component {
   handleSubmitForReview() {
     const { dispatch, accessToken, userData } = this.props;
     const {
-      clickedApp: { _id }
+      clickedApp: { _id },
     } = this.state;
 
     const appDetails = {
       appId: _id,
       newData: {
         isActive: false,
-        appState: C.APP_STATES.pending
-      }
+        appState: C.APP_STATES.pending,
+      },
     };
 
     this.setState({ reviewClicked: true }, () => {
@@ -606,7 +607,7 @@ class MyApps extends Component {
       appSelected,
       redirect,
       allAppsIds,
-      filterBy
+      filterBy,
     } = this.state;
     const anyApps = apps.length > 0;
 
@@ -615,7 +616,7 @@ class MyApps extends Component {
         <Redirect
           to={{
             pathname: redirect,
-            state: { from: location }
+            state: { from: location },
           }}
           push
         />
@@ -654,7 +655,7 @@ class MyApps extends Component {
             <button
               className="mb unselectable white-btn"
               onClick={this.getReportData.bind(null, {
-                appsIds: allAppsIds
+                appsIds: allAppsIds,
               })}
             >
               {SVG.globalReport} &nbsp;
@@ -714,15 +715,18 @@ const MyAppsPopup = ({ asyncLoading, handleSubmitForReview, togglePopup }) => {
   );
 };
 
-const mapStateToProps = state => ({
-  apps: state.app.get("apps"),
-  appsFilterBy: state.app.get("appsFilterBy"),
-  selectedApp: state.app.get("selectedApp"),
-  accessToken: state.app.get("accessToken"),
-  adminToken: state.app.get("adminToken"),
-  asyncLoading: state.app.get("asyncLoading"),
-  userData: state.app.get("userData"),
-  logoutCount: state.app.get("logoutCount")
-});
+const mapStateToProps = state => {
+  const {
+    app,
+    async: { asyncMessage, asyncError, asyncLoading },
+  } = state;
+
+  return {
+    ...app,
+    asyncMessage,
+    asyncError,
+    asyncLoading,
+  };
+};
 
 export default connect(mapStateToProps)(MyApps);
