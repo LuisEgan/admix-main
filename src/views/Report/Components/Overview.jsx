@@ -108,7 +108,7 @@ export default class Overview extends Component {
           attr: "fillRate",
         }),
       };
-      return { selectedApps: cloneDeep(selectedApps), overviewData };
+      return { selectedApps: { ...selectedApps }, overviewData };
     }
 
     return null;

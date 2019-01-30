@@ -184,7 +184,6 @@ class Report extends Component {
       allAppsSelected =
         Object.keys(selectedApps).length === Object.keys(userApps).length;
 
-      //    const last = keys[keys.length - 1];
       return {
         userApps,
         selectedApps,
@@ -822,15 +821,18 @@ class Report extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  apps: state.app.get("apps"),
-  accessToken: state.app.get("accessToken"),
-  userData: state.app.get("userData"),
-  selectedApp: state.app.get("selectedApp"),
-  reportData: state.app.get("reportData"),
-  initialReportAppId: state.app.get("initialReportAppId"),
-  placementsByAppId: state.app.get("placementsByAppId"),
-  isLoad_webgl: state.app.get("load_webgl"),
-});
+const mapStateToProps = state => {
+  const {
+    app,
+    async: { asyncMessage, asyncError, asyncLoading },
+  } = state;
+
+  return {
+    ...app,
+    asyncMessage,
+    asyncError,
+    asyncLoading,
+  };
+};
 
 export default connect(mapStateToProps)(Report);

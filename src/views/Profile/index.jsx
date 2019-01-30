@@ -103,7 +103,7 @@ class Profile extends Component {
 
     let update = {
       name: userName,
-      company: { ...companyInfo },
+      // company: { ...companyInfo },
     };
 
     delete values.email;
@@ -444,7 +444,12 @@ class Profile extends Component {
 }
 
 const mapStateToProps = state => {
-  const userData = state.app.get("userData");
+  const {
+    app,
+    async: { asyncMessage, asyncError, asyncLoading },
+  } = state;
+
+  const { userData } = app;
   const {
     payment: {
       paypalEmail,
@@ -471,10 +476,10 @@ const mapStateToProps = state => {
   }
 
   return {
-    accessToken: state.app.get("accessToken"),
-    isLoggedIn: state.app.get("isLoggedIn"),
-    userImgURL: state.app.get("userImgURL"),
-    asyncLoading: state.app.get("asyncLoading"),
+    ...app,
+    asyncMessage,
+    asyncError,
+    asyncLoading,
     userData,
     reduxForm: state.form,
     initialValues,

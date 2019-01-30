@@ -1,17 +1,12 @@
 import api from "../api";
-import { setAsyncError } from "./asyncActions";
+import { setAsyncError, setAsyncLoading } from "./asyncActions";
 import { REPORT_DATA, SET_INITIAL_REPORT_APP } from "./actions";
 
-const sendReportData = data => {
-  return {
-    type: REPORT_DATA,
-    data,
-  };
-};
-
-// * FETCH
-
-const getReportData = ({ appsIds, accessToken, publisherId }) => dispatch => {
+const getReportData = ({
+  appsIds,
+  accessToken,
+  publisherId,
+}) => async dispatch => {
   const currentDate = new Date();
 
   const data = {
@@ -28,17 +23,19 @@ const getReportData = ({ appsIds, accessToken, publisherId }) => dispatch => {
     publisherId,
   };
 
-  api
-    .getReportData(accessToken, data)
-    .then(res => {
-      dispatch(sendReportData(res));
-    })
-    .catch(error => {
-      dispatch(setAsyncError(error));
-    });
+  try {
+    const res = await api.getReportData(accessToken, data);
+    if (!res.success) throw res.message;
 
-  // const reportData = api.getReportData(appsIds);
-  // dispatch(sendReportData(reportData));
+    dispatch({
+      type: REPORT_DATA,
+      data: res,
+    });
+    dispatch(setAsyncLoading(false));
+  } catch (error) {
+    console.log("error: ", error);
+    dispatch(setAsyncError(error));
+  }
 };
 
 const setInitialReportApp = appId => dispatch => {

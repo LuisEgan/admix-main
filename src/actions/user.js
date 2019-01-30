@@ -1,51 +1,46 @@
 import api from "../api";
-import { setAsyncError } from "./asyncActions";
+import { setAsyncError, setAsyncLoading } from "./asyncActions";
 import { USER_DATA_SUCCESS, UPDATE_USER } from "./actions";
 
-const showUserData = data => {
-  if (data.status) {
-    return {
+const getUserData = accessToken => async dispatch => {
+  dispatch(setAsyncLoading(true));
+  try {
+    const res = await api.getUserData(accessToken);
+    if (!res.status) throw res.message;
+
+    dispatch({
       type: USER_DATA_SUCCESS,
-      data,
-    };
+      data: res,
+    });
+    dispatch(setAsyncLoading(false));
+  } catch (error) {
+    console.log("error: ", error);
+    dispatch(setAsyncError(error));
   }
 };
 
-const updateUserRes = data => {
-  if (data.status) {
-    return {
-      type: UPDATE_USER,
-      data,
-    };
-  }
-};
-
-// * FETCH
-
-const getUserData = accessToken => dispatch => {
-  api
-    .getUserData(accessToken)
-    .then(data => dispatch(showUserData(data)))
-    .catch(error => dispatch(setAsyncError(error)));
-};
-
-const updateUser = (userId, newData, accessToken) => dispatch => {
+const updateUser = (userId, newData, accessToken) => async dispatch => {
+  dispatch(setAsyncLoading(true));
   const body = {
     userId,
     newData,
   };
 
-  api
-    .updateUser(accessToken, body)
-    .then(data => {
-      dispatch(updateUserRes(data));
-      if (data.status) {
-        dispatch(getUserData(accessToken));
-      }
-    })
-    .catch(error => {
-      dispatch(setAsyncError(error));
+  try {
+    const res = await api.updateUser(accessToken, body);
+    if (!res.status) throw res.message;
+
+    dispatch({
+      type: UPDATE_USER,
+      data: res,
     });
+
+    dispatch(getUserData(accessToken));
+    dispatch(setAsyncLoading(false));
+  } catch (error) {
+    console.log("error: ", error);
+    dispatch(setAsyncError(error));
+  }
 };
 
 export default {

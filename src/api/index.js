@@ -221,8 +221,10 @@ const getScenes = async (accessToken, appId) => {
 
 const getPlacements = async (accessToken, data) => {
   const { appId, sceneId } = data;
+  let url = `${dns}/api/v2/placements/${appId}`;
+  sceneId && (url += `/${sceneId}`);
   try {
-    const res = await fetch(`${dns}/api/v2/placements/${appId}/${sceneId}`, {
+    const res = await fetch(url, {
       method: "GET",
       headers: new Headers({
         "Content-Type": "application/json",
@@ -313,18 +315,15 @@ const getUserData = async accessToken => {
 
 const getReportData = async data => {
   try {
-    const res = await fetch(
-      dns + `https://report.admix.in/report/placement/daily`,
-      {
-        method: "POST",
-        headers: new Headers({
-          "Content-Type": "application/json",
-          "x-auth-token":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YmU0NDc5MTIxMDBjMTMxZjJhNDQwYzEiLCJuYW1lIjoiQWRtaW4gUGxhdGZvcm0iLCJlbWFpbCI6ImFkbWluQGFkbWl4LmluIiwicm9sZSI6MCwiaWF0IjoxNTQxNjg3MTg1fQ.HcV0VUmfIHdHUHvH-EjWx35VKHj1H_IrSrBvW8Dz4lQ",
-        }),
-        body: JSON.stringify(data),
-      },
-    );
+    const res = await fetch(`https://report.admix.in/report/placement/daily`, {
+      method: "POST",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "x-auth-token":
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YmU0NDc5MTIxMDBjMTMxZjJhNDQwYzEiLCJuYW1lIjoiQWRtaW4gUGxhdGZvcm0iLCJlbWFpbCI6ImFkbWluQGFkbWl4LmluIiwicm9sZSI6MCwiaWF0IjoxNTQxNjg3MTg1fQ.HcV0VUmfIHdHUHvH-EjWx35VKHj1H_IrSrBvW8Dz4lQ",
+      }),
+      body: JSON.stringify(data),
+    });
 
     return res.json();
   } catch (error) {

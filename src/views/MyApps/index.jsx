@@ -188,7 +188,6 @@ class MyApps extends Component {
     );
 
     dispatch(setInitialReportApp(appsIds));
-    // dispatch(getApps({accessToken}));
     this.setState({ appSelected: true, redirect: routeCodes.REPORT });
   }
 

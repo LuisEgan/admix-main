@@ -63,7 +63,7 @@ class Download extends Component {
               <div>
                 <span className="st">Need help?</span>
               </div>
-              <div>
+              {/* <div>
                 <span className="mb">
                   Check out our <br /> Starter’s Guide{" "}
                   <a
@@ -75,10 +75,10 @@ class Download extends Component {
                     here
                   </a>
                 </span>
-              </div>
+              </div> */}
               <div>
                 <span className="mb">
-                  Questions? <br />{" "}
+                  {/* Questions? <br />{" "} */}
                   <a href="mailto:support@admix.in">Contact support</a>
                 </span>
               </div>
@@ -106,12 +106,16 @@ class Download extends Component {
 }
 
 const mapStateToProps = state => {
+  const {
+    app,
+    async: { asyncMessage, asyncError, asyncLoading },
+  } = state;
+
   return {
-    asyncData: state.app.get("asyncData"),
-    asyncError: state.app.get("asyncError"),
-    asyncLoading: state.app.get("asyncLoading"),
-    accessToken: state.app.get("accessToken"),
-    userData: state.app.get("userData"),
+    ...app,
+    asyncMessage,
+    asyncError,
+    asyncLoading,
   };
 };
 
