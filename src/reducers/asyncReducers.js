@@ -3,6 +3,7 @@ import {
   ASYNC_ERROR,
   ASYNC_MESSAGE,
   RESET_ASYNC,
+  TOGGLE_SNACKBAR
 } from "../actions/asyncActions";
 import C from "../utils/constants";
 
@@ -10,11 +11,16 @@ const initialState = {
   asyncLoading: null,
   asyncError: null,
   asyncMessage: null,
+  isSnackBarOpen: false,
 };
 
 const actionsMap = {
   [RESET_ASYNC]: () => {
     return { ...initialState };
+  },
+
+  [TOGGLE_SNACKBAR]: state => {
+    return { ...state, isSnackBarOpen: !state.isSnackBarOpen };
   },
 
   [SET_LOADING]: (state, action) => {
@@ -24,7 +30,7 @@ const actionsMap = {
     if (asyncLoading) {
       asyncError = null;
       asyncMessage = null;
-      asyncLoading = "Loading..."
+      asyncLoading = "Loading...";
     } else {
       asyncError = state.asyncError;
       asyncMessage = state.asyncMessage;
@@ -35,15 +41,21 @@ const actionsMap = {
 
   [ASYNC_ERROR]: (state, action) => {
     let { asyncError } = action;
-    asyncError = typeof asyncError === "object" ? C.ERRORS.error : asyncError;
+    asyncError = typeof asyncError !== "object" ? asyncError : C.ERRORS.error;
+    asyncError = asyncError || C.ERRORS.error;
 
-    return { ...initialState, asyncError };
+    return {
+      ...initialState,
+      asyncError,
+      asyncMessage: asyncError,
+      isSnackBarOpen: true,
+    };
   },
 
   [ASYNC_MESSAGE]: (state, action) => {
     const { asyncMessage } = action;
 
-    return { ...initialState, asyncMessage };
+    return { ...initialState, asyncMessage, isSnackBarOpen: true };
   },
 };
 

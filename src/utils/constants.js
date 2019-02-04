@@ -53,6 +53,16 @@ const ERRORS = {
 
 const SUCCESS = {
   emailSent: "Success! Check your email for further instructions 😉",
+  appUpdated: "App updated!",
+  imgUpdate: "Profile pic updated!",
+  userUpdate: "User updated!"
+};
+
+const COLORS = {
+  [`light${APP_STATES.live}`]: "#E6F5FF",
+  [`light${APP_STATES.inactive}`]: "#F5F7FA",
+  [`light${APP_STATES.sandbox}`]: "#FFEBCC",
+  [`light${APP_STATES.pending}`]: "#F5F7FA",
 };
 
 export default {
@@ -62,4 +72,5 @@ export default {
   LOGOS,
   ERRORS,
   SUCCESS,
+  COLORS,
 };

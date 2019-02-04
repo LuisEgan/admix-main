@@ -66,7 +66,6 @@ class LoginForm extends React.Component {
             name="password"
             type={hidePass ? "password" : "text"}
             label="Password"
-            normalize={lowerCase}
             icon={
               <FontAwesomeIcon icon="eye" onClick={this.togglePassInputType} />
             }

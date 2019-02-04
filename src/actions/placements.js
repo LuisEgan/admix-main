@@ -1,11 +1,11 @@
 import api from "../api";
-import { setAsyncError, setAsyncLoading } from "./asyncActions";
 import {
-  SET_PLACEMENTS,
-  SET_PLACEMENTS_BY_ID,
-  UPDATE_PLACEMENTS,
-  APPS_SUCCESS,
-} from "./actions";
+  setAsyncError,
+  setAsyncLoading,
+  setAsyncMessage,
+} from "./asyncActions";
+import { SET_PLACEMENTS, SET_PLACEMENTS_BY_ID, APPS_SUCCESS } from "./actions";
+import C from "../utils/constants";
 
 const getPlacements = (appId, sceneId, accessToken) => async dispatch => {
   const data = {
@@ -66,18 +66,11 @@ const updatePlacements = ({
       : await api.updatePlacementsAdmin(accessToken, adminToken, data);
 
     if (!res.status) throw res.message;
-
-    if (!adminToken) {
-      dispatch({
-        type: UPDATE_PLACEMENTS,
-        data,
-      });
-    } else {
-      dispatch({
-        type: APPS_SUCCESS,
-        data,
-      });
-    }
+    dispatch({
+      type: APPS_SUCCESS,
+      data,
+    });
+    dispatch(setAsyncMessage(C.SUCCESS.appUpdated));
     dispatch(setAsyncLoading(false));
   } catch (error) {
     console.log("error: ", error);

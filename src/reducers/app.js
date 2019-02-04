@@ -27,7 +27,6 @@ import {
 const initialState = {
   logoutCount: 0,
   counter: 0,
-  isSnackBarOpen: false,
   isLoggedIn: false,
   accessToken: "",
   adminToken: "",
@@ -331,9 +330,8 @@ const actionsMap = {
 
   [USER_IMG_UPLOAD]: (state, data) => {
     const userImgURL = data.data.data.secure_url;
-    const isSnackBarOpen = true;
 
-    return { ...state, userImgURL, isSnackBarOpen };
+    return { ...state, userImgURL };
   },
 
   [SET_USER_IMG_URL]: (state, data) => {

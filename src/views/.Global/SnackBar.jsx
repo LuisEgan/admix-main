@@ -1,12 +1,9 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import actions from "../../actions";
+import { resetAsync, toggleSnackbar } from "../../actions/asyncActions";
 import Snackbar from "@material-ui/core/Snackbar";
-import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
-
-const { snackbarToggle } = actions;
 
 const smilies = ["😀", "😁", "😎", "🙂", "💪", "👍", "🤘", "✌️"];
 
@@ -18,26 +15,22 @@ class SnackBar extends Component {
       smiley: smilies[Math.floor(Math.random() * smilies.length)],
     };
 
-    this.handleClick = this.handleClick.bind(this);
     this.handleClose = this.handleClose.bind(this);
-  }
-
-  handleClick() {
-    dispatch(snackbarToggle());
   }
 
   handleClose() {
     let { dispatch } = this.props;
     const smiley = smilies[Math.floor(Math.random() * smilies.length)];
 
-    dispatch(snackbarToggle());
+    dispatch(toggleSnackbar());
     setTimeout(() => {
+      dispatch(resetAsync());
       this.setState({ smiley });
     }, 200);
   }
 
   render() {
-    let { isSnackBarOpen, asyncData, asyncError, isLoggedIn } = this.props;
+    let { isSnackBarOpen, asyncMessage, asyncError, isLoggedIn } = this.props;
     let { smiley } = this.state;
 
     let snackbarClass = "";
@@ -63,7 +56,7 @@ class SnackBar extends Component {
         }}
         message={
           <span id="message-id">
-            {smiley} {asyncData ? asyncData.mssg[0].msg || asyncData.mssg : ""}
+            {smiley} {asyncMessage || asyncError}
           </span>
         }
         action={
@@ -82,30 +75,11 @@ class SnackBar extends Component {
 }
 
 const mapStateToProps = state => {
-  const {
-    app: {
-      isSnackBarOpen,
-      userData,
-      asyncData,
-      asyncError,
-      asyncLoading,
-      counter,
-      accesstoken,
-      userImgURL,
-      isLoggedIn,
-    },
-  } = state;
+  const { app, async } = state;
 
   return {
-    isSnackBarOpen,
-    userData,
-    asyncData,
-    asyncError,
-    asyncLoading,
-    counter,
-    accesstoken,
-    userImgURL,
-    isLoggedIn,
+    ...app,
+    ...async,
   };
 };
 

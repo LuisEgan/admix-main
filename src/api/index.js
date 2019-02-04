@@ -1,3 +1,5 @@
+import qs from "qs";
+
 const isProd = process.env.NODE_ENV !== "development";
 
 const dns = isProd ? "https://api.admix.in" : "http://localhost:3000";
@@ -111,12 +113,11 @@ const setNewEmail = async data => {
 const getAppsAll = async (accessToken, data) => {
   try {
     const res = await fetch(dns + "/api/v2/apps/all", {
-      method: "POST",
+      method: "GET",
       headers: new Headers({
         "Content-Type": "application/json",
         "x-access-token": accessToken,
       }),
-      body: JSON.stringify(data),
     });
 
     return res.json();
@@ -126,14 +127,15 @@ const getAppsAll = async (accessToken, data) => {
 };
 
 const getApps = async (accessToken, data) => {
+  const { filterBy } = data;
+  const query = `?${qs.stringify(filterBy)}`;
   try {
-    const res = await fetch(dns + "/api/v2/apps/all", {
-      method: "POST",
+    const res = await fetch(`${dns}/api/v2/apps/${query}`, {
+      method: "GET",
       headers: new Headers({
         "Content-Type": "application/json",
         "x-access-token": accessToken,
       }),
-      body: JSON.stringify(data),
     });
 
     return res.json();

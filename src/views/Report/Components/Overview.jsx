@@ -5,7 +5,7 @@ import { Line } from "react-chartjs-2";
 import ReactTable from "react-table";
 import Breadcrumbs from "../../../components/Breadcrumbs";
 import SVG from "../../../components/SVG";
-import { isEqual, cloneDeep } from "lodash";
+import { isEqual } from "lodash";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 
 const _a_location = routeCodes.REPORT;

@@ -1,7 +1,7 @@
 import api from "../api";
-import { setAsyncError, setAsyncLoading } from "./asyncActions";
+import { setAsyncError, setAsyncLoading, setAsyncMessage } from "./asyncActions";
 import { USER_DATA_SUCCESS, UPDATE_USER } from "./actions";
-
+import C from "../utils/constants"
 const getUserData = accessToken => async dispatch => {
   dispatch(setAsyncLoading(true));
   try {
@@ -36,6 +36,7 @@ const updateUser = (userId, newData, accessToken) => async dispatch => {
     });
 
     dispatch(getUserData(accessToken));
+    dispatch(setAsyncMessage(C.SUCCESS.userUpdate));
     dispatch(setAsyncLoading(false));
   } catch (error) {
     console.log("error: ", error);

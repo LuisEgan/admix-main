@@ -13,14 +13,14 @@ class Popup extends React.PureComponent {
   }
 
   render() {
-    const { children, showPopup } = this.props;
+    const { children, showPopup, id } = this.props;
 
     if (!showPopup) {
       return null;
     }
 
     return (
-      <div className="popup">
+      <div id={id} className="popup">
         <div className="popup-inner">{children}</div>
         <div className="popup-bg" onClick={this.closePopup.bind(this)} />
       </div>

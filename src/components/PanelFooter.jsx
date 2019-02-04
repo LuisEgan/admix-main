@@ -5,7 +5,7 @@ import C from "../utils/constants";
 class PanelFooter extends React.Component {
   render() {
     const { app, hideInner } = this.props;
-    const { appState, isActive, storeurl } = app;
+    const { appState, isActive } = app;
 
     let footerMssg =
       appState === C.APP_STATES.pending ||
@@ -20,25 +20,7 @@ class PanelFooter extends React.Component {
         </span>
       );
 
-    let footerActiveMssg =
-      appState !== undefined
-        ? appState
-        : storeurl !== undefined || storeurl !== ""
-        ? C.APP_STATES.inactive
-        : C.APP_STATES.pending;
-
-    let footerStyle;
-
-    switch (footerActiveMssg) {
-      case C.APP_STATES.inactive:
-        footerStyle = { background: "#F5F7FA" };
-        break;
-      case C.APP_STATES.pending:
-        footerStyle = { background: "#ffebcc" };
-        break;
-      default:
-        footerStyle = { background: "#e6f5ff" };
-    }
+    let footerStyle = { background: C.COLORS[`light${appState}`] };
 
     let classInner;
     if (hideInner) {

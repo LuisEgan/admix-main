@@ -442,8 +442,9 @@ class Scene extends Component {
     e.stopImmediatePropagation();
     const { isMouseOnPanel } = this.state;
 
-    // Check if mouse is on one of the side panels and avoid clicking on an object if so
-    if (!isMouseOnPanel) {
+    // TODO Check if mouse is on one of the side panels and avoid clicking on an object if so
+    // if (!isMouseOnPanel) {
+    if (true) {
       const intersects = this.checkIntersection();
 
       if (intersects.length > 0 && !!intersects[0].object.material.color) {
@@ -649,13 +650,6 @@ class Scene extends Component {
 
   mouseOnPanel() {
     const isMouseOnPanel = !this.state.isMouseOnPanel;
-
-    // this is so when the mouse is on either panel user can't rotate the scene onclick
-    if (isMouseOnPanel) {
-      //    this.controls && this.controls.noRotation();
-    } else {
-      //    this.controls && this.controls.yesRotation();
-    }
 
     this.setState({ isMouseOnPanel });
   }

@@ -95,10 +95,10 @@ class Profile extends Component {
     const {
       userName,
       paypalEmail,
-      initialPaymentRegion,
-      email,
-      password,
-      ...companyInfo
+      // initialPaymentRegion,
+      // email,
+      // password,
+      // ...companyInfo
     } = values;
 
     let update = {

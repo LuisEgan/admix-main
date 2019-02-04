@@ -1,7 +1,12 @@
 import api from "../api";
-import { setAsyncError, setAsyncLoading } from "./asyncActions";
+import {
+  setAsyncError,
+  setAsyncLoading,
+  setAsyncMessage,
+} from "./asyncActions";
 import { SET_USER_IMG_URL, USER_IMG_UPLOAD } from "./actions";
 import user from "./user";
+import C from "../utils/constants";
 
 const { getUserData } = user;
 
@@ -35,14 +40,13 @@ const imgUpload = (imgPath, userId, accessToken) => async dispatch => {
       data: res,
     });
     dispatch(getUserData(accessToken));
+    dispatch(setAsyncMessage(C.SUCCESS.imgUpdate));
     dispatch(setAsyncLoading(false));
   } catch (error) {
     console.log("error: ", error);
     dispatch(setAsyncError(error));
   }
 };
-
-
 
 export default {
   setUserImgURL,

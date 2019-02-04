@@ -1,5 +1,9 @@
 import api from "../api";
-import { setAsyncError, setAsyncLoading } from "./asyncActions";
+import {
+  setAsyncError,
+  setAsyncLoading,
+  setAsyncMessage,
+} from "./asyncActions";
 import {
   LOGOUT_SUCCESS,
   RESET_SELECTED_APP,
@@ -11,15 +15,7 @@ import {
   TOGGLE_APP_STATUS,
   SAVE_INPUTS,
 } from "./actions";
-
-const doUpdateApp = data => {
-  if (data.status) {
-    return {
-      type: UPDATE_APP,
-      data,
-    };
-  }
-};
+import C from "../utils/constants";
 
 const resetSelectedApp = () => ({
   type: RESET_SELECTED_APP,
@@ -80,6 +76,7 @@ const toggleAppStatus = (appDetails, accessToken) => async dispatch => {
       type: TOGGLE_APP_STATUS,
       data: res,
     });
+    dispatch(setAsyncMessage(C.SUCCESS.appUpdated));
     dispatch(setAsyncLoading(false));
   } catch (error) {
     console.log("error: ", error);
@@ -88,8 +85,10 @@ const toggleAppStatus = (appDetails, accessToken) => async dispatch => {
 };
 
 const selectApp = (appId, accessToken) => async dispatch => {
+  dispatch(setAsyncLoading(true));
   try {
     const res = await api.getScenes(accessToken, appId);
+    console.log('res: ', res);
     if (!res.status) throw res.message;
 
     const data = { appId, ...res };
@@ -105,23 +104,35 @@ const selectApp = (appId, accessToken) => async dispatch => {
 };
 
 const updateApp = ({ appData, accessToken, adminToken }) => async dispatch => {
-  api
-    .updateApp(accessToken, appData)
-    .then(() => {
-      return adminToken
-        ? api.getAppsAdmin(accessToken, adminToken)
-        : api.getApps(accessToken);
-    })
-    .then(res => {
-      dispatch(
-        getApps({
-          accessToken,
-        }),
-      );
-      dispatch(selectApp(appData.appId, accessToken));
-      dispatch(doUpdateApp(res));
-    })
-    .catch(error => dispatch(setAsyncError(error)));
+  dispatch(setAsyncLoading(true));
+  const { appId, ...newData } = appData;
+  const data = {
+    appId,
+    newData,
+  };
+
+  try {
+    const res = await api.updateApp(accessToken, data);
+    if (!res.status) throw res.message;
+
+    const resApps = adminToken
+      ? await api.getAppsAdmin(accessToken, adminToken)
+      : await api.getApps(accessToken);
+    if (!resApps.status) throw res.message;
+
+    dispatch(getApps({ accessToken }));
+    dispatch(selectApp(appId, accessToken));
+    dispatch({
+      type: UPDATE_APP,
+      data: resApps,
+    });
+
+    dispatch(setAsyncMessage(C.SUCCESS.appUpdated));
+    dispatch(setAsyncLoading(false));
+  } catch (error) {
+    console.log("error: ", error);
+    dispatch(setAsyncError(error));
+  }
 };
 
 export default {

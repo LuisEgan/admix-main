@@ -65,10 +65,12 @@ class Menu extends Component {
   }
 
   handleLogout() {
-    const { dispatch } = this.props;
-    this.setState({ imgChecked: false });
-    this.toggleDropdowns(true);
-    dispatch(logout());
+    const { dispatch, history } = this.props;
+    this.setState({ imgChecked: false }, () => {
+      this.toggleDropdowns(true);
+      dispatch(logout());
+      history.push("/");
+    });
   }
 
   toggleDropdowns(forceClose = false) {

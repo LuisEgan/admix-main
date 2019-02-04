@@ -5,7 +5,6 @@ import routeCodes from "../../config/routeCodes";
 import _a from "../../utils/analytics";
 import PropTypes from "prop-types";
 import actions from "../../actions";
-import Popup from "../../components/Popup";
 import C from "../../utils/constants";
 import STR from "../../utils/strFuncs";
 import { CLOUDINARY_IMG_URL } from "../../config/cloudinary";
@@ -25,8 +24,6 @@ const {
   getApps,
   getUserData,
   selectApp,
-  updateUser,
-  toggleAppStatus,
   getReportData,
   setInitialReportApp,
   resetSavedInputs,
@@ -49,8 +46,6 @@ class MyApps extends Component {
     super(props);
 
     this.state = {
-      reviewClicked: false,
-      showPopup: false,
       showContent: false,
       appSelected: false,
       activeApps: [],
@@ -65,13 +60,11 @@ class MyApps extends Component {
       userUsedFilter: false,
     };
 
-    this.togglePopup = this.togglePopup.bind(this);
     this.showContent = this.showContent.bind(this);
     this.setClickedApp = this.setClickedApp.bind(this);
     this.selectApp = this.selectApp.bind(this);
     this.getReportData = this.getReportData.bind(this);
     this.renderNoApps = this.renderNoApps.bind(this);
-    this.handleSubmitForReview = this.handleSubmitForReview.bind(this);
 
     //filter
     this.addFilter = this.addFilter.bind(this);
@@ -110,7 +103,7 @@ class MyApps extends Component {
 
   static getDerivedStateFromProps(nextProps, prevState) {
     let newState = {};
-    let { apps, asyncLoading } = nextProps;
+    let { apps } = nextProps;
     apps = Array.isArray(apps) ? apps : [];
     const activeApps = [];
     apps.forEach(app => {
@@ -122,16 +115,7 @@ class MyApps extends Component {
 
     newState = { allAppsIds, activeApps };
 
-    if (prevState.reviewClicked && !asyncLoading) {
-      newState.showPopup = false;
-    }
-
     return newState;
-  }
-
-  togglePopup() {
-    const { showPopup } = this.state;
-    this.setState({ showPopup: !showPopup });
   }
 
   showContent() {
@@ -456,7 +440,8 @@ class MyApps extends Component {
     const appsRe = apps.slice().reverse();
 
     return appsRe.map((app, i) => {
-      let { _id, userId, name, appState } = app;
+      let { _id, appId, userId, name, appState } = app;
+      _id = _id || appId;
 
       if (appState === C.APP_STATES.deleted) return null;
 
@@ -470,7 +455,7 @@ class MyApps extends Component {
       return (
         <div
           className={`app-select-container mb ${selectedAppClass}`}
-          key={_id}
+          key={_id || Math.random()}
         >
           <div id="app-select-info" className="text-truncate">
             <div className="engine-logo">{appEngineLogo}</div>
@@ -481,7 +466,7 @@ class MyApps extends Component {
               <div className="app-status mb">
                 <AppsStateToggle
                   app={app}
-                  onLive={app.reviewed ? null : this.togglePopup}
+                  // onLive={app.reviewed ? null : this.togglePopup}
                   onClick={this.setClickedApp.bind(null, app)}
                   {...this.props}
                 />
@@ -572,31 +557,10 @@ class MyApps extends Component {
     );
   }
 
-  handleSubmitForReview() {
-    const { dispatch, accessToken, userData } = this.props;
-    const {
-      clickedApp: { _id },
-    } = this.state;
-
-    const appDetails = {
-      appId: _id,
-      newData: {
-        isActive: false,
-        appState: C.APP_STATES.pending,
-      },
-    };
-
-    this.setState({ reviewClicked: true }, () => {
-      dispatch(toggleAppStatus(appDetails, accessToken));
-      dispatch(updateUser(userData._id, { status: 4 }, accessToken));
-    });
-  }
-
   render() {
     const { location, apps, adminToken, asyncLoading, userData } = this.props;
 
     const {
-      showPopup,
       showContent,
       appSelected,
       redirect,
@@ -622,14 +586,6 @@ class MyApps extends Component {
 
     return (
       <div className="step-container" id="apps">
-        <Popup showPopup={showPopup} togglePopup={this.togglePopup}>
-          <MyAppsPopup
-            asyncLoading={asyncLoading}
-            handleSubmitForReview={this.handleSubmitForReview}
-            togglePopup={this.togglePopup}
-          />
-        </Popup>
-
         <div id="apps-header" className="step-title">
           <h3 className="st sc-h3">My apps</h3>
         </div>
@@ -671,43 +627,6 @@ class MyApps extends Component {
     );
   }
 }
-
-const MyAppsPopup = ({ asyncLoading, handleSubmitForReview, togglePopup }) => {
-  return (
-    <React.Fragment>
-      <span className="popup-title">Ready to go live?</span>
-      <br />
-      <br />
-      <span className="popup-text">
-        Your app will be submitted for review to make sure all is ok. This can
-        take 1 to 2h. After that, you'll start to make revenue.
-      </span>
-      <br />
-      <br />
-      <span className="popup-btns">
-        {asyncLoading && (
-          <button className="btn" id="review-btn" type="button">
-            Loading...
-          </button>
-        )}
-
-        {!asyncLoading && (
-          <button
-            className="btn"
-            id="review-btn"
-            onClick={handleSubmitForReview}
-          >
-            Submit for review
-          </button>
-        )}
-
-        <button className="cancel-btn mb" id="cancel-btn" onClick={togglePopup}>
-          Cancel
-        </button>
-      </span>
-    </React.Fragment>
-  );
-};
 
 const mapStateToProps = state => {
   const {
