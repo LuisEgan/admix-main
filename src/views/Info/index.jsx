@@ -8,6 +8,7 @@ import actions from "../../actions";
 import { setAsyncLoading } from "../../actions/asyncActions";
 import PropTypes from "prop-types";
 import validate from "validate.js";
+import FormTextInput from "../../components/formInputs/FormTextInput";
 
 import Breadcrumbs from "../../components/Breadcrumbs";
 import PanelFooter from "../../components/PanelFooter";
@@ -46,7 +47,7 @@ class Info extends Component {
     super(props);
 
     this.state = {
-      show: "cal",
+      show: "url",
       deleteClicked: false,
     };
 
@@ -286,10 +287,8 @@ class Info extends Component {
             {fields.map(field => {
               return (
                 <div key={field.name}>
-                  <span>{field.title}</span>
-
                   {field.name !== "world" && (
-                    <Field name={field.name} component={this.renderField} />
+                    <FormTextInput name={field.name} label={field.title} />
                   )}
 
                   {field.name === "world" && <div>{restOfTheWorld}</div>}
@@ -417,8 +416,7 @@ class Info extends Component {
 
             {show("url") && (
               <div id="info-url">
-                <span>App store URL</span>
-                <Field name="storeurl" component={this.renderField} />
+                <FormTextInput name="storeurl" label="App store URL" />
               </div>
             )}
 

@@ -2719,6 +2719,11 @@ $inputsFontSize: calc(0.45em+0.3vw);
 // INFO ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------------
 #info {
+  #info-url {
+    padding: 3%;
+    background-color: white;
+    min-height: 20vh;
+  }
   #info-header {
     display: flex;
     padding-bottom: 5%;
@@ -2759,7 +2764,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
   .input-delete {
     position: absolute;
     width: unset;
-    right: 40px;
+    right: 10%;
     top: 0;
     bottom: 0;
     margin: auto;
