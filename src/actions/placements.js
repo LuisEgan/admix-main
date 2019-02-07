@@ -28,6 +28,27 @@ const getPlacements = (appId, sceneId, accessToken) => async dispatch => {
   }
 };
 
+const getPlacementsAdmin = ({appId, sceneId, accessToken, adminToken}) => async dispatch => {
+  const data = {
+    appId,
+    sceneId,
+  };
+
+  try {
+    const res = await api.getPlacementsAdmin(accessToken, adminToken, data);
+    if (!res.status) throw res.message;
+
+    dispatch({
+      type: SET_PLACEMENTS,
+      data: res,
+    });
+    dispatch(setAsyncLoading(false));
+  } catch (error) {
+    console.log("error: ", error);
+    dispatch(setAsyncError(error));
+  }
+};
+
 const getPlacementsByAppId = (appId, accessToken) => async dispatch => {
   const data = {
     appId,
@@ -80,6 +101,7 @@ const updatePlacements = ({
 
 export default {
   getPlacements,
+  getPlacementsAdmin,
   getPlacementsByAppId,
   updatePlacements,
 };

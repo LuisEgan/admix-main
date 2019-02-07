@@ -53,6 +53,7 @@ const ERRORS = {
 
 const SUCCESS = {
   emailSent: "Success! Check your email for further instructions 😉",
+  passChanged: "Password changed! You can log in now",
   appUpdated: "App updated!",
   imgUpdate: "Profile pic updated!",
   userUpdate: "User updated!"

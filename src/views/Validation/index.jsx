@@ -128,12 +128,6 @@ class Validation extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  asyncError: state.app.get("asyncError"),
-  asyncLoading: state.app.get("asyncLoading"),
-  selectedApp: state.app.get("selectedApp"),
-  savedInputs: state.app.get("savedInputs"),
-  accessToken: state.app.get("accessToken"),
-});
+const mapStateToProps = state => ({ ...state });
 
 export default connect(mapStateToProps)(Validation);

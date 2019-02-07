@@ -6,8 +6,7 @@ import STR from "../../utils/strFuncs";
 
 const { ga } = _a;
 
-const { setNewEmail } = actions;
-
+const { setNewEmail, logout } = actions;
 class ChangeEmail extends Component {
   constructor(props) {
     super(props);
@@ -21,6 +20,12 @@ class ChangeEmail extends Component {
     this.hardFocus = this.hardFocus.bind(this);
     this.handleChangeEmail = this.handleChangeEmail.bind(this);
   }
+  
+  componentDidMount = () => {
+    const { dispatch } = this.props;
+    dispatch(logout());
+  }
+  
 
   handleKeyPress(e) {
     if (e.key === "Enter") {
@@ -63,7 +68,7 @@ class ChangeEmail extends Component {
   }
 
   render() {
-    const { asyncData, asyncError, asyncLoading } = this.props;
+    const { asyncMessage, asyncError, asyncLoading } = this.props;
 
     const { isValidEmail } = this.state;
 
@@ -106,8 +111,8 @@ class ChangeEmail extends Component {
             <div className="login-btn cc">
               {asyncLoading && loadingIcon}
               {asyncError && <p>Error: {asyncError}</p>}
-              {asyncData !== null && <p>{asyncData.mssg}</p>}
-              {!asyncLoading && !asyncError && !asyncData && (
+              {asyncMessage !== null && <p>{asyncMessage}</p>}
+              {!asyncLoading && !asyncError && !asyncMessage && (
                 <button
                   className="btn btn-dark"
                   onClick={this.handleChangeEmail}
@@ -128,12 +133,6 @@ class ChangeEmail extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  asyncData: state.app.get("asyncData"),
-  asyncError: state.app.get("asyncError"),
-  asyncLoading: state.app.get("asyncLoading"),
-  counter: state.app.get("counter"),
-  isLoggedIn: state.app.get("isLoggedIn"),
-});
+const mapStateToProps = state => ({ ...state });
 
 export default connect(mapStateToProps)(ChangeEmail);

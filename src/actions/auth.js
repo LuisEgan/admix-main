@@ -145,7 +145,7 @@ const setNewPass = ({ token, userId, newPass }) => async dispatch => {
     const res = await api.setNewPass(data);
     if (!res.status) throw res.message;
 
-    dispatch(setAsyncMessage(C.SUCCESS.emailSent));
+    dispatch(setAsyncMessage(C.SUCCESS.passChanged));
   } catch (error) {
     console.error("error: ", error);
     dispatch(setAsyncError(error));

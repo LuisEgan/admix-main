@@ -10,8 +10,8 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 import Select from "@material-ui/core/Select";
 import Input from "@material-ui/core/Input";
 import { KeyboardArrowDown } from "@material-ui/icons";
-import Checkbox from "@material-ui/core/Checkbox";
-import Tooltip from "@material-ui/core/Tooltip";
+// import Checkbox from "@material-ui/core/Checkbox";
+// import Tooltip from "@material-ui/core/Tooltip";
 
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 
@@ -59,11 +59,11 @@ export default class PaymentConfig extends React.PureComponent {
       payBanksDetailsStyle,
     } = this.props;
 
-    const { invoiceCheck } = this.state;
+    // const { invoiceCheck } = this.state;
 
     return (
       <React.Fragment>
-        <Tooltip
+        {/* <Tooltip
           title="By ticking this box you’ll be paid automatically every month if your
        balance exceeds $500"
           placement="right"
@@ -79,7 +79,7 @@ export default class PaymentConfig extends React.PureComponent {
             }
             label="Generate automatic invoices"
           />
-        </Tooltip>
+        </Tooltip> */}
 
         <RadioGroup
           aria-label="paymentOpts"

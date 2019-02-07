@@ -1650,6 +1650,28 @@ $inputsFontSize: calc(0.45em+0.3vw);
     }
   }
 }
+#forgotPass {
+  .login-btn-container {
+    text-align: center;
+    width: 100%;
+    margin: auto;
+    button {
+      margin-top: 15px;
+    }
+  }
+  form {
+    margin: auto;
+    >div {
+      padding: 5% 0;
+      &:last-child{
+        text-align: center;
+      }
+      >div {
+        padding-bottom: 5%;
+      }
+    }
+  }
+}
 // ----------------------------------------------------------------------------------------------------------
 // APPS ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------------
@@ -3037,6 +3059,9 @@ $ballSize: 20px;
   > div {
     width: 100%;
   }
+  * {
+    transition: 0.2s ease-in-out;
+  }
   input {
     @extend .mb;
     border: 0;
@@ -3278,4 +3303,3 @@ $ballSize: 20px;
     margin-top: 5px;
   }
 }
-

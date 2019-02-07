@@ -95,16 +95,17 @@ class Profile extends Component {
     const {
       userName,
       paypalEmail,
-      // initialPaymentRegion,
-      // email,
-      // password,
-      // ...companyInfo
+      initialPaymentRegion,
+      email,
+      password,
+      ...companyInfo
     } = values;
 
     let update = {
       name: userName,
-      // company: { ...companyInfo },
+      company: { ...companyInfo },
     };
+    console.log('update: ', update);
 
     delete values.email;
     delete values.password;

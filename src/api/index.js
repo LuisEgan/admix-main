@@ -240,6 +240,26 @@ const getPlacements = async (accessToken, data) => {
   }
 };
 
+const getPlacementsAdmin = async (accessToken, adminToken, data) => {
+  const { appId, sceneId } = data;
+  let url = `${dns}/api/v2/admin/placements/${appId}`;
+  sceneId && (url += `/${sceneId}`);
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "x-access-token": accessToken,
+        "x-admin-token": adminToken,
+      }),
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ getPlacementsAdmin: ", error);
+  }
+};
+
 const updatePlacements = async (accessToken, data) => {
   try {
     const res = await fetch(dns + "/api/v2/placements/update", {
@@ -390,6 +410,7 @@ export default {
   toggleAppStatus,
   getScenes,
   getPlacements,
+  getPlacementsAdmin,
   updatePlacements,
   getReportData,
 };

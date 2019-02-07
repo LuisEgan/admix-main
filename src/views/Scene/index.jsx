@@ -440,7 +440,7 @@ class Scene extends Component {
   onObjectClick(e) {
     const { THREE } = window;
     e.stopImmediatePropagation();
-    const { isMouseOnPanel } = this.state;
+    // const { isMouseOnPanel } = this.state;
 
     // TODO Check if mouse is on one of the side panels and avoid clicking on an object if so
     // if (!isMouseOnPanel) {

@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { reduxForm } from "redux-form";
 import actions from "../../actions";
 import { resetAsync } from "../../actions/asyncActions";
-import TextInput from "../../components/formInputs/FormTextInput";
+import FormTextInput from "../../components/formInputs/FormTextInput";
 import STR from "../../utils/strFuncs";
 import C from "../../utils/constants";
 import { lowerCase } from "../../utils/normalizers";
@@ -61,8 +61,8 @@ class LoginForm extends React.Component {
     return (
       <React.Fragment>
         <form onSubmit={handleSubmit(this.handleLogin)}>
-          <TextInput name="email" label="Email" normalize={lowerCase} />
-          <TextInput
+          <FormTextInput name="email" label="Email" normalize={lowerCase} />
+          <FormTextInput
             name="password"
             type={hidePass ? "password" : "text"}
             label="Password"

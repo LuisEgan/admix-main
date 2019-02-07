@@ -31,6 +31,7 @@ const {
   setUserImgURL,
   setAppsFilterBy,
   getPlacementsByAppId,
+  getPlacementsAdmin,
 } = actions;
 
 class MyApps extends Component {
@@ -150,7 +151,7 @@ class MyApps extends Component {
       },
     );
 
-    const { dispatch, accessToken, userData } = this.props;
+    const { dispatch, accessToken, adminToken, userData } = this.props;
 
     // to assing scenes to the apps for the scenes names for the graphs
     let c = 0;
@@ -158,8 +159,11 @@ class MyApps extends Component {
 
     do {
       appId = Array.isArray(appsIds) ? appsIds[c] : appsIds;
-      //    dispatch(selectApp(appId, accessToken));
-      dispatch(getPlacementsByAppId(appId, accessToken));
+
+      adminToken
+        ? dispatch(getPlacementsAdmin({appId, accessToken, adminToken}))
+        : dispatch(getPlacementsByAppId(appId, accessToken));
+
       c++;
     } while (Array.isArray(appsIds) && c < appsIds.length);
 

@@ -19,11 +19,11 @@ export default ({
             <div />
             <div>
                <span className="profile-helper-text">
-                  <a onClick={handleUserUpdate.bind(null, "email")}>
+                  {/* <a onClick={handleUserUpdate.bind(null, "email")}>
                      {asyncLoading && clicked === "email"
                         ? " ...Loading"
                         : " Update email"}
-                  </a>
+                  </a> */}
                </span>
             </div>
             <div>

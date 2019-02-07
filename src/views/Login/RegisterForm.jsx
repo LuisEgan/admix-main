@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { reduxForm } from "redux-form";
 import actions from "../../actions";
 import { resetAsync } from "../../actions/asyncActions";
-import TextInput from "../../components/formInputs/FormTextInput";
+import FormTextInput from "../../components/formInputs/FormTextInput";
 import Checkbox from "../../components/formInputs/FormCheckbox";
 import STR from "../../utils/strFuncs";
 import { lowerCase } from "../../utils/normalizers";
@@ -134,14 +134,14 @@ class RegisterForm extends React.Component {
     return (
       <React.Fragment>
         <form onSubmit={handleSubmit(this.handleRegister)}>
-          <TextInput name="name" label="Name" guideline={`only letter`} />
-          <TextInput
+          <FormTextInput name="name" label="Name" guideline={`only letter`} />
+          <FormTextInput
             name="email"
             label="Email"
             normalize={lowerCase}
             guideline={`valid email`}
           />
-          <TextInput
+          <FormTextInput
             name="password"
             type={hidePass ? "password" : "text"}
             label="Password"
@@ -151,7 +151,7 @@ class RegisterForm extends React.Component {
             guideline={this.passGuideline()}
             customonchange={this.setPassGuidelineStyle}
           />
-          <TextInput
+          <FormTextInput
             name="passwordCheck"
             type={hidePass ? "password" : "text"}
             label="Confirm Password"

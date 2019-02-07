@@ -10,7 +10,6 @@ import {
   RESET_SAVED_INPUTS,
   SET_APPS_FILTER_BY,
   SELECT_APP,
-  UPDATE_APP,
   APPS_SUCCESS,
   TOGGLE_APP_STATUS,
   SAVE_INPUTS,
@@ -88,7 +87,6 @@ const selectApp = (appId, accessToken) => async dispatch => {
   dispatch(setAsyncLoading(true));
   try {
     const res = await api.getScenes(accessToken, appId);
-    console.log('res: ', res);
     if (!res.status) throw res.message;
 
     const data = { appId, ...res };
@@ -115,17 +113,8 @@ const updateApp = ({ appData, accessToken, adminToken }) => async dispatch => {
     const res = await api.updateApp(accessToken, data);
     if (!res.status) throw res.message;
 
-    const resApps = adminToken
-      ? await api.getAppsAdmin(accessToken, adminToken)
-      : await api.getApps(accessToken);
-    if (!resApps.status) throw res.message;
-
     dispatch(getApps({ accessToken }));
     dispatch(selectApp(appId, accessToken));
-    dispatch({
-      type: UPDATE_APP,
-      data: resApps,
-    });
 
     dispatch(setAsyncMessage(C.SUCCESS.appUpdated));
     dispatch(setAsyncLoading(false));

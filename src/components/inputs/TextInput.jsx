@@ -19,6 +19,7 @@ class Input extends React.Component {
 
     this.forceFocus = this.forceFocus.bind(this);
     this.onFocus = this.onFocus.bind(this);
+    this.onBlur = this.onBlur.bind(this);
   }
 
   shouldComponentUpdate = (nextProps, nextState) => {
@@ -44,6 +45,13 @@ class Input extends React.Component {
     const { onFocus } = this.props;
     this.setState({ focused: true }, () => {
       onFocus && onFocus();
+    });
+  }
+
+  onBlur() {
+    const { onBlur } = this.props;
+    this.setState({ focused: false }, () => {
+      onBlur && onBlur();
     });
   }
 
@@ -91,6 +99,7 @@ class Input extends React.Component {
                 this.input = i;
               }}
               onFocus={this.onFocus}
+              onBlur={this.onBlur}
             />
           </div>
 

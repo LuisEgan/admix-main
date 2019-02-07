@@ -24,7 +24,7 @@ const getReportData = ({
   };
 
   try {
-    const res = await api.getReportData(accessToken, data);
+    const res = await api.getReportData(data);
     if (!res.success) throw res.message;
 
     dispatch({

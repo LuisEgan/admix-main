@@ -2,17 +2,15 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { NavLink } from "react-router-dom";
 import _a from "../../utils/analytics";
-import { Field, reduxForm, change } from "redux-form";
+import { reduxForm, change } from "redux-form";
 import routeCodes from "../../config/routeCodes";
 import actions from "../../actions";
-import { setAsyncLoading } from "../../actions/asyncActions";
 import PropTypes from "prop-types";
 import validate from "validate.js";
 import FormTextInput from "../../components/formInputs/FormTextInput";
 
 import Breadcrumbs from "../../components/Breadcrumbs";
 import PanelFooter from "../../components/PanelFooter";
-import Input from "../../components/inputs/TextInput";
 import AdmixCalculator from "../../components/AdmixCalculator";
 import ReactSVG from "react-svg";
 
@@ -22,9 +20,8 @@ import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 
 import C from "../../utils/constants";
+import { onlyNums } from "../../utils/normalizers";
 
-import SVG_tickGreen from "../../assets/svg/tick-green.svg";
-import SVG_checkFail from "../../assets/svg/check-fail.svg";
 import SVG_delete from "../../assets/svg/delete.svg";
 
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
@@ -141,7 +138,6 @@ class Info extends Component {
     this.handleDelete = this.handleDelete.bind(this);
     this.show = this.show.bind(this);
     this.renderExpansionPanel = this.renderExpansionPanel.bind(this);
-    this.renderField = this.renderField.bind(this);
   }
 
   changeView(view) {
@@ -162,19 +158,19 @@ class Info extends Component {
       accessToken,
       admintoken,
       dispatch,
-      selectedApp,
+      selectedApp: { platformName, name, _id },
       admixCalculatorForm,
     } = this.props;
 
     const appData = {
-      platformName: selectedApp.platformName,
-      name: selectedApp.name,
-      appId: selectedApp._id,
+      platformName: platformName,
+      name: name,
+      appId: _id,
       metrics: {
         dau: values.dau || null,
         mau: values.mau || null,
         avgTimePerSession: values.avgTimePerSession || null,
-        sessions: values.session || null,
+        sessions: values.sessions || null,
       },
       geos: {
         us: +values.us || null,
@@ -191,11 +187,11 @@ class Info extends Component {
           old: values.old,
         },
       },
-      calculator: {
-        ...admixCalculatorForm,
-      },
       ...values,
     };
+
+    Object.keys(admixCalculatorForm).length > 0 &&
+      (appData.calculator = { ...admixCalculatorForm });
 
     dispatch(updateApp({ appData, accessToken, admintoken }));
   }
@@ -222,38 +218,6 @@ class Info extends Component {
     return show === view;
   }
 
-  renderField(field) {
-    const {
-      input,
-      meta: { error },
-    } = field;
-
-    return (
-      <div className="redux-form-inputs-container">
-        <Input
-          {...input}
-          id={input.name}
-          //    placeholder="App store URL"
-          rootstyle={error ? { borderColor: "red" } : null}
-          icon={
-            <ReactSVG
-              src={
-                input.value === "" ? "" : error ? SVG_checkFail : SVG_tickGreen
-              }
-              className="input-svg-icon"
-            />
-          }
-        />
-
-        <ReactSVG
-          src={SVG_delete}
-          className="input-delete"
-          onClick={this.deleteValue.bind(null, input.name)}
-        />
-      </div>
-    );
-  }
-
   renderExpansionPanel({ panelIcon, panelTitle, fields }) {
     let {
       reduxForm: { infoForm },
@@ -261,15 +225,20 @@ class Info extends Component {
 
     let us = 0,
       uk = 0,
-      eu = 0;
+      eu = 0,
+      male = 0;
 
     if (infoForm) {
       us = infoForm.values.us || us;
       uk = infoForm.values.uk || uk;
       eu = infoForm.values.eu || eu;
+      male = infoForm.values.male || male;
     }
 
     const restOfTheWorld = 100 - (+us + +uk + +eu);
+    const femDem = 100 - male;
+
+    let normalizer;
 
     return (
       <ExpansionPanel
@@ -285,13 +254,39 @@ class Info extends Component {
         <ExpansionPanelDetails>
           <div className="expansionPanelDetails-container">
             {fields.map(field => {
+              normalizer = field.name === "male" ? onlyNums : null;
               return (
                 <div key={field.name}>
-                  {field.name !== "world" && (
-                    <FormTextInput name={field.name} label={field.title} />
+                  {field.name !== "world" && field.name !== "female" && (
+                    <FormTextInput
+                      name={field.name}
+                      label={field.title}
+                      normalize={normalizer}
+                      icon={
+                        <ReactSVG
+                          src={SVG_delete}
+                          className="input-delete"
+                          onClick={this.deleteValue.bind(null, field.name)}
+                        />
+                      }
+                    />
                   )}
 
-                  {field.name === "world" && <div>{restOfTheWorld}</div>}
+                  {field.name === "world" && (
+                    <FormTextInput
+                      name={field.name}
+                      label={field.title}
+                      value={restOfTheWorld}
+                    />
+                  )}
+
+                  {field.name === "female" && (
+                    <FormTextInput
+                      name={field.name}
+                      label={field.title}
+                      value={femDem}
+                    />
+                  )}
                 </div>
               );
             })}
@@ -416,7 +411,17 @@ class Info extends Component {
 
             {show("url") && (
               <div id="info-url">
-                <FormTextInput name="storeurl" label="App store URL" />
+                <FormTextInput
+                  name="storeurl"
+                  label="App store URL"
+                  icon={
+                    <ReactSVG
+                      src={SVG_delete}
+                      className="input-delete"
+                      onClick={this.deleteValue.bind(null, "storeurl")}
+                    />
+                  }
+                />
               </div>
             )}
 
@@ -530,8 +535,8 @@ const mapStateToProps = state => {
 
 const validateForm = values => {
   const errors = {};
-  let { storeurl, us, uk, eu } = values;
-  const numericValues = { us, uk, eu };
+  let { storeurl, us, uk, eu, female } = values;
+  const numericValues = { us, uk, eu, female };
 
   storeurl =
     storeurl && storeurl.indexOf("http") < 0 ? "https://" + storeurl : storeurl;
@@ -554,15 +559,9 @@ const validateForm = values => {
   return errors;
 };
 
-const onSubmitFail = (errors, dispatch) => {
-  const error = errors ? { message: errors.storeurl } : {};
-  dispatch(setAsyncLoading(error));
-};
-
 const formConfig = {
   form: "infoForm",
   validate: validateForm,
-  onSubmitFail,
 };
 
 Info = reduxForm(formConfig)(Info);
