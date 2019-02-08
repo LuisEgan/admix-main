@@ -28,7 +28,12 @@ const getPlacements = (appId, sceneId, accessToken) => async dispatch => {
   }
 };
 
-const getPlacementsAdmin = ({appId, sceneId, accessToken, adminToken}) => async dispatch => {
+const getPlacementsAdmin = ({
+  appId,
+  sceneId,
+  accessToken,
+  adminToken,
+}) => async dispatch => {
   const data = {
     appId,
     sceneId,
@@ -49,13 +54,19 @@ const getPlacementsAdmin = ({appId, sceneId, accessToken, adminToken}) => async 
   }
 };
 
-const getPlacementsByAppId = (appId, accessToken) => async dispatch => {
+const getPlacementsByAppId = ({
+  appId,
+  accessToken,
+  adminToken,
+}) => async dispatch => {
   const data = {
     appId,
   };
 
   try {
-    const res = await api.getPlacements(accessToken, data);
+    const res = adminToken
+      ? await api.getPlacementsAdmin(accessToken, adminToken, data)
+      : await api.getPlacements(accessToken, data);
     if (!res.status) throw res.message;
 
     dispatch({

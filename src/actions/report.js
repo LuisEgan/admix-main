@@ -34,7 +34,7 @@ const getReportData = ({
     dispatch(setAsyncLoading(false));
   } catch (error) {
     console.log("error: ", error);
-    dispatch(setAsyncError(error));
+    // dispatch(setAsyncError(error));
   }
 };
 

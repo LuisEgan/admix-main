@@ -31,7 +31,7 @@ const {
   setUserImgURL,
   setAppsFilterBy,
   getPlacementsByAppId,
-  getPlacementsAdmin,
+  getScenesByAppId,
 } = actions;
 
 class MyApps extends Component {
@@ -161,8 +161,12 @@ class MyApps extends Component {
       appId = Array.isArray(appsIds) ? appsIds[c] : appsIds;
 
       adminToken
-        ? dispatch(getPlacementsAdmin({appId, accessToken, adminToken}))
-        : dispatch(getPlacementsByAppId(appId, accessToken));
+        ? dispatch(getPlacementsByAppId({ appId, accessToken, adminToken }))
+        : dispatch(getPlacementsByAppId({ appId, accessToken }));
+
+      adminToken
+        ? dispatch(getScenesByAppId({ appId, accessToken, adminToken }))
+        : dispatch(getScenesByAppId({ appId, accessToken }));
 
       c++;
     } while (Array.isArray(appsIds) && c < appsIds.length);

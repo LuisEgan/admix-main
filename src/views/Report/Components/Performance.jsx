@@ -3,7 +3,7 @@ import _a from "../../../utils/analytics";
 import PropTypes from "prop-types";
 import routeCodes from "../../../config/routeCodes";
 import Breadcrumbs from "../../../components/Breadcrumbs";
-import { isEqual, cloneDeep } from "lodash";
+import isEqual from "lodash/isEqual";
 import STR from "../../../utils/strFuncs";
 import CSS from "../../../utils/InLineCSS";
 
@@ -53,7 +53,6 @@ export default class Performance extends Component {
       scenesById: {},
       dataToShow: "revenue",
       selectedScenes: [],
-      AllScenesArr: [],
       bgColorsById: {},
     };
 
@@ -130,61 +129,46 @@ export default class Performance extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { dataToShow, updateGraphData } = this.state;
+
     if (dataToShow !== prevState.dataToShow || updateGraphData) {
       this.setGraphsData();
     }
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    const { placementsByAppId, selectedApps } = nextProps;
+    const { placementsById, scenesById, selectedApps } = nextProps;
     let newState = null;
 
     if (
       !isEqual(selectedApps, prevState.selectedApps) ||
-      !isEqual(placementsByAppId, prevState.placementsByAppId)
+      !isEqual(placementsById, prevState.placementsById)
     ) {
-      const scenesById = {};
       const scenesByAppId = {};
       const selectedScenes = [];
-      const selectedAppsScenesById = {};
       const selectedAppsScenes = [];
 
       let pcData;
 
-      for (let placementId in placementsByAppId) {
-        pcData = { ...placementsByAppId[placementId] };
-
-        scenesById[pcData.sceneId._id] = cloneDeep(pcData.sceneId);
+      for (let placementId in placementsById) {
+        pcData = { ...placementsById[placementId] };
 
         scenesByAppId[pcData.appId] = scenesByAppId[pcData.appId] || [];
-        scenesByAppId[pcData.appId].push(cloneDeep(pcData.sceneId));
+        scenesByAppId[pcData.appId].push(pcData.sceneId);
 
-        selectedScenes.indexOf(pcData.sceneName) < 0 &&
-          selectedScenes.push(pcData.sceneName);
-      }
-      const AllScenesArr = cloneDeep(selectedScenes);
-
-      for (let appId in scenesByAppId) {
-        if (selectedApps[appId]) {
-          for (let i = 0; i < scenesByAppId[appId].length; i++) {
-            selectedAppsScenesById[scenesByAppId[appId][i]._id] = cloneDeep(
-              scenesByAppId[appId][i],
-            );
-          }
-        }
+        selectedScenes.indexOf(pcData.sceneId) < 0 &&
+          selectedScenes.push(pcData.sceneId);
       }
 
-      for (let scene in selectedAppsScenesById) {
-        selectedAppsScenes.push(selectedAppsScenesById[scene]);
+      for (let sceneId in scenesById) {
+        selectedAppsScenes.push(scenesById[sceneId]);
       }
 
       newState = {
-        selectedApps: cloneDeep(nextProps.selectedApps),
-        placementsByAppId: cloneDeep(nextProps.placementsByAppId),
+        selectedApps: { ...nextProps.selectedApps },
+        placementsById: { ...nextProps.placementsById },
         updateGraphData: true,
         scenesById,
         selectedScenes,
-        AllScenesArr,
         selectedAppsScenes,
       };
     }
@@ -207,27 +191,30 @@ export default class Performance extends Component {
     const {
       target: { value },
     } = event;
-    let { AllScenesArr, selectedScenes } = this.state;
-    selectedScenes =
-      value.indexOf("all") >= 0
-        ? selectedScenes.length === AllScenesArr.length
-          ? []
-          : AllScenesArr
-        : value;
+    let { selectedAppsScenes, selectedScenes } = this.state;
+    const prevSelectedScenesLength = selectedScenes.length;
+
+    if (value.indexOf("all") >= 0) {
+      selectedScenes = [];
+      if (prevSelectedScenesLength !== selectedAppsScenes.length) {
+        selectedAppsScenes.forEach(scene => {
+          selectedScenes.push(scene._id);
+        });
+      }
+    } else {
+      selectedScenes = value;
+    }
+
     this.setState({ selectedScenes }, () => {
       this.setGraphsData();
     });
   }
 
   setGraphsData() {
-    const { placementsByAppId } = this.props;
-    let {
-      dataToShow,
-      scenesById,
-      selectedScenes,
-      bgColorsById,
-      selectedApps,
-    } = this.state;
+    const { placementsById, scenesById } = this.props;
+    console.log('placementsById: ', placementsById);
+    let { dataToShow, selectedScenes, bgColorsById, selectedApps } = this.state;
+    console.log('selectedScenes: ', selectedScenes);
 
     let appsBgColors = [];
     let appsLabels = [];
@@ -262,11 +249,11 @@ export default class Performance extends Component {
 
             totals[reportKey][byItemId] = totals[reportKey][byItemId] || {};
 
-            totals[reportKey][byItemId][byItemKey] = totals[reportKey][
-              byItemId
-            ][byItemKey]
-              ? totals[reportKey][byItemId] + byItemValue
-              : byItemValue;
+            totals[reportKey][byItemId][byItemKey] =
+              totals[reportKey][byItemId][byItemKey] &&
+              typeof totals[reportKey][byItemId] !== "object"
+                ? totals[reportKey][byItemId] + byItemValue
+                : byItemValue;
           }
         }
       }
@@ -279,7 +266,9 @@ export default class Performance extends Component {
 
     for (let byId in totals) {
       for (let id in totals[byId]) {
-        totals[byId][id].revenue = (totals[byId][id].revenue / 1000).toFixed(2);
+        totals[byId][id].revenue = +(
+          (totals[byId][id].revenue || 0) / 1000
+        ).toFixed(2);
 
         dataToShow = dataToShow === "impressions" ? "impression" : dataToShow;
 
@@ -324,13 +313,15 @@ export default class Performance extends Component {
 
           case "byPlacementId":
             if (
-              placementsByAppId[id] &&
-              selectedScenes.indexOf(placementsByAppId[id].sceneName) > -1
+              placementsById[id] &&
+              selectedScenes.includes(placementsById[id].sceneId)
             ) {
               pcsData.push(valueToPush);
               pcsBgColors.push(bgColor);
 
-              pcLabel = STR.withoutPrefix(placementsByAppId[id].placementName);
+              console.warn('pcLabel: ', pcLabel);
+              console.log('id: ', id);
+              pcLabel = STR.withoutPrefix(placementsById[id].placementName);
               pcsVirginLabels.push(pcLabel);
 
               pcLabel =
@@ -454,7 +445,6 @@ export default class Performance extends Component {
       scenesGraphData,
       pcsGraphData,
       selectedScenes,
-      AllScenesArr,
       selectedAppsScenes,
     } = this.state;
 
@@ -479,13 +469,13 @@ export default class Performance extends Component {
           >
             <MenuItem key={"all"} value={"all"}>
               <Checkbox
-                checked={selectedScenes.length === AllScenesArr.length}
+                checked={selectedScenes.length === selectedAppsScenes.length}
               />
               <ListItemText primary={"Select all scenes"} />
             </MenuItem>
             {selectedAppsScenes.map(scene => (
-              <MenuItem key={scene.name} value={scene.name}>
-                <Checkbox checked={selectedScenes.indexOf(scene.name) > -1} />
+              <MenuItem key={scene._id} value={scene._id}>
+                <Checkbox checked={selectedScenes.indexOf(scene._id) > -1} />
                 <ListItemText primary={scene.name} />
               </MenuItem>
             ))}

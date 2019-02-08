@@ -235,26 +235,27 @@ export default class Overview extends Component {
     const { asyncLoading } = this.props;
     const { selectedApps } = this.state;
 
-    // ! let reportData = this.previousPeriodsTableData();
     const reportData = [];
-
+    let i;
     for (let appId in selectedApps) {
+      i = 0;
       for (let date in selectedApps[appId].reportData.byDate) {
-        reportData.push({
+        let { impression, revenue } = selectedApps[appId].reportData.byDate[
+          date
+        ];
+        impression = isNaN(impression) ? 0 : impression;
+        revenue = isNaN(revenue / 1000) ? 0 : +(revenue / 1000).toFixed(2);
+
+        reportData[i] = reportData[i] || {};
+        reportData[i].impression = reportData[i].impression || 0;
+        reportData[i].revenue = reportData[i].revenue || 0;
+        reportData[i] = {
           date,
-          impression: isNaN(
-            selectedApps[appId].reportData.byDate[date].impression,
-          )
-            ? 0
-            : selectedApps[appId].reportData.byDate[date].impression,
-          revenue: isNaN(
-            selectedApps[appId].reportData.byDate[date].revenue / 1000,
-          )
-            ? 0
-            : (
-                selectedApps[appId].reportData.byDate[date].revenue / 1000
-              ).toFixed(2),
-        });
+          impression: reportData[i].impression + impression,
+          revenue: +(reportData[i].revenue + revenue).toFixed(2),
+        };
+
+        i++;
       }
     }
 

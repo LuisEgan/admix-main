@@ -25,7 +25,7 @@ import WebGLScene from "../WebGLScene";
 
 const { ga } = _a;
 
-const { getPlacementsByAppId } = actions;
+const { getPlacementsByAppId, getScenesByAppId } = actions;
 
 const addDays = function(date, days) {
   var dat = new Date(date);
@@ -92,7 +92,7 @@ class Report extends Component {
       selectedApps: {},
       selectedAppsLength: 0,
       allAppsSelected: false,
-      placementsByAppId: {},
+      placementsById: {},
     };
 
     this.filteredData = this.filteredData.bind(this);
@@ -132,7 +132,7 @@ class Report extends Component {
       show,
       selectedAppsLength,
       quickFilter,
-      placementsByAppId,
+      placementsById,
     } = this.state;
     if (
       from !== nextState.from ||
@@ -141,7 +141,7 @@ class Report extends Component {
       selectedAppsLength !== nextState.selectedAppsLength ||
       show !== nextState.show ||
       quickFilter !== nextState.quickFilter ||
-      !isEqual(placementsByAppId, nextProps.placementsByAppId)
+      !isEqual(placementsById, nextProps.placementsById)
     ) {
       return true;
     }
@@ -149,12 +149,7 @@ class Report extends Component {
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
-    const {
-      apps,
-      reportData,
-      initialReportAppId,
-      placementsByAppId,
-    } = nextProps;
+    const { apps, reportData, initialReportAppId, placementsById } = nextProps;
     const { initialDateSetup } = prevState;
 
     if (Object.keys(reportData).length > 0 && !initialDateSetup) {
@@ -189,7 +184,7 @@ class Report extends Component {
         selectedApps,
         allAppsSelected,
         selectedAppsLength: Object.keys(selectedApps).length,
-        placementsByAppId: cloneDeep(placementsByAppId),
+        placementsById: cloneDeep(placementsById),
 
         initialDateSetup: true,
         from,
@@ -198,9 +193,9 @@ class Report extends Component {
       };
     }
 
-    if (!isEqual(placementsByAppId, prevState.placementsByAppId)) {
+    if (!isEqual(placementsById, prevState.placementsById)) {
       return {
-        placementsByAppId: cloneDeep(placementsByAppId),
+        placementsById: { ...placementsById },
       };
     }
 
@@ -567,7 +562,7 @@ class Report extends Component {
 
   changeAppSelection(appId, e) {
     let { userApps, selectedApps, allAppsSelected, from, to } = this.state;
-    const { accessToken, dispatch, reportData } = this.props;
+    const { accessToken, adminToken, dispatch, reportData } = this.props;
     appId = e.target.value || appId;
 
     const _aAction =
@@ -629,8 +624,11 @@ class Report extends Component {
         },
         () => {
           if (getNewPcs) {
-            for (let appId in userApps) {
-              dispatch(getPlacementsByAppId(appId, accessToken));
+            for (let appId in selectedApps) {
+              dispatch(
+                getPlacementsByAppId({ appId, accessToken, adminToken }),
+              );
+              dispatch(getScenesByAppId({ appId, accessToken, adminToken }));
             }
           }
         },

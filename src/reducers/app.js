@@ -11,6 +11,7 @@ import {
   SET_PLACEMENT,
   SET_PLACEMENTS,
   SET_PLACEMENTS_BY_ID,
+  SET_SCENES_BY_ID,
   SAVE_INPUTS,
   RESET_SAVED_INPUTS,
   TOGGLE_APP_STATUS,
@@ -34,14 +35,15 @@ const initialState = {
   userData: {},
   apps: [],
   selectedApp: {},
-  placementsByAppId: {},
+  placementsById: {},
+  scenesById: {},
   savedApps: [],
   savedInputs: [],
   reportData: {},
   initialReportAppId: [],
   userImgURL: "",
   appsFilterBy: [],
-  loadedScenesByAppId: null,
+  loadedScenesById: null,
 };
 
 const actionsMap = {
@@ -116,8 +118,9 @@ const actionsMap = {
 
   [RESET_SELECTED_APP]: state => {
     const selectedApp = {};
-    const placementsByAppId = {};
-    return { ...state, selectedApp, placementsByAppId };
+    const placementsById = {};
+    const scenesById = {};
+    return { ...state, selectedApp, placementsById, scenesById };
   },
   [SAVE_APP]: (state, { app }) => {
     let savedApps = [...state.savedApps];
@@ -231,17 +234,27 @@ const actionsMap = {
   },
 
   [SET_PLACEMENTS_BY_ID]: (state, data) => {
-    let placementsByAppId = { ...state.placementsByAppId };
+    let placementsById = { ...state.placementsById };
     const placements = Array.isArray(data.data.data) ? [...data.data.data] : [];
-    let newPcsById = placements.length > 0 ? { ...placementsByAppId } : {};
 
     placements &&
       placements.forEach(placement => {
-        newPcsById[placement._id] = { ...placement };
-        delete newPcsById[placement._id]._id;
+        placementsById[placement._id] = { ...placement };
       });
 
-    return { ...state, placementsByAppId: newPcsById };
+    return { ...state, placementsById };
+  },
+
+  [SET_SCENES_BY_ID]: (state, data) => {
+    let scenesById = { ...state.scenesById };
+    const scenes = Array.isArray(data.data.data) ? [...data.data.data] : [];
+
+    scenes &&
+      scenes.forEach(scene => {
+        scenesById[scene._id] = { ...scene };
+      });
+
+    return { ...state, scenesById };
   },
 
   [SAVE_INPUTS]: (state, { toSaveInputs }) => {
@@ -341,11 +354,11 @@ const actionsMap = {
   },
 
   [SET_LOADED_SCENE]: (state, data) => {
-    let loadedScenesByAppId = state.loadedScenesByAppId || {};
+    let loadedScenesById = state.loadedScenesById || {};
 
-    loadedScenesByAppId[data.loadedScene.appId] = { ...data.loadedScene };
+    loadedScenesById[data.loadedScene.appId] = { ...data.loadedScene };
 
-    return { ...state, loadedScenesByAppId };
+    return { ...state, loadedScenesById };
   },
 };
 

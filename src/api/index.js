@@ -217,6 +217,24 @@ const getScenes = async (accessToken, appId) => {
   }
 };
 
+const getScenesAdmin = async (accessToken, adminToken, appId) => {
+  try {
+    const res = await fetch(`${dns}/api/v2/scenes/${appId}`, {
+      method: "GET",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "x-access-token": accessToken,
+        "x-admin-token": adminToken,
+      }),
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ getScenes: ", error);
+  }
+};
+
+
 // ************ //
 // * PLACEMENTS
 // ************ //
@@ -409,6 +427,7 @@ export default {
   getUserData,
   toggleAppStatus,
   getScenes,
+  getScenesAdmin,
   getPlacements,
   getPlacementsAdmin,
   updatePlacements,
