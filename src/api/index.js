@@ -1,8 +1,9 @@
 import qs from "qs";
 
-const isProd = process.env.NODE_ENV !== "development";
+const onTestServer = window.location.host.includes("3001");
+const isProd = process.env.NODE_ENV !== "development" && !onTestServer;
 
-const dns = isProd ? "https://api.admix.in" : "http://localhost:3000";
+const dns = isProd ? "https://api.admix.in" : onTestServer ? "http://test.api.admix.in" : "http://localhost:3000";
 !isProd && console.warn("dns: ", dns);
 
 // ************ //
