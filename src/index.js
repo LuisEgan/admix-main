@@ -17,52 +17,52 @@ import App from "./views/App";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
-   faStroopwafel,
-   faPen,
-   faAngleUp,
-   faUniversity,
-   faMousePointer,
-   faMinusSquare,
-   faGamepad,
-   faEye,
-   faGlobeAmericas,
-   faUsers,
-   faArrowDown,
-   faArrowUp,
-   faBuilding
+  faStroopwafel,
+  faPen,
+  faAngleUp,
+  faUniversity,
+  faMousePointer,
+  faMinusSquare,
+  faGamepad,
+  faEye,
+  faGlobeAmericas,
+  faUsers,
+  faArrowDown,
+  faArrowUp,
+  faBuilding,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
-   faStroopwafel,
-   faPen,
-   faAngleUp,
-   faUniversity,
-   faMousePointer,
-   faMinusSquare,
-   faGamepad,
-   faEye,
-   faGlobeAmericas,
-   faUsers,
-   faArrowDown,
-   faArrowUp,
-   faBuilding
+  faStroopwafel,
+  faPen,
+  faAngleUp,
+  faUniversity,
+  faMousePointer,
+  faMinusSquare,
+  faGamepad,
+  faEye,
+  faGlobeAmericas,
+  faUsers,
+  faArrowDown,
+  faArrowUp,
+  faBuilding,
 );
 
 const { persistor, store } = configureStore();
 
 const render = Component => {
-   ReactDOM.render(
-      <Provider store={store}>
-         <PersistGate persistor={persistor}>
-            <BrowserRouter>
-               <LastLocationProvider>
-                  <Component />
-               </LastLocationProvider>
-            </BrowserRouter>
-         </PersistGate>
-      </Provider>,
-      document.getElementById("root")
-   );
+  ReactDOM.render(
+    <Provider store={store}>
+      <PersistGate persistor={persistor}>
+        <BrowserRouter>
+          <LastLocationProvider>
+            <Component />
+          </LastLocationProvider>
+        </BrowserRouter>
+      </PersistGate>
+    </Provider>,
+    document.getElementById("root"),
+  );
 };
 
 // Render app

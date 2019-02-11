@@ -3,7 +3,7 @@ import {
   ASYNC_ERROR,
   ASYNC_MESSAGE,
   RESET_ASYNC,
-  TOGGLE_SNACKBAR
+  TOGGLE_SNACKBAR,
 } from "../actions/asyncActions";
 import C from "../utils/constants";
 
