@@ -453,12 +453,21 @@ export default class Overview extends Component {
     const revenueData = [];
     const impressionData = [];
 
-    const uniqueDatesArr = [];
+    let uniqueDatesArr = [];
     for (let date in uniqueDates) {
       uniqueDatesArr.push(date);
     }
 
-    uniqueDatesArr.sort().forEach(date => {
+    uniqueDatesArr = uniqueDatesArr.sort();
+    const sortedByDate = [];
+
+    for (let i = 2018; i <= new Date().getFullYear(); i++) {
+      uniqueDatesArr.forEach(date => {
+        if (date.includes(i)) sortedByDate.push(date);
+      });
+    }
+
+    sortedByDate.forEach(date => {
       labels.push(this.formatDate(date));
 
       if (totalByDate.revenue[date]) {
