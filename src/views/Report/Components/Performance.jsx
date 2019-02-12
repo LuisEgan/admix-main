@@ -212,9 +212,7 @@ export default class Performance extends Component {
 
   setGraphsData() {
     const { placementsById, scenesById } = this.props;
-    console.log('placementsById: ', placementsById);
     let { dataToShow, selectedScenes, bgColorsById, selectedApps } = this.state;
-    console.log('selectedScenes: ', selectedScenes);
 
     let appsBgColors = [];
     let appsLabels = [];
@@ -319,8 +317,6 @@ export default class Performance extends Component {
               pcsData.push(valueToPush);
               pcsBgColors.push(bgColor);
 
-              console.warn('pcLabel: ', pcLabel);
-              console.log('id: ', id);
               pcLabel = STR.withoutPrefix(placementsById[id].placementName);
               pcsVirginLabels.push(pcLabel);
 

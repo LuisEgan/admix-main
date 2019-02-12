@@ -105,7 +105,6 @@ class Profile extends Component {
       name: userName,
       company: { ...companyInfo },
     };
-    console.log('update: ', update);
 
     delete values.email;
     delete values.password;
