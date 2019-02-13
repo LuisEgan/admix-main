@@ -23,6 +23,8 @@ import {
   SNACKBAR_TOGGLE,
   SET_APPS_FILTER_BY,
   SET_LOADED_SCENE,
+  UNSET_PLACEMENTS_BY_ID,
+  UNSET_SCENES_BY_ID,
 } from "../actions/actions";
 
 const initialState = {
@@ -245,6 +247,19 @@ const actionsMap = {
     return { ...state, placementsById };
   },
 
+  [UNSET_PLACEMENTS_BY_ID]: (state, { appId }) => {
+    const { placementsById } = state;
+
+    for (let pcId in placementsById) {
+      const pc = placementsById[pcId];
+      if (pc.appId === appId) {
+        delete placementsById[pcId];
+      }
+    }
+
+    return { ...state, placementsById };
+  },
+
   [SET_SCENES_BY_ID]: (state, data) => {
     let scenesById = { ...state.scenesById };
     const scenes = Array.isArray(data.data.data) ? [...data.data.data] : [];
@@ -253,6 +268,19 @@ const actionsMap = {
       scenes.forEach(scene => {
         scenesById[scene._id] = { ...scene };
       });
+
+    return { ...state, scenesById };
+  },
+
+  [UNSET_SCENES_BY_ID]: (state, { appId }) => {
+    const { scenesById } = state;
+
+    for (let pcId in scenesById) {
+      const pc = scenesById[pcId];
+      if (pc.appId === appId) {
+        delete scenesById[pcId];
+      }
+    }
 
     return { ...state, scenesById };
   },

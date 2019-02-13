@@ -7,6 +7,7 @@ import Breadcrumbs from "../../../components/Breadcrumbs";
 import SVG from "../../../components/SVG";
 import { isEqual } from "lodash";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import STR from "../../../utils/strFuncs";
 
 const _a_location = routeCodes.REPORT;
 
@@ -459,16 +460,9 @@ export default class Overview extends Component {
       uniqueDatesArr.push(date);
     }
 
-    uniqueDatesArr = uniqueDatesArr.sort();
-    const sortedByDate = [];
+    uniqueDatesArr = STR.arrangeArrByDate(uniqueDatesArr);
 
-    for (let i = 2018; i <= new Date().getFullYear(); i++) {
-      uniqueDatesArr.forEach(date => {
-        if (date.includes(i)) sortedByDate.push(date);
-      });
-    }
-
-    sortedByDate.forEach(date => {
+    uniqueDatesArr.forEach(date => {
       labels.push(this.formatDate(date));
 
       if (totalByDate.revenue[date]) {
@@ -570,6 +564,7 @@ export default class Overview extends Component {
   }
 
   render() {
+    const { asyncLoading } = this.props;
     const { overviewData } = this.state;
 
     return (
@@ -579,36 +574,42 @@ export default class Overview extends Component {
           <span className="st">Overview</span>
         </div>
 
-        <div id="overview-data">
-          <div>
-            <div>{overviewData.impression}</div>
-            <span>Impressions</span>
-          </div>
-          <div>
-            <div>€ {overviewData.revenue}</div>
-            <span>Net Revenue</span>
-          </div>
-          <div>
-            <div>{overviewData.impressionUnique}</div>
-            <span>Uniques</span>
-          </div>
-          <div>
-            <div>{overviewData.fillRate}%</div>
-            <span>Fill rate</span>
-          </div>
-          <div>
-            <div>€ {overviewData.RPM}</div>
-            <span>RPM</span>
-          </div>
-        </div>
+        {asyncLoading && SVG.AdmixLoading({ loadingText: "Loading" })}
 
-        <div id="overview-graph">
-          <div className="graph">{this.renderGraph()}</div>
-        </div>
+        {!asyncLoading && (
+          <React.Fragment>
+            <div id="overview-data">
+              <div>
+                <div>{overviewData.impression}</div>
+                <span>Impressions</span>
+              </div>
+              <div>
+                <div>€ {overviewData.revenue}</div>
+                <span>Net Revenue</span>
+              </div>
+              <div>
+                <div>{overviewData.impressionUnique}</div>
+                <span>Uniques</span>
+              </div>
+              <div>
+                <div>{overviewData.fillRate}%</div>
+                <span>Fill rate</span>
+              </div>
+              <div>
+                <div>€ {overviewData.RPM}</div>
+                <span>RPM</span>
+              </div>
+            </div>
 
-        <div id="overview-graph-table">{this.renderGraphDataTable()}</div>
+            <div id="overview-graph">
+              <div className="graph">{this.renderGraph()}</div>
+            </div>
 
-        <div id="overview-table">{this.renderPreviousPeriodsTable()}</div>
+            <div id="overview-graph-table">{this.renderGraphDataTable()}</div>
+
+            <div id="overview-table">{this.renderPreviousPeriodsTable()}</div>
+          </React.Fragment>
+        )}
       </div>
     );
   }

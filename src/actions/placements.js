@@ -4,7 +4,12 @@ import {
   setAsyncLoading,
   setAsyncMessage,
 } from "./asyncActions";
-import { SET_PLACEMENTS, SET_PLACEMENTS_BY_ID, APPS_SUCCESS } from "./actions";
+import {
+  SET_PLACEMENTS,
+  SET_PLACEMENTS_BY_ID,
+  APPS_SUCCESS,
+  UNSET_PLACEMENTS_BY_ID,
+} from "./actions";
 import C from "../utils/constants";
 
 const getPlacements = (appId, sceneId, accessToken) => async dispatch => {
@@ -58,7 +63,9 @@ const getPlacementsByAppId = ({
   appId,
   accessToken,
   adminToken,
+  noSetAsync,
 }) => async dispatch => {
+  !noSetAsync && dispatch(setAsyncLoading(true));
   const data = {
     appId,
   };
@@ -73,7 +80,7 @@ const getPlacementsByAppId = ({
       type: SET_PLACEMENTS_BY_ID,
       data: res,
     });
-    dispatch(setAsyncLoading(false));
+    !noSetAsync && dispatch(setAsyncLoading(false));
   } catch (error) {
     console.log("error: ", error);
     dispatch(setAsyncError(error));
@@ -110,9 +117,17 @@ const updatePlacements = ({
   }
 };
 
+const unsetPlacementByAppId = ({ appId }) => dispatch => {
+  dispatch({
+    type: UNSET_PLACEMENTS_BY_ID,
+    appId,
+  });
+};
+
 export default {
   getPlacements,
   getPlacementsAdmin,
   getPlacementsByAppId,
   updatePlacements,
+  unsetPlacementByAppId
 };

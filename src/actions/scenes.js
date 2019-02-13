@@ -1,6 +1,6 @@
 import api from "../api";
 import { setAsyncError, setAsyncLoading } from "./asyncActions";
-import { SELECT_APP, SET_SCENES_BY_ID } from "./actions";
+import { SELECT_APP, SET_SCENES_BY_ID, UNSET_SCENES_BY_ID } from "./actions";
 
 const getScenes = (appId, accessToken) => async dispatch => {
   dispatch(setAsyncLoading(true));
@@ -24,8 +24,9 @@ const getScenesByAppId = ({
   appId,
   accessToken,
   adminToken,
+  noSetAsync,
 }) => async dispatch => {
-  dispatch(setAsyncLoading(true));
+  !noSetAsync && dispatch(setAsyncLoading(true));
 
   try {
     const res = adminToken
@@ -37,13 +38,23 @@ const getScenesByAppId = ({
       data: res,
     });
 
+    !noSetAsync && dispatch(setAsyncLoading(false));
   } catch (error) {
     console.log("error: ", error);
     dispatch(setAsyncError(error));
   }
 };
 
+const unsetScenesByAppId = ({ appId }) => dispatch => {
+  dispatch({
+    type: UNSET_SCENES_BY_ID,
+    appId,
+  });
+};
+
+
 export default {
   getScenes,
   getScenesByAppId,
+  unsetScenesByAppId
 };

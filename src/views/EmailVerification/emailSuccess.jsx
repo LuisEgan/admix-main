@@ -14,6 +14,7 @@ export default class Congratulations extends Component {
             height="1"
             width="1"
             style={{ display: "none" }}
+            alt="fb"
           />
         </noscript>
         <div className="container simple-container">

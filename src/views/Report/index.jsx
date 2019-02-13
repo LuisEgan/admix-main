@@ -16,6 +16,7 @@ import Select from "@material-ui/core/Select";
 import { KeyboardArrowDown, KeyboardArrowRight } from "@material-ui/icons";
 
 import CSS from "../../utils/InLineCSS";
+import STR from "../../utils/strFuncs";
 
 import Overview from "./Components/Overview";
 import Performance from "./Components/Performance";
@@ -25,7 +26,12 @@ import WebGLScene from "../WebGLScene";
 
 const { ga } = _a;
 
-const { getPlacementsByAppId, getScenesByAppId } = actions;
+const {
+  getPlacementsByAppId,
+  getScenesByAppId,
+  unsetPlacementByAppId,
+  unsetScenesByAppId,
+} = actions;
 
 const addDays = function(date, days) {
   var dat = new Date(date);
@@ -82,7 +88,7 @@ class Report extends Component {
       to: new Date(),
       initialDateSetup: false,
       quickFilterFirstClick: true,
-      quickFilter: "l",
+      quickFilter: "",
       doLoadScene: false,
       isSceneLoaded: false,
       isLoadingScene: false,
@@ -121,10 +127,10 @@ class Report extends Component {
 
   componentDidMount() {
     document.getElementById("report-content").scrollTop = 0;
-    this.quickFilter("l");
   }
 
   shouldComponentUpdate(nextProps, nextState, nextContext) {
+    const { asyncLoading } = this.props;
     const {
       from,
       to,
@@ -141,7 +147,8 @@ class Report extends Component {
       selectedAppsLength !== nextState.selectedAppsLength ||
       show !== nextState.show ||
       quickFilter !== nextState.quickFilter ||
-      !isEqual(placementsById, nextProps.placementsById)
+      !isEqual(placementsById, nextProps.placementsById) ||
+      asyncLoading !== nextProps.asyncLoading
     ) {
       return true;
     }
@@ -153,9 +160,9 @@ class Report extends Component {
     const { initialDateSetup } = prevState;
 
     if (Object.keys(reportData).length > 0 && !initialDateSetup) {
-      const keys = Object.keys(reportData).sort();
-      const first = keys[0];
-      const from = new Date(first);
+      const lastWeek = new Date();
+      lastWeek.setDate(lastWeek.getDate() - 6);
+      const from = lastWeek;
       const to = new Date();
       const selectedApps = {};
       let allAppsSelected = false;
@@ -545,7 +552,7 @@ class Report extends Component {
         to = today;
         break;
       case "a":
-        const keys = Object.keys(reportData).sort();
+        const keys = STR.arrangeArrByDate(Object.keys(reportData).sort());
         const first = keys[0];
         from = first ? new Date(first) : new Date();
         to = today;
@@ -584,6 +591,8 @@ class Report extends Component {
       if (appId !== "all") {
         if (selectedApps[appId]) {
           delete selectedApps[appId];
+          dispatch(unsetPlacementByAppId({ appId }));
+          dispatch(unsetScenesByAppId({ appId }));
         } else {
           getNewPcs = true;
           selectedApps[appId] = {};
@@ -820,16 +829,11 @@ class Report extends Component {
 }
 
 const mapStateToProps = state => {
-  const {
-    app,
-    async: { asyncMessage, asyncError, asyncLoading },
-  } = state;
+  const { app, async } = state;
 
   return {
     ...app,
-    asyncMessage,
-    asyncError,
-    asyncLoading,
+    ...async,
   };
 };
 

@@ -1,5 +1,5 @@
 import api from "../api";
-import { setAsyncError, setAsyncLoading } from "./asyncActions";
+import { setAsyncLoading } from "./asyncActions";
 import { REPORT_DATA, SET_INITIAL_REPORT_APP } from "./actions";
 
 const getReportData = ({
@@ -7,6 +7,7 @@ const getReportData = ({
   accessToken,
   publisherId,
 }) => async dispatch => {
+  dispatch(setAsyncLoading(true));
   const currentDate = new Date();
 
   const data = {
@@ -34,7 +35,7 @@ const getReportData = ({
     dispatch(setAsyncLoading(false));
   } catch (error) {
     console.log("error: ", error);
-    // dispatch(setAsyncError(error));
+    dispatch(setAsyncLoading(false));
   }
 };
 

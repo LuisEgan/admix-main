@@ -67,6 +67,18 @@ const randomArrayValue = array => {
   return array[Math.floor(Math.random() * array.length)];
 };
 
+const arrangeArrByDate = array => {
+  const sortedByDate = [];
+
+  for (let i = 2018; i <= new Date().getFullYear(); i++) {
+    array.forEach(date => {
+      if (date.includes(i)) sortedByDate.push(date);
+    });
+  }
+
+  return sortedByDate;
+};
+
 export default {
   isAtleast,
   hasLetter,
@@ -82,4 +94,5 @@ export default {
   parsePathName,
   appStateToNumber,
   randomArrayValue,
+  arrangeArrByDate,
 };
