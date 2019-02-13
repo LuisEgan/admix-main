@@ -160,29 +160,30 @@ class MyApps extends Component {
     do {
       appId = Array.isArray(appsIds) ? appsIds[c] : appsIds;
 
-      adminToken
-        ? dispatch(
-            getPlacementsByAppId({
-              appId,
-              accessToken,
-              adminToken,
-              noSetAsync: true,
-            }),
-          )
-        : dispatch(
-            getPlacementsByAppId({ appId, accessToken, noSetAsync: true }),
-          );
+      if (adminToken) {
+        dispatch(
+          getPlacementsByAppId({
+            appId,
+            accessToken,
+            adminToken,
+            noSetAsync: true,
+          }),
+        );
 
-      adminToken
-        ? dispatch(
-            getScenesByAppId({
-              appId,
-              accessToken,
-              adminToken,
-              noSetAsync: true,
-            }),
-          )
-        : dispatch(getScenesByAppId({ appId, accessToken, noSetAsync: true }));
+        dispatch(
+          getScenesByAppId({
+            appId,
+            accessToken,
+            adminToken,
+            noSetAsync: true,
+          }),
+        );
+      } else {
+        dispatch(
+          getPlacementsByAppId({ appId, accessToken, noSetAsync: true }),
+        );
+        dispatch(getScenesByAppId({ appId, accessToken, noSetAsync: true }));
+      }
 
       c++;
     } while (Array.isArray(appsIds) && c < appsIds.length);

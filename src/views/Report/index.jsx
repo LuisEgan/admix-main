@@ -145,6 +145,7 @@ class Report extends Component {
       to !== nextState.to ||
       Object.keys(selectedApps).length === 0 ||
       selectedAppsLength !== nextState.selectedAppsLength ||
+      !isEqual(selectedApps, nextState.selectedApps) ||
       show !== nextState.show ||
       quickFilter !== nextState.quickFilter ||
       !isEqual(placementsById, nextProps.placementsById) ||
@@ -157,9 +158,10 @@ class Report extends Component {
 
   static getDerivedStateFromProps(nextProps, prevState) {
     const { apps, reportData, initialReportAppId, placementsById } = nextProps;
+    console.log('reportData: ', reportData);
     const { initialDateSetup } = prevState;
 
-    if (Object.keys(reportData).length > 0 && !initialDateSetup) {
+    if (!initialDateSetup) {
       const lastWeek = new Date();
       lastWeek.setDate(lastWeek.getDate() - 6);
       const from = lastWeek;
@@ -171,6 +173,7 @@ class Report extends Component {
       apps.forEach(app => {
         userApps[app._id] = app.name;
       });
+      console.log('userApps: ', userApps);
 
       initialReportAppId.forEach(appId => {
         selectedApps[appId] = {};
