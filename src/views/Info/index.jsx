@@ -8,6 +8,7 @@ import actions from "../../actions";
 import PropTypes from "prop-types";
 import validate from "validate.js";
 import FormTextInput from "../../components/formInputs/FormTextInput";
+import isEqual from "lodash/isEqual";
 
 import Breadcrumbs from "../../components/Breadcrumbs";
 import PanelFooter from "../../components/PanelFooter";
@@ -138,6 +139,14 @@ class Info extends Component {
     this.handleDelete = this.handleDelete.bind(this);
     this.show = this.show.bind(this);
     this.renderExpansionPanel = this.renderExpansionPanel.bind(this);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { initialize, initialValues } = this.props;
+
+    if (!isEqual(initialValues, prevProps.initialValues)) {
+      initialize({ ...initialValues });
+    }
   }
 
   changeView(view) {
