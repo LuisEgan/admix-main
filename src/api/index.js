@@ -5,6 +5,7 @@ const isProd = process.env.NODE_ENV === "production" && !onTestServer;
 
 const dns = isProd ? "https://api.admix.in" : onTestServer ? "http://test.api.admix.in" : "http://localhost:3000";
 // const dns = "https://api.admix.in";
+// const dns = "http://localhost:3000";
 
 !isProd && console.warn("dns: ", dns);
 

@@ -31,6 +31,7 @@ class SnackBar extends Component {
 
   render() {
     let { isSnackBarOpen, asyncMessage, asyncError, isLoggedIn } = this.props;
+    console.log('asyncMessage: ', asyncMessage);
     let { smiley } = this.state;
 
     let snackbarClass = "";
@@ -48,7 +49,7 @@ class SnackBar extends Component {
           vertical: "bottom",
           horizontal: "right",
         }}
-        open={isLoggedIn ? asyncMessage !== "" && isSnackBarOpen : false}
+        open={isLoggedIn ? asyncMessage && isSnackBarOpen : false}
         autoHideDuration={5000}
         onClose={this.handleClose}
         ContentProps={{

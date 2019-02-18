@@ -172,7 +172,6 @@ class Report extends Component {
       apps.forEach(app => {
         userApps[app._id] = app.name;
       });
-      console.log("userApps: ", userApps);
 
       initialReportAppId.forEach(appId => {
         selectedApps[appId] = {};
