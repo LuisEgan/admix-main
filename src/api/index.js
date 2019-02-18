@@ -4,6 +4,8 @@ const onTestServer = window.location.host.includes("test");
 const isProd = process.env.NODE_ENV === "production" && !onTestServer;
 
 const dns = isProd ? "https://api.admix.in" : onTestServer ? "http://test.api.admix.in" : "http://localhost:3000";
+// const dns = "https://api.admix.in";
+
 !isProd && console.warn("dns: ", dns);
 
 // ************ //
@@ -234,7 +236,6 @@ const getScenesAdmin = async (accessToken, adminToken, appId) => {
     console.error("API ERROR @ getScenes: ", error);
   }
 };
-
 
 // ************ //
 // * PLACEMENTS

@@ -158,10 +158,9 @@ class Report extends Component {
 
   static getDerivedStateFromProps(nextProps, prevState) {
     const { apps, reportData, initialReportAppId, placementsById } = nextProps;
-    console.log('reportData: ', reportData);
     const { initialDateSetup } = prevState;
 
-    if (!initialDateSetup) {
+    if (Object.keys(reportData).length && !initialDateSetup) {
       const lastWeek = new Date();
       lastWeek.setDate(lastWeek.getDate() - 6);
       const from = lastWeek;
@@ -173,7 +172,7 @@ class Report extends Component {
       apps.forEach(app => {
         userApps[app._id] = app.name;
       });
-      console.log('userApps: ', userApps);
+      console.log("userApps: ", userApps);
 
       initialReportAppId.forEach(appId => {
         selectedApps[appId] = {};

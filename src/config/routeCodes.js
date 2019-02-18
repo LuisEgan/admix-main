@@ -15,4 +15,5 @@ export default {
   CHANGE_EMAIL: `${publicPath}changeEmail`,
   EMAIL_SUCCESS: `${publicPath}emailSuccess`,
   EMAIL_FAILURE: `${publicPath}emailFailure`,
+  APP_ACTIVATION: `${publicPath}appActivation`,
 };

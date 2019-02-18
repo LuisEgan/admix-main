@@ -21,7 +21,7 @@ class Download extends Component {
 
     const { updateUser, userData, accessToken } = this.props;
 
-    updateUser(userData._id, { status: 2 }, accessToken);
+    updateUser({userId: userData._id, newData: { status: 2 }, accessToken});
   }
 
   render() {
@@ -120,8 +120,8 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => ({
-  updateUser: (userId, update, accessToken) =>
-    dispatch(updateUser(userId, update, accessToken)),
+  updateUser: ({userId, update, accessToken}) =>
+    dispatch(updateUser({userId, update, accessToken, noSetAsync: true})),
 });
 
 export default connect(

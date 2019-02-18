@@ -148,7 +148,7 @@ class Profile extends Component {
       }
     }
 
-    dispatch(updateUser(userData._id, update, accessToken));
+    dispatch(updateUser({userId: userData._id, newData: update, accessToken}));
   };
 
   onImageDrop(files) {

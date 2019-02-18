@@ -48,7 +48,7 @@ class SnackBar extends Component {
           vertical: "bottom",
           horizontal: "right",
         }}
-        open={isLoggedIn ? isSnackBarOpen : false}
+        open={isLoggedIn ? asyncMessage !== "" && isSnackBarOpen : false}
         autoHideDuration={5000}
         onClose={this.handleClose}
         ContentProps={{

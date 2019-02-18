@@ -19,7 +19,7 @@ const getUserData = accessToken => async dispatch => {
   }
 };
 
-const updateUser = (userId, newData, accessToken) => async dispatch => {
+const updateUser = ({userId, newData, accessToken, noSetAsync}) => async dispatch => {
   dispatch(setAsyncLoading(true));
   const body = {
     userId,
@@ -36,7 +36,7 @@ const updateUser = (userId, newData, accessToken) => async dispatch => {
     });
 
     dispatch(getUserData(accessToken));
-    dispatch(setAsyncMessage(C.SUCCESS.userUpdate));
+    !noSetAsync && dispatch(setAsyncMessage(C.SUCCESS.userUpdate));
     dispatch(setAsyncLoading(false));
   } catch (error) {
     console.log("error: ", error);

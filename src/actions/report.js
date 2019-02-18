@@ -2,7 +2,7 @@ import api from "../api";
 import { setAsyncLoading } from "./asyncActions";
 import { REPORT_DATA, SET_INITIAL_REPORT_APP } from "./actions";
 
-const   getReportData = ({
+const getReportData = ({
   appsIds,
   accessToken,
   publisherId,

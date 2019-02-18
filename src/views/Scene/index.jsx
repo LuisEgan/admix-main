@@ -52,6 +52,7 @@ class Scene extends Component {
     super(props);
 
     this.state = {
+      defaultSceneSelected: false,
       appDidUpdate: false,
       showControls: true,
       displayMode: "raw",
@@ -142,29 +143,6 @@ class Scene extends Component {
   }
 
   componentDidMount() {
-    // this.Panels = this.Panels.getWrappedInstance();
-    const { selectedApp } = this.props;
-    selectedApp.scenes = selectedApp.scenes || [];
-
-    let scene1Timestamp, scene2Timestamp, closestToToday;
-
-    const sceneToDisplay =
-      selectedApp.scenes.length > 0
-        ? selectedApp.scenes.reduce((scene1, scene2) => {
-            scene1Timestamp = new Date(
-              scene1.updatedAt || scene1.createdAt || 0,
-            );
-            scene2Timestamp = new Date(
-              scene2.updatedAt || scene2.createdAt || 0,
-            );
-
-            closestToToday =
-              scene1Timestamp > scene2Timestamp ? { ...scene1 } : { ...scene2 };
-
-            return closestToToday;
-          }) || selectedApp.scenes[0]
-        : {};
-
     const { THREE } = window;
 
     // POST-PROCESSING
@@ -175,9 +153,38 @@ class Scene extends Component {
     this.selectedObjects = [];
 
     this.intersected = null;
-
-    this.MenuPanel.sceneChange(sceneToDisplay.name || {});
   }
+
+  componentDidUpdate = (prevProps, prevState) => {
+    const { selectedApp } = this.props;
+    selectedApp.scenes = selectedApp.scenes || [];
+
+    if (selectedApp.scenes.length && !prevState.defaultSceneSelected) {
+      this.setState({ defaultSceneSelected: true }, () => {
+        let scene1Timestamp, scene2Timestamp, closestToToday;
+
+        const sceneToDisplay =
+          selectedApp.scenes.length > 0
+            ? selectedApp.scenes.reduce((scene1, scene2) => {
+                scene1Timestamp = new Date(
+                  scene1.updatedAt || scene1.createdAt || 0,
+                );
+                scene2Timestamp = new Date(
+                  scene2.updatedAt || scene2.createdAt || 0,
+                );
+
+                closestToToday =
+                  scene1Timestamp > scene2Timestamp
+                    ? { ...scene1 }
+                    : { ...scene2 };
+
+                return closestToToday;
+              }) || selectedApp.scenes[0]
+            : {};
+        this.MenuPanel.sceneChange(sceneToDisplay.name || {});
+      });
+    }
+  };
 
   componentWillUnmount() {
     const { sceneMounted } = this.state;
@@ -243,8 +250,6 @@ class Scene extends Component {
         return false;
       });
 
-      // console.log("UPDATE ALL");
-      // console.log('NEW selectedApp: ', selectedApp);
       return {
         initialSet: !emptyPlacements,
         selectedApp,

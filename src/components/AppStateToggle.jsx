@@ -322,7 +322,7 @@ const mapDispatchToProps = dispacth => {
     toggleAppStatus: (appDetails, accessToken) =>
       dispacth(toggleAppStatus(appDetails, accessToken)),
     updateUserStatus: (userId, accessToken) =>
-      dispacth(updateUser(userId, { status: 4 }, accessToken)),
+      dispacth(updateUser({userId, newData: { status: 4 }, accessToken, noSetAsync: true})),
   };
 };
 
