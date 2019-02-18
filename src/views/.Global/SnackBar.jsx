@@ -31,7 +31,6 @@ class SnackBar extends Component {
 
   render() {
     let { isSnackBarOpen, asyncMessage, asyncError, isLoggedIn } = this.props;
-    console.log('asyncMessage: ', asyncMessage);
     let { smiley } = this.state;
 
     let snackbarClass = "";
