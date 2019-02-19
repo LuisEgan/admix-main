@@ -2,9 +2,6 @@
 private:
 rm -R build.live/ && mv build/ build.live && pm2 restart frontend-private-server.js
 
-newui:
-rm -R build.live/ && mv build/ build.live && pm2 restart frontend-newui-server.js
-
 
 ------ PROD -------
 rm -R build.backup/ && mv build.live/ build.backup && mv build build.live && pm2 restart frontend-public-server.js

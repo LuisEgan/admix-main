@@ -4,21 +4,7 @@ import { Redirect, NavLink } from "react-router-dom";
 import routeCodes from "../../config/routeCodes";
 import _a from "../../utils/analytics";
 import PropTypes from "prop-types";
-import {
-  getApps,
-  getUserData,
-  selectApp,
-  updateUser,
-  toggleAppStatus,
-  getReportData,
-  setInitialReportApp,
-  resetSavedInputs,
-  resetSelectedApp,
-  setUserImgURL,
-  setAppsFilterBy,
-  getPlacementsByAppId
-} from "../../actions";
-import Popup from "../../components/Popup";
+import actions from "../../actions";
 import C from "../../utils/constants";
 import STR from "../../utils/strFuncs";
 import { CLOUDINARY_IMG_URL } from "../../config/cloudinary";
@@ -28,27 +14,39 @@ import Select from "@material-ui/core/Select";
 import { KeyboardArrowDown } from "@material-ui/icons";
 
 import AppsStateToggle from "../../components/AppStateToggle";
-import Input from "../../components/Input";
+import Input from "../../components/inputs/TextInput";
 import SVG from "../../components/SVG";
 import CSS from "../../utils/InLineCSS";
 
 const { ga } = _a;
 
+const {
+  getApps,
+  getUserData,
+  selectApp,
+  getReportData,
+  setInitialReportApp,
+  resetSavedInputs,
+  resetSelectedApp,
+  setUserImgURL,
+  setAppsFilterBy,
+  getPlacementsByAppId,
+  getScenesByAppId,
+} = actions;
+
 class MyApps extends Component {
   static propTypes = {
     apps: PropTypes.array,
     accessToken: PropTypes.string,
-    asyncLoading: PropTypes.bool,
+    asyncLoading: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
     userData: PropTypes.object,
-    dispatch: PropTypes.func
+    dispatch: PropTypes.func,
   };
 
   constructor(props) {
     super(props);
 
     this.state = {
-      reviewClicked: false,
-      showPopup: false,
       showContent: false,
       appSelected: false,
       activeApps: [],
@@ -60,16 +58,14 @@ class MyApps extends Component {
 
       filterBy: [],
       showFilter: true,
-      userUsedFilter: false
+      userUsedFilter: false,
     };
 
-    this.togglePopup = this.togglePopup.bind(this);
     this.showContent = this.showContent.bind(this);
     this.setClickedApp = this.setClickedApp.bind(this);
     this.selectApp = this.selectApp.bind(this);
     this.getReportData = this.getReportData.bind(this);
     this.renderNoApps = this.renderNoApps.bind(this);
-    this.handleSubmitForReview = this.handleSubmitForReview.bind(this);
 
     //filter
     this.addFilter = this.addFilter.bind(this);
@@ -84,7 +80,7 @@ class MyApps extends Component {
       accessToken,
       adminToken,
       userData,
-      appsFilterBy
+      appsFilterBy,
     } = this.props;
     apps = Array.isArray(apps) ? apps : [];
     const activeApps = [];
@@ -96,8 +92,9 @@ class MyApps extends Component {
     const allAppsIds = apps.map(app => app._id);
     this.setState({ allAppsIds, activeApps, filterBy: appsFilterBy || [] });
 
-    (!appsFilterBy || appsFilterBy.length === 0) &&
+    if (!appsFilterBy || appsFilterBy.length === 0) {
       dispatch(getApps({ accessToken, adminToken }));
+    }
     dispatch(resetSelectedApp());
     dispatch(getUserData(accessToken));
     dispatch(setUserImgURL(CLOUDINARY_IMG_URL + userData._id + ".png"));
@@ -107,7 +104,7 @@ class MyApps extends Component {
 
   static getDerivedStateFromProps(nextProps, prevState) {
     let newState = {};
-    let { apps, asyncLoading } = nextProps;
+    let { apps } = nextProps;
     apps = Array.isArray(apps) ? apps : [];
     const activeApps = [];
     apps.forEach(app => {
@@ -119,16 +116,7 @@ class MyApps extends Component {
 
     newState = { allAppsIds, activeApps };
 
-    if (prevState.reviewClicked && !asyncLoading) {
-      newState.showPopup = false;
-    }
-
     return newState;
-  }
-
-  togglePopup() {
-    const { showPopup } = this.state;
-    this.setState({ showPopup: !showPopup });
   }
 
   showContent() {
@@ -159,11 +147,11 @@ class MyApps extends Component {
     _a.track(
       ga.actions.navigationLinks[isGlobal ? "toGlobalReport" : "toReport"],
       {
-        category: ga.categories.navigationLinks
-      }
+        category: ga.categories.navigationLinks,
+      },
     );
 
-    const { dispatch, accessToken, userData } = this.props;
+    const { dispatch, accessToken, adminToken, userData } = this.props;
 
     // to assing scenes to the apps for the scenes names for the graphs
     let c = 0;
@@ -171,8 +159,32 @@ class MyApps extends Component {
 
     do {
       appId = Array.isArray(appsIds) ? appsIds[c] : appsIds;
-      //    dispatch(selectApp(appId, accessToken));
-      dispatch(getPlacementsByAppId(appId, accessToken));
+
+      if (adminToken) {
+        dispatch(
+          getPlacementsByAppId({
+            appId,
+            accessToken,
+            adminToken,
+            noSetAsync: true,
+          }),
+        );
+
+        dispatch(
+          getScenesByAppId({
+            appId,
+            accessToken,
+            adminToken,
+            noSetAsync: true,
+          }),
+        );
+      } else {
+        dispatch(
+          getPlacementsByAppId({ appId, accessToken, noSetAsync: true }),
+        );
+        dispatch(getScenesByAppId({ appId, accessToken, noSetAsync: true }));
+      }
+
       c++;
     } while (Array.isArray(appsIds) && c < appsIds.length);
 
@@ -180,12 +192,11 @@ class MyApps extends Component {
       getReportData({
         appsIds,
         accessToken,
-        publisherId: userId || userData._id
-      })
+        publisherId: userId || userData._id,
+      }),
     );
 
     dispatch(setInitialReportApp(appsIds));
-    // dispatch(getApps({accessToken}));
     this.setState({ appSelected: true, redirect: routeCodes.REPORT });
   }
 
@@ -197,7 +208,7 @@ class MyApps extends Component {
         ? ga.actions.apps.openFilter
         : ga.actions.apps.addFilter;
     _a.track(_aAction, {
-      category: ga.categories.apps
+      category: ga.categories.apps,
     });
 
     const { filterBy } = this.state;
@@ -210,7 +221,7 @@ class MyApps extends Component {
       platformName: "",
 
       userName: "",
-      appEngine: ""
+      appEngine: "",
     };
 
     filterBy.push(newFilter);
@@ -220,7 +231,7 @@ class MyApps extends Component {
 
   deleteFilter(i) {
     _a.track(ga.actions.apps.deleteFilter, {
-      category: ga.categories.apps
+      category: ga.categories.apps,
     });
 
     const { accessToken, adminToken, dispatch } = this.props;
@@ -237,7 +248,7 @@ class MyApps extends Component {
     const usedAttr = !!filterBy[filterIndex][attr];
 
     let {
-      target: { value }
+      target: { value },
     } = e;
 
     value =
@@ -303,37 +314,29 @@ class MyApps extends Component {
           break;
         default:
           str = `${STR.capitalizeFirstLetter(
-            str.substring(0, uppIndex)
+            str.substring(0, uppIndex),
           )} ${str.substring(uppIndex, str.length)}`;
       }
 
       return str;
     };
 
-    let {
-      //    location: { search },
-      userData,
-      appsFilterBy
-    } = this.props;
+    let { userData, appsFilterBy } = this.props;
     let { filterBy } = this.state;
 
     appsFilterBy = appsFilterBy || [];
     filterBy = Object.keys(appsFilterBy).length > 0 ? appsFilterBy : filterBy;
 
-    // const isAdmin = search === "?iamanadmin";
-
     const filterTypes = userData.isAdmin
       ? [
           "name",
-          //   "_id",
           "email.value",
           "userName",
           "appEngine",
           "isActive",
-          "platformName"
+          "platformName",
         ]
       : ["name", "isActive", "appEngine"];
-    //      ["name", "appEngine", "isActive", "platformName"];
 
     const appEnginesOpts = Object.keys(C.APP_ENGINES_IMGS).map(engine => {
       return (
@@ -357,13 +360,13 @@ class MyApps extends Component {
         style={CSS.mb}
       >
         Inactive
-      </MenuItem>
+      </MenuItem>,
     ];
 
     const platformOpts = [
       <MenuItem value="Android" key="android" style={CSS.mb}>
         Android
-      </MenuItem>
+      </MenuItem>,
     ];
 
     return (
@@ -405,7 +408,7 @@ class MyApps extends Component {
                       value={selectValue}
                       onChange={this.setFilter.bind(null, {
                         filterIndex: i,
-                        attr: filterType
+                        attr: filterType,
                       })}
                       classes={{ root: "mui-select-root" }}
                       disableUnderline={true}
@@ -426,8 +429,9 @@ class MyApps extends Component {
                     value={filter[filterType]}
                     onChange={this.setFilter.bind(null, {
                       filterIndex: i,
-                      attr: filterType
+                      attr: filterType,
                     })}
+                    name={filterType}
                   />
                 </div>
               );
@@ -461,7 +465,8 @@ class MyApps extends Component {
     const appsRe = apps.slice().reverse();
 
     return appsRe.map((app, i) => {
-      let { _id, userId, name, appState } = app;
+      let { _id, appId, userId, name, appState } = app;
+      _id = _id || appId;
 
       if (appState === C.APP_STATES.deleted) return null;
 
@@ -475,7 +480,7 @@ class MyApps extends Component {
       return (
         <div
           className={`app-select-container mb ${selectedAppClass}`}
-          key={_id}
+          key={_id || Math.random()}
         >
           <div id="app-select-info" className="text-truncate">
             <div className="engine-logo">{appEngineLogo}</div>
@@ -486,7 +491,7 @@ class MyApps extends Component {
               <div className="app-status mb">
                 <AppsStateToggle
                   app={app}
-                  onLive={app.reviewed ? null : this.togglePopup}
+                  // onLive={app.reviewed ? null : this.togglePopup}
                   onClick={this.setClickedApp.bind(null, app)}
                   {...this.props}
                 />
@@ -498,7 +503,7 @@ class MyApps extends Component {
                 <button
                   onClick={this.selectApp.bind(null, {
                     appId: _id,
-                    redirect: routeCodes.SCENE
+                    redirect: routeCodes.SCENE,
                   })}
                 >
                   {SVG.setup}
@@ -506,7 +511,7 @@ class MyApps extends Component {
                 <button
                   onClick={this.selectApp.bind(null, {
                     appId: _id,
-                    redirect: routeCodes.INFO
+                    redirect: routeCodes.INFO,
                   })}
                 >
                   {SVG.info}
@@ -516,7 +521,7 @@ class MyApps extends Component {
                 <button
                   onClick={this.getReportData.bind(null, {
                     appsIds: _id,
-                    userId
+                    userId,
                   })}
                 >
                   {SVG.report}
@@ -556,7 +561,7 @@ class MyApps extends Component {
               className="btn btn-dark"
               onClick={() => {
                 _a.track(ga.actions.navigationLinks.toDownloadNoApps, {
-                  category: ga.categories.navigationLinks
+                  category: ga.categories.navigationLinks,
                 });
               }}
             >
@@ -577,45 +582,24 @@ class MyApps extends Component {
     );
   }
 
-  handleSubmitForReview() {
-    const { dispatch, accessToken, userData } = this.props;
-    const {
-      clickedApp: { _id }
-    } = this.state;
-
-    const appDetails = {
-      appId: _id,
-      newData: {
-        isActive: false,
-        appState: C.APP_STATES.pending
-      }
-    };
-
-    this.setState({ reviewClicked: true }, () => {
-      dispatch(toggleAppStatus(appDetails, accessToken));
-      dispatch(updateUser(userData._id, { status: 4 }, accessToken));
-    });
-  }
-
   render() {
-    const { location, apps, adminToken, asyncLoading, userData } = this.props;
+    const { location, apps, adminToken, userData } = this.props;
 
     const {
-      showPopup,
       showContent,
       appSelected,
       redirect,
       allAppsIds,
-      filterBy
+      filterBy,
     } = this.state;
     const anyApps = apps.length > 0;
 
-    if (!asyncLoading && appSelected) {
+    if (appSelected) {
       return (
         <Redirect
           to={{
             pathname: redirect,
-            state: { from: location }
+            state: { from: location },
           }}
           push
         />
@@ -627,14 +611,6 @@ class MyApps extends Component {
 
     return (
       <div className="step-container" id="apps">
-        <Popup showPopup={showPopup} togglePopup={this.togglePopup}>
-          <MyAppsPopup
-            asyncLoading={asyncLoading}
-            handleSubmitForReview={this.handleSubmitForReview}
-            togglePopup={this.togglePopup}
-          />
-        </Popup>
-
         <div id="apps-header" className="step-title">
           <h3 className="st sc-h3">My apps</h3>
         </div>
@@ -654,7 +630,7 @@ class MyApps extends Component {
             <button
               className="mb unselectable white-btn"
               onClick={this.getReportData.bind(null, {
-                appsIds: allAppsIds
+                appsIds: allAppsIds,
               })}
             >
               {SVG.globalReport} &nbsp;
@@ -677,52 +653,18 @@ class MyApps extends Component {
   }
 }
 
-const MyAppsPopup = ({ asyncLoading, handleSubmitForReview, togglePopup }) => {
-  return (
-    <React.Fragment>
-      <span className="popup-title">Ready to go live?</span>
-      <br />
-      <br />
-      <span className="popup-text">
-        Your app will be submitted for review to make sure all is ok. This can
-        take 1 to 2h. After that, you'll start to make revenue.
-      </span>
-      <br />
-      <br />
-      <span className="popup-btns">
-        {asyncLoading && (
-          <button className="btn" id="review-btn" type="button">
-            Loading...
-          </button>
-        )}
+const mapStateToProps = state => {
+  const {
+    app,
+    async: { asyncMessage, asyncError, asyncLoading },
+  } = state;
 
-        {!asyncLoading && (
-          <button
-            className="btn"
-            id="review-btn"
-            onClick={handleSubmitForReview}
-          >
-            Submit for review
-          </button>
-        )}
-
-        <button className="cancel-btn mb" id="cancel-btn" onClick={togglePopup}>
-          Cancel
-        </button>
-      </span>
-    </React.Fragment>
-  );
+  return {
+    ...app,
+    asyncMessage,
+    asyncError,
+    asyncLoading,
+  };
 };
-
-const mapStateToProps = state => ({
-  apps: state.app.get("apps"),
-  appsFilterBy: state.app.get("appsFilterBy"),
-  selectedApp: state.app.get("selectedApp"),
-  accessToken: state.app.get("accessToken"),
-  adminToken: state.app.get("adminToken"),
-  asyncLoading: state.app.get("asyncLoading"),
-  userData: state.app.get("userData"),
-  logoutCount: state.app.get("logoutCount")
-});
 
 export default connect(mapStateToProps)(MyApps);

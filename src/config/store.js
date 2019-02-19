@@ -1,41 +1,36 @@
-import {
-    createStore,
-    applyMiddleware,
-    combineReducers
-} from "redux";
-import {
-    persistStore
-} from "redux-persist";
+import { createStore, applyMiddleware, combineReducers } from "redux";
+import { persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import immutableTransform from "redux-persist-transform-immutable";
 import thunk from "redux-thunk";
-import logger from "./redux-logger";
+import { createLogger } from "redux-logger";
 
 import rootReducer from "../reducers";
 import persistReducer from "redux-persist/lib/persistReducer";
 
 const isProduction = process.env.NODE_ENV === "production";
 
-const middleware = isProduction ?
-    applyMiddleware(thunk) :
-    applyMiddleware(thunk, logger);
+const logger = createLogger({
+  collapsed: true,
+});
 
-// Add redux-persist's configuration
-const config = {
-    transforms: [immutableTransform()],
-    key: "root",
-    storage,
-    whitelist: ["app"]
-    //    blacklist: ["app"]
+const middleware = isProduction
+  ? applyMiddleware(thunk)
+  : applyMiddleware(thunk, logger);
+
+const persistConfig = {
+  key: "root",
+  storage,
+  blacklist: ["async", "form"],
+  whitelist: ["app"],
 };
 
 const reducer = combineReducers(rootReducer);
-const persistedReducer = persistReducer(config, reducer);
+const persistedReducer = persistReducer(persistConfig, reducer);
 
 const store = createStore(persistedReducer, middleware);
 let persistor = persistStore(store);
 
 export default () => ({
-    persistor,
-    store
+  persistor,
+  store,
 });

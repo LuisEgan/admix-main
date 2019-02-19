@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { saveInputs } from "../../../actions/";
+import actions from "../../../actions/";
 
 import Input from "@material-ui/core/Input";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -14,6 +14,7 @@ import CSS from "../../../utils/InLineCSS";
 import dbCategories from "./categories.json";
 import dbSubCategories from "./subCategories.json";
 
+const { saveInputs } = actions;
 export default class FormPanel extends Component {
   static propTypes = {
     onSave: PropTypes.func,
@@ -26,7 +27,7 @@ export default class FormPanel extends Component {
 
     savedApps: PropTypes.array,
 
-    sceneMounted: PropTypes.bool
+    sceneMounted: PropTypes.bool,
   };
 
   constructor(props) {
@@ -52,8 +53,8 @@ export default class FormPanel extends Component {
         placementType: "",
         isActive: true,
         category: "Category",
-        subCategory: "Sub-Category"
-      }
+        subCategory: "Sub-Category",
+      },
     };
 
     this.toggleSlide = this.toggleSlide.bind(this);
@@ -86,7 +87,7 @@ export default class FormPanel extends Component {
       "isActive",
       "category",
       "subCategory",
-      "addedPrefix"
+      "addedPrefix",
     ];
 
     if (
@@ -157,7 +158,7 @@ export default class FormPanel extends Component {
         this.onSave();
         rawDataChangeActive({
           placementId: savedInputs.placementId,
-          save: false
+          save: false,
         });
       }
     });
@@ -184,7 +185,7 @@ export default class FormPanel extends Component {
       category: "Category",
       subCategory: "Sub-Category",
       Preferred: "",
-      Blacklisted: ""
+      Blacklisted: "",
     };
     this.setState({ savedInputs });
   }
@@ -210,9 +211,9 @@ export default class FormPanel extends Component {
             dropdown,
             save: false,
             placementId: savedInputs.placementId,
-            newValue: value
+            newValue: value,
           },
-          e
+          e,
         );
       }
     });
@@ -240,7 +241,7 @@ export default class FormPanel extends Component {
         value={value}
         onChange={this.changeDropdownValue.bind(null, {
           dropdown: input,
-          save: true
+          save: true,
         })}
         input={<Input name={input} id={`${input}-helper`} />}
         classes={{ root: "mui-select-root" }}
@@ -275,7 +276,7 @@ export default class FormPanel extends Component {
       placementTypeInfoBox,
       activeInfoBox,
       categoryInfoBox,
-      savedInputs
+      savedInputs,
     } = this.state;
 
     const _q_icon = input => {

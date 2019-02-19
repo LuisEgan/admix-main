@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { withLastLocation } from "react-router-last-location";
 import { connect } from "react-redux";
-import { logout } from "../../actions";
+import actions from "../../actions";
 
 import Routes from "../../config/routes";
 import Menu from "../.Global/Menu";
@@ -12,91 +12,116 @@ import Snackbar from "../.Global/SnackBar";
 import _a from "../../utils/analytics";
 import STR from "../../utils/strFuncs";
 
-// @withRouter()
-// @connect(state => ({
-//   isLoggedIn: state.app.get('isLoggedIn'),
-// }))
-class App extends Component {
-   constructor(props) {
-      super(props);
+const { logout } = actions;
 
-      this.updateMenuImg = this.updateMenuImg.bind(this);
-   }
+class ErrorCatcher extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
 
-   componentDidMount() {
-      const {
-         history: {
-            location: { pathname }
-         }
-      } = this.props;
+  componentDidCatch(error, info) {
+    console.log("info: ", info);
+    console.log("error: ", error);
+    this.setState({ hasError: true });
+  }
 
-      _a.load();
-
-      const pageName = STR.parsePathName(pathname);
-      _a.page(pageName, {
-         referrer: document.referrer
-      });
-   }
-
-   updateMenuImg() {
-      this.menu.updateMenuImg();
-   }
-
-   forceLogout() {
-      const { dispatch } = this.props;
-      dispatch(logout());
-   }
-
-   render() {
-      const {
-         isLoggedIn,
-         location,
-         history,
-         lastLocation,
-         logoutCount
-      } = this.props;
-
-      if (logoutCount !== 2) {
-         this.forceLogout();
-         return null;
-      }
-
-      if (history.action === "PUSH" || history.action === "REPLACE") {
-         const pageName = STR.parsePathName(history.location.pathname);
-         _a.page(pageName, {
-            referrer: lastLocation.pathname
-         });
-      }
-
-      const contentStyle = !isLoggedIn ? { width: "100%" } : {};
-
-      return (
-         <div className="App">
-            <Menu
-               isLoggedIn={isLoggedIn}
-               location={location}
-               history={history}
-               onRef={ref => (this.menu = ref)}
-            />
-            <div id="Page">
-               <SideMenu location={location} history={history} />
-               <div id="content" style={contentStyle}>
-                  <Routes
-                     isLoggedIn={isLoggedIn}
-                     location={location}
-                     updateMenuImg={this.updateMenuImg}
-                  />
-               </div>
-            </div>
-            <Snackbar />
-         </div>
-      );
-   }
+  render() {
+    // if (this.state.hasError) {
+    //   return <h1>Something went wrong.</h1>;
+    // }
+    return this.props.children;
+  }
 }
 
-const mapStateToProps = state => ({
-   isLoggedIn: state.app.get("isLoggedIn"),
-   logoutCount: state.app.get("logoutCount")
-});
+class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.updateMenuImg = this.updateMenuImg.bind(this);
+  }
+
+  componentDidMount() {
+    const {
+      history: {
+        location: { pathname },
+      },
+    } = this.props;
+
+    _a.load();
+
+    const pageName = STR.parsePathName(pathname);
+    _a.page(pageName, {
+      referrer: document.referrer,
+    });
+  }
+
+  updateMenuImg() {
+    this.menu.updateMenuImg();
+  }
+
+  forceLogout() {
+    const { dispatch } = this.props;
+    dispatch(logout());
+  }
+
+  render() {
+    const {
+      isLoggedIn,
+      location,
+      history,
+      lastLocation,
+      logoutCount,
+    } = this.props;
+
+    if (logoutCount !== 2) {
+      this.forceLogout();
+      return null;
+    }
+
+    if (history.action === "PUSH" || history.action === "REPLACE") {
+      const pageName = STR.parsePathName(history.location.pathname);
+      _a.page(pageName, {
+        referrer: lastLocation.pathname,
+      });
+    }
+
+    const contentStyle = !isLoggedIn ? { width: "100%" } : {};
+
+    return (
+      <ErrorCatcher>
+        <div className="App">
+          <Menu
+            isLoggedIn={isLoggedIn}
+            location={location}
+            history={history}
+            onRef={ref => (this.menu = ref)}
+          />
+          <div id="Page">
+            <SideMenu location={location} history={history} />
+            <div id="content" style={contentStyle}>
+              <Routes
+                isLoggedIn={isLoggedIn}
+                location={location}
+                updateMenuImg={this.updateMenuImg}
+              />
+            </div>
+          </div>
+          <Snackbar />
+        </div>
+      </ErrorCatcher>
+    );
+  }
+}
+
+const mapStateToProps = state => {
+  const {
+    app: { isLoggedIn, logoutCount },
+  } = state;
+  return {
+    isLoggedIn,
+    logoutCount,
+  };
+};
 
 export default withLastLocation(withRouter(connect(mapStateToProps)(App)));

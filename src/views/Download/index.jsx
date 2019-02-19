@@ -2,10 +2,11 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import _a from "../../utils/analytics";
 import SVG from "../../components/SVG";
-import { updateUser } from "../../actions";
+import actions from "../../actions";
 
 const { ga } = _a;
 
+const { updateUser } = actions;
 class Download extends Component {
   constructor(props) {
     super(props);
@@ -20,7 +21,7 @@ class Download extends Component {
 
     const { updateUser, userData, accessToken } = this.props;
 
-    updateUser(userData._id, { status: 2 }, accessToken);
+    updateUser({userId: userData._id, newData: { status: 2 }, accessToken});
   }
 
   render() {
@@ -62,7 +63,7 @@ class Download extends Component {
               <div>
                 <span className="st">Need help?</span>
               </div>
-              <div>
+              {/* <div>
                 <span className="mb">
                   Check out our <br /> Starter’s Guide{" "}
                   <a
@@ -74,10 +75,10 @@ class Download extends Component {
                     here
                   </a>
                 </span>
-              </div>
+              </div> */}
               <div>
                 <span className="mb">
-                  Questions? <br />{" "}
+                  {/* Questions? <br />{" "} */}
                   <a href="mailto:support@admix.in">Contact support</a>
                 </span>
               </div>
@@ -105,18 +106,22 @@ class Download extends Component {
 }
 
 const mapStateToProps = state => {
+  const {
+    app,
+    async: { asyncMessage, asyncError, asyncLoading },
+  } = state;
+
   return {
-    asyncData: state.app.get("asyncData"),
-    asyncError: state.app.get("asyncError"),
-    asyncLoading: state.app.get("asyncLoading"),
-    accessToken: state.app.get("accessToken"),
-    userData: state.app.get("userData"),
+    ...app,
+    asyncMessage,
+    asyncError,
+    asyncLoading,
   };
 };
 
 const mapDispatchToProps = dispatch => ({
-  updateUser: (userId, update, accessToken) =>
-    dispatch(updateUser(userId, update, accessToken)),
+  updateUser: ({userId, update, accessToken}) =>
+    dispatch(updateUser({userId, update, accessToken, noSetAsync: true})),
 });
 
 export default connect(

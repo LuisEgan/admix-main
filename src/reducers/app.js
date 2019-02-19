@@ -1,51 +1,35 @@
-import { Map } from "immutable";
-import { cloneDeep } from "lodash";
 import C from "../utils/constants";
 
 import {
-  ACTION,
-  ACTION_START,
-  ACTION_ERROR,
-  ACTION_SUCCESS,
-  RESET_ASYNC,
-  FORGOT_PASS,
-  CHANGE_EMAIL,
-  SET_PASS,
-  SET_NEW_EMAIL,
   LOGIN_SUCCESS,
   LOGOUT_SUCCESS,
   REGISTER_SUCCESS,
   APPS_SUCCESS,
   SELECT_APP,
-  UPDATE_APP,
   RESET_SELECTED_APP,
   SAVE_APP,
   SET_PLACEMENT,
   SET_PLACEMENTS,
   SET_PLACEMENTS_BY_ID,
+  SET_SCENES_BY_ID,
   SAVE_INPUTS,
   RESET_SAVED_INPUTS,
   TOGGLE_APP_STATUS,
   USER_DATA_SUCCESS,
-  LOADED_WEBGL_SCRIPTS,
   REPORT_DATA,
   SET_INITIAL_REPORT_APP,
-  UPDATE_PLACEMENTS,
-  UPDATE_USER,
   USER_IMG_UPLOAD,
   SET_USER_IMG_URL,
   SNACKBAR_TOGGLE,
   SET_APPS_FILTER_BY,
   SET_LOADED_SCENE,
-} from "../actions";
+  UNSET_PLACEMENTS_BY_ID,
+  UNSET_SCENES_BY_ID,
+} from "../actions/actions";
 
-const initialStateValues = {
+const initialState = {
   logoutCount: 0,
   counter: 0,
-  isSnackBarOpen: false,
-  asyncLoading: false,
-  asyncError: null,
-  asyncData: null,
   isLoggedIn: false,
   accessToken: "",
   adminToken: "",
@@ -53,106 +37,31 @@ const initialStateValues = {
   userData: {},
   apps: [],
   selectedApp: {},
-  placementsByAppId: {},
+  placementsById: {},
+  scenesById: {},
   savedApps: [],
   savedInputs: [],
-  load_webgl: false,
   reportData: {},
   initialReportAppId: [],
   userImgURL: "",
   appsFilterBy: [],
-  loadedScenesByAppId: null,
+  loadedScenesById: null,
 };
 
-export const initialState = Map({ ...initialStateValues });
-
 const actionsMap = {
-  [ACTION]: state => {
-    const counter = state.get("counter") + 1;
-
-    return state.merge(
-      Map({
-        counter,
-      }),
-    );
-  },
-
   [SNACKBAR_TOGGLE]: state => {
-    let isSnackBarOpen = state.get("isSnackBarOpen");
-    const isLoggedIn = state.get("isLoggedIn");
+    let isSnackBarOpen = state.isSnackBarOpen;
+    const isLoggedIn = state.isLoggedIn;
 
     isSnackBarOpen = isLoggedIn ? !isSnackBarOpen : false;
 
-    return state.merge(
-      Map({
-        isSnackBarOpen,
-      }),
-    );
+    return { ...state, isSnackBarOpen };
   },
 
   [SET_APPS_FILTER_BY]: (state, action) => {
     const appsFilterBy = action.data;
 
-    return state.merge(
-      Map({
-        appsFilterBy,
-      }),
-    );
-  },
-
-  [LOADED_WEBGL_SCRIPTS]: state => {
-    return state.merge(
-      Map({
-        load_webgl: true,
-      }),
-    );
-  },
-
-  // Async action
-  [ACTION_START]: state => {
-    return state.merge(
-      Map({
-        asyncLoading: true,
-        asyncError: null,
-      }),
-    );
-  },
-  [ACTION_ERROR]: (state, action) => {
-    const isLoggedIn = state.get("isLoggedIn");
-
-    const { message, statusMessage } = action.data;
-    let asyncError = Array.isArray(message) ? message[0].msg : message;
-
-    // Fallback
-    (!asyncError || asyncError === "") && (asyncError = statusMessage);
-
-    const asyncData = {
-      mssg: asyncError || "Oops.. Something went wrong",
-    };
-    const isSnackBarOpen = isLoggedIn;
-
-    const asyncLoading = false;
-    return state.merge(
-      Map({
-        asyncLoading,
-        asyncError,
-        asyncData,
-        isSnackBarOpen,
-      }),
-    );
-  },
-  [ACTION_SUCCESS]: (state, action) => {
-    const asyncLoading = false;
-    const asyncData = {};
-    let mssg = Array.isArray(action.data) ? action.data[0].msg : action.data;
-    asyncData.mssg = mssg;
-
-    return state.merge(
-      Map({
-        asyncLoading,
-        asyncData,
-      }),
-    );
+    return { ...state, appsFilterBy };
   },
 
   [REGISTER_SUCCESS]: (state, action) => {
@@ -162,159 +71,37 @@ const actionsMap = {
       userEmail: to.email,
     };
 
-    const asyncLoading = false;
-    const asyncData = {
-      mssg: "Success! Now, please confirm your email.",
-    };
-    return state.merge(
-      Map({
-        asyncLoading,
-        asyncData,
-        signupInfo,
-      }),
-    );
-  },
-
-  [RESET_ASYNC]: state => {
-    const asyncError = null;
-    const asyncData = null;
-    const asyncLoading = false;
-    return state.merge(
-      Map({
-        asyncError,
-        asyncData,
-        asyncLoading,
-      }),
-    );
-  },
-
-  [FORGOT_PASS]: (state, data) => {
-    const asyncLoading = false;
-    const asyncData = {
-      mssg: "Success! Now, check your email for further instructions.",
-    };
-    const isSnackBarOpen = true;
-    return state.merge(
-      Map({
-        asyncLoading,
-        asyncData,
-        isSnackBarOpen,
-      }),
-    );
-  },
-
-  [CHANGE_EMAIL]: (state, data) => {
-    const asyncLoading = false;
-    const asyncData = {
-      mssg: "Success! Now, check your email for further instructions.",
-    };
-    const isSnackBarOpen = true;
-    return state.merge(
-      Map({
-        asyncLoading,
-        asyncData,
-        isSnackBarOpen,
-      }),
-    );
-  },
-
-  [UPDATE_USER]: (state, data) => {
-    const asyncLoading = false;
-    const asyncData = {
-      mssg: "Success! User updated!",
-    };
-    const isSnackBarOpen = true;
-    return state.merge(
-      Map({
-        asyncLoading,
-        asyncData,
-        isSnackBarOpen,
-      }),
-    );
-  },
-
-  [SET_PASS]: (state, data) => {
-    const asyncLoading = false;
-
-    const asyncData = {
-      mssg: Array.isArray(data.data.message)
-        ? data.data.message[0].msg
-        : data.data.message,
-    };
-    return state.merge(
-      Map({
-        asyncLoading,
-        asyncData,
-      }),
-    );
-  },
-
-  [SET_NEW_EMAIL]: (state, data) => {
-    const asyncLoading = false;
-
-    const asyncData = {
-      mssg: Array.isArray(data.data.message)
-        ? data.data.message[0].msg
-        : data.data.message,
-    };
-    return state.merge(
-      Map({
-        asyncLoading,
-        asyncData,
-      }),
-    );
+    return { ...state, signupInfo };
   },
 
   [LOGIN_SUCCESS]: (state, action) => {
-    const { data } = action.data;
-    const isLoggedIn = true;
-    const asyncLoading = false;
+    const { data } = action;
 
     const newState = {
-      isLoggedIn,
+      isLoggedIn: true,
       accessToken: data.loginToken,
-      asyncLoading,
-      asyncData: null,
     };
 
     if (data.adminToken) {
       newState.adminToken = data.adminToken;
     }
 
-    return state.merge(Map(newState));
+    return { ...state, ...newState };
   },
-  [LOGOUT_SUCCESS]: (state, action) => {
-    return state.merge(
-      Map({
-        ...initialStateValues,
-        logoutCount: 2,
-      }),
-    );
+  [LOGOUT_SUCCESS]: () => {
+    return { ...initialState, logoutCount: 2 };
   },
   [APPS_SUCCESS]: (state, action) => {
-    const asyncLoading = false;
     const apps = Array.isArray(action.data.data) ? action.data.data : [];
-    return state.merge(
-      Map({
-        apps,
-        asyncLoading,
-      }),
-    );
+    return { ...state, apps };
   },
   [USER_DATA_SUCCESS]: (state, action) => {
-    const asyncLoading = false;
     const userData = action.data.data;
-
-    return state.merge(
-      Map({
-        asyncLoading,
-        userData,
-      }),
-    );
+    return { ...state, userData };
   },
 
   [SELECT_APP]: (state, data) => {
-    const apps = state.get("apps");
+    const apps = [...state.apps];
     let selectedApp = {};
     const { appId } = data.data;
     const scenes = [...data.data.data];
@@ -328,43 +115,17 @@ const actionsMap = {
     });
     selectedApp.scenes = [...scenes];
 
-    const asyncLoading = false;
-    return state.merge(
-      Map({
-        selectedApp,
-        asyncLoading,
-      }),
-    );
-  },
-  [UPDATE_APP]: (state, data) => {
-    const asyncData = {
-      mssg: "App updated!",
-    };
-    const isSnackBarOpen = true;
-
-    const asyncLoading = false;
-    return state.merge(
-      Map({
-        asyncLoading,
-        asyncData,
-        isSnackBarOpen,
-      }),
-    );
+    return { ...state, selectedApp };
   },
 
   [RESET_SELECTED_APP]: state => {
     const selectedApp = {};
-    const placementsByAppId = {};
-    return state.merge(
-      Map({
-        selectedApp,
-        placementsByAppId,
-      }),
-    );
+    const placementsById = {};
+    const scenesById = {};
+    return { ...state, selectedApp, placementsById, scenesById };
   },
   [SAVE_APP]: (state, { app }) => {
-    let savedApps = state.get("savedApps");
-    // savedApps = savedApps ? savedApps : [];
+    let savedApps = [...state.savedApps];
     const { savedInputs, scenes, selectedScene } = app;
     delete app.savedInputs;
     delete app.selectedScene;
@@ -411,26 +172,17 @@ const actionsMap = {
         return false;
       });
     }
-
-    return state.merge(
-      Map({
-        savedApps,
-      }),
-    );
+    return { ...state, savedApps };
   },
 
   [SET_PLACEMENT]: (state, { placementOpt }) => {
-    let selectedApp = state.get("selectedApp");
+    let selectedApp = { ...state.selectedApp };
     selectedApp.placementOpt = placementOpt;
-    return state.merge(
-      Map({
-        selectedApp,
-      }),
-    );
+    return { ...state, selectedApp };
   },
   [SET_PLACEMENTS]: (state, data) => {
-    const selectedApp = state.get("selectedApp");
-    const apps = state.get("apps");
+    const selectedApp = { ...state.selectedApp };
+    const apps = [...state.apps];
     const placements = data.data.data;
 
     apps.forEach(app => {
@@ -441,7 +193,7 @@ const actionsMap = {
           Array.isArray(placements) &&
             placements.forEach((placement, i) => {
               if (scene._id === placement.sceneId._id) {
-                const placementToPush = cloneDeep(placements[i]);
+                const placementToPush = { ...placements[i] };
                 placementToPush.addedPrefix = false;
 
                 if (
@@ -464,7 +216,7 @@ const actionsMap = {
         Array.isArray(placements) &&
           placements.forEach((placement, i) => {
             if (scene._id === placement.sceneId) {
-              const placementToPush = cloneDeep(placements[i]);
+              const placementToPush = { ...placements[i] };
               placementToPush.addedPrefix = false;
 
               if (
@@ -480,64 +232,81 @@ const actionsMap = {
           });
       });
 
-    const asyncLoading = false;
-    return state.merge(
-      Map({
-        selectedApp,
-        asyncLoading,
-      }),
-    );
+    return { ...state, selectedApp };
   },
+
   [SET_PLACEMENTS_BY_ID]: (state, data) => {
-    let placementsByAppId = state.get("placementsByAppId");
+    let placementsById = { ...state.placementsById };
     const placements = Array.isArray(data.data.data) ? [...data.data.data] : [];
-    let newPcsById = placements.length > 0 ? cloneDeep(placementsByAppId) : {};
 
     placements &&
       placements.forEach(placement => {
-        newPcsById[placement._id] = cloneDeep(placement);
-        delete newPcsById[placement._id]._id;
+        placementsById[placement._id] = { ...placement };
       });
 
-    const asyncLoading = false;
-    return state.merge(
-      Map({
-        asyncLoading,
-        placementsByAppId: newPcsById,
-      }),
-    );
+    return { ...state, placementsById };
+  },
+
+  [UNSET_PLACEMENTS_BY_ID]: (state, { appId }) => {
+    const { placementsById } = state;
+
+    for (let pcId in placementsById) {
+      const pc = placementsById[pcId];
+      if (pc.appId === appId) {
+        delete placementsById[pcId];
+      }
+    }
+
+    return { ...state, placementsById };
+  },
+
+  [SET_SCENES_BY_ID]: (state, data) => {
+    let scenesById = { ...state.scenesById };
+    const scenes = Array.isArray(data.data.data) ? [...data.data.data] : [];
+
+    scenes &&
+      scenes.forEach(scene => {
+        scenesById[scene._id] = { ...scene };
+      });
+
+    return { ...state, scenesById };
+  },
+
+  [UNSET_SCENES_BY_ID]: (state, { appId }) => {
+    const { scenesById } = state;
+
+    for (let pcId in scenesById) {
+      const pc = scenesById[pcId];
+      if (pc.appId === appId) {
+        delete scenesById[pcId];
+      }
+    }
+
+    return { ...state, scenesById };
   },
 
   [SAVE_INPUTS]: (state, { toSaveInputs }) => {
-    let savedInputs = state.get("savedInputs");
-    const newInput = cloneDeep(toSaveInputs);
+    let savedInputs = [...state.savedInputs];
+    const newInput = { ...toSaveInputs };
     savedInputs = !!savedInputs ? savedInputs : [];
 
-    // Slice out the savedInput if it was already saved
+    // * Slice out the savedInput if it was already saved
     savedInputs = savedInputs.filter(input => {
       return input.placementName !== toSaveInputs.placementName;
     });
 
     savedInputs = [...savedInputs, newInput];
 
-    return state.merge(
-      Map({
-        savedInputs,
-      }),
-    );
+    return { ...state, savedInputs };
   },
 
   [RESET_SAVED_INPUTS]: state => {
-    return state.merge(
-      Map({
-        savedInputs: [],
-      }),
-    );
+    return { ...state, savedInputs: [] };
   },
 
   [TOGGLE_APP_STATUS]: (state, data) => {
-    let apps = state.get("apps");
-    let selectedApp = state.get("selectedApp");
+    let apps = [...state.apps];
+    let selectedApp = { ...state.selectedApp };
 
     const updatedApp = data.data.data;
     const { _id } = updatedApp;
@@ -553,46 +322,14 @@ const actionsMap = {
       selectedApp.appState = updatedApp.appState;
     }
 
-    const asyncLoading = false;
-    return state.merge(
-      Map({
-        apps,
-        selectedApp,
-        asyncLoading,
-      }),
-    );
-  },
-
-  [UPDATE_PLACEMENTS]: (state, data) => {
-    // this are for when there's a validation page
-    // const savedInputs = [];
-    // const selectedApp = {};
-    // const apps = [];
-
-    const asyncLoading = false;
-    const asyncData = {
-      mssg: "Success! Placements saved!",
-    };
-    const isSnackBarOpen = true;
-
-    return state.merge(
-      Map({
-        // savedInputs,
-        // selectedApp,
-        // apps,
-        asyncLoading,
-        asyncData,
-        isSnackBarOpen,
-      }),
-    );
+    return { ...state, apps, selectedApp };
   },
 
   [REPORT_DATA]: (state, data) => {
-    const asyncLoading = false;
     const reportData = {};
 
     data.data.data.forEach(elem => {
-      const elemClone = cloneDeep(elem);
+      const elemClone = { ...elem };
       const {
         date,
         keys: { appid },
@@ -623,64 +360,33 @@ const actionsMap = {
       }
     });
 
-    return state.merge(
-      Map({
-        reportData,
-        asyncLoading,
-      }),
-    );
+    return { ...state, reportData };
   },
   [SET_INITIAL_REPORT_APP]: (state, data) => {
     const appsIds = data.data;
     const initialReportAppId = Array.isArray(appsIds) ? appsIds : [appsIds];
 
-    return state.merge(
-      Map({
-        initialReportAppId,
-      }),
-    );
+    return { ...state, initialReportAppId };
   },
 
   [USER_IMG_UPLOAD]: (state, data) => {
-    const asyncLoading = false;
     const userImgURL = data.data.data.secure_url;
-    const asyncData = {
-      mssg: "Success! Image updated!",
-    };
-    const isSnackBarOpen = true;
 
-    return state.merge(
-      Map({
-        asyncLoading,
-        userImgURL,
-        asyncData,
-        isSnackBarOpen,
-      }),
-    );
+    return { ...state, userImgURL };
   },
 
   [SET_USER_IMG_URL]: (state, data) => {
-    const asyncLoading = false;
     const userImgURL = data.data;
 
-    return state.merge(
-      Map({
-        asyncLoading,
-        userImgURL,
-      }),
-    );
+    return { ...state, userImgURL };
   },
 
   [SET_LOADED_SCENE]: (state, data) => {
-    let loadedScenesByAppId = state.get("loadedScenesByAppId") || {};
+    let loadedScenesById = state.loadedScenesById || {};
 
-    loadedScenesByAppId[data.loadedScene.appId] = { ...data.loadedScene };
+    loadedScenesById[data.loadedScene.appId] = { ...data.loadedScene };
 
-    return state.merge(
-      Map({
-        loadedScenesByAppId,
-      }),
-    );
+    return { ...state, loadedScenesById };
   },
 };
 

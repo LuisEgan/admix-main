@@ -1,241 +1,422 @@
-// import reportData from "../assets/data/placementDailyReport.json";
-// import reportData from "../assets/data/placementDailyReport-total.json";
+import qs from "qs";
 
-// const dns = "http://ec2-52-15-223-69.us-east-2.compute.amazonaws.com:3006";
-// const dns = "http://ec2-18-188-77-242.us-east-2.compute.amazonaws.com";
+const onTestServer = window.location.host.includes("test");
+const isProd = process.env.NODE_ENV === "production" && !onTestServer;
 
-const isProd = process.env.NODE_ENV !== "development";
+const dns = isProd ? "https://api.admix.in" : onTestServer ? "http://test.api.admix.in" : "http://localhost:3000";
+// const dns = "https://api.admix.in";
+// const dns = "http://localhost:3000";
 
-// const dns = isProd ? "https://api.admix.in" : "http://sandbox.api.admix.in";
-const dns = isProd ? "https://api.admix.in" : "http://localhost:3000";
-console.warn("dns: ", dns);
+!isProd && console.warn("dns: ", dns);
 
-function async() {
-  return fetch("http://date.jsontest.com/").then(response => response.json());
-}
+// ************ //
+// * AUTH
+// ************ //
 
-function cloudinayImgUpload(accessToken, data) {
-  return fetch(dns + "/api/v1/user/cloudinaryUpload", {
-    method: "POST",
-    headers: new Headers({
-      "x-access-token": accessToken,
-      "Content-Type": "application/json",
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
-}
+const login = async data => {
+  try {
+    const res = await fetch(dns + "/api/v2/auth/login", {
+      method: "POST",
+      headers: new Headers({
+        "Content-Type": "application/json",
+      }),
+      body: JSON.stringify(data),
+    });
 
-function cloudinayImgURL(accessToken, data) {
-  return fetch(dns + "/api/v1/user/cloudinayImgURL", {
-    method: "POST",
-    headers: new Headers({
-      "x-access-token": accessToken,
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
-}
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ login: ", error);
+  }
+};
 
-function isAdmin(accessToken) {
-  return fetch(dns + "/api/v1/user/verify/isAdmin", {
-    method: "GET",
-    headers: new Headers({
-      "x-access-token": accessToken,
-    }),
-  }).then(response => response.json());
-}
+const register = async data => {
+  try {
+    const res = await fetch(dns + "/api/v2/auth/signup", {
+      method: "POST",
+      headers: new Headers({
+        "Content-Type": "application/json",
+      }),
+      body: JSON.stringify(data),
+    });
 
-function login(data) {
-  return fetch(dns + "/api/v1/user/login", {
-    method: "POST",
-    headers: new Headers({
-      "Content-Type": "application/json",
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
-}
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ register: ", error);
+  }
+};
 
-function signup(data) {
-  return fetch(dns + "/api/v1/user/signup", {
-    method: "POST",
-    headers: new Headers({
-      "Content-Type": "application/json",
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
-}
+const resendSignUpEmail = async data => {
+  try {
+    const res = await fetch(dns + "/api/v2/auth/resend/email", {
+      method: "POST",
+      headers: new Headers({
+        "Content-Type": "application/json",
+      }),
+      body: JSON.stringify(data),
+    });
 
-function resendSignUpEmail(data) {
-  return fetch(dns + "/api/v1/user/resendSignUpEmail", {
-    method: "POST",
-    headers: new Headers({
-      "Content-Type": "application/json",
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
-}
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ resendSignUpEmail: ", error);
+  }
+};
 
-const updateUser = (accessToken, data) =>
-  fetch(`${dns}/api/v2/user/update`, {
-    method: "PUT",
-    headers: new Headers({
-      "Content-Type": "application/json",
-      "x-access-token": accessToken,
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
+const forgotPass = async data => {
+  try {
+    const res = await fetch(dns + "/api/v2/auth/forgot", {
+      method: "POST",
+      headers: new Headers({
+        "Content-Type": "application/json",
+      }),
+      body: JSON.stringify(data),
+    });
 
-function forgotPass(data) {
-  return fetch(dns + "/api/v1/user/forgot", {
-    method: "POST",
-    headers: new Headers({
-      "Content-Type": "application/json",
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
-}
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ forgotPass: ", error);
+  }
+};
 
-function changeEmail(accessToken, data) {
-  return fetch(dns + "/api/v1/user/changeEmail", {
-    method: "POST",
-    headers: new Headers({
-      "Content-Type": "application/json",
-      "x-access-token": accessToken,
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
-}
+const setNewPass = async data => {
+  try {
+    const res = await fetch(dns + "/api/v2/auth/set/password", {
+      method: "PUT",
+      headers: new Headers({
+        "Content-Type": "application/json",
+      }),
+      body: JSON.stringify(data),
+    });
 
-function setNewPass(data) {
-  return fetch(dns + "/api/v1/user/setNewPassword", {
-    method: "POST",
-    headers: new Headers({
-      "Content-Type": "application/json",
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
-}
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ setNewPass: ", error);
+  }
+};
 
-function setNewEmail(data) {
-  return fetch(dns + "/api/v1/user/setNewEmail", {
-    method: "POST",
-    headers: new Headers({
-      "Content-Type": "application/json",
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
-}
+const setNewEmail = async data => {
+  try {
+    const res = await fetch(dns + "/api/v2/auth/set/email", {
+      method: "PUT",
+      headers: new Headers({
+        "Content-Type": "application/json",
+      }),
+      body: JSON.stringify(data),
+    });
 
-function getAppsAll(accessToken, data) {
-  return fetch(dns + "/api/v1/user/getApps", {
-    method: "GET",
-    headers: new Headers({
-      "x-access-token": accessToken,
-    }),
-  }).then(response => response.json());
-}
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ setNewEmail: ", error);
+  }
+};
 
-function getApps(accessToken, data) {
-  return fetch(dns + "/api/v1/user/getApps", {
-    method: "POST",
-    headers: new Headers({
-      "x-access-token": accessToken,
-      "Content-Type": "application/json",
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
-}
+// ************ //
+// * APPS
+// ************ //
 
-function updateApp(accessToken, data) {
-  return fetch(dns + "/api/v1/user/setApps", {
-    method: "POST",
-    headers: new Headers({
-      "x-access-token": accessToken,
-      "Content-Type": "application/json",
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
-}
+// ! there shouldn't be 2 for getting apps, 1 is enough for getting 1 app or all.
+const getAppsAll = async (accessToken, data) => {
+  try {
+    const res = await fetch(dns + "/api/v2/apps/all", {
+      method: "GET",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "x-access-token": accessToken,
+      }),
+    });
 
-function getAppsAdmin(accessToken, adminToken, data) {
-  return fetch(dns + "/api/v1/user/getAppsAdmin", {
-    method: "POST",
-    headers: new Headers({
-      "x-access-token": accessToken,
-      "x-admin-token": adminToken,
-      "Content-Type": "application/json",
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
-}
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ getAppsAll: ", error);
+  }
+};
 
-const getUserData = accessToken =>
-  fetch(`${dns}/api/v1/user/getPrefs`, {
-    method: "GET",
-    headers: new Headers({
-      "x-access-token": accessToken,
-    }),
-  }).then(response => response.json());
+const getApps = async (accessToken, data) => {
+  const { filterBy } = data;
+  const query = `?${qs.stringify(filterBy)}`;
+  try {
+    const res = await fetch(`${dns}/api/v2/apps/${query}`, {
+      method: "GET",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "x-access-token": accessToken,
+      }),
+    });
 
-const toggleAppStatus = (accessToken, data) =>
-  fetch(`${dns}/api/v1/user/setApps`, {
-    method: "POST",
-    headers: new Headers({
-      "Content-Type": "application/json",
-      "x-access-token": accessToken,
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ getApps: ", error);
+  }
+};
+// ! there shouldn't be 2 for getting apps, 1 is enough for getting 1 app or all.
 
-const getScenes = (accessToken, data) =>
-  fetch(`${dns}/api/v1/user/getScenes`, {
-    method: "POST",
-    headers: new Headers({
-      "Content-Type": "application/json",
-      "x-access-token": accessToken,
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
+const updateApp = async (accessToken, data) => {
+  try {
+    const res = await fetch(dns + "/api/v2/apps/update", {
+      method: "PUT",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "x-access-token": accessToken,
+      }),
+      body: JSON.stringify(data),
+    });
 
-const getPlacements = (accessToken, data) =>
-  fetch(`${dns}/api/v1/user/getPlacements`, {
-    method: "POST",
-    headers: new Headers({
-      "Content-Type": "application/json",
-      "x-access-token": accessToken,
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ updateApp: ", error);
+  }
+};
 
-const updatePlacements = (accessToken, data) =>
-  fetch(`${dns}/api/v1/user/updatePlacements`, {
-    method: "POST",
-    headers: new Headers({
-      "Content-Type": "application/json",
-      "x-access-token": accessToken,
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
+const getAppsAdmin = async (accessToken, adminToken, data) => {
+  try {
+    const res = await fetch(dns + "/api/v2/admin/data/apps", {
+      method: "POST",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "x-access-token": accessToken,
+        "x-admin-token": adminToken,
+      }),
+      body: JSON.stringify(data),
+    });
 
-// const getReportData = (accessToken, data) => reportData;
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ getAppsAdmin: ", error);
+  }
+};
 
-const getReportData = (accessToken, data) =>
-  fetch(`https://report.admix.in/report/placement/daily`, {
-    method: "POST",
-    headers: new Headers({
-      "Content-Type": "application/json",
-      "x-auth-token":
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YmU0NDc5MTIxMDBjMTMxZjJhNDQwYzEiLCJuYW1lIjoiQWRtaW4gUGxhdGZvcm0iLCJlbWFpbCI6ImFkbWluQGFkbWl4LmluIiwicm9sZSI6MCwiaWF0IjoxNTQxNjg3MTg1fQ.HcV0VUmfIHdHUHvH-EjWx35VKHj1H_IrSrBvW8Dz4lQ",
-    }),
-    body: JSON.stringify(data),
-  }).then(response => response.json());
+const toggleAppStatus = async (accessToken, data) => {
+  try {
+    const res = await fetch(dns + "/api/v2/apps/update", {
+      method: "PUT",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "x-access-token": accessToken,
+      }),
+      body: JSON.stringify(data),
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ toggleAppStatus: ", error);
+  }
+};
+
+// ************ //
+// * SCENES
+// ************ //
+
+const getScenes = async (accessToken, appId) => {
+  try {
+    const res = await fetch(`${dns}/api/v2/scenes/${appId}`, {
+      method: "GET",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "x-access-token": accessToken,
+      }),
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ getScenes: ", error);
+  }
+};
+
+const getScenesAdmin = async (accessToken, adminToken, appId) => {
+  try {
+    const res = await fetch(`${dns}/api/v2/scenes/${appId}`, {
+      method: "GET",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "x-access-token": accessToken,
+        "x-admin-token": adminToken,
+      }),
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ getScenes: ", error);
+  }
+};
+
+// ************ //
+// * PLACEMENTS
+// ************ //
+
+const getPlacements = async (accessToken, data) => {
+  const { appId, sceneId } = data;
+  let url = `${dns}/api/v2/placements/${appId}`;
+  sceneId && (url += `/${sceneId}`);
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "x-access-token": accessToken,
+      }),
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ getPlacements: ", error);
+  }
+};
+
+const getPlacementsAdmin = async (accessToken, adminToken, data) => {
+  const { appId, sceneId } = data;
+  let url = `${dns}/api/v2/admin/placements/${appId}`;
+  sceneId && (url += `/${sceneId}`);
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "x-access-token": accessToken,
+        "x-admin-token": adminToken,
+      }),
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ getPlacementsAdmin: ", error);
+  }
+};
+
+const updatePlacements = async (accessToken, data) => {
+  try {
+    const res = await fetch(dns + "/api/v2/placements/update", {
+      method: "PUT",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "x-access-token": accessToken,
+      }),
+      body: JSON.stringify(data),
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ updatePlacements: ", error);
+  }
+};
+
+// ************ //
+// * USER
+// ************ //
+
+const updateUser = async (accessToken, data) => {
+  try {
+    const res = await fetch(dns + "/api/v2/user/update", {
+      method: "PUT",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "x-access-token": accessToken,
+      }),
+      body: JSON.stringify(data),
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ updateUser: ", error);
+  }
+};
+
+const changeEmail = async (accessToken, data) => {
+  try {
+    const res = await fetch(dns + "/api/v2/user/update/email", {
+      method: "PUT",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "x-access-token": accessToken,
+      }),
+      body: JSON.stringify(data),
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ changeEmail: ", error);
+  }
+};
+
+const getUserData = async accessToken => {
+  try {
+    const res = await fetch(dns + "/api/v2/user/preferences", {
+      method: "GET",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "x-access-token": accessToken,
+      }),
+    });
+
+    return res.json();
+  } catch (error) {
+    console.log("API ERROR @ getUserData: ", error);
+  }
+};
+
+// ************ //
+// * REPORT
+// ************ //
+
+const getReportData = async data => {
+  try {
+    const res = await fetch(`https://report.admix.in/report/placement/daily`, {
+      method: "POST",
+      headers: new Headers({
+        "Content-Type": "application/json",
+        "x-auth-token":
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YmU0NDc5MTIxMDBjMTMxZjJhNDQwYzEiLCJuYW1lIjoiQWRtaW4gUGxhdGZvcm0iLCJlbWFpbCI6ImFkbWluQGFkbWl4LmluIiwicm9sZSI6MCwiaWF0IjoxNTQxNjg3MTg1fQ.HcV0VUmfIHdHUHvH-EjWx35VKHj1H_IrSrBvW8Dz4lQ",
+      }),
+      body: JSON.stringify(data),
+    });
+
+    return res.json();
+  } catch (error) {
+    console.log("API ERROR @ getReportData: ", error);
+  }
+};
+
+// ************ //
+// * CLOUDINARY
+// ************ //
+
+const cloudinayImgUpload = async (accessToken, data) => {
+  try {
+    const res = await fetch(dns + "/api/v2/cloudinary/upload", {
+      method: "POST",
+      headers: new Headers({
+        "x-access-token": accessToken,
+        "Content-Type": "application/json",
+      }),
+      body: JSON.stringify(data),
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ cloudinayImgUpload: ", error);
+  }
+};
+
+const cloudinayImgURL = async (accessToken, data) => {
+  try {
+    const res = await fetch(dns + "/api/v2/cloudinary/imgurl", {
+      method: "POST",
+      headers: new Headers({
+        "x-access-token": accessToken,
+        "Content-Type": "application/json",
+      }),
+      body: JSON.stringify(data),
+    });
+
+    return res.json();
+  } catch (error) {
+    console.error("API ERROR @ cloudinayImgURL: ", error);
+  }
+};
 
 export default {
-  async,
   cloudinayImgUpload,
   cloudinayImgURL,
-  isAdmin,
   login,
-  signup,
+  register,
   resendSignUpEmail,
   updateUser,
   forgotPass,
@@ -249,7 +430,9 @@ export default {
   getUserData,
   toggleAppStatus,
   getScenes,
+  getScenesAdmin,
   getPlacements,
+  getPlacementsAdmin,
   updatePlacements,
   getReportData,
 };

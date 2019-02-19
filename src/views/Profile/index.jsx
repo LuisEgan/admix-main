@@ -2,13 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import _a from "../../utils/analytics";
 import { reduxForm, reset, change } from "redux-form";
-import {
-  imgUpload,
-  setUserImgURL,
-  forgotPass,
-  changeEmail,
-  updateUser
-} from "../../actions";
+import actions from "../../actions";
 import PropTypes from "prop-types";
 import Dropzone from "react-dropzone";
 import request from "superagent";
@@ -24,28 +18,34 @@ import PaymentConfig from "./Panels/PaymentConfig";
 import SVG_personalInfo from "../../assets/svg/personal-information.svg";
 import SVG_payment from "../../assets/svg/payments-configuration.svg";
 
-import CustomInput from "../../components/Input";
+import CustomInput from "../../components/inputs/TextInput";
 
 import {
   CLOUDINARY_UPLOAD_PRESET,
-  CLOUDINARY_UPLOAD_URL
+  CLOUDINARY_UPLOAD_URL,
 } from "../../config/cloudinary";
 
 import defaultImg from "../../assets/img/default_pic.jpg";
 import SVG from "../../components/SVG";
 
 const { ga } = _a;
-
+const {
+  imgUpload,
+  setUserImgURL,
+  forgotPass,
+  changeEmail,
+  updateUser,
+} = actions;
 class Profile extends Component {
   static propTypes = {
-    dispatch: PropTypes.func
+    dispatch: PropTypes.func,
   };
 
   constructor(props) {
     super(props);
 
     const {
-      userData: { payment }
+      userData: { payment },
     } = props;
 
     this.state = {
@@ -58,8 +58,8 @@ class Profile extends Component {
       payment: {
         option: payment.option ? payment.option : "",
         region: payment.details.region ? payment.details.region : "",
-        details: payment.details.bankDetails ? payment.details.bankDetails : {}
-      }
+        details: payment.details.bankDetails ? payment.details.bankDetails : {},
+      },
     };
 
     this.togglePassInputType = this.togglePassInputType.bind(this);
@@ -87,7 +87,7 @@ class Profile extends Component {
 
   handleSubmit = values => {
     _a.track(ga.actions.account.accountUpdate, {
-      category: ga.categories.account
+      category: ga.categories.account,
     });
 
     const { userData, dispatch, accessToken, initialValues } = this.props;
@@ -103,7 +103,7 @@ class Profile extends Component {
 
     let update = {
       name: userName,
-      company: { ...companyInfo }
+      company: { ...companyInfo },
     };
 
     delete values.email;
@@ -111,7 +111,7 @@ class Profile extends Component {
 
     if (payment.option !== "") {
       update.payment = {
-        option: payment.option
+        option: payment.option,
       };
 
       if (payment.option !== "paypal") {
@@ -148,18 +148,18 @@ class Profile extends Component {
       }
     }
 
-    dispatch(updateUser(userData._id, update, accessToken));
+    dispatch(updateUser({userId: userData._id, newData: update, accessToken}));
   };
 
   onImageDrop(files) {
     _a.track(ga.actions.account.imageChange, {
-      category: ga.categories.account
+      category: ga.categories.account,
     });
 
     const { userData } = this.props;
 
     this.setState({
-      uploadedFile: files[0]
+      uploadedFile: files[0],
     });
 
     const reader = new FileReader();
@@ -175,7 +175,7 @@ class Profile extends Component {
   handleImageUploadClient(file) {
     const {
       userData: { _id },
-      dispatch
+      dispatch,
     } = this.props;
 
     let upload = request
@@ -191,7 +191,7 @@ class Profile extends Component {
 
       if (response.body.secure_url !== "") {
         const imgURL = {
-          data: response.body.secure_url
+          data: response.body.secure_url,
         };
         dispatch(setUserImgURL(imgURL));
       }
@@ -210,7 +210,7 @@ class Profile extends Component {
         ? ga.actions.account.passwordChangeRequest
         : ga.actions.account.emailChangeRequest;
     _a.track(_aAction, {
-      category: ga.categories.account
+      category: ga.categories.account,
     });
 
     const { dispatch, initialValues, accessToken } = this.props;
@@ -232,9 +232,9 @@ class Profile extends Component {
     const {
       dispatch,
       reduxForm: {
-        profileForm: { values }
+        profileForm: { values },
       },
-      initialValues
+      initialValues,
     } = this.props;
     let payment = this.state.payment;
     payment[input] = e.target.value;
@@ -250,7 +250,7 @@ class Profile extends Component {
         initialValue !== "email"
       ) {
         dispatch(
-          change("profileForm", initialValue, initialValues[initialValue])
+          change("profileForm", initialValue, initialValues[initialValue]),
         );
       }
     }
@@ -444,15 +444,20 @@ class Profile extends Component {
 }
 
 const mapStateToProps = state => {
-  const userData = state.app.get("userData");
+  const {
+    app,
+    async: { asyncMessage, asyncError, asyncLoading },
+  } = state;
+
+  const { userData } = app;
   const {
     payment: {
       paypalEmail,
-      details: { bankDetails, region }
+      details: { bankDetails, region },
     },
     name,
     email: { value },
-    company
+    company,
   } = userData;
 
   const initialPaymentRegion = region;
@@ -463,7 +468,7 @@ const mapStateToProps = state => {
     password: "Click -> to change it!",
     paypalEmail: paypalEmail || "",
     ...company,
-    initialPaymentRegion
+    initialPaymentRegion,
   };
 
   for (let bankDetail in bankDetails) {
@@ -471,13 +476,13 @@ const mapStateToProps = state => {
   }
 
   return {
-    accessToken: state.app.get("accessToken"),
-    isLoggedIn: state.app.get("isLoggedIn"),
-    userImgURL: state.app.get("userImgURL"),
-    asyncLoading: state.app.get("asyncLoading"),
+    ...app,
+    asyncMessage,
+    asyncError,
+    asyncLoading,
     userData,
     reduxForm: state.form,
-    initialValues
+    initialValues,
   };
 };
 
@@ -489,7 +494,7 @@ const validate = values => {
 
 const formConfig = {
   form: "profileForm",
-  validate
+  validate,
 };
 
 Profile = reduxForm(formConfig)(Profile);

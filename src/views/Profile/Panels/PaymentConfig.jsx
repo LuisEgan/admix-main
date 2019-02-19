@@ -10,8 +10,8 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 import Select from "@material-ui/core/Select";
 import Input from "@material-ui/core/Input";
 import { KeyboardArrowDown } from "@material-ui/icons";
-import Checkbox from "@material-ui/core/Checkbox";
-import Tooltip from "@material-ui/core/Tooltip";
+// import Checkbox from "@material-ui/core/Checkbox";
+// import Tooltip from "@material-ui/core/Tooltip";
 
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
 
@@ -24,7 +24,7 @@ const regions = [
   { title: <em>Please select a region</em>, value: "" },
   { title: "United States of America", value: "usa" },
   { title: "United Kingdom", value: "uk" },
-  { title: "Europe", value: "eu" }
+  { title: "Europe", value: "eu" },
 ];
 
 export default class PaymentConfig extends React.PureComponent {
@@ -33,7 +33,7 @@ export default class PaymentConfig extends React.PureComponent {
 
     this.state = {
       invoiceCheck: false,
-      oninvoiceCheck: false
+      oninvoiceCheck: false,
     };
 
     this.handleInvoiceCheck = this.handleInvoiceCheck.bind(this);
@@ -56,18 +56,17 @@ export default class PaymentConfig extends React.PureComponent {
       payment,
       paypalEmailStyle,
       payBanksStyle,
-      payBanksDetailsStyle
+      payBanksDetailsStyle,
     } = this.props;
 
-    const { invoiceCheck, oninvoiceCheck } = this.state;
+    // const { invoiceCheck } = this.state;
 
     return (
       <React.Fragment>
-        <Tooltip
+        {/* <Tooltip
           title="By ticking this box you’ll be paid automatically every month if your
        balance exceeds $500"
           placement="right"
-          classes={{ tooltip: { maxWidth: "50px" } }}
         >
           <FormControlLabel
             control={
@@ -80,7 +79,7 @@ export default class PaymentConfig extends React.PureComponent {
             }
             label="Generate automatic invoices"
           />
-        </Tooltip>
+        </Tooltip> */}
 
         <RadioGroup
           aria-label="paymentOpts"

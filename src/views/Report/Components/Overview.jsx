@@ -5,8 +5,9 @@ import { Line } from "react-chartjs-2";
 import ReactTable from "react-table";
 import Breadcrumbs from "../../../components/Breadcrumbs";
 import SVG from "../../../components/SVG";
-import { isEqual, cloneDeep } from "lodash";
+import { isEqual } from "lodash";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import STR from "../../../utils/strFuncs";
 
 const _a_location = routeCodes.REPORT;
 
@@ -108,7 +109,7 @@ export default class Overview extends Component {
           attr: "fillRate",
         }),
       };
-      return { selectedApps: cloneDeep(selectedApps), overviewData };
+      return { selectedApps: { ...selectedApps }, overviewData };
     }
 
     return null;
@@ -235,26 +236,27 @@ export default class Overview extends Component {
     const { asyncLoading } = this.props;
     const { selectedApps } = this.state;
 
-    // ! let reportData = this.previousPeriodsTableData();
     const reportData = [];
-
+    let i;
     for (let appId in selectedApps) {
+      i = 0;
       for (let date in selectedApps[appId].reportData.byDate) {
-        reportData.push({
+        let { impression, revenue } = selectedApps[appId].reportData.byDate[
+          date
+        ];
+        impression = isNaN(impression) ? 0 : impression;
+        revenue = isNaN(revenue / 1000) ? 0 : +(revenue / 1000).toFixed(2);
+
+        reportData[i] = reportData[i] || {};
+        reportData[i].impression = reportData[i].impression || 0;
+        reportData[i].revenue = reportData[i].revenue || 0;
+        reportData[i] = {
           date,
-          impression: isNaN(
-            selectedApps[appId].reportData.byDate[date].impression,
-          )
-            ? 0
-            : selectedApps[appId].reportData.byDate[date].impression,
-          revenue: isNaN(
-            selectedApps[appId].reportData.byDate[date].revenue / 1000,
-          )
-            ? 0
-            : (
-                selectedApps[appId].reportData.byDate[date].revenue / 1000
-              ).toFixed(2),
-        });
+          impression: reportData[i].impression + impression,
+          revenue: +(reportData[i].revenue + revenue).toFixed(2),
+        };
+
+        i++;
       }
     }
 
@@ -458,16 +460,9 @@ export default class Overview extends Component {
       uniqueDatesArr.push(date);
     }
 
-    uniqueDatesArr = uniqueDatesArr.sort();
-    const sortedByDate = [];
+    uniqueDatesArr = STR.arrangeArrByDate(uniqueDatesArr);
 
-    for (let i = 2018; i <= new Date().getFullYear(); i++) {
-      uniqueDatesArr.forEach(date => {
-        if (date.includes(i)) sortedByDate.push(date);
-      });
-    }
-
-    sortedByDate.forEach(date => {
+    uniqueDatesArr.forEach(date => {
       labels.push(this.formatDate(date));
 
       if (totalByDate.revenue[date]) {
@@ -569,6 +564,7 @@ export default class Overview extends Component {
   }
 
   render() {
+    const { asyncLoading } = this.props;
     const { overviewData } = this.state;
 
     return (
@@ -578,36 +574,42 @@ export default class Overview extends Component {
           <span className="st">Overview</span>
         </div>
 
-        <div id="overview-data">
-          <div>
-            <div>{overviewData.impression}</div>
-            <span>Impressions</span>
-          </div>
-          <div>
-            <div>€ {overviewData.revenue}</div>
-            <span>Net Revenue</span>
-          </div>
-          <div>
-            <div>{overviewData.impressionUnique}</div>
-            <span>Uniques</span>
-          </div>
-          <div>
-            <div>{overviewData.fillRate}%</div>
-            <span>Fill rate</span>
-          </div>
-          <div>
-            <div>€ {overviewData.RPM}</div>
-            <span>RPM</span>
-          </div>
-        </div>
+        {asyncLoading && SVG.AdmixLoading({ loadingText: "Loading" })}
 
-        <div id="overview-graph">
-          <div className="graph">{this.renderGraph()}</div>
-        </div>
+        {!asyncLoading && (
+          <React.Fragment>
+            <div id="overview-data">
+              <div>
+                <div>{overviewData.impression}</div>
+                <span>Impressions</span>
+              </div>
+              <div>
+                <div>€ {overviewData.revenue}</div>
+                <span>Net Revenue</span>
+              </div>
+              <div>
+                <div>{overviewData.impressionUnique}</div>
+                <span>Uniques</span>
+              </div>
+              <div>
+                <div>{overviewData.fillRate}%</div>
+                <span>Fill rate</span>
+              </div>
+              <div>
+                <div>€ {overviewData.RPM}</div>
+                <span>RPM</span>
+              </div>
+            </div>
 
-        <div id="overview-graph-table">{this.renderGraphDataTable()}</div>
+            <div id="overview-graph">
+              <div className="graph">{this.renderGraph()}</div>
+            </div>
 
-        <div id="overview-table">{this.renderPreviousPeriodsTable()}</div>
+            <div id="overview-graph-table">{this.renderGraphDataTable()}</div>
+
+            <div id="overview-table">{this.renderPreviousPeriodsTable()}</div>
+          </React.Fragment>
+        )}
       </div>
     );
   }
