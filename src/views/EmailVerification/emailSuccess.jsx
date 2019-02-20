@@ -2,8 +2,6 @@ import React, { Component } from "react";
 import { Redirect } from "react-router-dom"
 import routeCodes from "../../config/routeCodes";
 
-// import OK from "../../assets/img/Thumbs_Up_Hand_Sign_Emoji.png";
-
 export default class Congratulations extends Component {
   static propTypes = {};
 
