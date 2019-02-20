@@ -139,13 +139,11 @@ class RegisterForm extends React.Component {
             <FormTextInput
               name="name"
               label="Username"
-              // guideline={`only letter`}
             />
             <FormTextInput
               name="email"
               label="Email"
               normalize={lowerCase}
-              // guideline={`valid email`}
             />
             <FormTextInput
               name="password"
@@ -161,8 +159,6 @@ class RegisterForm extends React.Component {
                 "Must have at least 8 characters, at least 1 letter and at least 1 number"
               }
               hideGuideLineOnSucces={true}
-              // guideline={this.passGuideline()}
-              // customonchange={this.setPassGuidelineStyle}
             />
             <FormTextInput
               name="passwordCheck"
@@ -205,7 +201,6 @@ class RegisterForm extends React.Component {
 const validate = values => {
   const errors = {};
   const { name, email, password, passwordCheck, privacy, dataUsage } = values;
-  // let error;
 
   if (!name) {
     errors.name = "We need a name!";
@@ -223,33 +218,6 @@ const validate = values => {
   ) {
     errors.password = "Invalid password.";
   }
-
-  // if (!password || !STR.isAtleast(password, 8)) {
-  //   errors.password = "Please add a minimum of 8 characters";
-  //   errors.password = true;
-  //   errors.passwordGuideline = errors.passwordGuideline || "";
-  //   errors.passwordGuideline += "limit";
-  // }
-
-  // if (!password || !STR.hasLetter(password)) {
-  //   error = "Please add a minimum of 1 letter";
-  //   errors.password = errors.password ? `${errors.password} - ${error}` : `${error}`;
-  //   errors.password = true;
-  //   errors.passwordGuideline = errors.passwordGuideline || "";
-  //   errors.passwordGuideline += "letter";
-  // }
-
-  // if (!password || !STR.hasNumber(password)) {
-  //   error = "Please add a minimum of 1 number";
-  //   errors.password = errors.password ? `${errors.password} - ${error}` : `${error}`;
-  //   errors.password = true;
-  //   errors.passwordGuideline = errors.passwordGuideline || "";
-  //   errors.passwordGuideline += "number";
-  // }
-
-  // if (!passwordCheck) {
-  //   errors.passwordCheck = true;
-  // }
 
   if (!passwordCheck || password !== passwordCheck) {
     errors.passwordCheck = "Passwords do not match!";
