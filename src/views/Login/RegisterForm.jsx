@@ -9,6 +9,7 @@ import STR from "../../utils/strFuncs";
 import { lowerCase } from "../../utils/normalizers";
 import isEqual from "lodash/isEqual";
 import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+import C from "../../utils/constants";
 
 const { register } = actions;
 
@@ -132,52 +133,71 @@ class RegisterForm extends React.Component {
     const feedbackStyle = asyncError ? { color: "red" } : {};
 
     return (
-      <React.Fragment>
-        <form onSubmit={handleSubmit(this.handleRegister)}>
-          <FormTextInput name="name" label="Name" guideline={`only letter`} />
-          <FormTextInput
-            name="email"
-            label="Email"
-            normalize={lowerCase}
-            guideline={`valid email`}
-          />
-          <FormTextInput
-            name="password"
-            type={hidePass ? "password" : "text"}
-            label="Password"
-            icon={
-              <FontAwesomeIcon icon="eye" onClick={this.togglePassInputType} />
-            }
-            guideline={this.passGuideline()}
-            customonchange={this.setPassGuidelineStyle}
-          />
-          <FormTextInput
-            name="passwordCheck"
-            type={hidePass ? "password" : "text"}
-            label="Confirm Password"
-            icon={
-              <FontAwesomeIcon icon="eye" onClick={this.togglePassInputType} />
-            }
-            guideline={`both password match`}
-          />
-          <Checkbox name="privacy" id="privacy" textComp={this.privacyText()} />
-          <Checkbox
-            name="dataUsage"
-            id="dataUsage"
-            textComp={this.dataUsageText()}
-          />
-          <button className="gradient-btn">Register</button>
+      <form onSubmit={handleSubmit(this.handleRegister)}>
+        {asyncMessage !== C.SUCCESS.emailSent && (
+          <React.Fragment>
+            <FormTextInput
+              name="name"
+              label="Username"
+              // guideline={`only letter`}
+            />
+            <FormTextInput
+              name="email"
+              label="Email"
+              normalize={lowerCase}
+              // guideline={`valid email`}
+            />
+            <FormTextInput
+              name="password"
+              type={hidePass ? "password" : "text"}
+              label="Password"
+              icon={
+                <FontAwesomeIcon
+                  icon="eye"
+                  onClick={this.togglePassInputType}
+                />
+              }
+              guideline={
+                "Must have at least 8 characters, at least 1 letter and at least 1 number"
+              }
+              hideGuideLineOnSucces={true}
+              // guideline={this.passGuideline()}
+              // customonchange={this.setPassGuidelineStyle}
+            />
+            <FormTextInput
+              name="passwordCheck"
+              type={hidePass ? "password" : "text"}
+              label="Confirm Password"
+              icon={
+                <FontAwesomeIcon
+                  icon="eye"
+                  onClick={this.togglePassInputType}
+                />
+              }
+            />
+            <Checkbox
+              name="privacy"
+              id="privacy"
+              textComp={this.privacyText()}
+            />
+            <Checkbox
+              name="dataUsage"
+              id="dataUsage"
+              textComp={this.dataUsageText()}
+            />
+            <button className="gradient-btn">Register</button>
+          </React.Fragment>
+        )}
 
-          <div
-            ref={e => (this.feedback = e)}
-            id="register-feedback"
-            className="animate fadeIn"
-            style={feedbackStyle}
-          >
-            {asyncLoading || asyncError || asyncMessage}
-          </div>
-        </form>
-      </React.Fragment>
+        <div
+          ref={e => (this.feedback = e)}
+          id="register-feedback"
+          className="animate fadeIn"
+          style={feedbackStyle}
+        >
+          {asyncLoading || asyncError || asyncMessage}
+        </div>
+      </form>
     );
   }
 }
@@ -185,39 +205,54 @@ class RegisterForm extends React.Component {
 const validate = values => {
   const errors = {};
   const { name, email, password, passwordCheck, privacy, dataUsage } = values;
+  // let error;
 
-  if (!name || !STR.hasOnlyLetters(name)) {
-    errors.name = true;
+  if (!name) {
+    errors.name = "We need a name!";
   }
 
   if (!email || !STR.isValidEmail(email)) {
-    errors.email = true;
+    errors.email = "Your email is invalid.";
   }
 
-  if (!password || !STR.isAtleast(password, 8)) {
-    errors.password = true;
-    errors.passwordGuideline = errors.passwordGuideline || "";
-    errors.passwordGuideline += "limit";
+  if (
+    !password ||
+    !STR.isAtleast(password, 8) ||
+    !STR.hasLetter(password) ||
+    !STR.hasNumber(password)
+  ) {
+    errors.password = "Invalid password.";
   }
 
-  if (!password || !STR.hasLetter(password)) {
-    errors.password = true;
-    errors.passwordGuideline = errors.passwordGuideline || "";
-    errors.passwordGuideline += "letter";
-  }
+  // if (!password || !STR.isAtleast(password, 8)) {
+  //   errors.password = "Please add a minimum of 8 characters";
+  //   errors.password = true;
+  //   errors.passwordGuideline = errors.passwordGuideline || "";
+  //   errors.passwordGuideline += "limit";
+  // }
 
-  if (!password || !STR.hasNumber(password)) {
-    errors.password = true;
-    errors.passwordGuideline = errors.passwordGuideline || "";
-    errors.passwordGuideline += "number";
-  }
+  // if (!password || !STR.hasLetter(password)) {
+  //   error = "Please add a minimum of 1 letter";
+  //   errors.password = errors.password ? `${errors.password} - ${error}` : `${error}`;
+  //   errors.password = true;
+  //   errors.passwordGuideline = errors.passwordGuideline || "";
+  //   errors.passwordGuideline += "letter";
+  // }
 
-  if (!passwordCheck) {
-    errors.passwordCheck = true;
-  }
+  // if (!password || !STR.hasNumber(password)) {
+  //   error = "Please add a minimum of 1 number";
+  //   errors.password = errors.password ? `${errors.password} - ${error}` : `${error}`;
+  //   errors.password = true;
+  //   errors.passwordGuideline = errors.passwordGuideline || "";
+  //   errors.passwordGuideline += "number";
+  // }
 
-  if (password !== passwordCheck) {
-    errors.passwordCheck = true;
+  // if (!passwordCheck) {
+  //   errors.passwordCheck = true;
+  // }
+
+  if (!passwordCheck || password !== passwordCheck) {
+    errors.passwordCheck = "Passwords do not match!";
   }
 
   if (!privacy) {
