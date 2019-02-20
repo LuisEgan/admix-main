@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { reduxForm } from "redux-form";
+import routeCodes from "../../config/routeCodes";
 import actions from "../../actions";
 import { resetAsync } from "../../actions/asyncActions";
 import FormTextInput from "../../components/formInputs/FormTextInput";
@@ -56,10 +57,24 @@ class LoginForm extends React.Component {
   }
 
   render() {
-    const { handleSubmit, renderAsyncMessage } = this.props;
+    const {
+      location: {
+        state: { from },
+      },
+      handleSubmit,
+      renderAsyncMessage,
+    } = this.props;
     const { hidePass } = this.state;
     return (
       <React.Fragment>
+        {from === routeCodes.EMAIL_SUCCESS && (
+          <div className="" style={{ color: "#14b9be", padding: "10px 0" }}>
+            Verified! You may log in now{" "}
+            <span role="img" aria-label="cool">
+              😎
+            </span>
+          </div>
+        )}
         <form onSubmit={handleSubmit(this.handleLogin)}>
           <FormTextInput name="email" label="Email" normalize={lowerCase} />
           <FormTextInput

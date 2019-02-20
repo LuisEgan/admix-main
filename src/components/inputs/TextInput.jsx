@@ -8,6 +8,7 @@ class Input extends React.Component {
     label: PropTypes.string,
     error: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
     showErrors: PropTypes.bool,
+    hideGuideLineOnSucces: PropTypes.bool
   };
 
   constructor(props) {
@@ -61,6 +62,7 @@ class Input extends React.Component {
       touched,
       error,
       guideline,
+      hideGuideLineOnSucces,
       customonchange,
       ...inputProps
     } = this.props;
@@ -77,7 +79,7 @@ class Input extends React.Component {
     const guidelineStyle = touched
       ? error
         ? { color: "red" }
-        : { color: "green" }
+        : hideGuideLineOnSucces ? { display: "none" } : { color: "green" }
       : {};
     error = typeof error === "object" ? JSON.stringify(error) : error;
 
