@@ -17,9 +17,15 @@ const views = {
 };
 
 const Forms = {
-  [views.login]: ram => <LoginForm renderAsyncMessage={ram} />,
-  [views.register]: ram => <RegisterForm renderAsyncMessage={ram} />,
-  [views.forgot]: ram => <ForgotPassForm renderAsyncMessage={ram} />,
+  [views.login]: (ram, l) => (
+    <LoginForm renderAsyncMessage={ram} location={l} />
+  ),
+  [views.register]: (ram, l) => (
+    <RegisterForm renderAsyncMessage={ram} location={l} />
+  ),
+  [views.forgot]: (ram, l) => (
+    <ForgotPassForm renderAsyncMessage={ram} location={l} />
+  ),
 };
 
 class Login extends Component {
@@ -115,10 +121,10 @@ class Login extends Component {
   }
 
   render() {
+    const { location } = this.props;
     const { show } = this.state;
     const formsStyle = show !== views.register ? { height: "45%" } : {};
     const navStyle = show !== views.register ? { height: "25%" } : {};
-
     return (
       <div id="login">
         <div>
@@ -131,7 +137,7 @@ class Login extends Component {
           </div>
 
           <div id="login-forms" style={formsStyle}>
-            {Forms[show](this.renderAsyncMessage)}
+            {Forms[show](this.renderAsyncMessage, location)}
           </div>
 
           <div id="login-nav" className="mb" style={navStyle}>
