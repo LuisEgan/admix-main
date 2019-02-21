@@ -97,7 +97,7 @@ class Download extends Component {
           <div className="mb download-bottom-section">
             <div>
               <span className="subtitle">VERSION</span>
-              <span>Admix.Unity_Rev1.5.2_Release.unitypackage</span>
+              <span>Admix.Unity_Rev1.6.2_Release.unitypackage</span>
               <span className="subtitle">SIZE</span>
               <span>2MB</span>
               <span className="subtitle">REQUIREMENTS</span>
