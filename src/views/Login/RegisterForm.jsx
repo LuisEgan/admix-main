@@ -99,7 +99,7 @@ class RegisterForm extends React.Component {
       <div className="mbs">
         I have read to Admix’s &nbsp;
         <a
-          href="https://admix.in/wp-content/uploads/2018/08/terms-1.pdf"
+          href="https://admix.in/wp-content/uploads/2019/02/Admix-Supply-Partner-Integration-and-Media-Agmt-web-acceptance-version-16-01-19.pdf"
           target="_blank"
           rel="noopener noreferrer"
         >
