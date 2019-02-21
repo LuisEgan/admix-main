@@ -39,12 +39,8 @@ const LOGOS = {
 
 const ERRORS = {
   error: "Sorry there was an error, please try again later",
-  noEmail: ["🤔 No email?", "🤷‍ We need an email!", "😵 Who are you?"],
-  noPassword: [
-    "🤔 Where's the password?",
-    "🤷‍ We need a password!",
-    "😵 Please enter a password",
-  ],
+  noEmail: ["Please enter a valid email"],
+  noPassword: ["Please enter a password"],
   failedLogin: "Wrong username or password",
   userExists: "Sorry, that user already exists!",
   onlyLetters: "This can only contain letters!",

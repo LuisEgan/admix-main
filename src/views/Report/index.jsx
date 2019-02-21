@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { isEmpty, cloneDeep, isEqual } from "lodash";
 import actions from "../../actions";
+import PanelFooter from "../../components/PanelFooter";
 
 import ToggleDisplay from "react-toggle-display";
 import DayPickerInput from "react-day-picker/DayPickerInput";
@@ -805,6 +806,23 @@ class Report extends Component {
               )}
             </div>
           </div>
+          <PanelFooter>
+            <div className="" style={{ height: "unset" }}>
+              *All info provided in the Reporting page is for purposes of
+              information only and subject to change based on adjustments from
+              demand partners source reporting. <br /> Check our{" "}
+              <u>
+                <a
+                  href="https://admix.in/wp-content/uploads/2019/02/Admix-Supply-Partner-Integration-and-Media-Agmt-web-acceptance-version-16-01-19.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  T&Cs
+                </a>{" "}
+              </u>
+              for more information.
+            </div>
+          </PanelFooter>
         </div>
 
         <div className="page-content" id="report-content">
