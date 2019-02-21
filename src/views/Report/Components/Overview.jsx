@@ -585,7 +585,7 @@ export default class Overview extends Component {
               </div>
               <div>
                 <div>€ {overviewData.revenue}</div>
-                <span>Net Revenue</span>
+                <span>Estimated net revenue*</span>
               </div>
               <div>
                 <div>{overviewData.impressionUnique}</div>

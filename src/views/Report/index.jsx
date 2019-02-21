@@ -810,7 +810,7 @@ class Report extends Component {
             <div className="" style={{ height: "unset" }}>
               *All info provided in the Reporting page is for purposes of
               information only and subject to change based on adjustments from
-              demand partners source reporting. <br /> Checkout our{" "}
+              demand partners source reporting. <br /> Check our{" "}
               <u>
                 <a
                   href="https://admix.in/wp-content/uploads/2019/02/Admix-Supply-Partner-Integration-and-Media-Agmt-web-acceptance-version-16-01-19.pdf"
