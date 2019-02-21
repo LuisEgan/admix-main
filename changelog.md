@@ -1,3 +1,6 @@
+--- 2.2.1
+Update plugin download link for plugin v1.6.2
+
 --- 2.2.0
 Update noEmail and noPass error messages
 Update T&Cs link
