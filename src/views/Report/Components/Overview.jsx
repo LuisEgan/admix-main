@@ -585,7 +585,9 @@ export default class Overview extends Component {
               </div>
               <div>
                 <div>€ {overviewData.revenue}</div>
-                <span>Estimated net revenue*</span>
+                <span style={{ textAlign: "center" }}>
+                  Estimated net revenue*
+                </span>
               </div>
               <div>
                 <div>{overviewData.impressionUnique}</div>
