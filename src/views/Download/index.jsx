@@ -99,7 +99,7 @@ class Download extends Component {
               <span className="subtitle">VERSION</span>
               <span>Admix.Unity_Rev1.6.2_Release.unitypackage</span>
               <span className="subtitle">SIZE</span>
-              <span>2MB</span>
+              <span>4MB</span>
               <span className="subtitle">REQUIREMENTS</span>
               <span>Unity 2017.4.14f1 LTS and above</span>
             </div>
