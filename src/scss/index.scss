@@ -2439,6 +2439,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
         @extend .mb;
         color: #ffffff;
         opacity: 0.4;
+        max-height: 15px;
       }
       > div {
         @extend .cc;
