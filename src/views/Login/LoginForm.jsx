@@ -57,6 +57,7 @@ class LoginForm extends React.Component {
   }
 
   render() {
+	const from = history.location ?  history.location.from  :  {};
     const {
       location: {
         state: { from },
@@ -64,6 +65,8 @@ class LoginForm extends React.Component {
       handleSubmit,
       renderAsyncMessage,
     } = this.props;
+	
+	
     const { hidePass } = this.state;
     return (
       <React.Fragment>
