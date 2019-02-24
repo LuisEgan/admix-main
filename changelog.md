@@ -1,5 +1,5 @@
 --- 2.3.0
-Add video in help section
+Add tutorial video in download section
 Hide filter and global report if there are no apps
 Separate in routes login, forgot password and register forms in: /login, /forgot and /register
 
