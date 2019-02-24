@@ -1661,12 +1661,12 @@ $inputsFontSize: calc(0.45em+0.3vw);
   }
   form {
     margin: auto;
-    >div {
+    > div {
       padding: 5% 0;
-      &:last-child{
+      &:last-child {
         text-align: center;
       }
-      >div {
+      > div {
         padding-bottom: 5%;
       }
     }
@@ -2817,6 +2817,10 @@ $inputsFontSize: calc(0.45em+0.3vw);
 // DOWNLOAD ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------------
 #download {
+  iframe {
+    width: 100%;
+    padding: 10px 0;
+  }
   > div {
     div {
       display: flex;
@@ -2824,12 +2828,17 @@ $inputsFontSize: calc(0.45em+0.3vw);
     }
     .download-top-section {
       justify-content: space-between;
+      svg {
+        width: 5vw;
+        height: 100px;
+        min-width: 50px;
+      }
       > div {
         border-radius: 10px;
         flex-flow: column;
         justify-content: space-evenly;
         width: 30%;
-        padding: 3% 0;
+        // padding: 3% 0;
         > div {
           padding: 0 10%;
         }
@@ -2875,7 +2884,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
       > div {
         margin: 10px 0;
         justify-content: center;
-        min-height: 25%;
+        min-height: 15%;
       }
     }
     #download-unity {
@@ -2901,9 +2910,15 @@ $inputsFontSize: calc(0.45em+0.3vw);
     #download-help {
       div {
         justify-content: center;
+        padding: 0;
       }
       a {
         color: #14b9be;
+      }
+      > div {
+        &:first-child {
+          padding-bottom: 10px;
+        }
       }
     }
   }
