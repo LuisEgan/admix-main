@@ -58,7 +58,7 @@ class LoginForm extends React.Component {
 
   render() {
     const { location, handleSubmit, renderAsyncMessage } = this.props;
-    const from = location ? location.state.from : {};
+    const from = location && location.state ? location.state.from : {};
 
     const { hidePass } = this.state;
     return (

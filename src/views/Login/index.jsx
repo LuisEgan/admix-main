@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import { Redirect } from "react-router-dom";
 import PropTypes from "prop-types";
 import actions from "../../actions";
 
@@ -7,6 +8,7 @@ import admixLogo from "../../assets/img/logo.png";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import ForgotPassForm from "./ForgotPassForm";
+import routeCodes from "../../config/routeCodes";
 
 const { resendSignUpEmail } = actions;
 
@@ -37,12 +39,17 @@ class Login extends Component {
   constructor(props) {
     super(props);
 
+    const show =
+      props.location && props.location.pathname === "/register"
+        ? views.register
+        : views.login;
+
     this.state = {
       policy: false,
       consent: false,
       registerBtnDisabled: true,
       passInputType: "password",
-      show: views.login,
+      show,
     };
 
     this.resendSignUpEmail = this.resendSignUpEmail.bind(this);
@@ -53,7 +60,14 @@ class Login extends Component {
   }
 
   toggleView(show) {
-    this.setState({ show });
+    const { history } = this.props;
+    this.setState({ show }, () => {
+      if (show === views.register) {
+        history.push(routeCodes.REGISTER);
+      } else if (show === views.login) {
+        history.push(routeCodes.LOGIN);
+      }
+    });
   }
 
   resendSignUpEmail() {
@@ -125,6 +139,7 @@ class Login extends Component {
     const { show } = this.state;
     const formsStyle = show !== views.register ? { height: "45%" } : {};
     const navStyle = show !== views.register ? { height: "25%" } : {};
+
     return (
       <div id="login">
         <div>

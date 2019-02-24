@@ -615,29 +615,31 @@ class MyApps extends Component {
           <h3 className="st sc-h3">My apps</h3>
         </div>
 
-        <div id="apps-buttons">
-          <button
-            id="filter"
-            className="mb unselectable white-btn"
-            onClick={this.addFilter.bind(null, "main")}
-          >
-            {SVG.filter} &nbsp;
-            <span>Filter selection</span>
-          </button>
-
-          {/* REPORT COMMENTED */}
-          {renderGlobal && (
+        {anyApps && (
+          <div id="apps-buttons">
             <button
+              id="filter"
               className="mb unselectable white-btn"
-              onClick={this.getReportData.bind(null, {
-                appsIds: allAppsIds,
-              })}
+              onClick={this.addFilter.bind(null, "main")}
             >
-              {SVG.globalReport} &nbsp;
-              <span>Global Report</span>
+              {SVG.filter} &nbsp;
+              <span>Filter selection</span>
             </button>
-          )}
-        </div>
+
+            {/* REPORT COMMENTED */}
+            {renderGlobal && (
+              <button
+                className="mb unselectable white-btn"
+                onClick={this.getReportData.bind(null, {
+                  appsIds: allAppsIds,
+                })}
+              >
+                {SVG.globalReport} &nbsp;
+                <span>Global Report</span>
+              </button>
+            )}
+          </div>
+        )}
 
         {!showContent && SVG.AdmixLoading({ loadingText: "Loading" })}
 

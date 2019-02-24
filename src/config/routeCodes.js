@@ -3,6 +3,7 @@ const publicPath = "/";
 export default {
   PUBLIC_PATH: publicPath,
   LOGIN: `${publicPath}login`,
+  REGISTER: `${publicPath}register`,
   MYAPPS: `${publicPath}myapps`,
   INFO: `${publicPath}info`,
   SCENE: `${publicPath}scene`,
