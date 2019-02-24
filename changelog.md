@@ -1,7 +1,7 @@
 --- 2.3.0
 Add tutorial video in download section
 Hide filter and global report if there are no apps
-Separate in routes login, forgot password and register forms in: /login, /forgot and /register
+Separate in routes login and register forms in: /login and /register
 
 --- 2.2.1
 Update plugin download link for plugin v1.6.2
