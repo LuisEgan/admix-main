@@ -1,13 +1,13 @@
 import React from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import Popup from "./Popup";
-import TextInput from "./inputs/TextInput";
-import actions from "../actions";
+import Popup from "../Popup";
+import TextInput from "../inputs/TextInput";
+import actions from "../../actions";
 
-import _a from "../utils/analytics";
-import C from "../utils/constants";
-import STR from "../utils/strFuncs";
+import _a from "../../utils/analytics";
+import C from "../../utils/constants";
+import STR from "../../utils/strFuncs";
 
 const { ga } = _a;
 

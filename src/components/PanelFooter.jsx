@@ -1,5 +1,5 @@
 import React from "react";
-import AppsStateToggle from "./AppStateToggle";
+import AppsStateToggle from "./AppStateToggle/";
 import C from "../utils/constants";
 
 class PanelFooter extends React.Component {
