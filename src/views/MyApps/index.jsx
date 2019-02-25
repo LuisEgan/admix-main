@@ -549,7 +549,7 @@ class MyApps extends Component {
             </h3>
             <h2 className="mb">
               To get started, create your inventory in Unity with the <br />{" "}
-              Advir plugin. Apps will appear here automatically.
+              Admix plugin. Apps will appear here automatically.
             </h2>
             <h2 className="mb">
               <br />
