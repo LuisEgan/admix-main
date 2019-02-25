@@ -74,14 +74,14 @@ class Download extends Component {
               </div>
               <div>
                 <span className="mb" style={{ width: "100%" }}>
-                  Here is how to get started with Admix in less than 3 minutes
+                  Here is how to get started with Admix <br/> in less than 3 minutes
                   <iframe
                     width="560"
                     height="315"
                     src="https://www.youtube.com/embed/E1Vu6vVbcKU"
-                    frameborder="0"
+                    frameBorder="0"
                     allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen
+                    allowFullScreen
                   />
                 </span>
               </div>
