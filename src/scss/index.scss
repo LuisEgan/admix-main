@@ -3265,19 +3265,21 @@ $ballSize: 20px;
     background-color: rgba(0, 0, 0, 0.5);
   }
   .popup-inner {
-    width: 30%;
+    width: 35%;
     background: white;
     padding: 2% 5%;
     border-radius: 5px;
-    text-align: center;
     z-index: 1;
     .popup-title {
       @extend .st;
+      display: block;
+      width: 100%;
+      text-align: center;
       padding: 5px 0;
     }
     .popup-text {
       @extend .mb;
-      padding: 5px;
+      padding: 5px 0;
     }
     .gradient-btn {
       width: 100%;

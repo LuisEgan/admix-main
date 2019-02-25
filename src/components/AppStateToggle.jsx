@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import Popup from "./Popup";
+import TextInput from "./inputs/TextInput";
 import actions from "../actions";
 
 import _a from "../utils/analytics";
@@ -16,18 +17,24 @@ class AppStateToggle extends React.Component {
   constructor(props) {
     super(props);
 
+    const {
+      app: { storeurl },
+    } = props;
+
     this.state = {
       oninactive: false,
       onsandbox: false,
       onlive: false,
       reviewClicked: false,
       showPopup: false,
+      storeurl,
     };
 
     this.togglePopup = this.togglePopup.bind(this);
     this.handleSubmitForReview = this.handleSubmitForReview.bind(this);
     this.handleMouseHover = this.handleMouseHover.bind(this);
     this.handleAppStateClick = this.handleAppStateClick.bind(this);
+    this.handleInputOnchange = this.handleInputOnchange.bind(this);
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -54,11 +61,14 @@ class AppStateToggle extends React.Component {
       app: { _id },
     } = this.props;
 
+    const { storeurl } = this.state;
+
     const appDetails = {
       appId: _id,
       newData: {
         isActive: false,
         appState: C.APP_STATES.pending,
+        storeurl,
       },
     };
 
@@ -123,12 +133,20 @@ class AppStateToggle extends React.Component {
     toggleAppStatus(appDetails, accessToken);
   }
 
+  handleInputOnchange(input, e) {
+    const {
+      target: { value },
+    } = e;
+    this.setState({ [input]: value });
+  }
+
   liveText(appState) {
     const text =
       appState === C.APP_STATES.pending
         ? {
             title: "Pending",
-            tooltip: "In PENDING mode, your app is being reviewed, and you cannot toggle its status in the meantime.",
+            tooltip:
+              "In PENDING mode, your app is being reviewed, and you cannot toggle its status in the meantime.",
           }
         : {
             title: STR.capitalizeFirstLetter(C.APP_STATES.live),
@@ -139,7 +157,7 @@ class AppStateToggle extends React.Component {
 
   render() {
     let { app, asyncLoading, displayTooltip } = this.props;
-    const { showPopup, oninactive, onsandbox, onlive } = this.state;
+    const { showPopup, oninactive, onsandbox, onlive, storeurl } = this.state;
     const { appState } = app;
 
     if (displayTooltip === undefined) displayTooltip = true;
@@ -177,6 +195,8 @@ class AppStateToggle extends React.Component {
             asyncLoading={asyncLoading}
             handleSubmitForReview={this.handleSubmitForReview}
             togglePopup={this.togglePopup}
+            handleInputOnchange={this.handleInputOnchange}
+            storeurl={storeurl}
           />
         </Popup>
         <div className="appStateToggle">
@@ -259,15 +279,35 @@ const AppStateTogglePopup = ({
   asyncLoading,
   handleSubmitForReview,
   togglePopup,
+  handleInputOnchange,
+  storeurl,
 }) => {
   return (
     <React.Fragment>
       <span className="popup-title">Ready to go live?</span>
       <br />
-      <br />
       <span className="popup-text">
-        Your app will be submitted for review to make sure all is ok. This can
-        take 1 to 2h. After that, you'll start to make revenue.
+        To go Live, your app needs to be published on a Store
+      </span>
+      <br />
+      <br />
+      <TextInput
+        name="popupUrl"
+        label="Your app URL"
+        placeholder="Your app store URL here (Google Play Store, Steam)"
+        onChange={e => handleInputOnchange("storeurl", e)}
+        value={storeurl}
+      />
+      <br />
+      <span className="popup-text">Next, your app will be pending review</span>
+      <br />
+      <span className="mbs" style={{ fontWeight: "normal" }}>
+        We'll make some final checks to make sure it is setup properly. This can
+        take up to 2h. After that, your app will become Live and you'll start to
+        make revenue{" "}
+        <span role="img" aria-label="wohoo">
+          🎉
+        </span>
       </span>
       <br />
       <br />
@@ -322,7 +362,14 @@ const mapDispatchToProps = dispacth => {
     toggleAppStatus: (appDetails, accessToken) =>
       dispacth(toggleAppStatus(appDetails, accessToken)),
     updateUserStatus: (userId, accessToken) =>
-      dispacth(updateUser({userId, newData: { status: 4 }, accessToken, noSetAsync: true})),
+      dispacth(
+        updateUser({
+          userId,
+          newData: { status: 4 },
+          accessToken,
+          noSetAsync: true,
+        }),
+      ),
   };
 };
 
