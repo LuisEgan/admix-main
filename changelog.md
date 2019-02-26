@@ -1,4 +1,5 @@
 --- 2.3.0
+Add store url to review popup
 Add tutorial video in download section
 Hide filter and global report if there are no apps
 Separate in routes login and register forms in: /login and /register
