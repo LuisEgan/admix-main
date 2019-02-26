@@ -419,19 +419,22 @@ class Info extends Component {
             </div>
 
             {show("url") && (
-              <div id="info-url">
-                <FormTextInput
-                  name="storeurl"
-                  label="App store URL"
-                  icon={
-                    <ReactSVG
-                      src={SVG_delete}
-                      className="input-delete"
-                      onClick={this.deleteValue.bind(null, "storeurl")}
-                    />
-                  }
-                />
-              </div>
+              <React.Fragment>
+                asdawdwdas
+                <div id="info-url">
+                  <FormTextInput
+                    name="storeurl"
+                    label="App store URL"
+                    icon={
+                      <ReactSVG
+                        src={SVG_delete}
+                        className="input-delete"
+                        onClick={this.deleteValue.bind(null, "storeurl")}
+                      />
+                    }
+                  />
+                </div>
+              </React.Fragment>
             )}
 
             {show("aud") && (
@@ -472,9 +475,8 @@ class Info extends Component {
                   </span>{" "}
                   <br />
                   <br />
-                  This will inactivate your app and you will not be able to
-                  activate it and it will dissappear from your "My apps" menu.{" "}
-                  <br />
+                  This will deactivate your app and it will disappear from the
+                  "My apps" menu. Are you sure you want to continue? <br />
                   <span className="mbs">
                     Note: you can re-activate it by contacting{" "}
                     <a href="mailto:support@admix.in">support@admix.in</a>
@@ -486,7 +488,7 @@ class Info extends Component {
                     type="button"
                     onClick={this.handleDelete}
                   >
-                    Confirm
+                    Confirm deletion
                   </button>
                 </React.Fragment>
               )}
