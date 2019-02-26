@@ -1,8 +1,11 @@
---- 2.3.0
+--- 2.4.0
 Add store url to review popup
 Add tutorial video in download section
 Hide filter and global report if there are no apps
 Separate in routes login and register forms in: /login and /register
+
+--- 2.3.0
+/emailSuccess now has a success message and a link to /login
 
 --- 2.2.1
 Update plugin download link for plugin v1.6.2
