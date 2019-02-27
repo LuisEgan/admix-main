@@ -31,6 +31,7 @@ import {
   KeyboardArrowRight,
   Timeline,
 } from "@material-ui/icons";
+import GuideBox from "../../components/GuideBox";
 // import SVG from "../../components/SVG";
 
 const { ga } = _a;
@@ -402,9 +403,6 @@ class Info extends Component {
           <form onSubmit={handleSubmit(this.handleUpdateInfo)}>
             <Breadcrumbs breadcrumbs={this.breadcrumbs} />
             <div id="info-header">
-              <div className="engine-logo">
-                {C.LOGOS[selectedApp.appEngine]}
-              </div>
               <div>
                 <h3 className="st">{selectedApp.name}</h3>
               </div>
@@ -420,7 +418,7 @@ class Info extends Component {
 
             {show("url") && (
               <React.Fragment>
-                asdawdwdas
+                <GuideBox text="To go Live and start generating revenue, your app needs to be published in a Store. Add the store URL in the field below." />
                 <div id="info-url">
                   <FormTextInput
                     name="storeurl"
@@ -432,38 +430,45 @@ class Info extends Component {
                         onClick={this.deleteValue.bind(null, "storeurl")}
                       />
                     }
+                    placeholder="Eg: https://play.google.com/store/apps/details?id=com.your.app.here"
                   />
                 </div>
               </React.Fragment>
             )}
 
             {show("aud") && (
-              <div id="info-aud">
-                {this.renderExpansionPanel({
-                  panelIcon: this.expMetrics.panelIcon,
-                  panelTitle: this.expMetrics.panelTitle,
-                  fields: this.expMetrics.fields,
-                })}
+              <React.Fragment>
+                <GuideBox text="Please fill as much information on your app as possible to help us maximise your revenue. This data helps us forecast the amount of inventory your app will generate and prioritise it with our advertisers." />
+                <div id="info-aud">
+                  {this.renderExpansionPanel({
+                    panelIcon: this.expMetrics.panelIcon,
+                    panelTitle: this.expMetrics.panelTitle,
+                    fields: this.expMetrics.fields,
+                  })}
 
-                {this.renderExpansionPanel({
-                  panelIcon: this.expGeos.panelIcon,
-                  panelTitle: this.expGeos.panelTitle,
-                  fields: this.expGeos.fields,
-                })}
+                  {this.renderExpansionPanel({
+                    panelIcon: this.expGeos.panelIcon,
+                    panelTitle: this.expGeos.panelTitle,
+                    fields: this.expGeos.fields,
+                  })}
 
-                {this.renderExpansionPanel({
-                  panelIcon: this.expDemos.panelIcon,
-                  panelTitle: this.expDemos.panelTitle,
-                  fields: this.expDemos.fields,
-                })}
-              </div>
+                  {this.renderExpansionPanel({
+                    panelIcon: this.expDemos.panelIcon,
+                    panelTitle: this.expDemos.panelTitle,
+                    fields: this.expDemos.fields,
+                  })}
+                </div>
+              </React.Fragment>
             )}
           </form>
 
           {show("cal") && (
-            <div>
-              <AdmixCalculator initialValues={calculatorInitialValues} />
-            </div>
+            <React.Fragment>
+              <GuideBox text="Complete the fields below to project how much revenue your app can make. Figures are for indication only and can vary based on our fill rate and the location of your users." />
+              <div>
+                <AdmixCalculator initialValues={calculatorInitialValues} />
+              </div>
+            </React.Fragment>
           )}
 
           {show("del") && (
