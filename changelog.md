@@ -1,4 +1,10 @@
 --- 2.4.0
+
+Change /info calculator formula
+    - CPM fixed to 10
+    - Add .25 multiplicator
+    - Remove .00 to digits
+Add guide texts to /info
 Add store url to review popup
 Add tutorial video in download section
 Hide filter and global report if there are no apps
