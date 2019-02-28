@@ -91,12 +91,6 @@ class App extends Component {
     return (
       <ErrorCatcher>
         <div className="App">
-          {/* <Menu
-            isLoggedIn={isLoggedIn}
-            location={location}
-            history={history}
-            onRef={ref => (this.menu = ref)}
-          /> */}
           <div id="Page">
             <SideMenu location={location} history={history} />
             <div id="content" style={contentStyle}>
