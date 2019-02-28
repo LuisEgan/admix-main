@@ -346,7 +346,7 @@ export default class MenuPanel extends Component {
             </span>
             <span className="sst">{selectedApp.name}</span>
           </div>
-          <MainNavButtons />
+          <MainNavButtons appId={selectedApp._id} />
         </div>
 
         {this.renderScenesSelect()}

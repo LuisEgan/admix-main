@@ -9,6 +9,7 @@ import PropTypes from "prop-types";
 import validate from "validate.js";
 import FormTextInput from "../../components/formInputs/FormTextInput";
 import isEqual from "lodash/isEqual";
+import MainNavButtons from "../../components/MainNavButtons";
 
 import Breadcrumbs from "../../components/Breadcrumbs";
 import PanelFooter from "../../components/PanelFooter";
@@ -344,6 +345,7 @@ class Info extends Component {
               </span>
               <span className="sst">{selectedApp.name}</span>
             </div>
+            <MainNavButtons appId={selectedApp._id} />
           </div>
           <div className="list-group">
             <div

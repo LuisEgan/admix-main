@@ -1083,7 +1083,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
   min-width: 250px;
   box-shadow: 0 3px 4px 0 rgba(10, 31, 68, 0.1);
   > div {
-    padding: 20px 25px;
+    padding: 25px 30px;
   }
   .panel-title-container {
     border-bottom: solid #f5f7fa;
@@ -1811,6 +1811,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
   display: flex;
   position: relative;
   padding: 1% 0;
+  flex-flow: row !important;
   button {
     background-color: #ffffff;
     border: none;

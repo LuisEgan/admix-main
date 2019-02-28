@@ -500,26 +500,7 @@ class MyApps extends Component {
             </div>
 
             <div>
-              <MainNavButtons
-                editOnClick={() =>
-                  this.selectApp({
-                    appId: _id,
-                    redirect: routeCodes.SCENE,
-                  })
-                }
-                infoOnClick={() =>
-                  this.selectApp({
-                    appId: _id,
-                    redirect: routeCodes.INFO,
-                  })
-                }
-                reportOnClick={() =>
-                  this.getReportData({
-                    appsIds: _id,
-                    userId,
-                  })
-                }
-              />
+              <MainNavButtons appId={_id} userId={userId} />
             </div>
           </div>
         </div>
