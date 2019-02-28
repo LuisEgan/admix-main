@@ -1127,6 +1127,12 @@ $inputsFontSize: calc(0.45em+0.3vw);
       }
     }
   }
+  .list-group-footer {
+    @extend .list-group;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+  }
   .panel-footer {
     color: #53627c;
     position: absolute;
@@ -2636,9 +2642,20 @@ $inputsFontSize: calc(0.45em+0.3vw);
 // PROFILE ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------------
 #profile {
+  iframe {
+    width: 100%;
+    height: 70vh;
+  }
   .step-title {
     display: flex;
     justify-content: space-between;
+    margin-bottom: 5vh;
+    align-items: center;
+  }
+  .step-content {
+    display: flex;
+    width: 100%;
+    justify-content: space-evenly;
   }
   .profile-helper-text {
     padding: 5%;
@@ -2724,7 +2741,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
           > div {
             width: 65%;
             &:first-child {
-              width: 30%;
+              // width: 30%;
             }
           }
         }

@@ -40,6 +40,7 @@
         "react-day-picker": "^7.1.6",
         "react-dom": "^16.3.2",
         "react-dropzone": "^4.2.9",
+        "react-pdf": "^4.0.3",
         "react-progressbar": "^15.4.1",
         "react-redux": "^5.0.7",
         "react-router": "^4.2.0",
