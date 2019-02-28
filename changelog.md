@@ -1,4 +1,8 @@
 --- 2.4.0
+Redo /profile
+    - Follow same structure as Edit page with left panel
+    - Organise existing sections into tabs
+    - Link to T&Cs / logout button
 Add profile link with picture to side menu
 Delete header Menu
 Change /info calculator formula
