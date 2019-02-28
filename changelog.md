@@ -1,5 +1,6 @@
 --- 2.4.0
-
+Add profile link with picture to side menu
+Delete header Menu
 Change /info calculator formula
     - CPM fixed to 10
     - Add .25 multiplicator
