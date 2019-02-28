@@ -14,6 +14,7 @@ import Select from "@material-ui/core/Select";
 import { KeyboardArrowDown } from "@material-ui/icons";
 
 import AppsStateToggle from "../../components/AppStateToggle";
+import MainNavButtons from "../../components/MainNavButtons";
 import Input from "../../components/inputs/TextInput";
 import SVG from "../../components/SVG";
 import CSS from "../../utils/InLineCSS";
@@ -499,34 +500,26 @@ class MyApps extends Component {
             </div>
 
             <div>
-              <div className="app-buttons">
-                <button
-                  onClick={this.selectApp.bind(null, {
+              <MainNavButtons
+                editOnClick={() =>
+                  this.selectApp({
                     appId: _id,
                     redirect: routeCodes.SCENE,
-                  })}
-                >
-                  {SVG.setup}
-                </button>
-                <button
-                  onClick={this.selectApp.bind(null, {
+                  })
+                }
+                infoOnClick={() =>
+                  this.selectApp({
                     appId: _id,
                     redirect: routeCodes.INFO,
-                  })}
-                >
-                  {SVG.info}
-                </button>
-
-                {/* REPORT COMMENTED */}
-                <button
-                  onClick={this.getReportData.bind(null, {
+                  })
+                }
+                reportOnClick={() =>
+                  this.getReportData({
                     appsIds: _id,
                     userId,
-                  })}
-                >
-                  {SVG.report}
-                </button>
-              </div>
+                  })
+                }
+              />
             </div>
           </div>
         </div>

@@ -992,17 +992,38 @@ $inputsFontSize: calc(0.45em+0.3vw);
 #sideMenu {
   display: flex;
   flex-flow: column;
-  position: relative;
   z-index: 3;
   width: 7.5%;
-  padding-top: 30px;
-  min-width: 115px;
   background-image: linear-gradient(135.78deg, #002590 0%, #1388b7 50.87%, #56c4c6 100%);
+  min-width: 115px;
+  padding: 2.5% 0;
+}
+#sideMenu-header {
+  height: 15%;
+  text-align: center;
+  img {
+    width: 70%;
+  }
+}
+#sideMenu-body {
+  position: relative;
+  display: flex;
+  flex-flow: column;
+  justify-content: space-between;
+  height: 90%;
+  width: 100%;
 
+  img {
+    max-width: 50px;
+  }
   svg {
+    min-width: 100%;
     g {
       fill: white;
     }
+  }
+  button {
+    overflow: hidden;
   }
   > div {
     @extend .mbs;
@@ -1014,7 +1035,6 @@ $inputsFontSize: calc(0.45em+0.3vw);
     height: 15vh;
     max-height: 120px;
     opacity: 0.3;
-    margin-bottom: 10%;
     color: #ffffff;
     &:hover {
       opacity: 1;
@@ -1030,6 +1050,13 @@ $inputsFontSize: calc(0.45em+0.3vw);
     }
     > div {
       padding: 7% 0;
+    }
+    &:nth-child(3) {
+      > div {
+        svg {
+          font-size: 3em;
+        }
+      }
     }
   }
   .selectedSection {
@@ -1752,23 +1779,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
           height: 80%;
           min-width: 200px;
         }
-        .app-buttons {
-          display: flex;
-          position: relative;
-          padding: 1% 0;
-          button {
-            background-color: #ffffff;
-            border: none;
-            border-radius: 50px;
-            padding: 0;
-            &:not(:first-of-type) {
-              margin-left: 8px;
-            }
-            &:focus {
-              outline: none;
-            }
-          }
-        }
+
         .pendingState {
           box-shadow: inset 0 0 0 20px orange, 0 0 0 2px orange;
         }
@@ -1787,6 +1798,23 @@ $inputsFontSize: calc(0.45em+0.3vw);
     h3,
     h2 {
       padding: 1.2%;
+    }
+  }
+}
+.app-buttons {
+  display: flex;
+  position: relative;
+  padding: 1% 0;
+  button {
+    background-color: #ffffff;
+    border: none;
+    border-radius: 50px;
+    padding: 0;
+    &:not(:first-of-type) {
+      margin-left: 8px;
+    }
+    &:focus {
+      outline: none;
     }
   }
 }
@@ -1872,15 +1900,18 @@ $inputsFontSize: calc(0.45em+0.3vw);
   #scene-menu-panel {
     > div {
       display: flex;
+      flex-direction: column;
       &:not(:first-child) {
         padding: 5% 0;
       }
       > div {
         display: flex;
         padding: 0 10%;
-        flex-direction: column;
         > span {
           padding-bottom: 5px;
+        }
+        &:first-child {
+          flex-direction: column;
         }
       }
     }
