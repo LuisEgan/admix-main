@@ -14,8 +14,6 @@ export class AdmixCalculator extends React.Component {
       admixCut: 0,
       expected: 0,
     };
-
-    this.updateInput = this.updateInput.bind(this);
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -24,6 +22,7 @@ export class AdmixCalculator extends React.Component {
     const { admixCalculatorForm } = nextProps;
     const values = { ...admixCalculatorForm };
     const { cpm, mau, session, avg } = values;
+    console.log('cpm: ', cpm);
 
     if (
       cpm !== prevState.cpm &&
@@ -31,34 +30,13 @@ export class AdmixCalculator extends React.Component {
       session !== prevState.session &&
       avg !== prevState.avg
     ) {
-      newState.impressions = Math.round(mau * session * avg);
+      newState.impressions = Math.round(mau * session * avg) * 0.25;
       newState.revenue = Math.round((newState.impressions * cpm) / 1000);
       newState.admixCut = Math.round(newState.revenue / 5);
-      newState.expected =
-        Math.round(newState.revenue - newState.admixCut) * 0.25;
+      newState.expected = Math.round(newState.revenue - newState.admixCut);
     }
 
     return newState;
-  }
-
-  updateInput(e) {
-    const { admixCalculatorForm } = this.props;
-    const {
-      target: { value, name },
-    } = e;
-
-    const values = { ...admixCalculatorForm };
-    values[name] = onlyNums(value);
-
-    const { cpm, mau, session, avg } = values;
-    const newState = { ...this.state };
-
-    newState.impressions = Math.round(mau * session * avg);
-    newState.revenue = Math.round((newState.impressions * cpm) / 1000);
-    newState.admixCut = Math.round(newState.revenue / 5);
-    newState.expected = Math.round(newState.revenue - newState.admixCut) * 0.25;
-
-    this.setState(newState);
   }
 
   renderField(field) {
@@ -74,12 +52,7 @@ export class AdmixCalculator extends React.Component {
       <div className="admix-calculator">
         <div>Monthly Active Users for this app</div>
         <div>
-          <Field
-            component={this.renderField}
-            name="mau"
-            normalize={onlyNums}
-            onChange={this.updateInput}
-          />
+          <Field component={this.renderField} name="mau" normalize={onlyNums} />
         </div>
 
         <div>Average number of Session / User / Month</div>
@@ -88,21 +61,15 @@ export class AdmixCalculator extends React.Component {
             component={this.renderField}
             name="session"
             normalize={onlyNums}
-            onChange={this.updateInput}
           />
         </div>
 
         <div>Number of ads placed in your app</div>
         <div>
-          <Field
-            component={this.renderField}
-            name="avg"
-            normalize={onlyNums}
-            onChange={this.updateInput}
-          />
+          <Field component={this.renderField} name="avg" normalize={onlyNums} />
         </div>
 
-        <div id="admixCalc-impressions">Impressions generated</div>
+        <div id="admixCalc-impressions">Average Impressions generated</div>
         <div id="impressions">{impressions}</div>
 
         <div>Gross revenue ($)</div>
@@ -126,11 +93,11 @@ const mapStateToProps = (state, props) => {
 
   return {
     initialValues: {
-      cpm: 20,
       mau: 0,
       session: 0,
       avg: 0,
       ...initialValues,
+      cpm: 10,
     },
     admixCalculatorForm: admixCalculatorForm ? admixCalculatorForm.values : {},
   };
