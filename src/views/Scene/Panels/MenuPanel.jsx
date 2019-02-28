@@ -18,7 +18,7 @@ import { KeyboardArrowDown } from "@material-ui/icons";
 import STR from "../../../utils/strFuncs";
 import SVG from "../../../components/SVG";
 import PanelFooter from "../../../components/PanelFooter";
-import MainNavButtons from "../../../components/MainNavButtons"
+import MainNavButtons from "../../../components/MainNavButtons";
 
 const { ga } = _a;
 
@@ -346,7 +346,7 @@ export default class MenuPanel extends Component {
             </span>
             <span className="sst">{selectedApp.name}</span>
           </div>
-          <MainNavButtons/>
+          <MainNavButtons />
         </div>
 
         {this.renderScenesSelect()}
