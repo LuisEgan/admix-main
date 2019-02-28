@@ -325,7 +325,6 @@ export default class MenuPanel extends Component {
 
   render() {
     const { selectedApp, displayMode } = this.props;
-    console.log('selectedApp: ', selectedApp);
 
     const { slidedIn } = this.state;
 
