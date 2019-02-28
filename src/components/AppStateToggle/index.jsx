@@ -2,7 +2,6 @@ import React from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import Popup from "../Popup";
-import TextInput from "../inputs/TextInput";
 import actions from "../../actions";
 import AppStateTogglePopup from "./AppStateTogglePopup";
 

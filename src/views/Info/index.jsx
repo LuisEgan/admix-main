@@ -20,7 +20,6 @@ import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 
-import C from "../../utils/constants";
 import { onlyNums } from "../../utils/normalizers";
 
 import SVG_delete from "../../assets/svg/delete.svg";

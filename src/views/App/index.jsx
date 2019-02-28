@@ -5,7 +5,6 @@ import { connect } from "react-redux";
 import actions from "../../actions";
 
 import Routes from "../../config/routes";
-import Menu from "../.Global/Menu";
 import SideMenu from "../.Global/SideMenu";
 import Snackbar from "../.Global/SnackBar";
 

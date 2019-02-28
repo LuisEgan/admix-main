@@ -551,6 +551,7 @@ class Profile extends Component {
                     <iframe
                       src={`https://admix.in/wp-content/uploads/2019/02/Admix-Supply-Partner-Integration-and-Media-Agmt-web-acceptance-version-16-01-19.pdf`}
                       frameborder="0"
+                      title="pdf"
                     />
                   )}
                 </div>
