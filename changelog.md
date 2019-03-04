@@ -1,3 +1,6 @@
+--- 2.3.0
+/emailSuccess now has a success message and a link to /login
+
 --- 2.2.1
 Update plugin download link for plugin v1.6.2
 
