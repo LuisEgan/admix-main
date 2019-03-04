@@ -5,6 +5,7 @@ import PropTypes from "prop-types";
 import { isEmpty, cloneDeep, isEqual } from "lodash";
 import actions from "../../actions";
 import PanelFooter from "../../components/PanelFooter";
+import MainNavButtons from "../../components/MainNavButtons";
 
 import ToggleDisplay from "react-toggle-display";
 import DayPickerInput from "react-day-picker/DayPickerInput";
@@ -84,6 +85,7 @@ class Report extends Component {
     super(props);
 
     this.state = {
+      panelTitle: "Loading...",
       show: "ov",
       from: new Date(),
       to: new Date(),
@@ -189,6 +191,10 @@ class Report extends Component {
         Object.keys(selectedApps).length === Object.keys(userApps).length;
 
       return {
+        panelTitle:
+          initialReportAppId.length === 1
+            ? userApps[initialReportAppId[0]]
+            : "My apps",
         userApps,
         selectedApps,
         allAppsSelected,
@@ -650,6 +656,7 @@ class Report extends Component {
   // Render Methods -----------------------------------------
 
   renderAppsDropdown() {
+    const { initialReportAppId } = this.props;
     const { userApps, selectedApps, allAppsSelected } = this.state;
     const selectedAppsDisplay = [];
     const dropdown = [];
@@ -668,16 +675,26 @@ class Report extends Component {
       }
     }
 
+    let preventDelete = false;
     for (let appId in selectedApps) {
+      // * Prevent deletion of app if it's the main (and only / non-global report) one selected;
+      preventDelete =
+        initialReportAppId.length === 1 && initialReportAppId[0] === appId;
+
       const selectedAppDisplay = (
         <div
           className="report-selectedApp"
           key={`${selectedApps[appId].name}-${Math.random()}`}
         >
           <div>{selectedApps[appId].name}</div> &nbsp;
-          <div onClick={this.changeAppSelection.bind(null, appId)}>
-            {/* <FontAwesomeIcon icon={faTrash} /> */} X
-          </div>
+          {!preventDelete && (
+            <div
+              className="report-deleteAppBtn"
+              onClick={this.changeAppSelection.bind(null, appId)}
+            >
+              X
+            </div>
+          )}
         </div>
       );
       selectedAppsDisplay.push(selectedAppDisplay);
@@ -713,9 +730,9 @@ class Report extends Component {
   render() {
     const { show, previousPeriods } = this;
 
-    const { from, to } = this.state;
+    const { from, to, panelTitle } = this.state;
 
-    const { dispatch, isLoad_webgl, userData } = this.props;
+    const { dispatch, isLoad_webgl, userData, initialReportAppId } = this.props;
 
     const owAct = show("ov") ? "active" : "";
     const perAct = show("pe") ? "active" : "";
@@ -723,6 +740,11 @@ class Report extends Component {
     const performanceShow = show("pe")
       ? { display: "block" }
       : { display: "none" };
+
+    const navButtons =
+      initialReportAppId.length === 1 ? (
+        <MainNavButtons appId={initialReportAppId[0]} />
+      ) : null;
 
     return (
       <div id="report" className="page-withPanel-container">
@@ -742,7 +764,16 @@ class Report extends Component {
 
         <div className={`panel menu-panel mb slidePanelInLeft`}>
           <div id="app-selection">
-            <span style={{ color: "#14B9BE" }}>Reporting</span>
+            <div className="panel-title-container">
+              <div>
+                <span className="mb panel-title" style={{ color: "#14B9BE" }}>
+                  Reporting
+                </span>
+                <span className="sst block-with-text">{panelTitle}</span>
+              </div>
+              {navButtons}
+            </div>
+
             {this.renderAppsDropdown()}
           </div>
 

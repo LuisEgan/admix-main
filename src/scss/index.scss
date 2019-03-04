@@ -1115,6 +1115,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
   }
   .panel-title-container {
     border-bottom: solid #f5f7fa;
+    padding-bottom: 5px;
     span {
       word-break: break-all;
     }
@@ -2481,11 +2482,11 @@ $inputsFontSize: calc(0.45em+0.3vw);
           min-width: 45%;
           max-width: 95%;
         }
-        &:last-child {
-          color: red;
-          &:hover {
-            cursor: pointer;
-          }
+      }
+      .report-deleteAppBtn {
+        color: red;
+        &:hover {
+          cursor: pointer;
         }
       }
     }
@@ -2507,8 +2508,12 @@ $inputsFontSize: calc(0.45em+0.3vw);
     }
   }
   #app-selection {
+    display: flex;
+    flex-flow: column;
     > div {
-      padding-top: 3vh;
+      &:last-child {
+        padding-top: 3vh;
+      }
     }
   }
   #overview {

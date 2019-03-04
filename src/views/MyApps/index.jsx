@@ -609,7 +609,7 @@ class MyApps extends Component {
                 })}
               >
                 {SVG.globalReport} &nbsp;
-                <span>Global Report</span>
+                <span>All apps Report</span>
               </button>
             )}
           </div>

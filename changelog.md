@@ -1,4 +1,7 @@
 --- 2.4.0
+Report panel now shows the name of the selected app. In case of "All apps report"
+it shows "My apps" with no navigation buttons.
+Add navigation buttons to all panels
 Simplify AdmixCalculator component
 Redo /profile
     - Follow same structure as Edit page with left panel
