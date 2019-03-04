@@ -597,7 +597,7 @@ class MyApps extends Component {
               onClick={this.addFilter.bind(null, "main")}
             >
               {SVG.filter} &nbsp;
-              <span>Filter selection</span>
+              <span>Filter</span>
             </button>
 
             {/* REPORT COMMENTED */}
@@ -609,7 +609,7 @@ class MyApps extends Component {
                 })}
               >
                 {SVG.globalReport} &nbsp;
-                <span>All apps Report</span>
+                <span>All apps report</span>
               </button>
             )}
           </div>
