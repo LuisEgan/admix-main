@@ -74,6 +74,12 @@ class MainNavButtons extends React.PureComponent {
 
   render() {
     const { redirect } = this.state;
+    const {
+      location: { pathname },
+    } = window;
+    const onScene = pathname === routeCodes.SCENE;
+    const onInfo = pathname === routeCodes.INFO;
+    const onReport = pathname === routeCodes.REPORT;
 
     if (redirect) {
       return (
@@ -87,13 +93,24 @@ class MainNavButtons extends React.PureComponent {
 
     return (
       <div className="app-buttons">
-        <button onClick={() => this.selectApp({ redirect: routeCodes.SCENE })}>
+        <button
+          className={onScene ? "app-button-selected" : ""}
+          onClick={() => this.selectApp({ redirect: routeCodes.SCENE })}
+        >
           {SVG.setup}
         </button>
-        <button onClick={() => this.selectApp({ redirect: routeCodes.INFO })}>
+        <button
+          className={onInfo ? "app-button-selected" : ""}
+          onClick={() => this.selectApp({ redirect: routeCodes.INFO })}
+        >
           {SVG.info}
         </button>
-        <button onClick={() => this.getReportData()}>{SVG.report}</button>
+        <button
+          className={onReport ? "app-button-selected" : ""}
+          onClick={() => this.getReportData()}
+        >
+          {SVG.report}
+        </button>
       </div>
     );
   }

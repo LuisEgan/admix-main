@@ -30,6 +30,8 @@ import defaultImg from "../../assets/img/default_pic.jpg";
 import SVG from "../../components/SVG";
 import routeCodes from "../../config/routeCodes";
 
+import pdf from "../../assets/pdf/Admix-Supply-Partner-Integration-and-Media-Agmt-web-acceptance-version-16-01-19.pdf";
+
 const { ga } = _a;
 const {
   imgUpload,
@@ -39,6 +41,16 @@ const {
   updateUser,
   logout,
 } = actions;
+
+const tabs = {
+  per: "Personal Info",
+  org: "Organisation",
+  com: "Company info",
+  pay: "Payments",
+  noti: "Notifications",
+  ter: "Terms and conditions",
+  log: "Logout",
+};
 class Profile extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
@@ -52,7 +64,7 @@ class Profile extends Component {
     } = props;
 
     this.state = {
-      show: "per",
+      show: tabs.per,
       statusMssg: "",
       uploadedFile: "",
       passInputType: "password",
@@ -371,11 +383,12 @@ class Profile extends Component {
     const payBanksDetailsStyle =
       payment.region !== "" ? { display: "block" } : { display: "none" };
 
-    let perAct = show("per") ? "active" : "";
-    let orgAct = show("org") ? "active" : "";
-    let payAct = show("pay") ? "active" : "";
-    let notiAct = show("noti") ? "active" : "";
-    let terAct = show("ter") ? "active" : "";
+    let perAct = show(tabs.per) ? "active" : "";
+    // let orgAct = show(tabs.org) ? "active" : "";
+    let comAct = show(tabs.com) ? "active" : "";
+    let payAct = show(tabs.pay) ? "active" : "";
+    // let notiAct = show(tabs.noti) ? "active" : "";
+    let terAct = show(tabs.ter) ? "active" : "";
 
     return (
       <div className="page-withPanel-container" id="profile">
@@ -383,13 +396,16 @@ class Profile extends Component {
           <div className="panel-title-container">
             <div>
               <span className="mb panel-title" style={{ color: "#14B9BE" }}>
-                Profile
+                My profile
               </span>
               <span className="sst">{userData.name}</span>
             </div>
           </div>
           <div className="list-group mb">
-            <div className={`${perAct}`} onClick={() => this.changeView("per")}>
+            <div
+              className={`${perAct}`}
+              onClick={() => this.changeView(tabs.per)}
+            >
               <span>Personal info</span>
               {perAct ? (
                 <KeyboardArrowRight className="rotate90" />
@@ -398,16 +414,22 @@ class Profile extends Component {
               )}
             </div>
 
-            <div className={`${orgAct}`} onClick={() => this.changeView("org")}>
-              <span>Organisation</span>
-              {orgAct ? (
+            <div
+              className={`${comAct}`}
+              onClick={() => this.changeView(tabs.com)}
+            >
+              <span>Company info</span>
+              {comAct ? (
                 <KeyboardArrowRight className="rotate90" />
               ) : (
                 <KeyboardArrowDown className="rotate270" />
               )}
             </div>
 
-            <div className={`${payAct}`} onClick={() => this.changeView("pay")}>
+            <div
+              className={`${payAct}`}
+              onClick={() => this.changeView(tabs.pay)}
+            >
               <span>Payments</span>
               {payAct ? (
                 <KeyboardArrowRight className="rotate90" />
@@ -416,9 +438,9 @@ class Profile extends Component {
               )}
             </div>
 
-            <div
+            {/* <div
               className={`${notiAct}`}
-              onClick={() => this.changeView("noti")}
+              onClick={() => this.changeView(tabs.noti)}
             >
               <span>Notifications</span>
               {notiAct ? (
@@ -426,11 +448,14 @@ class Profile extends Component {
               ) : (
                 <KeyboardArrowDown className="rotate270" />
               )}
-            </div>
+            </div> */}
           </div>
 
           <div className="list-group-footer mb">
-            <div className={`${terAct}`} onClick={() => this.changeView("ter")}>
+            <div
+              className={`${terAct}`}
+              onClick={() => this.changeView(tabs.ter)}
+            >
               <span>Terms and conditions</span>
               {terAct ? (
                 <KeyboardArrowRight className="rotate90" />
@@ -439,7 +464,7 @@ class Profile extends Component {
               )}
             </div>
 
-            <div onClick={() => this.handleLogout()}>
+            <div className="delete-arrow" onClick={() => this.handleLogout()}>
               <span>Logout</span>
               <KeyboardArrowDown className="rotate270" />
             </div>
@@ -447,12 +472,14 @@ class Profile extends Component {
         </div>
 
         <div className="page-content">
-          <form onSubmit={handleSubmit(this.handleSubmit)}>
+          <form className="form-top-bot-btns" onSubmit={handleSubmit(this.handleSubmit)}>
             <div className="step-title">
-              <h3 className="st sc-h3">My profile</h3>
-              <button type="submit" className="mb gradient-btn">
-                Save
-              </button>
+              <h3 className="st sc-h3">{this.state.show}</h3>
+              {!terAct && (
+                <button type="submit" className="mb gradient-btn">
+                  Save
+                </button>
+              )}
             </div>
 
             <div className="step-content">
@@ -506,7 +533,7 @@ class Profile extends Component {
                   )}
 
                   {/* COMPANY INFORMATION */}
-                  {orgAct && (
+                  {comAct && (
                     <ExpansionPanel
                       headerIcon={
                         <FontAwesomeIcon
@@ -514,7 +541,7 @@ class Profile extends Component {
                           className="sectionIcon"
                         />
                       }
-                      headerTitle={"Company Information"}
+                      headerTitle={"Company information"}
                     >
                       <CompanyInfo
                         renderField={this.renderField}
@@ -547,15 +574,17 @@ class Profile extends Component {
                   )}
 
                   {/* TERMS AND CONDITIONS */}
-                  {terAct && (
-                    <iframe
-                      src={`https://admix.in/wp-content/uploads/2019/02/Admix-Supply-Partner-Integration-and-Media-Agmt-web-acceptance-version-16-01-19.pdf`}
-                      frameborder="0"
-                      title="pdf"
-                    />
-                  )}
+                  {terAct && <iframe src={pdf} frameborder="0" title="pdf" />}
                 </div>
               </div>
+            </div>
+
+            <div className="bottom-download">
+              {!terAct && (
+                <button type="submit" className="mb gradient-btn">
+                  Save
+                </button>
+              )}
             </div>
           </form>
         </div>

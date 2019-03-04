@@ -344,7 +344,7 @@ export default class MenuPanel extends Component {
             <span className="mb" style={{ color: "#14B9BE" }}>
               Editing
             </span>
-            <span className="sst">{selectedApp.name}</span>
+            <span className="sst block-with-text">{selectedApp.name}</span>
           </div>
           <MainNavButtons appId={selectedApp._id || ""} />
         </div>

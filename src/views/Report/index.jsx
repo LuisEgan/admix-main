@@ -740,7 +740,7 @@ class Report extends Component {
           />
         </div>
 
-        <div className={`panel menu-panel mb`}>
+        <div className={`panel menu-panel mb slidePanelInLeft`}>
           <div id="app-selection">
             <span style={{ color: "#14B9BE" }}>Reporting</span>
             {this.renderAppsDropdown()}

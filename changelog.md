@@ -1,4 +1,5 @@
 --- 2.4.0
+Simplify AdmixCalculator component
 Redo /profile
     - Follow same structure as Edit page with left panel
     - Organise existing sections into tabs

@@ -337,7 +337,7 @@ class Info extends Component {
 
     return (
       <div className="mb page-withPanel-container" id="info">
-        <div className={`panel menu-panel`}>
+        <div className={`panel menu-panel slidePanelInLeft`}>
           <div className="panel-title-container">
             <div>
               <span className="mb panel-title" style={{ color: "#14B9BE" }}>
@@ -401,7 +401,10 @@ class Info extends Component {
         </div>
 
         <div className="page-content">
-          <form onSubmit={handleSubmit(this.handleUpdateInfo)}>
+          <form
+            className="form-top-bot-btns"
+            onSubmit={handleSubmit(this.handleUpdateInfo)}
+          >
             <Breadcrumbs breadcrumbs={this.breadcrumbs} />
             <div id="info-header">
               <div>
@@ -461,57 +464,68 @@ class Info extends Component {
                 </div>
               </React.Fragment>
             )}
-          </form>
 
-          {show("cal") && (
-            <React.Fragment>
-              <GuideBox text="Complete the fields below to project how much revenue your app can make. Figures are for indication only and can vary based on our fill rate and the location of your users." />
-              <div>
-                <AdmixCalculator initialValues={calculatorInitialValues} />
-              </div>
-            </React.Fragment>
-          )}
-
-          {show("del") && (
-            <div id="info-del">
-              {!deleteClicked && (
-                <React.Fragment>
-                  <span className="sst" style={{ color: "red" }}>
-                    Warning!
-                  </span>{" "}
-                  <br />
-                  <br />
-                  This will deactivate your app and it will disappear from the
-                  "My apps" menu. Are you sure you want to continue? <br />
-                  <span className="mbs">
-                    Note: you can re-activate it by contacting{" "}
-                    <a href="mailto:support@admix.in">support@admix.in</a>
-                  </span>{" "}
-                  <br />
-                  <br />
-                  <button
-                    className="gradient-btn"
-                    type="button"
-                    onClick={this.handleDelete}
-                  >
-                    Confirm deletion
-                  </button>
-                </React.Fragment>
-              )}
-
-              {deleteClicked && (
+            {show("cal") && (
+              <React.Fragment>
+                <GuideBox text="Complete the fields below to project how much revenue your app can make. Figures are for indication only and can vary based on our fill rate and the location of your users." />
                 <div>
-                  <NavLink
-                    style={{ margin: "auto", width: "20vw" }}
-                    className="gradient-btn cc"
-                    to="/myapps"
-                  >
-                    Go back to My Apps
-                  </NavLink>
+                  <AdmixCalculator initialValues={calculatorInitialValues} />
+                </div>
+              </React.Fragment>
+            )}
+
+            {show("del") && (
+              <div id="info-del">
+                {!deleteClicked && (
+                  <React.Fragment>
+                    <span className="sst" style={{ color: "red" }}>
+                      Warning!
+                    </span>{" "}
+                    <br />
+                    <br />
+                    This will deactivate your app and it will disappear from the
+                    "My apps" menu. Are you sure you want to continue? <br />
+                    <span className="mbs">
+                      Note: you can re-activate it by contacting{" "}
+                      <a href="mailto:support@admix.in">support@admix.in</a>
+                    </span>{" "}
+                    <br />
+                    <br />
+                    <button
+                      className="gradient-btn"
+                      type="button"
+                      onClick={this.handleDelete}
+                    >
+                      Confirm deletion
+                    </button>
+                  </React.Fragment>
+                )}
+
+                {deleteClicked && (
+                  <div>
+                    <NavLink
+                      style={{ margin: "auto", width: "20vw" }}
+                      className="gradient-btn cc"
+                      to="/myapps"
+                    >
+                      Go back to My Apps
+                    </NavLink>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="bottom-download">
+              {!show("del") && (
+                <div>
+                  <button type="submit" className="gradient-btn">
+                    {" "}
+                    Save
+                  </button>
                 </div>
               )}
             </div>
-          )}
+          </form>
         </div>
       </div>
     );

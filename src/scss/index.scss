@@ -16,6 +16,7 @@ $tableBorder: rgba(179, 179, 179, 0.1);
 
   &::-webkit-scrollbar {
     width: 0.5em;
+    height: 0.7em;
   }
 
   &::-webkit-scrollbar-track {
@@ -57,40 +58,40 @@ body {
 input {
   &::-webkit-input-placeholder {
     /* WebKit, Blink, Edge */
+    font-weight: normal;
     color: #c9ced6 !important;
-    text-align: center;
   }
 
   &:-moz-placeholder {
     /* Mozilla Firefox 4 to 18 */
+    font-weight: normal;
     color: #c9ced6 !important;
-    text-align: center;
     opacity: 1;
   }
 
   &::-moz-placeholder {
     /* Mozilla Firefox 19+ */
+    font-weight: normal;
     color: #c9ced6 !important;
-    text-align: center;
     opacity: 1;
   }
 
   &:-ms-input-placeholder {
     /* Internet Explorer 10-11 */
+    font-weight: normal;
     color: #c9ced6 !important;
-    text-align: center;
   }
 
   &::-ms-input-placeholder {
     /* Microsoft Edge */
+    font-weight: normal;
     color: #c9ced6 !important;
-    text-align: center;
   }
 
   &::placeholder {
     /* Most modern browsers support this now. */
+    font-weight: normal;
     color: #c9ced6 !important;
-    text-align: center;
   }
 }
 
@@ -253,6 +254,31 @@ p {
   font-weight: lighter;
   color: #4b44c5;
   font-size: 18px !important;
+}
+
+.block-with-text {
+  overflow: hidden;
+  position: relative;
+  line-height: 1.2em;
+  max-height: 3.6em;
+  text-align: justify;
+  margin-right: -1em;
+  padding-right: 1em;
+}
+.block-with-text:before {
+  content: "...";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+.block-with-text:after {
+  content: "";
+  position: absolute;
+  right: 0;
+  width: 1em;
+  height: 1em;
+  margin-top: 0.2em;
+  background: white;
 }
 
 // ----------------------------------------------------------------------------------------------------------
@@ -1002,7 +1028,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
   height: 15%;
   text-align: center;
   img {
-    width: 70%;
+    width: 55%;
   }
 }
 #sideMenu-body {
@@ -1034,11 +1060,12 @@ $inputsFontSize: calc(0.45em+0.3vw);
     justify-content: center;
     height: 15vh;
     max-height: 120px;
-    opacity: 0.3;
     color: #ffffff;
     &:hover {
-      opacity: 1;
       cursor: pointer;
+      > div {
+        opacity: 1;
+      }
     }
     &::after {
       @extend .fadeIn;
@@ -1050,11 +1077,12 @@ $inputsFontSize: calc(0.45em+0.3vw);
     }
     > div {
       padding: 7% 0;
+      opacity: 0.3;
     }
-    &:nth-child(3) {
+    &:last-child {
       > div {
-        svg {
-          font-size: 3em;
+        &:first-child {
+          opacity: 1;
         }
       }
     }
@@ -1570,6 +1598,24 @@ $inputsFontSize: calc(0.45em+0.3vw);
     color: #0066ff;
   }
 }
+.bottom-download {
+  display: flex;
+  justify-content: flex-end !important;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+.form-top-bot-btns {
+  position: relative;
+  display: flex;
+  flex-flow: column;
+  min-height: 100%;
+  > div {
+    &:nth-last-child(2) {
+      margin-bottom: 10vh;
+    }
+  }
+}
 // ----------------------------------------------------------------------------------------------------------
 // LOGIN ----------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------------
@@ -1824,6 +1870,9 @@ $inputsFontSize: calc(0.45em+0.3vw);
       outline: none;
     }
   }
+}
+.app-button-selected #Rectangle-6 {
+  fill: #f2f2f2;
 }
 // ----------------------------------------------------------------------------------------------------------
 // SCENE ----------------------------------------------------------------------------------------
@@ -2734,52 +2783,50 @@ $inputsFontSize: calc(0.45em+0.3vw);
     width: 100%;
   }
   form {
-    > div {
+    .step-content {
       &:last-child {
-        &:last-child {
-          display: flex;
-          justify-content: space-between;
-          > div {
-            width: 65%;
-            &:first-child {
-              // width: 30%;
-            }
+        display: flex;
+        justify-content: space-between;
+        > div {
+          width: 65%;
+          &:first-child {
+            // width: 30%;
           }
         }
-        > div {
-          &:last-child {
+      }
+      > div {
+        &:last-child {
+          > div {
+            width: 100%;
+            position: relative;
             > div {
+              &:not(:first-child) {
+                margin-top: unset;
+              }
+            }
+            .expansionPanelDetails-container {
+              display: flex;
               width: 100%;
-              position: relative;
               > div {
-                &:not(:first-child) {
-                  margin-top: unset;
-                }
-              }
-              .expansionPanelDetails-container {
-                display: flex;
-                width: 100%;
+                width: 50%;
                 > div {
-                  width: 50%;
-                  > div {
-                    display: flex;
-                    position: relative;
-                    flex-flow: column;
-                    min-height: 15vh;
-                    justify-content: center;
-                  }
+                  display: flex;
+                  position: relative;
+                  flex-flow: column;
+                  min-height: 15vh;
+                  justify-content: center;
                 }
               }
-              .mui-expansionPanel-root {
-                margin-bottom: 10px;
-                .sectionIcon {
-                  margin-right: 2vw;
-                  max-width: 2vw;
-                }
-                img {
-                  width: 5vw;
-                  max-width: 80px;
-                }
+            }
+            .mui-expansionPanel-root {
+              margin-bottom: 10px;
+              .sectionIcon {
+                margin-right: 2vw;
+                max-width: 2vw;
+              }
+              img {
+                width: 5vw;
+                max-width: 80px;
               }
             }
           }
@@ -3315,6 +3362,7 @@ $ballSize: 20px;
     padding: 2% 5%;
     border-radius: 5px;
     z-index: 1;
+    text-align: left;
     .popup-title {
       @extend .st;
       display: block;

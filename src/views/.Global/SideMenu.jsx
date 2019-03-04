@@ -7,6 +7,7 @@ import IconButton from "@material-ui/core/IconButton";
 import SVG from "../../components/SVG";
 import SVG_docs from "../../assets/svg/documentation.svg";
 import logo from "../../assets/img/logo-vertical.png";
+import defaultImg from "../../assets/img/default_pic.jpg";
 
 function openInNewTab(url) {
   const sideMenu = document.getElementById("sideMenu");
@@ -68,6 +69,7 @@ class SideMenu extends Component {
       icon: (
         <IconButton aria-haspopup="true" color="inherit">
           <img
+            onError={e => (e.target.src = defaultImg)}
             src={userData.cloudinaryImgURL}
             alt="Profile"
           />
