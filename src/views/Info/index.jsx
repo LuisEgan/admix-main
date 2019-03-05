@@ -37,6 +37,13 @@ import GuideBox from "../../components/GuideBox";
 const { ga } = _a;
 
 const { updateApp } = actions;
+
+const tabs = {
+  url: "App store URL",
+  aud: "Audience breakdown",
+  cal: "Revenue calculator",
+  del: "Delete app",
+};
 class Info extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
@@ -46,7 +53,7 @@ class Info extends Component {
     super(props);
 
     this.state = {
-      show: "url",
+      show: tabs.url,
       deleteClicked: false,
     };
 
@@ -326,10 +333,10 @@ class Info extends Component {
       },
     ];
 
-    let urlAct = show("url") ? "active" : "";
-    let audAct = show("aud") ? "active" : "";
-    let delAct = show("del") ? "active" : "";
-    let calAct = show("cal") ? "active" : "";
+    let urlAct = show(tabs.url) ? "active" : "";
+    let audAct = show(tabs.aud) ? "active" : "";
+    let delAct = show(tabs.del) ? "active" : "";
+    let calAct = show(tabs.cal) ? "active" : "";
 
     if (deleteClicked) {
       urlAct = audAct = delAct = calAct = "inactive";
@@ -350,10 +357,10 @@ class Info extends Component {
           <div className="list-group">
             <div
               className={`${urlAct}`}
-              onClick={deleteClicked ? null : this.changeView.bind(null, "url")}
+              onClick={deleteClicked ? null : this.changeView.bind(null, tabs.url)}
             >
               <span>App store URL</span>
-              {show("url") ? (
+              {show(tabs.url) ? (
                 <KeyboardArrowRight className="rotate90" />
               ) : (
                 <KeyboardArrowDown className="rotate270" />
@@ -361,10 +368,10 @@ class Info extends Component {
             </div>
             <div
               className={`${audAct}`}
-              onClick={deleteClicked ? null : this.changeView.bind(null, "aud")}
+              onClick={deleteClicked ? null : this.changeView.bind(null, tabs.aud)}
             >
               <span>Audience breakdown</span>
-              {show("aud") ? (
+              {show(tabs.aud) ? (
                 <KeyboardArrowRight className="rotate90" />
               ) : (
                 <KeyboardArrowDown className="rotate270" />
@@ -372,10 +379,10 @@ class Info extends Component {
             </div>
             <div
               className={`${calAct}`}
-              onClick={deleteClicked ? null : this.changeView.bind(null, "cal")}
+              onClick={deleteClicked ? null : this.changeView.bind(null, tabs.cal)}
             >
               <span>Revenue calculator</span>
-              {show("cal") ? (
+              {show(tabs.cal) ? (
                 <KeyboardArrowRight className="rotate90" />
               ) : (
                 <KeyboardArrowDown className="rotate270" />
@@ -383,10 +390,10 @@ class Info extends Component {
             </div>
             <div
               className={`${delAct} delete-arrow`}
-              onClick={deleteClicked ? null : this.changeView.bind(null, "del")}
+              onClick={deleteClicked ? null : this.changeView.bind(null, tabs.del)}
             >
               <span>Delete app</span>
-              {show("del") ? (
+              {show(tabs.del) ? (
                 <KeyboardArrowRight className="rotate90" />
               ) : (
                 <KeyboardArrowDown className="rotate270" />
@@ -408,9 +415,9 @@ class Info extends Component {
             <Breadcrumbs breadcrumbs={this.breadcrumbs} />
             <div id="info-header">
               <div>
-                <h3 className="st">{selectedApp.name}</h3>
+                <h3 className="st">{this.state.show}</h3>
               </div>
-              {!show("del") && (
+              {!show(tabs.del) && (
                 <div>
                   <button type="submit" className="gradient-btn">
                     {" "}
@@ -420,7 +427,7 @@ class Info extends Component {
               )}
             </div>
 
-            {show("url") && (
+            {show(tabs.url) && (
               <React.Fragment>
                 <GuideBox text="To go Live and start generating revenue, your app needs to be published in a Store. Add the store URL in the field below." />
                 <div id="info-url">
@@ -440,7 +447,7 @@ class Info extends Component {
               </React.Fragment>
             )}
 
-            {show("aud") && (
+            {show(tabs.aud) && (
               <React.Fragment>
                 <GuideBox text="Please fill as much information on your app as possible to help us maximise your revenue. This data helps us forecast the amount of inventory your app will generate and prioritise it with our advertisers." />
                 <div id="info-aud">
@@ -465,7 +472,7 @@ class Info extends Component {
               </React.Fragment>
             )}
 
-            {show("cal") && (
+            {show(tabs.cal) && (
               <React.Fragment>
                 <GuideBox text="Complete the fields below to project how much revenue your app can make. Figures are for indication only and can vary based on our fill rate and the location of your users." />
                 <div>
@@ -474,7 +481,7 @@ class Info extends Component {
               </React.Fragment>
             )}
 
-            {show("del") && (
+            {show(tabs.del) && (
               <div id="info-del">
                 {!deleteClicked && (
                   <React.Fragment>
@@ -516,7 +523,7 @@ class Info extends Component {
             )}
 
             <div className="bottom-download">
-              {!show("del") && (
+              {!show(tabs.del) && (
                 <div>
                   <button type="submit" className="gradient-btn">
                     {" "}
