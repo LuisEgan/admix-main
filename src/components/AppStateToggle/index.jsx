@@ -205,7 +205,7 @@ class AppStateToggle extends React.Component {
           >
             <span>Off</span>
             {displayTooltip && (
-              <div className="admix-tooltip" style={offTooltip}>
+              <div className="admix-tooltip tooltip-left" style={offTooltip}>
                 In Off mode, ads are not delivering and appear transparent.
               </div>
             )}
@@ -229,7 +229,7 @@ class AppStateToggle extends React.Component {
           >
             <span>Sandbox</span>
             {displayTooltip && (
-              <div className="admix-tooltip" style={sandboxTooltip}>
+              <div className="admix-tooltip tooltip-sandbox" style={sandboxTooltip}>
                 In SANDBOX mode, placeholder ads are delivered for testing
                 purposes but not generating revenue.
               </div>
@@ -250,7 +250,7 @@ class AppStateToggle extends React.Component {
               {this.liveText(appState).title}
             </span>
             {displayTooltip && (
-              <div className="admix-tooltip" style={liveTooltip}>
+              <div className="admix-tooltip tooltip-right" style={liveTooltip}>
                 {this.liveText(appState).tooltip}
               </div>
             )}

@@ -14,7 +14,7 @@ const {
   getScenesByAppId,
 } = actions;
 
-class MainNavButtons extends React.PureComponent {
+class MainNavButtons extends React.Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
   };
@@ -22,9 +22,21 @@ class MainNavButtons extends React.PureComponent {
   constructor(props) {
     super(props);
 
-    this.state = { redirect: null };
+    this.state = {
+      redirect: null,
+      hoverEdit: false,
+      hoverInfo: false,
+      hoverReport: false,
+    };
 
+    this.handleMouseHover = this.handleMouseHover.bind(this);
     this.selectApp = this.selectApp.bind(this);
+  }
+
+  handleMouseHover(button) {
+    const newState = this.state;
+    newState[`hover${button}`] = !newState[`hover${button}`];
+    this.setState(newState);
   }
 
   selectApp({ redirect }) {
@@ -73,13 +85,17 @@ class MainNavButtons extends React.PureComponent {
   }
 
   render() {
-    const { redirect } = this.state;
+    const { redirect, hoverEdit, hoverInfo, hoverReport } = this.state;
     const {
       location: { pathname },
     } = window;
     const onScene = pathname === routeCodes.SCENE;
     const onInfo = pathname === routeCodes.INFO;
     const onReport = pathname === routeCodes.REPORT;
+
+    const editTooltip = hoverEdit ? { display: "block" } : {};
+    const infoTooltip = hoverInfo ? { display: "block" } : {};
+    const reportTooltip = hoverReport ? { display: "block" } : {};
 
     if (redirect) {
       return (
@@ -93,24 +109,50 @@ class MainNavButtons extends React.PureComponent {
 
     return (
       <div className="app-buttons">
-        <button
-          className={onScene ? "app-button-selected" : ""}
-          onClick={() => this.selectApp({ redirect: routeCodes.SCENE })}
+        <div
+          onMouseEnter={() => this.handleMouseHover("Edit")}
+          onMouseLeave={() => this.handleMouseHover("Edit")}
         >
-          {SVG.setup}
-        </button>
-        <button
-          className={onInfo ? "app-button-selected" : ""}
-          onClick={() => this.selectApp({ redirect: routeCodes.INFO })}
+          <button
+            className={onScene ? "app-button-selected" : ""}
+            onClick={() => this.selectApp({ redirect: routeCodes.SCENE })}
+          >
+            {SVG.setup}
+          </button>
+          <div className="admix-tooltip tooltip-left" style={editTooltip}>
+            Manage your placements, filter advertisers and activate your app.
+          </div>
+        </div>
+
+        <div
+          onMouseEnter={() => this.handleMouseHover("Info")}
+          onMouseLeave={() => this.handleMouseHover("Info")}
         >
-          {SVG.info}
-        </button>
-        <button
-          className={onReport ? "app-button-selected" : ""}
-          onClick={() => this.getReportData()}
+          <button
+            className={onInfo ? "app-button-selected" : ""}
+            onClick={() => this.selectApp({ redirect: routeCodes.INFO })}
+          >
+            {SVG.info}
+          </button>
+          <div className="admix-tooltip" style={infoTooltip}>
+            Manage your app information.
+          </div>
+        </div>
+
+        <div
+          onMouseEnter={() => this.handleMouseHover("Report")}
+          onMouseLeave={() => this.handleMouseHover("Report")}
         >
-          {SVG.report}
-        </button>
+          <button
+            className={onReport ? "app-button-selected" : ""}
+            onClick={() => this.getReportData()}
+          >
+            {SVG.report}
+          </button>
+          <div className="admix-tooltip tooltip-right" style={reportTooltip}>
+            Check performance reports and how much revenue you've made.
+          </div>
+        </div>
       </div>
     );
   }

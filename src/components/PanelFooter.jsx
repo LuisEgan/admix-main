@@ -47,7 +47,7 @@ class PanelFooter extends React.Component {
                 <AppsStateToggle
                   app={app}
                   {...this.props}
-                  displayTooltip={false}
+                  // displayTooltip={false}
                 />
               )}
             </div>
