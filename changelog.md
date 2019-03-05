@@ -1,4 +1,5 @@
 --- 2.4.0
+Add tooltips to navigation buttons
 Report panel now shows the name of the selected app. In case of "All apps report"
 it shows "My apps" with no navigation buttons.
 Add navigation buttons to all panels
