@@ -33,6 +33,7 @@ const {
   getScenesByAppId,
   unsetPlacementByAppId,
   unsetScenesByAppId,
+  resetKey,
 } = actions;
 
 const addDays = function(date, days) {
@@ -125,6 +126,8 @@ class Report extends Component {
   }
 
   componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatch(resetKey("reportData"));
     this.disposeEventListeners();
   }
 
@@ -143,7 +146,8 @@ class Report extends Component {
       quickFilter,
       placementsById,
     } = this.state;
-    if (
+
+    const update =
       from !== nextState.from ||
       to !== nextState.to ||
       Object.keys(selectedApps).length === 0 ||
@@ -152,11 +156,9 @@ class Report extends Component {
       show !== nextState.show ||
       quickFilter !== nextState.quickFilter ||
       !isEqual(placementsById, nextProps.placementsById) ||
-      asyncLoading !== nextProps.asyncLoading
-    ) {
-      return true;
-    }
-    return false;
+      asyncLoading !== nextProps.asyncLoading;
+
+    return update;
   }
 
   static getDerivedStateFromProps(nextProps, prevState) {
@@ -169,6 +171,7 @@ class Report extends Component {
       const from = lastWeek;
       const to = new Date();
       const selectedApps = {};
+
       let allAppsSelected = false;
 
       const userApps = {};
@@ -204,6 +207,7 @@ class Report extends Component {
         initialDateSetup: true,
         from,
         to,
+        reportData,
         // to: new Date(last)
       };
     }

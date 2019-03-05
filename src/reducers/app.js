@@ -1,6 +1,7 @@
 import C from "../utils/constants";
 
 import {
+  RESET_STATE_BY_KEY,
   LOGIN_SUCCESS,
   LOGOUT_SUCCESS,
   REGISTER_SUCCESS,
@@ -49,6 +50,18 @@ const initialState = {
 };
 
 const actionsMap = {
+  [RESET_STATE_BY_KEY]: (state, action) => {
+    const newState = { ...state };
+    let { keys } = action;
+    keys = Array.isArray(keys) ? keys : [keys];
+
+    keys.forEach(key => {
+      newState[key] = initialState[key];
+    });
+
+    return { ...newState };
+  },
+
   [SNACKBAR_TOGGLE]: state => {
     let isSnackBarOpen = state.isSnackBarOpen;
     const isLoggedIn = state.isLoggedIn;
