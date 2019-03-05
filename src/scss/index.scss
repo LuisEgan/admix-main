@@ -1569,6 +1569,7 @@ $inputsFontSize: calc(0.45em+0.3vw);
     // bottom: -200%;
     margin-top: 55px;
     min-width: 150px;
+    text-align: left;
     &::after {
       content: "";
       position: absolute;
