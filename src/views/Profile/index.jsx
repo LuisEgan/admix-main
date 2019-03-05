@@ -43,7 +43,7 @@ const {
 } = actions;
 
 const tabs = {
-  per: "Personal Info",
+  per: "Personal info",
   org: "Organisation",
   com: "Company info",
   pay: "Payments",
