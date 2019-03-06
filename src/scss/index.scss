@@ -3407,6 +3407,7 @@ $ballSize: 20px;
   color: white;
   z-index: 1;
   border-radius: 5px;
+  text-align: left;
   &::after {
     content: "";
     position: absolute;

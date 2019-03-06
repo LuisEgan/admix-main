@@ -1,4 +1,5 @@
 --- 2.4.0
+Fix report not showing data at first sometimes
 Add tooltips to navigation buttons
 Report panel now shows the name of the selected app. In case of "All apps report"
 it shows "My apps" with no navigation buttons.
