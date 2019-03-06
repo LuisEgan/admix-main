@@ -1,3 +1,6 @@
+--- 2.4.1
+AppActivation route now updated the app per url param
+
 --- 2.4.0
 Fix report not showing data at first sometimes
 Add tooltips to navigation buttons
