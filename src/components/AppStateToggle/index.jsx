@@ -1,12 +1,13 @@
 import React from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import Popup from "./Popup";
-import actions from "../actions";
+import Popup from "../Popup";
+import actions from "../../actions";
+import AppStateTogglePopup from "./AppStateTogglePopup";
 
-import _a from "../utils/analytics";
-import C from "../utils/constants";
-import STR from "../utils/strFuncs";
+import _a from "../../utils/analytics";
+import C from "../../utils/constants";
+import STR from "../../utils/strFuncs";
 
 const { ga } = _a;
 
@@ -45,7 +46,7 @@ class AppStateToggle extends React.Component {
     this.setState({ showPopup: !showPopup });
   }
 
-  handleSubmitForReview() {
+  handleSubmitForReview(values) {
     const {
       accessToken,
       userData,
@@ -54,11 +55,14 @@ class AppStateToggle extends React.Component {
       app: { _id },
     } = this.props;
 
+    const { storeurl } = values;
+
     const appDetails = {
       appId: _id,
       newData: {
         isActive: false,
         appState: C.APP_STATES.pending,
+        storeurl,
       },
     };
 
@@ -128,7 +132,8 @@ class AppStateToggle extends React.Component {
       appState === C.APP_STATES.pending
         ? {
             title: "Pending",
-            tooltip: "In PENDING mode, your app is being reviewed, and you cannot toggle its status in the meantime.",
+            tooltip:
+              "In PENDING mode, your app is being reviewed, and you cannot toggle its status in the meantime.",
           }
         : {
             title: STR.capitalizeFirstLetter(C.APP_STATES.live),
@@ -177,6 +182,7 @@ class AppStateToggle extends React.Component {
             asyncLoading={asyncLoading}
             handleSubmitForReview={this.handleSubmitForReview}
             togglePopup={this.togglePopup}
+            app={app}
           />
         </Popup>
         <div className="appStateToggle">
@@ -199,7 +205,7 @@ class AppStateToggle extends React.Component {
           >
             <span>Off</span>
             {displayTooltip && (
-              <div className="admix-tooltip" style={offTooltip}>
+              <div className="admix-tooltip tooltip-left" style={offTooltip}>
                 In Off mode, ads are not delivering and appear transparent.
               </div>
             )}
@@ -223,7 +229,7 @@ class AppStateToggle extends React.Component {
           >
             <span>Sandbox</span>
             {displayTooltip && (
-              <div className="admix-tooltip" style={sandboxTooltip}>
+              <div className="admix-tooltip tooltip-sandbox" style={sandboxTooltip}>
                 In SANDBOX mode, placeholder ads are delivered for testing
                 purposes but not generating revenue.
               </div>
@@ -244,7 +250,7 @@ class AppStateToggle extends React.Component {
               {this.liveText(appState).title}
             </span>
             {displayTooltip && (
-              <div className="admix-tooltip" style={liveTooltip}>
+              <div className="admix-tooltip tooltip-right" style={liveTooltip}>
                 {this.liveText(appState).tooltip}
               </div>
             )}
@@ -254,47 +260,6 @@ class AppStateToggle extends React.Component {
     );
   }
 }
-
-const AppStateTogglePopup = ({
-  asyncLoading,
-  handleSubmitForReview,
-  togglePopup,
-}) => {
-  return (
-    <React.Fragment>
-      <span className="popup-title">Ready to go live?</span>
-      <br />
-      <br />
-      <span className="popup-text">
-        Your app will be submitted for review to make sure all is ok. This can
-        take 1 to 2h. After that, you'll start to make revenue.
-      </span>
-      <br />
-      <br />
-      <span className="popup-btns">
-        {asyncLoading && (
-          <button className="btn" id="review-btn" type="button">
-            Loading...
-          </button>
-        )}
-
-        {!asyncLoading && (
-          <button
-            className="btn"
-            id="review-btn"
-            onClick={handleSubmitForReview}
-          >
-            Submit for review
-          </button>
-        )}
-
-        <button className="cancel-btn mb" id="cancel-btn" onClick={togglePopup}>
-          Cancel
-        </button>
-      </span>
-    </React.Fragment>
-  );
-};
 
 AppStateToggle.propTypes = {
   app: PropTypes.object.isRequired,
@@ -322,7 +287,14 @@ const mapDispatchToProps = dispacth => {
     toggleAppStatus: (appDetails, accessToken) =>
       dispacth(toggleAppStatus(appDetails, accessToken)),
     updateUserStatus: (userId, accessToken) =>
-      dispacth(updateUser({userId, newData: { status: 4 }, accessToken, noSetAsync: true})),
+      dispacth(
+        updateUser({
+          userId,
+          newData: { status: 4 },
+          accessToken,
+          noSetAsync: true,
+        }),
+      ),
   };
 };
 

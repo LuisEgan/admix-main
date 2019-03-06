@@ -1,5 +1,5 @@
 import React from "react";
-import AppsStateToggle from "./AppStateToggle";
+import AppsStateToggle from "./AppStateToggle/";
 import C from "../utils/constants";
 
 class PanelFooter extends React.Component {
@@ -13,11 +13,11 @@ class PanelFooter extends React.Component {
         appState === C.APP_STATES.pending ||
         appState === C.APP_STATES.inactive ||
         !isActive ? (
-          <span>
+          <span style={{margin: "auto"}}>
             Your app isn’t generating <br /> revenue yet
           </span>
         ) : (
-          <span>
+          <span style={{margin: "auto"}}>
             Your app is starting to <br /> generate revenue
           </span>
         );
@@ -47,11 +47,11 @@ class PanelFooter extends React.Component {
                 <AppsStateToggle
                   app={app}
                   {...this.props}
-                  displayTooltip={false}
+                  // displayTooltip={false}
                 />
               )}
             </div>
-            <div className={classInner}>{footerMssg}</div>
+            <div className={`mbs ${classInner}`}>{footerMssg}</div>
           </React.Fragment>
         )}
         {children}

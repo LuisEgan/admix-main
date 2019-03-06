@@ -74,6 +74,12 @@ export default props => {
         component={Login}
         isLoggedIn={isLoggedIn}
       />
+      <LoginRoute
+        exact
+        path={routeCodes.REGISTER}
+        component={Login}
+        isLoggedIn={isLoggedIn}
+      />
       {/* <PrivateRoute
             exact
             path={routeCodes.publicPath}

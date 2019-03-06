@@ -72,22 +72,23 @@ class Download extends Component {
               <div>
                 <span className="st">Need help?</span>
               </div>
-              {/* <div>
-                <span className="mb">
-                  Check out our <br /> Starter’s Guide{" "}
-                  <a
-                    href="https://admix.in/wp-content/uploads/2018/08/Admix_Starter_Guide.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={this.handleDownload.bind(null, "guide")}
-                  >
-                    here
-                  </a>
+              <div>
+                <span className="mb" style={{ width: "100%" }}>
+                  Here is how to get started with Admix <br/> in less than 3 minutes
+                  <iframe
+                    width="560"
+                    height="315"
+                    src="https://www.youtube.com/embed/E1Vu6vVbcKU"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title="help"
+                  />
                 </span>
-              </div> */}
+              </div>
               <div>
                 <span className="mb">
-                  {/* Questions? <br />{" "} */}
+                  More questions? <br />{" "}
                   <a href="mailto:support@admix.in">Contact support</a>
                 </span>
               </div>
@@ -101,7 +102,7 @@ class Download extends Component {
               <span className="subtitle">SIZE</span>
               <span>4MB</span>
               <span className="subtitle">REQUIREMENTS</span>
-              <span>Unity 2017.4.14f1 LTS and above</span>
+              <span>Unity 2017.4.21f1 LTS and above</span>
             </div>
             <div>
               <span>Available soon</span>

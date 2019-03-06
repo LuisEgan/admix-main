@@ -14,6 +14,7 @@ import Select from "@material-ui/core/Select";
 import { KeyboardArrowDown } from "@material-ui/icons";
 
 import AppsStateToggle from "../../components/AppStateToggle";
+import MainNavButtons from "../../components/MainNavButtons";
 import Input from "../../components/inputs/TextInput";
 import SVG from "../../components/SVG";
 import CSS from "../../utils/InLineCSS";
@@ -499,34 +500,7 @@ class MyApps extends Component {
             </div>
 
             <div>
-              <div className="app-buttons">
-                <button
-                  onClick={this.selectApp.bind(null, {
-                    appId: _id,
-                    redirect: routeCodes.SCENE,
-                  })}
-                >
-                  {SVG.setup}
-                </button>
-                <button
-                  onClick={this.selectApp.bind(null, {
-                    appId: _id,
-                    redirect: routeCodes.INFO,
-                  })}
-                >
-                  {SVG.info}
-                </button>
-
-                {/* REPORT COMMENTED */}
-                <button
-                  onClick={this.getReportData.bind(null, {
-                    appsIds: _id,
-                    userId,
-                  })}
-                >
-                  {SVG.report}
-                </button>
-              </div>
+              <MainNavButtons appId={_id} userId={userId} />
             </div>
           </div>
         </div>
@@ -549,7 +523,7 @@ class MyApps extends Component {
             </h3>
             <h2 className="mb">
               To get started, create your inventory in Unity with the <br />{" "}
-              Advir plugin. Apps will appear here automatically.
+              Admix plugin. Apps will appear here automatically.
             </h2>
             <h2 className="mb">
               <br />
@@ -615,29 +589,31 @@ class MyApps extends Component {
           <h3 className="st sc-h3">My apps</h3>
         </div>
 
-        <div id="apps-buttons">
-          <button
-            id="filter"
-            className="mb unselectable white-btn"
-            onClick={this.addFilter.bind(null, "main")}
-          >
-            {SVG.filter} &nbsp;
-            <span>Filter selection</span>
-          </button>
-
-          {/* REPORT COMMENTED */}
-          {renderGlobal && (
+        {anyApps && (
+          <div id="apps-buttons">
             <button
+              id="filter"
               className="mb unselectable white-btn"
-              onClick={this.getReportData.bind(null, {
-                appsIds: allAppsIds,
-              })}
+              onClick={this.addFilter.bind(null, "main")}
             >
-              {SVG.globalReport} &nbsp;
-              <span>Global Report</span>
+              {SVG.filter} &nbsp;
+              <span>Filter</span>
             </button>
-          )}
-        </div>
+
+            {/* REPORT COMMENTED */}
+            {renderGlobal && (
+              <button
+                className="mb unselectable white-btn"
+                onClick={this.getReportData.bind(null, {
+                  appsIds: allAppsIds,
+                })}
+              >
+                {SVG.globalReport} &nbsp;
+                <span>All apps report</span>
+              </button>
+            )}
+          </div>
+        )}
 
         {!showContent && SVG.AdmixLoading({ loadingText: "Loading" })}
 

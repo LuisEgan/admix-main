@@ -1,3 +1,4 @@
+import main from "./main"
 import auth from "./auth";
 import apps from "./apps";
 import scenes from "./scenes";
@@ -7,6 +8,7 @@ import report from "./report";
 import cloudinary from "./cloudinary";
 
 const allActions = {
+  ...main,
   ...auth,
   ...apps,
   ...scenes,

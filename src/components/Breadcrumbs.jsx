@@ -23,8 +23,8 @@ class Breadcrumbs extends React.Component {
           lastBread = i === allBreadcrumbs - 1;
           linkClass = lastBread ? "last" : "";
           return (
-            <React.Fragment key={breadcrumb.title}>
-              <div key={breadcrumb.title}>
+            <React.Fragment key={`${breadcrumb.title}-${Math.random()}`}>
+              <div key={`${breadcrumb.title}-${Math.random()}`}>
                 <NavLink
                   to={breadcrumb.route}
                   className={linkClass}

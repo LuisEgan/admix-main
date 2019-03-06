@@ -5,7 +5,6 @@ import { connect } from "react-redux";
 import actions from "../../actions";
 
 import Routes from "../../config/routes";
-import Menu from "../.Global/Menu";
 import SideMenu from "../.Global/SideMenu";
 import Snackbar from "../.Global/SnackBar";
 
@@ -91,12 +90,6 @@ class App extends Component {
     return (
       <ErrorCatcher>
         <div className="App">
-          <Menu
-            isLoggedIn={isLoggedIn}
-            location={location}
-            history={history}
-            onRef={ref => (this.menu = ref)}
-          />
           <div id="Page">
             <SideMenu location={location} history={history} />
             <div id="content" style={contentStyle}>

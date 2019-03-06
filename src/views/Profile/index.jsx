@@ -17,6 +17,7 @@ import PaymentConfig from "./Panels/PaymentConfig";
 //SVGs
 import SVG_personalInfo from "../../assets/svg/personal-information.svg";
 import SVG_payment from "../../assets/svg/payments-configuration.svg";
+import { KeyboardArrowDown, KeyboardArrowRight } from "@material-ui/icons";
 
 import CustomInput from "../../components/inputs/TextInput";
 
@@ -27,6 +28,9 @@ import {
 
 import defaultImg from "../../assets/img/default_pic.jpg";
 import SVG from "../../components/SVG";
+import routeCodes from "../../config/routeCodes";
+
+import pdf from "../../assets/pdf/Admix-Supply-Partner-Integration-and-Media-Agmt-web-acceptance-version-16-01-19.pdf";
 
 const { ga } = _a;
 const {
@@ -35,7 +39,18 @@ const {
   forgotPass,
   changeEmail,
   updateUser,
+  logout,
 } = actions;
+
+const tabs = {
+  per: "Personal info",
+  org: "Organisation",
+  com: "Company info",
+  pay: "Payments",
+  noti: "Notifications",
+  ter: "Terms and conditions",
+  log: "Logout",
+};
 class Profile extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
@@ -49,6 +64,7 @@ class Profile extends Component {
     } = props;
 
     this.state = {
+      show: tabs.per,
       statusMssg: "",
       uploadedFile: "",
       passInputType: "password",
@@ -62,13 +78,26 @@ class Profile extends Component {
       },
     };
 
+    this.handleLogout = this.handleLogout.bind(this);
+    this.changeView = this.changeView.bind(this);
     this.togglePassInputType = this.togglePassInputType.bind(this);
     this.renderField = this.renderField.bind(this);
     this.onImageDrop = this.onImageDrop.bind(this);
     this.handleImageUploadClient = this.handleImageUploadClient.bind(this);
     this.handleImageUploadServer = this.handleImageUploadServer.bind(this);
     this.handleUserUpdate = this.handleUserUpdate.bind(this);
+    this.show = this.show.bind(this);
     this.paymentChange = this.paymentChange.bind(this);
+  }
+
+  handleLogout() {
+    const { dispatch, history } = this.props;
+    dispatch(logout());
+    history.push(routeCodes.LOGIN);
+  }
+
+  changeView(view) {
+    this.setState({ show: view });
   }
 
   hardFocus(input) {
@@ -148,7 +177,9 @@ class Profile extends Component {
       }
     }
 
-    dispatch(updateUser({userId: userData._id, newData: update, accessToken}));
+    dispatch(
+      updateUser({ userId: userData._id, newData: update, accessToken }),
+    );
   };
 
   onImageDrop(files) {
@@ -257,6 +288,11 @@ class Profile extends Component {
     this.setState({ payment });
   }
 
+  show(view) {
+    const { show } = this.state;
+    return show === view;
+  }
+
   renderField(field) {
     const { initialValues } = this.props;
     const { input } = field;
@@ -334,6 +370,7 @@ class Profile extends Component {
   }
 
   render() {
+    const { show } = this;
     const { asyncLoading, userData, handleSubmit } = this.props;
     const { payment } = this.state;
 
@@ -346,98 +383,211 @@ class Profile extends Component {
     const payBanksDetailsStyle =
       payment.region !== "" ? { display: "block" } : { display: "none" };
 
+    let perAct = show(tabs.per) ? "active" : "";
+    // let orgAct = show(tabs.org) ? "active" : "";
+    let comAct = show(tabs.com) ? "active" : "";
+    let payAct = show(tabs.pay) ? "active" : "";
+    // let notiAct = show(tabs.noti) ? "active" : "";
+    let terAct = show(tabs.ter) ? "active" : "";
+
     return (
-      <div className="step-container" id="profile">
-        <form onSubmit={handleSubmit(this.handleSubmit)}>
-          <div className="step-title">
-            <h3 className="st sc-h3">My profile</h3>
-            <button type="submit" className="mb gradient-btn">
-              Save
-            </button>
+      <div className="page-withPanel-container" id="profile">
+        <div className={`panel menu-panel`}>
+          <div className="panel-title-container">
+            <div>
+              <span className="mb panel-title" style={{ color: "#14B9BE" }}>
+                My profile
+              </span>
+              <span className="sst">{userData.name}</span>
+            </div>
+          </div>
+          <div className="list-group mb">
+            <div
+              className={`${perAct}`}
+              onClick={() => this.changeView(tabs.per)}
+            >
+              <span>Personal info</span>
+              {perAct ? (
+                <KeyboardArrowRight className="rotate90" />
+              ) : (
+                <KeyboardArrowDown className="rotate270" />
+              )}
+            </div>
+
+            <div
+              className={`${comAct}`}
+              onClick={() => this.changeView(tabs.com)}
+            >
+              <span>Company info</span>
+              {comAct ? (
+                <KeyboardArrowRight className="rotate90" />
+              ) : (
+                <KeyboardArrowDown className="rotate270" />
+              )}
+            </div>
+
+            <div
+              className={`${payAct}`}
+              onClick={() => this.changeView(tabs.pay)}
+            >
+              <span>Payments</span>
+              {payAct ? (
+                <KeyboardArrowRight className="rotate90" />
+              ) : (
+                <KeyboardArrowDown className="rotate270" />
+              )}
+            </div>
+
+            {/* <div
+              className={`${notiAct}`}
+              onClick={() => this.changeView(tabs.noti)}
+            >
+              <span>Notifications</span>
+              {notiAct ? (
+                <KeyboardArrowRight className="rotate90" />
+              ) : (
+                <KeyboardArrowDown className="rotate270" />
+              )}
+            </div> */}
           </div>
 
-          <div>
-            <div>
-              <div className="image-drop-container">
-                <div className="image-drop">
-                  <Dropzone
-                    multiple={false}
-                    accept="image/*"
-                    onDrop={this.onImageDrop}
-                    className="dropzone"
-                  >
-                    {!asyncLoading && (
-                      <React.Fragment>
-                        <img
-                          src={userData.cloudinaryImgURL}
-                          onError={e => (e.target.src = defaultImg)}
-                          alt="+"
-                        />
-                        <FontAwesomeIcon icon="pen" />
-                      </React.Fragment>
-                    )}
+          <div className="list-group-footer mb">
+            <div
+              className={`${terAct}`}
+              onClick={() => this.changeView(tabs.ter)}
+            >
+              <span>Terms and conditions</span>
+              {terAct ? (
+                <KeyboardArrowRight className="rotate90" />
+              ) : (
+                <KeyboardArrowDown className="rotate270" />
+              )}
+            </div>
 
-                    {asyncLoading && SVG.AdmixLoading({})}
-                  </Dropzone>
+            <div className="delete-arrow" onClick={() => this.handleLogout()}>
+              <span>Logout</span>
+              <KeyboardArrowDown className="rotate270" />
+            </div>
+          </div>
+        </div>
+
+        <div className="page-content">
+          <form className="form-top-bot-btns" onSubmit={handleSubmit(this.handleSubmit)}>
+            <div className="step-title">
+              <h3 className="st sc-h3">{this.state.show}</h3>
+              {!terAct && (
+                <button type="submit" className="mb gradient-btn">
+                  Save
+                </button>
+              )}
+            </div>
+
+            <div className="step-content">
+              {perAct && (
+                <div style={{ width: "35%" }}>
+                  <div className="image-drop-container">
+                    <div className="image-drop">
+                      <Dropzone
+                        multiple={false}
+                        accept="image/*"
+                        onDrop={this.onImageDrop}
+                        className="dropzone"
+                      >
+                        {!asyncLoading && (
+                          <React.Fragment>
+                            <img
+                              src={userData.cloudinaryImgURL}
+                              onError={e => (e.target.src = defaultImg)}
+                              alt="+"
+                            />
+                            <FontAwesomeIcon icon="pen" />
+                          </React.Fragment>
+                        )}
+
+                        {asyncLoading && SVG.AdmixLoading({})}
+                      </Dropzone>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div style={{ width: perAct ? "60%" : "100%" }}>
+                <div className="mb">
+                  {/* PERSONAL INFORMATION */}
+                  {perAct && (
+                    <ExpansionPanel
+                      headerIcon={
+                        <ReactSVG
+                          src={SVG_personalInfo}
+                          className="sectionIcon"
+                        />
+                      }
+                      headerTitle={"Personal information"}
+                    >
+                      <PersonalInfo
+                        renderField={this.renderField}
+                        handleUserUpdate={this.handleUserUpdate}
+                        {...this.state}
+                        {...this.props}
+                      />
+                    </ExpansionPanel>
+                  )}
+
+                  {/* COMPANY INFORMATION */}
+                  {comAct && (
+                    <ExpansionPanel
+                      headerIcon={
+                        <FontAwesomeIcon
+                          icon="building"
+                          className="sectionIcon"
+                        />
+                      }
+                      headerTitle={"Company information"}
+                    >
+                      <CompanyInfo
+                        renderField={this.renderField}
+                        handleUserUpdate={this.handleUserUpdate}
+                        {...this.state}
+                        {...this.props}
+                      />
+                    </ExpansionPanel>
+                  )}
+
+                  {/* PAYMENT OPTIONS */}
+                  {payAct && (
+                    <ExpansionPanel
+                      headerIcon={
+                        <ReactSVG src={SVG_payment} className="sectionIcon" />
+                      }
+                      headerTitle={"Payment configuration"}
+                      contentId={"expansionPanelDetails-container-payment"}
+                    >
+                      <PaymentConfig
+                        renderField={this.renderField}
+                        paymentChange={this.paymentChange}
+                        paypalEmailStyle={paypalEmailStyle}
+                        payBanksStyle={payBanksStyle}
+                        payBanksDetailsStyle={payBanksDetailsStyle}
+                        {...this.state}
+                        {...this.props}
+                      />
+                    </ExpansionPanel>
+                  )}
+
+                  {/* TERMS AND CONDITIONS */}
+                  {terAct && <iframe src={pdf} frameborder="0" title="pdf" />}
                 </div>
               </div>
             </div>
-            <div>
-              <div className="mb">
-                {/* PERSONAL INFORMATION */}
-                <ExpansionPanel
-                  headerIcon={
-                    <ReactSVG src={SVG_personalInfo} className="sectionIcon" />
-                  }
-                  headerTitle={"Personal information"}
-                >
-                  <PersonalInfo
-                    renderField={this.renderField}
-                    handleUserUpdate={this.handleUserUpdate}
-                    {...this.state}
-                    {...this.props}
-                  />
-                </ExpansionPanel>
 
-                {/* PAYMENT OPTIONS */}
-                <ExpansionPanel
-                  headerIcon={
-                    <ReactSVG src={SVG_payment} className="sectionIcon" />
-                  }
-                  headerTitle={"Payment configuration"}
-                  contentId={"expansionPanelDetails-container-payment"}
-                >
-                  <PaymentConfig
-                    renderField={this.renderField}
-                    paymentChange={this.paymentChange}
-                    paypalEmailStyle={paypalEmailStyle}
-                    payBanksStyle={payBanksStyle}
-                    payBanksDetailsStyle={payBanksDetailsStyle}
-                    {...this.state}
-                    {...this.props}
-                  />
-                </ExpansionPanel>
-
-                {/* COMPANY INFORMATION */}
-                <ExpansionPanel
-                  headerIcon={
-                    <FontAwesomeIcon icon="building" className="sectionIcon" />
-                  }
-                  headerTitle={"Company Information"}
-                >
-                  <CompanyInfo
-                    renderField={this.renderField}
-                    handleUserUpdate={this.handleUserUpdate}
-                    {...this.state}
-                    {...this.props}
-                  />
-                </ExpansionPanel>
-
-                <br />
-              </div>
+            <div className="bottom-download">
+              {!terAct && (
+                <button type="submit" className="mb gradient-btn">
+                  Save
+                </button>
+              )}
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     );
   }

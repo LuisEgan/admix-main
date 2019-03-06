@@ -9,6 +9,7 @@ import PropTypes from "prop-types";
 import validate from "validate.js";
 import FormTextInput from "../../components/formInputs/FormTextInput";
 import isEqual from "lodash/isEqual";
+import MainNavButtons from "../../components/MainNavButtons";
 
 import Breadcrumbs from "../../components/Breadcrumbs";
 import PanelFooter from "../../components/PanelFooter";
@@ -20,7 +21,6 @@ import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 
-import C from "../../utils/constants";
 import { onlyNums } from "../../utils/normalizers";
 
 import SVG_delete from "../../assets/svg/delete.svg";
@@ -31,11 +31,19 @@ import {
   KeyboardArrowRight,
   Timeline,
 } from "@material-ui/icons";
+import GuideBox from "../../components/GuideBox";
 // import SVG from "../../components/SVG";
 
 const { ga } = _a;
 
 const { updateApp } = actions;
+
+const tabs = {
+  url: "App store URL",
+  aud: "Audience breakdown",
+  cal: "Revenue calculator",
+  del: "Delete app",
+};
 class Info extends Component {
   static propTypes = {
     dispatch: PropTypes.func,
@@ -45,7 +53,7 @@ class Info extends Component {
     super(props);
 
     this.state = {
-      show: "url",
+      show: tabs.url,
       deleteClicked: false,
     };
 
@@ -325,10 +333,10 @@ class Info extends Component {
       },
     ];
 
-    let urlAct = show("url") ? "active" : "";
-    let audAct = show("aud") ? "active" : "";
-    let delAct = show("del") ? "active" : "";
-    let calAct = show("cal") ? "active" : "";
+    let urlAct = show(tabs.url) ? "active" : "";
+    let audAct = show(tabs.aud) ? "active" : "";
+    let delAct = show(tabs.del) ? "active" : "";
+    let calAct = show(tabs.cal) ? "active" : "";
 
     if (deleteClicked) {
       urlAct = audAct = delAct = calAct = "inactive";
@@ -336,7 +344,7 @@ class Info extends Component {
 
     return (
       <div className="mb page-withPanel-container" id="info">
-        <div className={`panel menu-panel`}>
+        <div className={`panel menu-panel slidePanelInLeft`}>
           <div className="panel-title-container">
             <div>
               <span className="mb panel-title" style={{ color: "#14B9BE" }}>
@@ -344,14 +352,15 @@ class Info extends Component {
               </span>
               <span className="sst">{selectedApp.name}</span>
             </div>
+            <MainNavButtons appId={selectedApp._id} />
           </div>
           <div className="list-group">
             <div
               className={`${urlAct}`}
-              onClick={deleteClicked ? null : this.changeView.bind(null, "url")}
+              onClick={deleteClicked ? null : this.changeView.bind(null, tabs.url)}
             >
               <span>App store URL</span>
-              {show("url") ? (
+              {show(tabs.url) ? (
                 <KeyboardArrowRight className="rotate90" />
               ) : (
                 <KeyboardArrowDown className="rotate270" />
@@ -359,10 +368,10 @@ class Info extends Component {
             </div>
             <div
               className={`${audAct}`}
-              onClick={deleteClicked ? null : this.changeView.bind(null, "aud")}
+              onClick={deleteClicked ? null : this.changeView.bind(null, tabs.aud)}
             >
               <span>Audience breakdown</span>
-              {show("aud") ? (
+              {show(tabs.aud) ? (
                 <KeyboardArrowRight className="rotate90" />
               ) : (
                 <KeyboardArrowDown className="rotate270" />
@@ -370,10 +379,10 @@ class Info extends Component {
             </div>
             <div
               className={`${calAct}`}
-              onClick={deleteClicked ? null : this.changeView.bind(null, "cal")}
+              onClick={deleteClicked ? null : this.changeView.bind(null, tabs.cal)}
             >
               <span>Revenue calculator</span>
-              {show("cal") ? (
+              {show(tabs.cal) ? (
                 <KeyboardArrowRight className="rotate90" />
               ) : (
                 <KeyboardArrowDown className="rotate270" />
@@ -381,10 +390,10 @@ class Info extends Component {
             </div>
             <div
               className={`${delAct} delete-arrow`}
-              onClick={deleteClicked ? null : this.changeView.bind(null, "del")}
+              onClick={deleteClicked ? null : this.changeView.bind(null, tabs.del)}
             >
               <span>Delete app</span>
-              {show("del") ? (
+              {show(tabs.del) ? (
                 <KeyboardArrowRight className="rotate90" />
               ) : (
                 <KeyboardArrowDown className="rotate270" />
@@ -399,16 +408,16 @@ class Info extends Component {
         </div>
 
         <div className="page-content">
-          <form onSubmit={handleSubmit(this.handleUpdateInfo)}>
+          <form
+            className="form-top-bot-btns"
+            onSubmit={handleSubmit(this.handleUpdateInfo)}
+          >
             <Breadcrumbs breadcrumbs={this.breadcrumbs} />
             <div id="info-header">
-              <div className="engine-logo">
-                {C.LOGOS[selectedApp.appEngine]}
-              </div>
               <div>
-                <h3 className="st">{selectedApp.name}</h3>
+                <h3 className="st">{this.state.show}</h3>
               </div>
-              {!show("del") && (
+              {!show(tabs.del) && (
                 <div>
                   <button type="submit" className="gradient-btn">
                     {" "}
@@ -418,92 +427,112 @@ class Info extends Component {
               )}
             </div>
 
-            {show("url") && (
-              <div id="info-url">
-                <FormTextInput
-                  name="storeurl"
-                  label="App store URL"
-                  icon={
-                    <ReactSVG
-                      src={SVG_delete}
-                      className="input-delete"
-                      onClick={this.deleteValue.bind(null, "storeurl")}
-                    />
-                  }
-                />
-              </div>
+            {show(tabs.url) && (
+              <React.Fragment>
+                <GuideBox text="To go Live and start generating revenue, your app needs to be published in a Store. Add the store URL in the field below." />
+                <div id="info-url">
+                  <FormTextInput
+                    name="storeurl"
+                    label="App store URL"
+                    icon={
+                      <ReactSVG
+                        src={SVG_delete}
+                        className="input-delete"
+                        onClick={this.deleteValue.bind(null, "storeurl")}
+                      />
+                    }
+                    placeholder="Eg: https://play.google.com/store/apps/details?id=com.your.app.here"
+                  />
+                </div>
+              </React.Fragment>
             )}
 
-            {show("aud") && (
-              <div id="info-aud">
-                {this.renderExpansionPanel({
-                  panelIcon: this.expMetrics.panelIcon,
-                  panelTitle: this.expMetrics.panelTitle,
-                  fields: this.expMetrics.fields,
-                })}
+            {show(tabs.aud) && (
+              <React.Fragment>
+                <GuideBox text="Please fill as much information on your app as possible to help us maximise your revenue. This data helps us forecast the amount of inventory your app will generate and prioritise it with our advertisers." />
+                <div id="info-aud">
+                  {this.renderExpansionPanel({
+                    panelIcon: this.expMetrics.panelIcon,
+                    panelTitle: this.expMetrics.panelTitle,
+                    fields: this.expMetrics.fields,
+                  })}
 
-                {this.renderExpansionPanel({
-                  panelIcon: this.expGeos.panelIcon,
-                  panelTitle: this.expGeos.panelTitle,
-                  fields: this.expGeos.fields,
-                })}
+                  {this.renderExpansionPanel({
+                    panelIcon: this.expGeos.panelIcon,
+                    panelTitle: this.expGeos.panelTitle,
+                    fields: this.expGeos.fields,
+                  })}
 
-                {this.renderExpansionPanel({
-                  panelIcon: this.expDemos.panelIcon,
-                  panelTitle: this.expDemos.panelTitle,
-                  fields: this.expDemos.fields,
-                })}
-              </div>
+                  {this.renderExpansionPanel({
+                    panelIcon: this.expDemos.panelIcon,
+                    panelTitle: this.expDemos.panelTitle,
+                    fields: this.expDemos.fields,
+                  })}
+                </div>
+              </React.Fragment>
             )}
-          </form>
 
-          {show("cal") && (
-            <div>
-              <AdmixCalculator initialValues={calculatorInitialValues} />
-            </div>
-          )}
-
-          {show("del") && (
-            <div id="info-del">
-              {!deleteClicked && (
-                <React.Fragment>
-                  <span className="sst" style={{ color: "red" }}>
-                    Warning!
-                  </span>{" "}
-                  <br />
-                  <br />
-                  This will inactivate your app and you will not be able to
-                  activate it and it will dissappear from your "My apps" menu.{" "}
-                  <br />
-                  <span className="mbs">
-                    Note: you can re-activate it by contacting{" "}
-                    <a href="mailto:support@admix.in">support@admix.in</a>
-                  </span>{" "}
-                  <br />
-                  <br />
-                  <button
-                    className="gradient-btn"
-                    type="button"
-                    onClick={this.handleDelete}
-                  >
-                    Confirm
-                  </button>
-                </React.Fragment>
-              )}
-
-              {deleteClicked && (
+            {show(tabs.cal) && (
+              <React.Fragment>
+                <GuideBox text="Complete the fields below to project how much revenue your app can make. Figures are for indication only and can vary based on our fill rate and the location of your users." />
                 <div>
-                  <NavLink
-                    style={{ margin: "auto", width: "20vw" }}
-                    className="gradient-btn cc"
-                    to="/myapps"
-                  >
-                    Go back to My Apps
-                  </NavLink>
+                  <AdmixCalculator initialValues={calculatorInitialValues} />
+                </div>
+              </React.Fragment>
+            )}
+
+            {show(tabs.del) && (
+              <div id="info-del">
+                {!deleteClicked && (
+                  <React.Fragment>
+                    <span className="sst" style={{ color: "red" }}>
+                      Warning!
+                    </span>{" "}
+                    <br />
+                    <br />
+                    This will deactivate your app and it will disappear from the
+                    "My apps" menu. Are you sure you want to continue? <br />
+                    <span className="mbs">
+                      Note: you can re-activate it by contacting{" "}
+                      <a href="mailto:support@admix.in">support@admix.in</a>
+                    </span>{" "}
+                    <br />
+                    <br />
+                    <button
+                      className="gradient-btn"
+                      type="button"
+                      onClick={this.handleDelete}
+                    >
+                      Confirm deletion
+                    </button>
+                  </React.Fragment>
+                )}
+
+                {deleteClicked && (
+                  <div>
+                    <NavLink
+                      style={{ margin: "auto", width: "20vw" }}
+                      className="gradient-btn cc"
+                      to="/myapps"
+                    >
+                      Go back to My Apps
+                    </NavLink>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="bottom-download">
+              {!show(tabs.del) && (
+                <div>
+                  <button type="submit" className="gradient-btn">
+                    {" "}
+                    Save
+                  </button>
                 </div>
               )}
             </div>
-          )}
+          </form>
         </div>
       </div>
     );

@@ -1,3 +1,26 @@
+--- 2.4.0
+Fix report not showing data at first sometimes
+Add tooltips to navigation buttons
+Report panel now shows the name of the selected app. In case of "All apps report"
+it shows "My apps" with no navigation buttons.
+Add navigation buttons to all panels
+Simplify AdmixCalculator component
+Redo /profile
+    - Follow same structure as Edit page with left panel
+    - Organise existing sections into tabs
+    - Link to T&Cs / logout button
+Add profile link with picture to side menu
+Delete header Menu
+Change /info calculator formula
+    - CPM fixed to 10
+    - Add .25 multiplicator
+    - Remove .00 to digits
+Add guide texts to /info
+Add store url to review popup
+Add tutorial video in download section
+Hide filter and global report if there are no apps
+Separate in routes login and register forms in: /login and /register
+
 --- 2.3.0
 /emailSuccess now has a success message and a link to /login
 

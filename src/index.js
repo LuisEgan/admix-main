@@ -30,6 +30,7 @@ import {
   faArrowDown,
   faArrowUp,
   faBuilding,
+  faInfoCircle
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(
@@ -46,6 +47,7 @@ library.add(
   faArrowDown,
   faArrowUp,
   faBuilding,
+  faInfoCircle
 );
 
 const { persistor, store } = configureStore();

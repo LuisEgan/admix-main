@@ -2,9 +2,12 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import routeCodes from "../../config/routeCodes";
 import ReactSVG from "react-svg";
+import IconButton from "@material-ui/core/IconButton";
 
 import SVG from "../../components/SVG";
 import SVG_docs from "../../assets/svg/documentation.svg";
+import logo from "../../assets/img/logo-vertical.png";
+import defaultImg from "../../assets/img/default_pic.jpg";
 
 function openInNewTab(url) {
   const sideMenu = document.getElementById("sideMenu");
@@ -22,11 +25,11 @@ const sections = [
     title: "My apps",
     pathname: routeCodes.MYAPPS,
   },
-  {
-    icon: SVG.navMyProfile,
-    title: "My profile",
-    pathname: routeCodes.PROFILE,
-  },
+  // {
+  //   icon: SVG.navMyProfile,
+  //   title: "My profile",
+  //   pathname: routeCodes.PROFILE,
+  // },
   {
     icon: <ReactSVG src={SVG_docs} />,
     title: "Documentation",
@@ -59,23 +62,42 @@ class SideMenu extends Component {
   renderSections() {
     const {
       location: { pathname },
+      userData,
     } = this.props;
+
+    sections[3] = {
+      icon: (
+        <IconButton aria-haspopup="true" color="inherit">
+          <img
+            onError={e => (e.target.src = defaultImg)}
+            src={userData.cloudinaryImgURL}
+            alt="Profile"
+          />
+        </IconButton>
+      ),
+      title: "My profile",
+      pathname: routeCodes.PROFILE,
+    };
 
     let isSelected;
 
-    return sections.map(section => {
-      isSelected = section.pathname === pathname ? "selectedSection" : "";
-      return (
-        <div
-          className={isSelected}
-          key={section.title}
-          onClick={this.redirectTo.bind(null, section.pathname)}
-        >
-          <div>{section.icon}</div>
-          <div>{section.title}</div>
-        </div>
-      );
-    });
+    return (
+      <div id="sideMenu-body">
+        {sections.map(section => {
+          isSelected = section.pathname === pathname ? "selectedSection" : "";
+          return (
+            <div
+              className={isSelected}
+              key={section.title}
+              onClick={this.redirectTo.bind(null, section.pathname)}
+            >
+              <div>{section.icon}</div>
+              <div>{section.title}</div>
+            </div>
+          );
+        })}
+      </div>
+    );
   }
 
   render() {
@@ -83,16 +105,24 @@ class SideMenu extends Component {
 
     if (!isLoggedIn) return null;
 
-    return <div id="sideMenu">{this.renderSections()}</div>;
+    return (
+      <div id="sideMenu">
+        <div id="sideMenu-header">
+          <img src={logo} alt="logo" />
+        </div>
+        {this.renderSections()}
+      </div>
+    );
   }
 }
 
 const mapStateToProps = state => {
   const {
-    app: { isLoggedIn },
+    app: { isLoggedIn, userData },
   } = state;
   return {
     isLoggedIn,
+    userData,
   };
 };
 
