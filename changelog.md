@@ -1,3 +1,6 @@
+--- 2.4.2
+Update Unity plugin to v1.7.1
+
 --- 2.4.1
 Update Unity plugin to v1.6.3
 AppActivation route now updated the app per url param
