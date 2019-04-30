@@ -12,9 +12,11 @@ class AppActivation extends React.Component {
     const { location } = props;
 
     const appId = qs.parse(location.search)["?id"];
+    const newAppState = qs.parse(location.search)["state"];
 
     this.state = {
       appId,
+      newAppState,
       loading: true,
       appDetails: null,
       redirect: false,
@@ -27,8 +29,10 @@ class AppActivation extends React.Component {
 
   activateApp = async () => {
     const { accessToken, adminToken } = this.props;
-    const { appId } = this.state;
+    const { appId, newAppState } = this.state;
     let newState = { loading: false };
+
+    const reviewed = newAppState === C.APP_STATES.live;
 
     if (!accessToken) {
       newState.message = "Please login first!";
@@ -38,15 +42,15 @@ class AppActivation extends React.Component {
       const data = {
         appId,
         newData: {
-          appState: C.APP_STATES.live,
+          appState: newAppState,
           isActive: true,
-          reviewed: true,
+          reviewed,
         },
       };
       const res = await api.updateApp(accessToken, data);
 
       if (res.status) {
-        newState.message = "App activated!";
+        newState.message = reviewed ? "App activated!" : "App updated!";
         newState.appDetails = res.data;
       } else {
         newState.message = `Error: ${res.statusMessage}`;
