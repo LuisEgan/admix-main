@@ -43,7 +43,7 @@ class AppActivation extends React.Component {
         appId,
         newData: {
           // appState: newAppState,
-          appState: true,
+          appState: "live",
           isActive: true,
           // reviewed,
           reviewed: true,
