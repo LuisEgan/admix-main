@@ -42,9 +42,11 @@ class AppActivation extends React.Component {
       const data = {
         appId,
         newData: {
-          appState: newAppState,
+          // appState: newAppState,
+          appState: true,
           isActive: true,
-          reviewed,
+          // reviewed,
+          reviewed: true,
         },
       };
       const res = await api.updateApp(accessToken, data);
