@@ -103,8 +103,6 @@ class Download extends Component {
               <span>4MB</span>
               <span className="subtitle">REQUIREMENTS</span>
               <p>Unity 2017.4.28f1 LTS and above</p>
-              <p>Unity 2018.4.1f1 LTS and above</p>
-              <p>Unity 2019.1.5f1 LTS and above</p>
             </div>
             <div>
               <span>Available soon</span>
