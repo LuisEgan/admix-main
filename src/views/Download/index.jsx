@@ -50,7 +50,7 @@ class Download extends Component {
               <div>
                 <a
                   className="btn-dark mb"
-                  href="https://admix.in/wp-content/uploads/2019/04/Admix.Unity_Rev.1.7.3_RC3.unitypackage"
+                  href="http://admix.in/wp-content/uploads/2019/06/Admix.Unity_Rev.1.7.3.unitypackage"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={this.handleDownload.bind(null, "unity")}
@@ -98,7 +98,7 @@ class Download extends Component {
           <div className="mb download-bottom-section">
             <div>
               <span className="subtitle">VERSION</span>
-              <span>Admix.Unity_Rev.1.7.3_RC3.unitypackage</span>
+              <span>Admix.Unity_Rev.1.7.3.unitypackage</span>
               <span className="subtitle">SIZE</span>
               <span>4MB</span>
               <span className="subtitle">REQUIREMENTS</span>
