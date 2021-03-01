@@ -57,7 +57,7 @@
         "redux-persist-transform-immutable": "^5.0.0",
         "redux-thunk": "^2.2.0",
         "superagent": "^3.8.3",
-        "three": "^0.92.0",
+        "three": "^0.125.0",
         "three-trackballcontrols": "0.0.7",
         "validate.js": "^0.12.0"
     },
